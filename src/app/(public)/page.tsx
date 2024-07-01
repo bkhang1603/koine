@@ -1,6 +1,7 @@
 import Feature from '@/components/home/feature'
 import Hero from '@/components/home/hero'
 import Recommend from '@/components/home/recommend'
+import Service from '@/components/home/service'
 
 function Home() {
   return (
@@ -8,6 +9,7 @@ function Home() {
       <Hero />
       <Feature />
       <Recommend />
+      <Service />
     </>
   )
 }

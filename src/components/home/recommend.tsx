@@ -1,10 +1,11 @@
+import icons from '@/assets/icons'
 import images from '@/assets/images'
-import { ArrowUpRight } from 'lucide-react'
+import { ArrowRight, ArrowUpRight } from 'lucide-react'
 import Image from 'next/image'
 
 function Recommend() {
   return (
-    <section className='container flex items-center justify-center flex-col py-28'>
+    <section className='container flex items-center justify-center flex-col py-28 relative'>
       <h3 className='font-medium text-lg'>Các khóa học của chúng tôi</h3>
       <h2
         className='bg-gradient-to-r from-[#FF0059] via-[#FF597D] to-[#2945DE]
@@ -12,8 +13,19 @@ function Recommend() {
       >
         Khóa học đề xuất
       </h2>
+      <Image
+        src={icons.pinkStars}
+        alt='pink-stars'
+        width={200}
+        height={200}
+        className='absolute top-20 left-14 mt-32'
+      />
 
-      <div className='grid grid-cols-3 mt-28 gap-4'>
+      <div className='mt-20 p-4 w-full flex items-center justify-end gap-2 cursor-pointer text-gray-500 hover:text-secondary'>
+        <span className='font-semibold text-lg'>Xem thêm</span>
+        <ArrowRight />
+      </div>
+      <div className='grid grid-cols-3 gap-4'>
         <div
           className='h-[530px] rounded-xl shadow-md w-full overflow-hidden group
         transition-shadow duration-500 hover:shadow-xl cursor-pointer ease-in-out'
