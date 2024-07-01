@@ -5,6 +5,8 @@ import blueStar from './blue-star.png'
 import pinkStars from './pink-stars.png'
 import user from './user.png'
 import clock from './clock.png'
+import calendar from './calendar.png'
+import dollar from './dollar.png'
 
 const icons = {
   logo,
@@ -13,7 +15,9 @@ const icons = {
   blueStar,
   pinkStars,
   user,
-  clock
+  clock,
+  calendar,
+  dollar
 }
 
 export default icons

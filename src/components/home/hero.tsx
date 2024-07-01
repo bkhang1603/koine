@@ -24,10 +24,10 @@ function Hero() {
             className='max-w-[420px]'
           />
 
-          <h2 className='mt-6 max-w-[420px] text-lg text-center break-words'>
+          <h1 className='mt-6 max-w-[420px] text-lg text-center break-words'>
             “Vun đắp tâm hồn, thấu hiểu cơ thể.
             <br /> Một nền tảng cho một cuộc sống hạnh phúc.”
-          </h2>
+          </h1>
 
           <Button className='mt-12 h-14 w-[420px] bg-secondary hover:bg-secondary/90 text-lg rounded-2xl'>
             Trải nghiệm cùng Koine

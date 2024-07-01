@@ -51,7 +51,7 @@ function Recommend() {
 
         <div className='h-[530px] rounded-xl shadow-md w-full overflow-hidden group transition-shadow duration-300 hover:shadow-xl cursor-pointer'>
           <Image
-            src={images.children}
+            src={images.children1}
             alt='children'
             width={500}
             height={500}
@@ -71,7 +71,7 @@ function Recommend() {
 
         <div className='h-[530px] rounded-xl shadow-md w-full overflow-hidden group transition-shadow duration-300 hover:shadow-xl cursor-pointer'>
           <Image
-            src={images.children}
+            src={images.children2}
             alt='children'
             width={500}
             height={500}

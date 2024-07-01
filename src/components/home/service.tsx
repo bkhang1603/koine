@@ -16,7 +16,7 @@ function Service() {
         </h2>
 
         <div className='grid grid-cols-4 gap-4 mt-16'>
-          <Card>
+          <Card className='transition-shadow duration-300 hover:shadow-xl cursor-pointer'>
             <CardHeader>
               <Image src={icons.user} alt='user' width={70} height={70} />
             </CardHeader>
@@ -28,12 +28,36 @@ function Service() {
             </CardContent>
           </Card>
 
-          <Card>
+          <Card className='transition-shadow duration-300 hover:shadow-xl cursor-pointer'>
             <CardHeader>
               <Image src={icons.clock} alt='clock' width={70} height={70} />
             </CardHeader>
             <CardContent>
               <CardTitle>Sẵn sàng 24/7</CardTitle>
+              <CardDescription className='mt-2'>
+                Tất cả chương trình giáo dục đặc biệt của chúng tôi các chuyên gia có bằng cấp về giáo dục đặc biệt
+              </CardDescription>
+            </CardContent>
+          </Card>
+
+          <Card className='transition-shadow duration-300 hover:shadow-xl cursor-pointer'>
+            <CardHeader>
+              <Image src={icons.calendar} alt='calendar' width={70} height={70} />
+            </CardHeader>
+            <CardContent>
+              <CardTitle>nhận tư vấn mọi lúc</CardTitle>
+              <CardDescription className='mt-2'>
+                Tất cả chương trình giáo dục đặc biệt của chúng tôi các chuyên gia có bằng cấp về giáo dục đặc biệt
+              </CardDescription>
+            </CardContent>
+          </Card>
+
+          <Card className='transition-shadow duration-300 hover:shadow-xl cursor-pointer'>
+            <CardHeader>
+              <Image src={icons.dollar} alt='dollar' width={70} height={70} />
+            </CardHeader>
+            <CardContent>
+              <CardTitle>Giá cả phải chăng</CardTitle>
               <CardDescription className='mt-2'>
                 Tất cả chương trình giáo dục đặc biệt của chúng tôi các chuyên gia có bằng cấp về giáo dục đặc biệt
               </CardDescription>
