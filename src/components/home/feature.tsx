@@ -17,7 +17,7 @@ function Feature() {
           chân suy nghĩ, ta sẽ thấy chúng ta đuổi theo hạnh phúc nhưng không hề biết đến bản chất thật sự của nó, và
           không biết phải dùng phương tiện nào để đạt được nó.
         </p>
-        <Image src={icons.pinkStar} alt='Pink star' width={50} height={50} className='absolute top-20 left-0 ml-32' />
+        <Image src={icons.pinkStar} alt='pink star' width={50} height={50} className='absolute top-20 left-0 ml-32' />
         <Image
           src={icons.blueStar}
           alt='Blue star'

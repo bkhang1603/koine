@@ -11,18 +11,10 @@ function Hero() {
           alt='Hero background'
           width={1920}
           height={1080}
-          layout='responsive'
           className='absolute top-0 left-0 object-contain -z-10'
         />
         <div className='w-full mt-10 flex items-center flex-col'>
-          <Image
-            src={images.cloud}
-            alt='Cloud'
-            width={500}
-            height={500}
-            layout='responsive'
-            className='max-w-[420px]'
-          />
+          <Image src={images.cloud} alt='Cloud' width={500} height={500} className='max-w-[420px]' />
 
           <h1 className='mt-6 max-w-[420px] text-lg text-center break-words'>
             “Vun đắp tâm hồn, thấu hiểu cơ thể.
@@ -39,7 +31,7 @@ function Hero() {
         </div>
       </div>
       <div className='w-[calc(50vw-4px)]'>
-        <Image src={images.heroImage} alt='Hero image' width={1920} height={1080} layout='responsive' />
+        <Image src={images.heroImage} alt='Hero image' width={1920} height={1080} />
       </div>
     </section>
   )
