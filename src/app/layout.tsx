@@ -12,7 +12,23 @@ const fontSans = FontSans({
 
 export const metadata: Metadata = {
   title: 'Trang chủ - Koine',
-  description: 'Koine là nền tảng học trực tuyến với các khóa học chất lượng cao từ các chuyên gia hàng đầu.'
+  description: 'Koine là nền tảng học trực tuyến với các khóa học chất lượng cao từ các chuyên gia hàng đầu.',
+  openGraph: {
+    locale: 'vi_VN',
+    type: 'website',
+    siteName: 'Koine Company',
+    title: 'Trang chủ - Koine',
+    description: 'Koine là nền tảng học trực tuyến với các khóa học chất lượng cao từ các chuyên gia hàng đầu.',
+    url: 'https://koine-xi.vercel.app/',
+    images: [
+      {
+        url: '/images/welcome.png'
+      }
+    ]
+  },
+  alternates: {
+    canonical: 'https://koine-xi.vercel.app/'
+  }
 }
 
 export default function RootLayout({

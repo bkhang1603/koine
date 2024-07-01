@@ -27,6 +27,18 @@ function Service() {
               </CardDescription>
             </CardContent>
           </Card>
+
+          <Card>
+            <CardHeader>
+              <Image src={icons.clock} alt='clock' width={70} height={70} />
+            </CardHeader>
+            <CardContent>
+              <CardTitle>Sẵn sàng 24/7</CardTitle>
+              <CardDescription className='mt-2'>
+                Tất cả chương trình giáo dục đặc biệt của chúng tôi các chuyên gia có bằng cấp về giáo dục đặc biệt
+              </CardDescription>
+            </CardContent>
+          </Card>
         </div>
       </div>
     </section>
