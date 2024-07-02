@@ -19,22 +19,34 @@ function Footer() {
 
               <ul className='space-y-3 mt-4'>
                 <li>
-                  <Link href={configRoute.home}>Trang chủ</Link>
+                  <Link className='hover:text-black/70' href={configRoute.home}>
+                    Trang chủ
+                  </Link>
                 </li>
                 <li>
-                  <Link href={configRoute.course}>Khóa học</Link>
+                  <Link className='hover:text-black/70' href={configRoute.course}>
+                    Khóa học
+                  </Link>
                 </li>
                 <li>
-                  <Link href={configRoute.knowledge}>Kiến thức</Link>
+                  <Link className='hover:text-black/70' href={configRoute.knowledge}>
+                    Kiến thức
+                  </Link>
                 </li>
                 <li>
-                  <Link href={configRoute.about}>Tổng quan</Link>
+                  <Link className='hover:text-black/70' href={configRoute.about}>
+                    Tổng quan
+                  </Link>
                 </li>
                 <li>
-                  <Link href={configRoute.service}>Dịch vụ</Link>
+                  <Link className='hover:text-black/70' href={configRoute.service}>
+                    Dịch vụ
+                  </Link>
                 </li>
                 <li>
-                  <Link href={configRoute.contact}>Liên hệ</Link>
+                  <Link className='hover:text-black/70' href={configRoute.contact}>
+                    Liên hệ
+                  </Link>
                 </li>
               </ul>
             </div>
@@ -43,9 +55,15 @@ function Footer() {
               <h3 className='font-semibold text-xl'>Trợ giúp</h3>
 
               <ul className='space-y-3 mt-4 cursor-pointer'>
-                <li>Hỏi & đáp</li>
-                <li>Tin tức</li>
-                <li>Báo tường</li>
+                <li>
+                  <span className='hover:text-black/70'>Hỏi & đáp</span>
+                </li>
+                <li>
+                  <span className='hover:text-black/70'>Tin tức</span>
+                </li>
+                <li>
+                  <span className='hover:text-black/70'>Báo tường</span>
+                </li>
               </ul>
             </div>
 
@@ -54,21 +72,21 @@ function Footer() {
 
               <ul className='space-y-3 mt-4'>
                 <li>
-                  <Link href={'https://www.facebook.com/'} className='flex items-center gap-2'>
+                  <Link href={'https://www.facebook.com/'} className='flex items-center gap-3 hover:text-black/70'>
                     <Image src={icons.facebook} alt='facebook' width={100} height={100} className='w-5 h-5' />
-                    Facebook
+                    <span>Facebook</span>
                   </Link>
                 </li>
                 <li>
-                  <Link href={'https://www.facebook.com/'} className='flex items-center gap-2'>
+                  <Link href={'https://www.facebook.com/'} className='flex items-center gap-3 hover:text-black/70'>
                     <Image src={icons.instagram} alt='instagram' width={100} height={100} className='w-5 h-5' />
-                    Instagram
+                    <span>Instagram</span>
                   </Link>
                 </li>
                 <li>
-                  <Link href={'https://www.facebook.com/'} className='flex items-center gap-2'>
+                  <Link href={'https://www.facebook.com/'} className='flex items-center gap-3 hover:text-black/70'>
                     <Image src={icons.x} alt='instagram' width={100} height={100} className='w-5 h-5' />
-                    Twitter
+                    <span>Twitter</span>
                   </Link>
                 </li>
               </ul>
@@ -78,9 +96,19 @@ function Footer() {
               <h3 className='font-semibold text-xl'>Liên hệ</h3>
 
               <ul className='space-y-3 mt-4'>
-                <li>Địa chỉ: 123 ABC</li>
-                <li>Điện thoại: 123456789</li>
-                <li>Email: koine@gmail.com</li>
+                <li>
+                  Địa chỉ: <span className='text-primary'>66 Nguyen Ngoc Phuong, p19, Binh Thanh</span>
+                </li>
+                <li>
+                  <Link href={'https://zalo.me/0934600600'}>
+                    Điện thoại: <span className='text-primary'>+84 934 600 600</span>
+                  </Link>
+                </li>
+                <li>
+                  <Link href={'https://mail.google.com'}>
+                    Email: <span className='text-primary'>koine@gmail.com</span>
+                  </Link>
+                </li>
               </ul>
 
               <div className='flex w-full items-center mt-10 gap-2'>

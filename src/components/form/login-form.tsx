@@ -22,7 +22,7 @@ export default function LoginForm({ className }: { className?: string }) {
   const form = useForm<LoginBodyType>({
     resolver: zodResolver(LoginBody),
     defaultValues: {
-      email: '',
+      username: '',
       password: ''
     }
   })
@@ -53,17 +53,17 @@ export default function LoginForm({ className }: { className?: string }) {
     <Form {...form}>
       <form
         onSubmit={form.handleSubmit(onSubmit)}
-        className={`${className} space-y-2 max-w-[600px] flex-shrink-0 w-full`}
+        className={`${className} space-y-4 max-w-[600px] flex-shrink-0 w-full`}
         noValidate
       >
         <FormField
           control={form.control}
-          name='email'
+          name='username'
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Email</FormLabel>
+              <FormLabel>Tên đăng nhập</FormLabel>
               <FormControl>
-                <Input className='h-10' placeholder='Email' type='email' {...field} />
+                <Input className='h-10' placeholder='Tên đăng nhập' type='text' {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -76,7 +76,7 @@ export default function LoginForm({ className }: { className?: string }) {
             <FormItem>
               <FormLabel>Mật khẩu</FormLabel>
               <FormControl>
-                <Input className='h-10' placeholder='Password' type='password' {...field} />
+                <Input className='h-10' placeholder='Mật khẩu' type='password' {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>

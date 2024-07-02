@@ -1,18 +1,18 @@
 import icons from '@/assets/icons'
 import images from '@/assets/images'
-import LoginForm from '@/components/form/login-form'
 import { Button } from '@/components/ui/button'
 import configRoute from '@/config/route'
 import Image from 'next/image'
 import Link from 'next/link'
 import type { Metadata } from 'next'
+import RegisterForm from '@/components/form/register-form'
 
 export const metadata: Metadata = {
-  title: 'Đăng nhập',
-  description: 'Đăng nhập vào tài khoản của bạn trên Koine'
+  title: 'Đăng ký',
+  description: 'Đăng ký tài khoản mới trên Koine'
 }
 
-function LoginPage() {
+function RegisterPage() {
   return (
     <section className='h-screen flex flex-col justify-between'>
       <div className='container min-h-[100px] flex items-center'>
@@ -26,9 +26,9 @@ function LoginPage() {
           className='bg-gradient-to-r from-[#FF0059] via-[#FF597D] to-[#2945DE]
             inline-block text-transparent bg-clip-text text-5xl font-bold h-14'
         >
-          Đăng nhập
+          Đăng ký
         </h1>
-        <LoginForm className='mt-7' />
+        <RegisterForm className='mt-7' />
 
         <div className='my-8 flex items-center w-[600px]'>
           <div className='border-t border-sixth/80 w-full' />
@@ -47,9 +47,9 @@ function LoginPage() {
         </Button>
 
         <p className='text-secondary font-semibold mt-4'>
-          Bạn chưa có tài khoản? {''}
-          <Link href={configRoute.register} className='text-sixth hover:text-sixth/80'>
-            Đăng ký
+          Bạn đã có tài khoản? {''}
+          <Link href={configRoute.login} className='text-sixth hover:text-sixth/80'>
+            Đăng nhập
           </Link>
         </p>
 
@@ -91,4 +91,4 @@ function LoginPage() {
   )
 }
 
-export default LoginPage
+export default RegisterPage
