@@ -11,7 +11,7 @@ function Recommend() {
         className='bg-gradient-to-r from-[#FF0059] via-[#FF597D] to-[#2945DE]
           inline-block text-transparent bg-clip-text text-5xl font-bold mt-5 h-14'
       >
-        Khóa học đề xuất
+        Những khóa học hàng đầu
       </h2>
       <Image
         src={icons.pinkStars}
@@ -25,7 +25,7 @@ function Recommend() {
         <span className='font-semibold text-lg'>Xem thêm</span>
         <ArrowRight />
       </div>
-      <div className='grid grid-cols-3 gap-4'>
+      <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4'>
         <div
           className='h-[530px] rounded-xl shadow-md w-full overflow-hidden group
         transition-shadow duration-500 hover:shadow-xl cursor-pointer ease-in-out'
@@ -39,7 +39,7 @@ function Recommend() {
           />
           <div className='px-11 py-4 h-[180px] flex flex-col justify-between'>
             <h3 className='text-gray-400 font-medium text-base'>Tên khóa học</h3>
-            <h2 className='font-bold text-lg'>
+            <h2 className='font-bold text-lg line-clamp-3'>
               Hàng nghìn bà mẹ không thể sai được. Hãy xem vì sao bạn cũng cần một đĩa nhạc ngủ ngon.
             </h2>
             <div className='w-full flex justify-between items-center pt-3'>
@@ -59,7 +59,7 @@ function Recommend() {
           />
           <div className='px-11 py-4 h-[180px] flex flex-col justify-between'>
             <h3 className='text-gray-400 font-medium text-base'>Tên khóa học</h3>
-            <h2 className='font-bold text-lg'>
+            <h2 className='font-bold text-lg line-clamp-3'>
               Hàng nghìn bà mẹ không thể sai được. Hãy xem vì sao bạn cũng cần một đĩa nhạc ngủ ngon.
             </h2>
             <div className='w-full flex justify-between items-center pt-3'>
@@ -79,7 +79,7 @@ function Recommend() {
           />
           <div className='px-11 py-4 h-[180px] flex flex-col justify-between'>
             <h3 className='text-gray-400 font-medium text-base'>Tên khóa học</h3>
-            <h2 className='font-bold text-lg'>
+            <h2 className='font-bold text-lg line-clamp-3'>
               Hàng nghìn bà mẹ không thể sai được. Hãy xem vì sao bạn cũng cần một đĩa nhạc ngủ ngon.
             </h2>
             <div className='w-full flex justify-between items-center pt-3'>

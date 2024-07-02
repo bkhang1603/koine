@@ -8,7 +8,7 @@ function Blog() {
 
       <h2
         className='bg-gradient-to-r from-[#FF0059] via-[#FF597D] to-[#2945DE]
-          inline-block text-transparent bg-clip-text text-5xl font-bold h-14 mt-10'
+        text-transparent bg-clip-text text-5xl font-bold h-[52px] mt-10 line-clamp-1'
       >
         Những tin tức về giáo dục giới tính
       </h2>
@@ -22,7 +22,7 @@ function Blog() {
         <Tag>Bé gái</Tag>
       </div>
 
-      <div className='mt-10 w-[1200px] flex justify-center items-center flex-col gap-3'>
+      <div className='mt-10 lg:w-full flex justify-center items-center flex-col gap-3'>
         <CardBlog />
         <CardBlog />
         <CardBlog />

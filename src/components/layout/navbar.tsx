@@ -1,7 +1,7 @@
 import icons from '@/assets/icons'
 import { Button } from '@/components/ui/button'
 import configRoute from '@/config/route'
-import { ChevronDown } from 'lucide-react'
+import { AlignJustify, ChevronDown } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
 
@@ -12,7 +12,7 @@ function Navbar() {
         <Link href={configRoute.home}>
           <Image src={icons.logo} alt='Logo' width={100} height={100} className='object-contain cursor-pointer' />
         </Link>
-        <nav className='pl-20'>
+        <nav className='pl-20 hidden lg:block'>
           <ul className='flex space-x-6 font-semibold text-primary cursor-pointer'>
             <Link href={configRoute.home}>
               <li className='hover:text-primary/80 flex items-center justify-center gap-1'>Trang chủ</li>
@@ -38,7 +38,7 @@ function Navbar() {
             </Link>
           </ul>
         </nav>
-        <div className='flex items-center justify-center gap-2'>
+        <div className='items-center justify-center gap-2 hidden lg:flex'>
           <Button asChild variant='link' className='font-semibold text-base hover:no-underline hover:text-primary/80'>
             <Link href={configRoute.register}>Đăng ký</Link>
           </Button>
@@ -46,6 +46,8 @@ function Navbar() {
             <Link href={configRoute.login}>Đăng nhập</Link>
           </Button>
         </div>
+
+        <AlignJustify className='block lg:hidden w-10 h-10 cursor-pointer text-primary' />
       </div>
     </header>
   )

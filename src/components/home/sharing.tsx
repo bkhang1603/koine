@@ -8,7 +8,7 @@ import Link from 'next/link'
 function Sharing() {
   return (
     <section className='bg-fourth py-24'>
-      <div className='container grid grid-cols-2 gap-4 relative'>
+      <div className='container grid grid-cols-1 lg:grid-cols-2 gap-4 relative'>
         <Image
           src={images.sharing}
           alt='sharing'
@@ -48,7 +48,7 @@ function Sharing() {
           alt='pink stars'
           width={200}
           height={200}
-          className='absolute left-0 bottom-0 translate-x-[-50%] translate-y-[50%]'
+          className='hidden lg:block absolute left-0 bottom-0 translate-x-[-50%] translate-y-[50%]'
         />
       </div>
     </section>

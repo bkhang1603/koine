@@ -21,11 +21,11 @@ function CardBlog() {
         <div className='max-w-[800px] h-[150px] flex flex-col justify-between'>
           <h2
             className='bg-gradient-to-r from-[#FF0059] via-[#FF597D] to-[#2945DE]
-  inline-block text-transparent bg-clip-text text-2xl font-semibold'
+            text-transparent bg-clip-text text-2xl font-semibold line-clamp-1'
           >
             Một số vấn đề cần được giải quyết ngay lập tức kể từ bây giờ
           </h2>
-          <h3 className='line-clamp-3'>
+          <h3 className='line-clamp-2'>
             Bài viết này đơn giản là nơi để mình lưu lại những kinh nghiệm mà mình đã làm việc với mọi thứ như thế nào
             cũng như là nêu chia sẻ của mình về những vấn đề
           </h3>

@@ -10,12 +10,12 @@ function Service() {
         <h3 className='font-semibold text-lg'>Tại sao chọn chúng tôi</h3>
         <h2
           className='bg-gradient-to-r from-[#FF0059] via-[#FF597D] to-[#2945DE]
-          inline-block text-transparent bg-clip-text text-5xl font-bold mt-5 h-14'
+          text-transparent bg-clip-text text-5xl font-bold mt-5 h-[52px] line-clamp-1'
         >
           Các khóa học tạo nên sự khác biệt
         </h2>
 
-        <div className='grid grid-cols-4 gap-4 mt-16'>
+        <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mt-16'>
           <Card className='transition-shadow duration-300 hover:shadow-xl cursor-pointer'>
             <CardHeader>
               <Image src={icons.user} alt='user' width={70} height={70} />
