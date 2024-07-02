@@ -11,23 +11,34 @@ const fontSans = FontSans({
 })
 
 export const metadata: Metadata = {
-  title: 'Trang chủ - Koine',
-  description: 'Koine là nền tảng học trực tuyến với các khóa học chất lượng cao từ các chuyên gia hàng đầu.',
+  title: {
+    template: '%s | Koine',
+    default: 'Nền tảng giáo dục giới tính cho trẻ em | Koine'
+  },
+  description:
+    'Koine là nền tảng giáo dục giới tính cho trẻ em với các khóa học chất lượng cao từ các chuyên gia hàng đầu.',
   authors: [{ name: 'Koine Company', url: 'https://koine-xi.vercel.app' }],
-  keywords: ['Koine', 'Koine Company', 'Koine Online', 'Koine Học trực tuyến'],
+  keywords: [
+    'Koine',
+    'Koine Company',
+    'Koine Online',
+    'Koine Học trực tuyến',
+    'Koine Giáo dục giới tính',
+    'Koine Giáo dục trẻ em'
+  ],
   creator: 'Koine Company',
   publisher: 'Koine Company',
   robots: {
     index: true,
-    follow: true,
-    nocache: true
+    follow: true
   },
   openGraph: {
     locale: 'vi_VN',
     type: 'website',
     siteName: 'Koine Company',
     title: 'Trang chủ - Koine',
-    description: 'Koine là nền tảng học trực tuyến với các khóa học chất lượng cao từ các chuyên gia hàng đầu.',
+    description:
+      'Koine là nền tảng giáo dục giới tính cho trẻ em với các khóa học chất lượng cao từ các chuyên gia hàng đầu.',
     url: 'https://koine-xi.vercel.app',
     images: [
       {
