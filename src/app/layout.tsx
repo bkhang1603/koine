@@ -16,9 +16,9 @@ export const metadata: Metadata = {
     default: 'Nền tảng giáo dục giới tính cho trẻ em | Koine'
   },
   description:
-    'Koine là nền tảng giáo dục giới tính cho trẻ em với các khóa học chất lượng cao từ các chuyên gia hàng đầu.',
+    'Koine là nền tảng giáo dục giới tính cho trẻ em với các khóa học chất lượng cao từ các chuyên gia hàng đầu. Hãy tham gia ngay để giúp con bạn phát triển toàn diện nhất!',
   authors: [{ name: 'Koine', url: 'https://koine.id.vn' }],
-  keywords: ['Koine', 'Koine Company', 'Koine Online', 'Koine Học trực tuyến', 'Koine Giáo dục giới tính'],
+  keywords: ['Koine', 'Koine Giáo dục cho trẻ em', 'Koine Online', 'Koine Học trực tuyến', 'Koine Giáo dục giới tính'],
   creator: 'Koine',
   publisher: 'Koine',
   robots: {
@@ -42,9 +42,9 @@ export const metadata: Metadata = {
   alternates: {
     canonical: 'https://koine.id.vn',
     languages: {
+      'vi-VN': '/vi-VN',
       'en-US': '/en-US',
-      'de-DE': '/de-DE',
-      'vi-VN': '/vi-VN'
+      'de-DE': '/de-DE'
     }
   },
   metadataBase: new URL('https://koine.id.vn')
