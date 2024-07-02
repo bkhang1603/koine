@@ -3,6 +3,7 @@ import Feature from '@/components/home/feature'
 import Hero from '@/components/home/hero'
 import Recommend from '@/components/home/recommend'
 import Service from '@/components/home/service'
+import Sharing from '@/components/home/sharing'
 
 function Home() {
   return (
@@ -12,6 +13,7 @@ function Home() {
       <Recommend />
       <Service />
       <Blog />
+      <Sharing />
     </>
   )
 }

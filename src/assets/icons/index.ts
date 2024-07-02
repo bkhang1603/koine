@@ -11,6 +11,8 @@ import google from './google.svg'
 import facebook from './facebook.svg'
 import lightBlueStar from './light-blue-star.png'
 import loadingLogo from './loading-logo.png'
+import instagram from './instagram.svg'
+import x from './x.svg'
 
 const icons = {
   logo,
@@ -25,7 +27,9 @@ const icons = {
   dollar,
   google,
   facebook,
-  loadingLogo
+  loadingLogo,
+  instagram,
+  x
 }
 
 export default icons
