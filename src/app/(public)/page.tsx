@@ -1,3 +1,4 @@
+import Blog from '@/components/home/blog'
 import Feature from '@/components/home/feature'
 import Hero from '@/components/home/hero'
 import Recommend from '@/components/home/recommend'
@@ -10,6 +11,7 @@ function Home() {
       <Feature />
       <Recommend />
       <Service />
+      <Blog />
     </>
   )
 }
