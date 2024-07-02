@@ -1,5 +1,94 @@
+import icons from '@/assets/icons'
+import images from '@/assets/images'
+import LoginForm from '@/components/login/login-form'
+import { Button } from '@/components/ui/button'
+import configRoute from '@/config/route'
+import Image from 'next/image'
+import Link from 'next/link'
+import type { Metadata } from 'next'
+
+export const metadata: Metadata = {
+  title: 'Đăng nhập',
+  description: 'Đăng nhập vào tài khoản của bạn trên Koine'
+}
+
 function LoginPage() {
-  return <div>LoginPage</div>
+  return (
+    <section className='h-screen flex flex-col justify-between'>
+      <div className='container h-[100px] flex items-center'>
+        <Link href={configRoute.home}>
+          <Image src={icons.logo} alt='Koine logo' width={100} height={100} />
+        </Link>
+      </div>
+
+      <div className='container flex justify-center items-center flex-col relative'>
+        <h1
+          className='bg-gradient-to-r from-[#FF0059] via-[#FF597D] to-[#2945DE]
+            inline-block text-transparent bg-clip-text text-5xl font-bold h-14'
+        >
+          Đăng nhập
+        </h1>
+        <LoginForm className='mt-7' />
+
+        <div className='my-8 flex items-center w-[600px]'>
+          <div className='border-t border-sixth/80 w-full' />
+          <span className='text-sixth text-sm font-medium px-4'>Hoặc</span>
+          <div className='border-t border-sixth/80 w-full' />
+        </div>
+
+        <Button variant='outline' className='w-[600px] text-base h-10'>
+          <Image src={icons.facebook} alt='Google' width={24} height={24} className='mr-3' />
+          Đăng nhập với Facebook
+        </Button>
+
+        <Button variant='outline' className='w-[600px] text-base h-10 mt-5'>
+          <Image src={icons.google} alt='Google' width={24} height={24} className='mr-3' />
+          Đăng nhập với Google
+        </Button>
+
+        <p className='text-secondary font-semibold mt-3'>
+          Bạn chưa có tài khoản? {''}
+          <Link href={configRoute.register} className='text-sixth hover:text-sixth/80'>
+            Đăng ký
+          </Link>
+        </p>
+
+        <Image src={icons.pinkStar} alt='Koine' width={35} height={35} className='absolute top-0 left-0 mt-16 ml-40' />
+        <Image
+          src={icons.blueStar}
+          alt='Koine'
+          width={25}
+          height={25}
+          className='absolute bottom-0 left-0 mb-52 ml-5'
+        />
+        <Image
+          src={icons.lightBlueStar}
+          alt='Koine'
+          width={50}
+          height={50}
+          className='absolute bottom-0 left-0 ml-60 mb-10'
+        />
+
+        <Image
+          src={icons.pinkStar}
+          alt='Koine'
+          width={40}
+          height={40}
+          className='absolute bottom-0 right-0 mr-5 mb-32'
+        />
+        <Image
+          src={icons.lightBlueStar}
+          alt='Koine'
+          width={20}
+          height={20}
+          className='absolute top-0 right-0 mr-32 mt-32'
+        />
+        <Image src={icons.blueStar} alt='Koine' width={25} height={25} className='absolute bottom-0 right-0 mr-52' />
+      </div>
+
+      <Image src={images.loginVector} alt='Koine' width={1800} height={1800} className='w-[100vw] min-h-[200px]' />
+    </section>
+  )
 }
 
 export default LoginPage

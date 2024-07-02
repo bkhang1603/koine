@@ -1,39 +1,49 @@
 import icons from '@/assets/icons'
 import { Button } from '@/components/ui/button'
+import configRoute from '@/config/route'
 import { ChevronDown } from 'lucide-react'
 import Image from 'next/image'
+import Link from 'next/link'
 
 function Navbar() {
   return (
     <header className='fixed bg-white w-full h-[100px] shadow-md z-10'>
       <div className='container flex justify-between items-center h-full'>
-        <Image
-          src={icons.logo}
-          alt='Logo'
-          width={100}
-          height={100}
-          className='w-[100px] h-auto object-contain cursor-pointer'
-        />
+        <Link href={configRoute.home}>
+          <Image src={icons.logo} alt='Logo' width={100} height={100} className='object-contain cursor-pointer' />
+        </Link>
         <nav className='pl-20'>
           <ul className='flex space-x-6 font-semibold text-primary cursor-pointer'>
-            <li className='hover:text-primary/80 flex items-center justify-center gap-1'>Trang chủ</li>
-            <li className='hover:text-primary/80 flex items-center justify-center gap-1'>
-              Khóa học <ChevronDown />
-            </li>
-            <li className='hover:text-primary/80 flex items-center justify-center gap-1'>
-              Kiến thức <ChevronDown />
-            </li>
-            <li className='hover:text-primary/80 flex items-center justify-center gap-1'>Tổng quan</li>
-            <li className='hover:text-primary/80 flex items-center justify-center gap-1'>Dịch vụ</li>
-            <li className='hover:text-primary/80 flex items-center justify-center gap-1'>Liên hệ</li>
+            <Link href={configRoute.home}>
+              <li className='hover:text-primary/80 flex items-center justify-center gap-1'>Trang chủ</li>
+            </Link>
+            <Link href={configRoute.course}>
+              <li className='hover:text-primary/80 flex items-center justify-center gap-1'>
+                Khóa học <ChevronDown />
+              </li>
+            </Link>
+            <Link href={configRoute.knowledge}>
+              <li className='hover:text-primary/80 flex items-center justify-center gap-1'>
+                Kiến thức <ChevronDown />
+              </li>
+            </Link>
+            <Link href={configRoute.about}>
+              <li className='hover:text-primary/80 flex items-center justify-center gap-1'>Tổng quan</li>
+            </Link>
+            <Link href={configRoute.service}>
+              <li className='hover:text-primary/80 flex items-center justify-center gap-1'>Dịch vụ</li>
+            </Link>
+            <Link href={configRoute.contact}>
+              <li className='hover:text-primary/80 flex items-center justify-center gap-1'>Liên hệ</li>
+            </Link>
           </ul>
         </nav>
         <div className='flex items-center justify-center gap-2'>
-          <Button variant='link' className='font-semibold text-base hover:no-underline hover:text-primary/80'>
-            Đăng ký
+          <Button asChild variant='link' className='font-semibold text-base hover:no-underline hover:text-primary/80'>
+            <Link href={configRoute.register}>Đăng ký</Link>
           </Button>
-          <Button variant='default' className='rounded-[10px] text-base font-semibold h-[40px] px-4'>
-            Đăng nhập
+          <Button asChild variant='default' className='rounded-[10px] text-base font-semibold h-[40px] px-4'>
+            <Link href={configRoute.login}>Đăng nhập</Link>
           </Button>
         </div>
       </div>

@@ -7,6 +7,9 @@ import user from './user.png'
 import clock from './clock.png'
 import calendar from './calendar.png'
 import dollar from './dollar.png'
+import google from './google.svg'
+import facebook from './facebook.svg'
+import lightBlueStar from './light-blue-star.png'
 
 const icons = {
   logo,
@@ -14,10 +17,13 @@ const icons = {
   pinkStar,
   blueStar,
   pinkStars,
+  lightBlueStar,
   user,
   clock,
   calendar,
-  dollar
+  dollar,
+  google,
+  facebook
 }
 
 export default icons

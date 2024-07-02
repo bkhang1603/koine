@@ -40,6 +40,10 @@ const config = {
           DEFAULT: 'hsl(var(--fifth))',
           foreground: 'hsl(var(--fifth-foreground))'
         },
+        sixth: {
+          DEFAULT: 'hsl(var(--sixth))',
+          foreground: 'hsl(var(--sixth-foreground))'
+        },
         destructive: {
           DEFAULT: 'hsl(var(--destructive))',
           foreground: 'hsl(var(--destructive-foreground))'
