@@ -1,6 +1,7 @@
 import Blog from '@/components/home/blog'
 import Feature from '@/components/home/feature'
 import Hero from '@/components/home/hero'
+import Information from '@/components/home/information'
 import Recommend from '@/components/home/recommend'
 import Service from '@/components/home/service'
 import Sharing from '@/components/home/sharing'
@@ -14,6 +15,7 @@ function Home() {
       <Service />
       <Blog />
       <Sharing />
+      <Information />
     </>
   )
 }

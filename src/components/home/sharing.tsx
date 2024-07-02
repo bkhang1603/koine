@@ -7,7 +7,7 @@ import Link from 'next/link'
 
 function Sharing() {
   return (
-    <section className='relative py-24'>
+    <section className='bg-fourth py-24'>
       <div className='container grid grid-cols-2 gap-4 relative'>
         <Image
           src={images.sharing}
@@ -17,7 +17,7 @@ function Sharing() {
           className='w-full object-cover rounded-[20px]'
         />
 
-        <div className='flex items-center justify-between flex-col'>
+        <div className='flex items-center justify-between flex-col py-10'>
           <div className='text-center'>
             <h3 className='text-lg font-semibold'>Chia sẻ của chuyên gia</h3>
             <h2
@@ -28,7 +28,7 @@ function Sharing() {
             </h2>
           </div>
 
-          <p className='line-clamp-4 max-w-[450px] text-center font-medium mb-6'>
+          <p className='line-clamp-5 max-w-[520px] text-center font-medium text-lg'>
             Nguyên nhân chính của bệnh là do sự bận rộn với đời sống hằng ngày, nếp sống càng tiện nghi thì họ lại càng
             hết sức lao tâm lao lực để đạt đến cái tiện nghi hơn. Nguyên nhân chính của bệnh là do sự bận rộn với đời
             sống hằng ngày, nếp sống càng tiện nghi thì họ lại càng hết sức lao tâm lao lực để đạt đến cái tiện nghi.
@@ -51,14 +51,6 @@ function Sharing() {
           className='absolute left-0 bottom-0 translate-x-[-50%] translate-y-[50%]'
         />
       </div>
-
-      <Image
-        src={images.sharingBackground}
-        alt='koine'
-        width={2000}
-        height={2000}
-        className='w-[60vw] absolute right-0 top-0 -z-10'
-      />
     </section>
   )
 }
