@@ -45,7 +45,7 @@ function Service() {
               <Image src={icons.calendar} alt='calendar' width={70} height={70} />
             </CardHeader>
             <CardContent>
-              <CardTitle>nhận tư vấn mọi lúc</CardTitle>
+              <CardTitle>Nhận tư vấn mọi lúc</CardTitle>
               <CardDescription className='mt-2'>
                 Tất cả chương trình giáo dục đặc biệt của chúng tôi các chuyên gia có bằng cấp về giáo dục đặc biệt
               </CardDescription>
