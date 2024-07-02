@@ -53,7 +53,10 @@ export const metadata: Metadata = {
       'de-DE': '/de-DE'
     }
   },
-  metadataBase: new URL('https://koine.id.vn')
+  metadataBase: new URL('https://koine.id.vn'),
+  other: {
+    ['fb:app_id']: '997853571703877'
+  }
 }
 
 export default function RootLayout({
