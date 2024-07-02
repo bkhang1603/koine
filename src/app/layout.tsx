@@ -36,7 +36,7 @@ export const metadata: Metadata = {
     locale: 'vi_VN',
     type: 'website',
     siteName: 'Koine Company',
-    title: 'Trang chủ - Koine',
+    title: 'Nền tảng giáo dục giới tính cho trẻ em | Koine',
     description:
       'Koine là nền tảng giáo dục giới tính cho trẻ em với các khóa học chất lượng cao từ các chuyên gia hàng đầu.',
     url: 'https://koine-xi.vercel.app',
