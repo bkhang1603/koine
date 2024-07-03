@@ -12,8 +12,8 @@ function Sharing() {
         <Image
           src={images.sharing}
           alt='sharing'
-          width={1000}
-          height={1000}
+          width={500}
+          height={500}
           className='w-full object-cover rounded-[20px]'
         />
 

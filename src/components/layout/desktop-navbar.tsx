@@ -99,13 +99,7 @@ function DesktopNavbar() {
                     </div>
 
                     <div className='flex justify-end items-end mt-14'>
-                      <Image
-                        src={images.navbarBackground}
-                        alt='Koine'
-                        width={1000}
-                        height={1000}
-                        className='w-[450px]'
-                      />
+                      <Image src={images.navbarBackground} alt='Koine' width={500} height={500} className='w-[450px]' />
                     </div>
                   </div>
                 </TooltipContent>
