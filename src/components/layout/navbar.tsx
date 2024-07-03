@@ -13,7 +13,7 @@ function Navbar() {
     <header className='fixed bg-white w-full h-[100px] shadow-md z-10'>
       <div className='container flex justify-between items-center h-full'>
         <Link href={configRoute.home}>
-          <Image src={icons.logo} alt='Logo' width={100} height={100} className='object-contain cursor-pointer' />
+          <Image src={icons.logo} alt='Koine' width={100} height={100} className='object-contain cursor-pointer' />
         </Link>
 
         <DesktopNavbar />
@@ -33,7 +33,7 @@ function Navbar() {
           </SheetTrigger>
           <SheetContent>
             <SheetHeader>
-              <SheetTitle className='mb-4'>
+              <SheetTitle className='mb-5'>
                 <Image src={icons.logo} alt='Logo' width={70} height={70} className='object-contain cursor-pointer' />
               </SheetTitle>
             </SheetHeader>

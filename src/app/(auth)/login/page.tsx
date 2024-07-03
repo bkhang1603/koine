@@ -58,21 +58,21 @@ function LoginPage() {
           alt='Koine'
           width={35}
           height={35}
-          className='absolute -z-10 top-0 left-0 mt-16 ml-40'
+          className='hidden sm:block absolute -z-10 top-0 left-0 mt-16 ml-40'
         />
         <Image
           src={icons.blueStar}
           alt='Koine'
           width={25}
           height={25}
-          className='absolute -z-10 bottom-0 left-0 mb-52 ml-5'
+          className='hidden sm:block absolute -z-10 bottom-0 left-0 mb-52 ml-5'
         />
         <Image
           src={icons.lightBlueStar}
           alt='Koine'
           width={50}
           height={50}
-          className='absolute -z-10 bottom-0 left-0 ml-60 mb-10'
+          className='hidden sm:block absolute -z-10 bottom-0 left-0 ml-60 mb-10'
         />
 
         <Image
@@ -80,21 +80,21 @@ function LoginPage() {
           alt='Koine'
           width={40}
           height={40}
-          className='absolute -z-10 bottom-0 right-0 mr-5 mb-32'
+          className='hidden sm:block absolute -z-10 bottom-0 right-0 mr-5 mb-32'
         />
         <Image
           src={icons.lightBlueStar}
           alt='Koine'
           width={20}
           height={20}
-          className='absolute -z-10 top-0 right-0 mr-32 mt-32'
+          className='hidden sm:block absolute -z-10 top-0 right-0 mr-32 mt-32'
         />
         <Image
           src={icons.blueStar}
           alt='Koine'
           width={25}
           height={25}
-          className='absolute -z-10 bottom-0 right-0 mr-52'
+          className='hidden sm:block absolute -z-10 bottom-0 right-0 mr-52'
         />
       </div>
 

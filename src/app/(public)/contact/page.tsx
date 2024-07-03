@@ -9,7 +9,7 @@ function ContactPage() {
     <main className='py-20'>
       <h1
         className='bg-gradient-to-r from-[#FF0059] via-[#FF597D] to-[#2945DE] text-center
-        text-transparent bg-clip-text text-5xl font-bold h-[52px] mt-10 line-clamp-1'
+        text-transparent bg-clip-text text-2xl md:text-4xl lg:text-5xl lg:h-14 font-bold mt-10'
       >
         Liên hệ với Koine ngay nào
       </h1>
@@ -26,7 +26,7 @@ function ContactPage() {
         />
 
         <div className='flex justify-center items-center flex-col space-y-14 relative'>
-          <h2 className='font-semibold text-3xl text-secondary text-center'>Mẫu điền thông tin của Koine</h2>
+          <h2 className='font-semibold text-xl md:text-3xl text-secondary text-center'>Mẫu điền thông tin của Koine</h2>
 
           <ContactForm />
 

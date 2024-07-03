@@ -22,7 +22,7 @@ function Sharing() {
             <h3 className='text-lg font-semibold'>Chia sẻ của chuyên gia</h3>
             <h2
               className='bg-gradient-to-r from-[#FF0059] via-[#FF597D] to-[#2945DE]
-            inline-block text-transparent bg-clip-text text-4xl font-bold h-11 mt-6'
+            text-transparent bg-clip-text text-2xl md:text-3xl lg:text-4xl font-bold mt-6'
             >
               Các buổi tư vấn miễn phí
             </h2>

@@ -4,6 +4,7 @@ import { Book, Building2, HandHelping, Home, LibraryBig, Phone } from 'lucide-re
 import Link from 'next/link'
 import configRoute from '@/config/route'
 import { usePathname } from 'next/navigation'
+import { Button } from '@/components/ui/button'
 
 function MobileNavbar() {
   const pathname = usePathname()
@@ -17,7 +18,7 @@ function MobileNavbar() {
   ]
 
   return (
-    <nav>
+    <nav className='flex flex-col justify-between h-[91%]'>
       <ul className='flex flex-col space-y-4 text-primary font-medium text-lg'>
         {menuItems.map((item, index) => {
           return (
@@ -32,6 +33,9 @@ function MobileNavbar() {
           )
         })}
       </ul>
+      <Button asChild className='text-base'>
+        <Link href={configRoute.login}>Đăng nhập vào Koine</Link>
+      </Button>
     </nav>
   )
 }
