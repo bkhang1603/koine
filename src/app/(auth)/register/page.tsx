@@ -21,7 +21,7 @@ function RegisterPage() {
         </Link>
       </div>
 
-      <div className='container flex justify-center items-center flex-col relative'>
+      <div className='container flex justify-center items-center flex-col relative mt-10 sm:mt-0'>
         <h1
           className='bg-gradient-to-r from-[#FF0059] via-[#FF597D] to-[#2945DE]
             inline-block text-transparent bg-clip-text text-5xl font-bold h-14'
@@ -30,18 +30,18 @@ function RegisterPage() {
         </h1>
         <RegisterForm className='mt-7' />
 
-        <div className='my-8 flex items-center w-[600px]'>
+        <div className='my-8 flex items-center w-full md:w-[600px]'>
           <div className='border-t border-sixth/80 w-full' />
           <span className='text-sixth text-sm font-medium px-4'>Hoặc</span>
           <div className='border-t border-sixth/80 w-full' />
         </div>
 
-        <Button variant='outline' className='w-[600px] text-base h-10'>
+        <Button variant='outline' className='w-full md:w-[600px] text-base h-10'>
           <Image src={icons.facebook} alt='Google' width={24} height={24} className='mr-3' />
           Đăng nhập với Facebook
         </Button>
 
-        <Button variant='outline' className='w-[600px] text-base h-10 mt-5'>
+        <Button variant='outline' className='w-full md:w-[600px] text-base h-10 mt-5'>
           <Image src={icons.google} alt='Google' width={24} height={24} className='mr-3' />
           Đăng nhập với Google
         </Button>

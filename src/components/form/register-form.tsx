@@ -87,7 +87,7 @@ export default function RegisterForm({ className }: { className?: string }) {
             </FormItem>
           )}
         />
-        <div className='flex items-center justify-between'>
+        <div className='sm:flex items-center justify-between'>
           <FormField
             control={form.control}
             name='gender'
@@ -96,7 +96,7 @@ export default function RegisterForm({ className }: { className?: string }) {
                 <FormLabel>Giới tính</FormLabel>
                 <FormControl>
                   <RadioGroup
-                    className='flex items-center space-x-16 h-10'
+                    className='flex items-center space-x-14 sm:space-x-16 h-10'
                     {...field}
                     onValueChange={field.onChange}
                     defaultValue={field.value}
