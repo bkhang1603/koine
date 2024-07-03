@@ -19,6 +19,7 @@ import course4 from './course-4.png'
 import course5 from './course-5.png'
 import course6 from './course-6.png'
 import searchImage from './search-image.png'
+import navbarBackground from './navbar-background.png'
 
 const images = {
   heroImage,
@@ -41,7 +42,8 @@ const images = {
   course4,
   course5,
   course6,
-  searchImage
+  searchImage,
+  navbarBackground
 }
 
 export default images
