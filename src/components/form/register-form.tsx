@@ -191,7 +191,7 @@ export default function RegisterForm({ className }: { className?: string }) {
           )}
         />
         <Button type='submit' className='w-full h-10 bg-sixth hover:bg-sixth/80 text-base'>
-          Đăng nhập
+          Đăng ký
         </Button>
       </form>
     </Form>

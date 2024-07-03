@@ -7,7 +7,7 @@ function Information({ className }: { className?: string }) {
     <section className={cn('container flex items-center justify-center flex-col py-36', className)}>
       <h2
         className='bg-gradient-to-r from-[#FF0059] via-[#FF597D] to-[#2945DE]
-          inline-block text-transparent bg-clip-text text-4xl font-bold h-11'
+        text-transparent bg-clip-text text-4xl font-bold h-11'
       >
         Cập nhật những thông tin mới sớm nhất
       </h2>

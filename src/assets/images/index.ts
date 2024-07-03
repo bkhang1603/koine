@@ -11,6 +11,7 @@ import sharingBackground from './sharing-background.png'
 import footer from './footer.png'
 import knowledgeBackground from './knowledge-background.png'
 import underline from './underline.png'
+import contactImage from './contact-image.png'
 
 const images = {
   heroImage,
@@ -25,7 +26,8 @@ const images = {
   sharingBackground,
   footer,
   knowledgeBackground,
-  underline
+  underline,
+  contactImage
 }
 
 export default images

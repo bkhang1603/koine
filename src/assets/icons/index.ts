@@ -13,6 +13,8 @@ import lightBlueStar from './light-blue-star.png'
 import loadingLogo from './loading-logo.png'
 import instagram from './instagram.svg'
 import x from './x.svg'
+import blueCurly from './blue-curly.png'
+import purpleCurly from './purple-curly.png'
 
 const icons = {
   logo,
@@ -29,7 +31,9 @@ const icons = {
   facebook,
   loadingLogo,
   instagram,
-  x
+  x,
+  blueCurly,
+  purpleCurly
 }
 
 export default icons

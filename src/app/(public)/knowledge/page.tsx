@@ -17,7 +17,7 @@ import Image from 'next/image'
 
 function KnowledgePage() {
   return (
-    <section>
+    <main>
       <figure className='py-36 lg:py-48 flex items-center justify-center relative'>
         <Image
           src={images.knowledgeBackground}
@@ -76,7 +76,7 @@ function KnowledgePage() {
       <PaginationCustom className='mt-16' totalPage={5} href='/knowledge' />
 
       <Information className='mt-20' />
-    </section>
+    </main>
   )
 }
 
