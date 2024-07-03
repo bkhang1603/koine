@@ -12,6 +12,12 @@ import footer from './footer.png'
 import knowledgeBackground from './knowledge-background.png'
 import underline from './underline.png'
 import contactImage from './contact-image.png'
+import course from './course.png'
+import course2 from './course-2.png'
+import course3 from './course-3.png'
+import course4 from './course-4.png'
+import course5 from './course-5.png'
+import course6 from './course-6.png'
 
 const images = {
   heroImage,
@@ -27,7 +33,13 @@ const images = {
   footer,
   knowledgeBackground,
   underline,
-  contactImage
+  contactImage,
+  course,
+  course2,
+  course3,
+  course4,
+  course5,
+  course6
 }
 
 export default images
