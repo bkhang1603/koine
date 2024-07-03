@@ -1,4 +1,3 @@
-import images from '@/assets/images'
 import { StaticImport } from 'next/dist/shared/lib/get-img-props'
 import Image from 'next/image'
 
@@ -8,7 +7,7 @@ function CardCategory({ title, images }: { title: string; images: string | Stati
       className='relative rounded-2xl overflow-hidden group
         cursor-pointer'
     >
-      <Image src={images} alt='Học cùng Koine' width={1000} height={1000} className='object-cover' />
+      <Image src={images} alt='Học cùng Koine' width={1000} height={1000} className='object-cover h-[220px] w-full' />
 
       <div className='absolute inset-0 bg-gray-800 opacity-40' />
       <div className='absolute inset-0 flex items-center justify-center'>

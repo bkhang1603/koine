@@ -35,7 +35,7 @@ function ContactPage() {
             width={100}
             height={100}
             alt='Koine'
-            className='hidden lg:block absolute -bottom-20 -right-10 transform translate-x-1/2 -translate-y-1/2'
+            className='hidden 2xl:block absolute -bottom-20 -right-10 transform translate-x-1/2 -translate-y-1/2'
           />
         </div>
       </div>

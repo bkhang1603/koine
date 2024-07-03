@@ -18,16 +18,19 @@ import Image from 'next/image'
 function KnowledgePage() {
   return (
     <main>
-      <figure className='py-36 lg:py-48 flex items-center justify-center relative'>
+      <figure className='py-24 relative'>
         <Image
           src={images.knowledgeBackground}
           alt='Knowledge Background'
           width={2000}
           height={2000}
-          className='object-cover w-full absolute -z-10'
+          className='object-cover w-full'
         />
 
-        <h1 className='text-secondary font-bold text-3xl md:text-4xl text-center relative py-10'>
+        <h1
+          className='text-secondary font-bold text-3xl lg:text-4xl text-center
+        absolute inset-0 flex items-center justify-center mx-auto'
+        >
           “Có kiến thức bảo vệ bản thân
           <br />
           để tạo nên hạnh phúc”
@@ -36,7 +39,8 @@ function KnowledgePage() {
             alt='Underline'
             width={500}
             height={500}
-            className='object-contain w-44 md:w-52 absolute bottom-2 md:bottom-0 right-12 md:right-16'
+            className='w-40 lg:w-52 absolute top-[50%] right-[42%] transform
+            translate-x-1/2 translate-y-8 z-[-1]'
           />
         </h1>
       </figure>

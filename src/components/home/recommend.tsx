@@ -1,6 +1,7 @@
 import icons from '@/assets/icons'
 import images from '@/assets/images'
-import { ArrowRight, ArrowUpRight } from 'lucide-react'
+import CardCourse from '@/components/card-course'
+import { ArrowRight } from 'lucide-react'
 import Image from 'next/image'
 
 function Recommend() {
@@ -26,68 +27,9 @@ function Recommend() {
         <ArrowRight />
       </div>
       <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4'>
-        <div
-          className='h-[530px] rounded-xl shadow-md w-full overflow-hidden group
-        transition-shadow duration-500 hover:shadow-xl cursor-pointer ease-in-out'
-        >
-          <Image
-            src={images.children}
-            alt='children'
-            width={500}
-            height={500}
-            className='w-full h-[350px] object-cover'
-          />
-          <div className='px-11 py-4 h-[180px] flex flex-col justify-between'>
-            <h3 className='text-gray-400 font-medium text-base'>Tên khóa học</h3>
-            <h2 className='font-bold text-lg line-clamp-3'>
-              Hàng nghìn bà mẹ không thể sai được. Hãy xem vì sao bạn cũng cần một đĩa nhạc ngủ ngon.
-            </h2>
-            <div className='w-full flex justify-between items-center pt-3'>
-              <span className='text-sm text-gray-400'>5 Bài giảng</span>
-              <ArrowUpRight className='group-hover:text-secondary' />
-            </div>
-          </div>
-        </div>
-
-        <div className='h-[530px] rounded-xl shadow-md w-full overflow-hidden group transition-shadow duration-300 hover:shadow-xl cursor-pointer'>
-          <Image
-            src={images.children1}
-            alt='children'
-            width={500}
-            height={500}
-            className='w-full h-[350px] object-cover'
-          />
-          <div className='px-11 py-4 h-[180px] flex flex-col justify-between'>
-            <h3 className='text-gray-400 font-medium text-base'>Tên khóa học</h3>
-            <h2 className='font-bold text-lg line-clamp-3'>
-              Hàng nghìn bà mẹ không thể sai được. Hãy xem vì sao bạn cũng cần một đĩa nhạc ngủ ngon.
-            </h2>
-            <div className='w-full flex justify-between items-center pt-3'>
-              <span className='text-sm text-gray-400'>5 Bài giảng</span>
-              <ArrowUpRight className='group-hover:text-secondary' />
-            </div>
-          </div>
-        </div>
-
-        <div className='h-[530px] rounded-xl shadow-md w-full overflow-hidden group transition-shadow duration-300 hover:shadow-xl cursor-pointer'>
-          <Image
-            src={images.children2}
-            alt='children'
-            width={500}
-            height={500}
-            className='w-full h-[350px] object-cover'
-          />
-          <div className='px-11 py-4 h-[180px] flex flex-col justify-between'>
-            <h3 className='text-gray-400 font-medium text-base'>Tên khóa học</h3>
-            <h2 className='font-bold text-lg line-clamp-3'>
-              Hàng nghìn bà mẹ không thể sai được. Hãy xem vì sao bạn cũng cần một đĩa nhạc ngủ ngon.
-            </h2>
-            <div className='w-full flex justify-between items-center pt-3'>
-              <span className='text-sm text-gray-400'>5 Bài giảng</span>
-              <ArrowUpRight className='group-hover:text-secondary' />
-            </div>
-          </div>
-        </div>
+        <CardCourse images={images.children} />
+        <CardCourse images={images.children1} />
+        <CardCourse images={images.children2} />
       </div>
     </section>
   )
