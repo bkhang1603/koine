@@ -35,7 +35,7 @@ function Sharing() {
           </p>
 
           <Link
-            href={configRoute.home}
+            href={configRoute.register}
             className='w-full p-4 flex items-center justify-end gap-2 text-secondary hover:text-secondary/80'
           >
             <span className='font-semibold text-xl'>Đăng ký</span>

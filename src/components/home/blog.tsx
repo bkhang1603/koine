@@ -13,7 +13,7 @@ function Blog() {
         Những tin tức về giáo dục giới tính
       </h2>
 
-      <div className='mt-5 flex justify-center items-center gap-2'>
+      <div className='mt-5 hidden md:flex justify-center items-center gap-2'>
         <Tag>Cũ</Tag>
         <Tag>Mới</Tag>
         <Tag>Thanh thiếu niên</Tag>

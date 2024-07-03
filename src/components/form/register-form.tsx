@@ -11,7 +11,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { Input } from '@/components/ui/input'
 import { useToast } from '@/components/ui/use-toast'
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
-import { handleErrorApi } from '@/lib/utils'
+import { cn, handleErrorApi } from '@/lib/utils'
 import { RegisterBody, RegisterBodyType } from '@/schemaValidations/auth.schema'
 import { Checkbox } from '@/components/ui/checkbox'
 
@@ -58,7 +58,7 @@ export default function RegisterForm({ className }: { className?: string }) {
     <Form {...form}>
       <form
         onSubmit={form.handleSubmit(onSubmit)}
-        className={`${className} space-y-4 max-w-[600px] flex-shrink-0 w-full`}
+        className={cn('space-y-4 max-w-[600px] flex-shrink-0 w-full', className)}
         noValidate
       >
         <FormField

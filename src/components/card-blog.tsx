@@ -17,7 +17,7 @@ function CardBlog() {
         </div>
       </div>
 
-      <div className='flex justify-between items-center mt-3'>
+      <div className='flex justify-between items-center gap-4 mt-3'>
         <div className='max-w-[800px] h-[150px] flex flex-col justify-between'>
           <h2
             className='bg-gradient-to-r from-[#FF0059] via-[#FF597D] to-[#2945DE]

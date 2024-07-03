@@ -13,7 +13,7 @@ function Footer() {
 
       <div className='bg-fourth'>
         <section className='container'>
-          <div className='grid grid-cols-4 gap-4 py-20'>
+          <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-x-4 gap-y-8 py-20'>
             <div>
               <h3 className='font-semibold text-xl'>Giới thiệu</h3>
 

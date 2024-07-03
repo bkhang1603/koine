@@ -9,6 +9,8 @@ import avatar from './avatar.png'
 import sharing from './sharing.png'
 import sharingBackground from './sharing-background.png'
 import footer from './footer.png'
+import knowledgeBackground from './knowledge-background.png'
+import underline from './underline.png'
 
 const images = {
   heroImage,
@@ -21,7 +23,9 @@ const images = {
   avatar,
   sharing,
   sharingBackground,
-  footer
+  footer,
+  knowledgeBackground,
+  underline
 }
 
 export default images

@@ -53,20 +53,26 @@ function LoginPage() {
           </Link>
         </p>
 
-        <Image src={icons.pinkStar} alt='Koine' width={35} height={35} className='absolute top-0 left-0 mt-16 ml-40' />
+        <Image
+          src={icons.pinkStar}
+          alt='Koine'
+          width={35}
+          height={35}
+          className='absolute -z-10 top-0 left-0 mt-16 ml-40'
+        />
         <Image
           src={icons.blueStar}
           alt='Koine'
           width={25}
           height={25}
-          className='absolute bottom-0 left-0 mb-52 ml-5'
+          className='absolute -z-10 bottom-0 left-0 mb-52 ml-5'
         />
         <Image
           src={icons.lightBlueStar}
           alt='Koine'
           width={50}
           height={50}
-          className='absolute bottom-0 left-0 ml-60 mb-10'
+          className='absolute -z-10 bottom-0 left-0 ml-60 mb-10'
         />
 
         <Image
@@ -74,16 +80,22 @@ function LoginPage() {
           alt='Koine'
           width={40}
           height={40}
-          className='absolute bottom-0 right-0 mr-5 mb-32'
+          className='absolute -z-10 bottom-0 right-0 mr-5 mb-32'
         />
         <Image
           src={icons.lightBlueStar}
           alt='Koine'
           width={20}
           height={20}
-          className='absolute top-0 right-0 mr-32 mt-32'
+          className='absolute -z-10 top-0 right-0 mr-32 mt-32'
         />
-        <Image src={icons.blueStar} alt='Koine' width={25} height={25} className='absolute bottom-0 right-0 mr-52' />
+        <Image
+          src={icons.blueStar}
+          alt='Koine'
+          width={25}
+          height={25}
+          className='absolute -z-10 bottom-0 right-0 mr-52'
+        />
       </div>
 
       <Image src={images.loginVector} alt='Koine' width={1800} height={1800} className='w-[100vw] min-h-[200px]' />

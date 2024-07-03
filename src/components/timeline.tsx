@@ -8,7 +8,7 @@ Timeline.displayName = 'Timeline'
 
 const TimelineItem = React.forwardRef<HTMLLIElement, React.LiHTMLAttributes<HTMLLIElement>>(
   ({ className, ...props }, ref) => (
-    <li ref={ref} className={cn('relative flex flex-col pl-6 pt-0 [&>*]:mb-3', className)} {...props} />
+    <li ref={ref} className={cn('relative flex flex-col md:pl-6 pt-0 [&>*]:mb-2', className)} {...props} />
   )
 )
 TimelineItem.displayName = 'TimelineItem'
@@ -18,7 +18,7 @@ const TimelineTime = React.forwardRef<HTMLParagraphElement, React.HTMLAttributes
     <p
       ref={ref}
       className={cn(
-        'absolute translate-x-36 md:-translate-x-32 font-semibold text-base text-primary leading-none',
+        'hidden md:block absolute translate-x-36 md:-translate-x-32 font-semibold text-base text-primary leading-none',
         className
       )}
       {...props}
@@ -32,7 +32,7 @@ const TimelineConnector = React.forwardRef<HTMLDivElement, React.HTMLAttributes<
     <div
       ref={ref}
       className={cn(
-        'absolute top-[5px] left-[30px] -translate-x-1/2 translate-y-2 h-full w-px bg-secondary',
+        'hidden md:block absolute top-[5px] left-[30px] -translate-x-1/2 translate-y-2 h-full w-px bg-secondary',
         className
       )}
       {...props}
@@ -48,7 +48,7 @@ TimelineHeader.displayName = 'TimelineHeader'
 
 const TimelineTitle = React.forwardRef<HTMLHeadingElement, React.HTMLAttributes<HTMLHeadingElement>>(
   ({ className, children, ...props }, ref) => (
-    <h3 ref={ref} className={cn('font-semibold leading-none tracking-tight', className)} {...props}>
+    <h3 ref={ref} className={cn('hidden md:block font-semibold leading-none tracking-tight', className)} {...props}>
       {children}
     </h3>
   )
@@ -57,7 +57,7 @@ TimelineTitle.displayName = 'CardTitle'
 
 const TimelineIcon = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
   ({ className, ...props }, ref) => (
-    <div ref={ref} className={cn('flex flex-col size-3 bg-secondary rounded-full', className)} {...props} />
+    <div ref={ref} className={cn('hidden md:flex flex-col size-3 bg-secondary rounded-full', className)} {...props} />
   )
 )
 TimelineIcon.displayName = 'TimelineIcon'
@@ -71,7 +71,7 @@ TimelineDescription.displayName = 'TimelineDescription'
 
 const TimelineContent = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
   ({ className, ...props }, ref) => (
-    <div ref={ref} className={cn('flex flex-col items-start pl-10 pt-0', className)} {...props} />
+    <div ref={ref} className={cn('flex flex-col items-start md:pl-10 pt-0', className)} {...props} />
   )
 )
 TimelineContent.displayName = 'TimelineContent'
