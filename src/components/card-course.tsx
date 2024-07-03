@@ -9,7 +9,7 @@ function CardCourse({ images }: { images: string | StaticImport }) {
             transition-shadow duration-500 hover:shadow-xl cursor-pointer ease-in-out'
     >
       <Image src={images} alt='children' width={500} height={500} className='w-full h-[350px] object-cover' />
-      <div className='px-11 py-4 h-[180px] flex flex-col justify-between'>
+      <div className='px-4 md:px-8 xl:px-11 py-4 h-[180px] flex flex-col justify-between'>
         <h3 className='text-gray-400 font-medium text-base'>Tên khóa học</h3>
         <h2 className='font-bold text-lg line-clamp-3'>
           Hàng nghìn bà mẹ không thể sai được. Hãy xem vì sao bạn cũng cần một đĩa nhạc ngủ ngon.

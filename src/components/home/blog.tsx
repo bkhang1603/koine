@@ -8,7 +8,7 @@ function Blog() {
 
       <h2
         className='bg-gradient-to-r from-[#FF0059] via-[#FF597D] to-[#2945DE]
-        text-transparent bg-clip-text text-5xl font-bold h-[52px] mt-10 line-clamp-1'
+        text-transparent bg-clip-text text-2xl md:text-3xl lg:text-5xl xl:h-14 font-bold mt-10 text-center'
       >
         Những tin tức về giáo dục giới tính
       </h2>

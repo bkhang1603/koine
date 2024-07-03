@@ -7,7 +7,7 @@ function Feature() {
       <div className='container flex justify-center items-center flex-col relative pt-28 pb-24'>
         <h2
           className='bg-gradient-to-r from-[#FF0059] via-[#FF597D] to-[#2945DE]
-          inline-block text-transparent bg-clip-text text-4xl font-bold h-11'
+          text-transparent bg-clip-text text-2xl md:text-3xl lg:text-4xl font-bold text-center'
         >
           Câu chuyện của chúng tôi
         </h2>

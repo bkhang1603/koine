@@ -22,7 +22,7 @@ function PaginationCustom({ totalPage, href, className }: { totalPage: number; h
     <Pagination className={cn('', className)}>
       <PaginationContent>
         {currentPage > 1 && (
-          <PaginationItem>
+          <PaginationItem className='hidden sm:block'>
             <PaginationPrevious href={href + '?page_index=' + (currentPage - 1) + (search && `&search=${search}`)} />
           </PaginationItem>
         )}
@@ -53,7 +53,7 @@ function PaginationCustom({ totalPage, href, className }: { totalPage: number; h
             }
           })}
         {currentPage < totalPage && (
-          <PaginationItem>
+          <PaginationItem className='hidden sm:block'>
             <PaginationNext href={href + '?page_index=' + (currentPage + 1) + (search && `&search=${search}`)} />
           </PaginationItem>
         )}

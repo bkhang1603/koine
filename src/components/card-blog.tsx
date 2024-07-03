@@ -17,7 +17,7 @@ function CardBlog() {
         </div>
       </div>
 
-      <div className='flex justify-between items-center gap-4 mt-3'>
+      <div className='flex flex-col md:flex-row justify-between items-center gap-4 mt-3'>
         <div className='max-w-[800px] h-[150px] flex flex-col justify-between'>
           <h2
             className='bg-gradient-to-r from-[#FF0059] via-[#FF597D] to-[#2945DE]
@@ -36,7 +36,7 @@ function CardBlog() {
           alt='blog'
           width={500}
           height={500}
-          className='w-[320px] h-[180px] object-cover rounded-xl'
+          className='w-full md:w-[320px] h-[180px] object-cover rounded-xl'
         />
       </div>
     </article>

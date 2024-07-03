@@ -5,7 +5,7 @@ import Image from 'next/image'
 function Hero() {
   return (
     <section className='container pt-[100px] grid grid-cols-1 lg:grid-cols-2 h-[100vh]'>
-      <div className='relative mr-0 lg:mr-10 mt-32'>
+      <div className='relative mr-0 lg:mr-10 mt-24 ms:mt-32'>
         <Image
           src={images.heroBackground}
           alt='Hero background'
@@ -14,18 +14,18 @@ function Hero() {
           className='absolute top-0 left-0 object-contain -z-10'
         />
         <div className='w-full mt-10 flex items-center flex-col'>
-          <Image src={images.cloud} alt='Cloud' width={500} height={500} className='max-w-[420px]' />
+          <Image src={images.cloud} alt='Cloud' width={500} height={500} className='md:max-w-[420px]' />
 
           <h1 className='mt-6 max-w-[420px] text-lg text-center break-words'>
             “Vun đắp tâm hồn, thấu hiểu cơ thể.
             <br /> Một nền tảng cho một cuộc sống hạnh phúc.”
           </h1>
 
-          <Button className='mt-12 h-14 w-[420px] bg-secondary hover:bg-secondary/90 text-lg rounded-2xl'>
+          <Button className='mt-12 h-14 w-full md:w-[420px] bg-secondary hover:bg-secondary/90 text-lg rounded-2xl'>
             Trải nghiệm cùng Koine
           </Button>
 
-          <Button className='mt-4 h-14 w-[420px] bg-third hover:bg-third/90 text-lg rounded-2xl'>
+          <Button className='mt-4 h-14 w-full md:w-[420px] bg-third hover:bg-third/90 text-lg rounded-2xl'>
             Đăng ký các khóa học ngay
           </Button>
         </div>

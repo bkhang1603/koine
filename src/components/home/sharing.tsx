@@ -28,7 +28,7 @@ function Sharing() {
             </h2>
           </div>
 
-          <p className='line-clamp-5 max-w-[520px] text-center font-medium text-lg'>
+          <p className='line-clamp-5 max-w-[520px] text-center font-medium text-lg mt-10 lg:mt-0'>
             Nguyên nhân chính của bệnh là do sự bận rộn với đời sống hằng ngày, nếp sống càng tiện nghi thì họ lại càng
             hết sức lao tâm lao lực để đạt đến cái tiện nghi hơn. Nguyên nhân chính của bệnh là do sự bận rộn với đời
             sống hằng ngày, nếp sống càng tiện nghi thì họ lại càng hết sức lao tâm lao lực để đạt đến cái tiện nghi.

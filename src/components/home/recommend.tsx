@@ -10,7 +10,7 @@ function Recommend() {
       <h3 className='font-medium text-lg'>Các khóa học của chúng tôi</h3>
       <h2
         className='bg-gradient-to-r from-[#FF0059] via-[#FF597D] to-[#2945DE]
-        text-transparent bg-clip-text text-5xl font-bold mt-5 h-[52px] line-clamp-1'
+        text-transparent bg-clip-text text-2xl md:text-3xl lg:text-5xl lg:h-14 font-bold mt-5 text-center'
       >
         Những khóa học hàng đầu
       </h2>
@@ -19,7 +19,7 @@ function Recommend() {
         alt='pink-stars'
         width={200}
         height={200}
-        className='absolute top-20 left-14 mt-32'
+        className='hidden sm:block absolute top-20 left-14 mt-32'
       />
 
       <div className='mt-20 p-4 w-full flex items-center justify-end gap-2 cursor-pointer text-gray-500 hover:text-secondary'>

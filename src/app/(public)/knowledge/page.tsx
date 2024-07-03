@@ -24,23 +24,21 @@ function KnowledgePage() {
           alt='Knowledge Background'
           width={2000}
           height={2000}
-          className='object-cover w-full'
+          className='hidden sm:block object-cover w-full'
         />
 
         <h1
           className='text-secondary font-bold text-3xl lg:text-4xl text-center
-        absolute inset-0 flex items-center justify-center mx-auto'
+        absolute inset-0 flex items-center justify-center mx-auto max-w-[700px]'
         >
-          “Có kiến thức bảo vệ bản thân
-          <br />
-          để tạo nên hạnh phúc”
+          “Có kiến thức bảo vệ bản thân để tạo nên hạnh phúc”
           <Image
             src={images.underline}
             alt='Underline'
             width={500}
             height={500}
             className='w-40 lg:w-52 absolute top-[50%] right-[42%] transform
-            translate-x-1/2 translate-y-8 z-[-1]'
+            translate-x-1/2 translate-y-8 z-[-1] hidden lg:block'
           />
         </h1>
       </figure>

@@ -11,7 +11,7 @@ function CoursePage() {
   return (
     <main>
       <figure className='py-24 relative'>
-        <Image src={images.knowledgeBackground} alt='Koine' width={2000} height={2000} />
+        <Image src={images.knowledgeBackground} alt='Koine' width={2000} height={2000} className='hidden md:block' />
 
         <h1
           className='bg-gradient-to-r from-[#FF0059] via-[#FF597D] to-[#2945DE]
@@ -100,7 +100,7 @@ function CoursePage() {
           </div>
         </div>
 
-        <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-10'>
+        <div className='grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 mt-10'>
           <CardCourse images={images.children} />
           <CardCourse images={images.children1} />
           <CardCourse images={images.children2} />

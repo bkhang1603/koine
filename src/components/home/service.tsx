@@ -10,7 +10,7 @@ function Service() {
         <h3 className='font-semibold text-lg'>Tại sao chọn chúng tôi</h3>
         <h2
           className='bg-gradient-to-r from-[#FF0059] via-[#FF597D] to-[#2945DE]
-          text-transparent bg-clip-text text-5xl font-bold mt-5 h-[52px] line-clamp-1'
+          text-transparent bg-clip-text text-2xl md:text-3xl lg:text-5xl lg:h-14 font-bold mt-5 text-center'
         >
           Các khóa học tạo nên sự khác biệt
         </h2>
