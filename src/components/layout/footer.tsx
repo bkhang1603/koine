@@ -15,9 +15,9 @@ function Footer() {
         <section className='container'>
           <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-x-4 gap-y-8 py-20'>
             <div>
-              <h3 className='font-semibold text-xl'>Giới thiệu</h3>
+              <h3 className='font-semibold text-sm sm:text-xl'>Giới thiệu</h3>
 
-              <ul className='space-y-3 mt-4'>
+              <ul className='space-y-3 mt-4 text-xs sm:text-base'>
                 <li>
                   <Link className='hover:text-black/70' href={configRoute.home}>
                     Trang chủ
@@ -52,9 +52,9 @@ function Footer() {
             </div>
 
             <div>
-              <h3 className='font-semibold text-xl'>Trợ giúp</h3>
+              <h3 className='font-semibold text-sm sm:text-xl'>Trợ giúp</h3>
 
-              <ul className='space-y-3 mt-4 cursor-pointer'>
+              <ul className='space-y-3 mt-4 cursor-pointer text-xs sm:text-base'>
                 <li>
                   <span className='hover:text-black/70'>Hỏi & đáp</span>
                 </li>
@@ -68,9 +68,9 @@ function Footer() {
             </div>
 
             <div>
-              <h3 className='font-semibold text-xl'>Mạng xã hội</h3>
+              <h3 className='font-semibold text-sm sm:text-xl'>Mạng xã hội</h3>
 
-              <ul className='space-y-3 mt-4'>
+              <ul className='space-y-3 mt-4 text-xs sm:text-base'>
                 <li>
                   <Link href={'https://www.facebook.com/'} className='flex items-center gap-3 hover:text-black/70'>
                     <Image src={icons.facebook} alt='facebook' width={100} height={100} className='w-5 h-5' />
@@ -93,9 +93,9 @@ function Footer() {
             </div>
 
             <div>
-              <h3 className='font-semibold text-xl'>Liên hệ</h3>
+              <h3 className='font-semibold text-sm sm:text-xl'>Liên hệ</h3>
 
-              <ul className='space-y-3 mt-4'>
+              <ul className='space-y-3 mt-4 text-xs sm:text-base'>
                 <li>
                   Địa chỉ: <span className='text-primary'>66 Nguyen Ngoc Phuong, p19, Binh Thanh</span>
                 </li>
@@ -123,7 +123,9 @@ function Footer() {
           </div>
 
           <div className='flex justify-center items-center py-6 border-t border-t-secondary/40'>
-            <span className='text-secondary/80 font-semibold'>© 2024 - Copyright belongs to Koine</span>
+            <span className='text-secondary/80 font-semibold text-xs sm:text-base'>
+              © 2024 - Copyright belongs to Koine
+            </span>
           </div>
         </section>
       </div>

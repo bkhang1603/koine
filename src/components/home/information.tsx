@@ -11,7 +11,7 @@ function Information({ className }: { className?: string }) {
       >
         Cập nhật những thông tin mới sớm nhất
       </h2>
-      <p className='mt-11'>Hãy nhập email của bạn để chúng tôi có thể thông báo cho bạn sớm nhất.</p>
+      <p className='mt-11 text-center'>Hãy nhập email của bạn để chúng tôi có thể thông báo cho bạn sớm nhất.</p>
 
       <div className='flex items-center w-full sm:w-[500px] md:w-[600px] mt-9'>
         <Input className='focus-visible:ring-0 border-secondary rounded-lg' placeholder='Email' />

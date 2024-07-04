@@ -28,7 +28,7 @@ export default function RegisterForm({ className }: { className?: string }) {
       confirmPassword: '',
       gender: 'nam',
       yob: 1900,
-      term: true
+      term: false
     }
   })
 

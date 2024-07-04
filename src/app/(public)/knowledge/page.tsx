@@ -28,7 +28,7 @@ function KnowledgePage() {
         />
 
         <h1
-          className='text-secondary font-bold text-3xl lg:text-4xl text-center
+          className='text-secondary font-bold text-xl sm:text-3xl lg:text-4xl text-center
         absolute inset-0 flex items-center justify-center mx-auto max-w-[700px]'
         >
           “Có kiến thức bảo vệ bản thân để tạo nên hạnh phúc”

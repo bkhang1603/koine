@@ -4,7 +4,7 @@ import Image from 'next/image'
 
 function Hero() {
   return (
-    <section className='container pt-[100px] grid grid-cols-1 lg:grid-cols-2 h-[100vh]'>
+    <section className='container pt-[60px] md:pt-[100px] grid grid-cols-1 lg:grid-cols-2 h-[100vh]'>
       <div className='relative mr-0 lg:mr-10 mt-16 sm:mt-28 md:mt-32 2xl:mt-40'>
         <Image
           src={images.heroBackground}

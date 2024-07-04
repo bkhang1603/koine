@@ -7,11 +7,17 @@ function CardCategory({ title, images }: { title: string; images: string | Stati
       className='relative rounded-2xl overflow-hidden group
         cursor-pointer'
     >
-      <Image src={images} alt='Học cùng Koine' width={1000} height={1000} className='object-cover h-[220px] w-full' />
+      <Image
+        src={images}
+        alt='Học cùng Koine'
+        width={1000}
+        height={1000}
+        className='object-cover h-[120px] md:h-[220px] w-full'
+      />
 
       <div className='absolute inset-0 bg-gray-800 opacity-40' />
       <div className='absolute inset-0 flex items-center justify-center'>
-        <h2 className='text-white text-3xl font-bold'>{title}</h2>
+        <h2 className='text-white md:text-3xl font-bold'>{title}</h2>
       </div>
 
       <div

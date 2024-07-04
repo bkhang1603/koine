@@ -7,14 +7,14 @@ import Link from 'next/link'
 
 function Sharing() {
   return (
-    <section className='bg-fourth py-24'>
+    <section className='bg-fourth py-10 sm:py-24'>
       <div className='container grid grid-cols-1 lg:grid-cols-2 gap-4 relative'>
         <Image
           src={images.sharing}
           alt='sharing'
           width={500}
           height={500}
-          className='w-full object-cover rounded-[20px]'
+          className='w-full max-h-[500px] object-cover rounded-[20px]'
         />
 
         <div className='flex items-center justify-between flex-col py-10'>

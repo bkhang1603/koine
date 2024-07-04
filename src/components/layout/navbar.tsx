@@ -10,10 +10,16 @@ import Link from 'next/link'
 
 function Navbar() {
   return (
-    <header className='fixed bg-white w-full h-[100px] shadow-md z-10'>
+    <header className='fixed bg-white w-full h-[60px] md:h-[100px] shadow-md z-10'>
       <div className='container flex justify-between items-center h-full'>
         <Link href={configRoute.home}>
-          <Image src={icons.logo} alt='Koine' width={100} height={100} className='object-contain cursor-pointer' />
+          <Image
+            src={icons.logo}
+            alt='Koine'
+            width={100}
+            height={100}
+            className='w-[70px] md:w-[100px] object-contain cursor-pointer'
+          />
         </Link>
 
         <DesktopNavbar />
@@ -29,7 +35,7 @@ function Navbar() {
 
         <Sheet aria-describedby={undefined}>
           <SheetTrigger asChild>
-            <AlignJustify className='block lg:hidden w-10 h-10 cursor-pointer text-primary' />
+            <AlignJustify className='block lg:hidden w-8 h-8 md:w-10 md:h-10 cursor-pointer text-primary' />
           </SheetTrigger>
           <SheetContent>
             <SheetHeader>
