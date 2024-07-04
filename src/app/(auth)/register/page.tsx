@@ -24,7 +24,7 @@ function RegisterPage() {
       <div className='container flex justify-center items-center flex-col relative mt-10 sm:mt-0'>
         <h1
           className='bg-gradient-to-r from-[#FF0059] via-[#FF597D] to-[#2945DE]
-            inline-block text-transparent bg-clip-text text-5xl font-bold h-14'
+            inline-block text-transparent bg-clip-text text-3xl lg:text-5xl font-bold lg:h-14'
         >
           Đăng ký
         </h1>
@@ -46,7 +46,7 @@ function RegisterPage() {
           Đăng nhập với Google
         </Button>
 
-        <p className='text-secondary font-semibold mt-4'>
+        <p className='text-secondary font-semibold mt-4 text-center text-sm sm:text-base'>
           Bạn đã có tài khoản? {''}
           <Link href={configRoute.login} className='text-sixth hover:text-sixth/80'>
             Đăng nhập

@@ -18,12 +18,12 @@ function ForgotPasswordPage() {
       <div className='container flex justify-center items-center flex-col relative mt-10 sm:mt-0'>
         <h1
           className='bg-gradient-to-r from-[#FF0059] via-[#FF597D] to-[#2945DE]
-        inline-block text-transparent bg-clip-text text-5xl font-bold h-14'
+        inline-block text-transparent bg-clip-text text-2xl sm:text-4xl lg:text-5xl font-bold lg:h-14'
         >
           Bạn đã quên mật khẩu?
         </h1>
-        <p className='mt-6 font-semibold'>Trên đời này có hai thứ không được bỏ lỡ</p>
-        <p className='font-semibold'>Đó là chuyến xe cuối cùng và mật khẩu của mình</p>
+        <p className='mt-6 font-semibold text-sm sm:text-base text-center'>Trên đời này có hai thứ không được bỏ lỡ</p>
+        <p className='font-semibold text-sm sm:text-base text-center'>Đó là chuyến xe cuối cùng và mật khẩu của mình</p>
 
         <ForgotPasswordForm className='mt-10' />
 
@@ -43,7 +43,7 @@ function ForgotPasswordPage() {
           Đăng nhập với Google
         </Button>
 
-        <p className='text-secondary font-semibold mt-4'>
+        <p className='text-secondary font-semibold mt-4 text-center text-sm sm:text-base max-sm:max-w-[260px]'>
           Bạn đã nhớ ra tài khoản của mình? {''}
           <Link href={configRoute.login} className='text-sixth hover:text-sixth/80'>
             Đăng nhập
