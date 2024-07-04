@@ -132,3 +132,11 @@ export const RegisterRes = z.object({
 })
 
 export type RegisterResType = z.TypeOf<typeof RegisterRes>
+
+export const ForgotPasswordBody = z.object({
+  email: z.string().email({
+    message: 'Email không hợp lệ.'
+  })
+})
+
+export type ForgotPasswordBodyType = z.TypeOf<typeof ForgotPasswordBody>

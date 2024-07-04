@@ -16,8 +16,9 @@ function Navbar() {
           <Image
             src={icons.logo}
             alt='Koine'
-            width={100}
-            height={100}
+            width={1000}
+            height={1000}
+            quality={100}
             className='w-[70px] md:w-[100px] object-contain cursor-pointer'
           />
         </Link>
