@@ -1,17 +1,8 @@
-import { NewDataType } from '@/app/(public)/knowledge/[id]/page'
+import { DataType } from '@/app/(public)/knowledge/[id]/page'
 import images from '@/assets/images'
 import CardBlog from '@/components/card-blog'
 import Information from '@/components/home/information'
 import Tag from '@/components/tag'
-import {
-  Timeline,
-  TimelineConnector,
-  TimelineContent,
-  TimelineHeader,
-  TimelineIcon,
-  TimelineItem,
-  TimelineTime
-} from '@/components/timeline'
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area'
 import configRoute from '@/config/route'
 import data from '@/data/data'
@@ -19,7 +10,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 
 function KnowledgePage() {
-  const newData = data as NewDataType[]
+  const newData = data as unknown as DataType[]
 
   return (
     <main>
@@ -63,23 +54,12 @@ function KnowledgePage() {
         <ScrollBar orientation='horizontal' />
       </ScrollArea>
 
-      <div className='w-full flex items-center py-10'>
-        <Timeline className='md:pl-28'>
-          {newData.map((item, index) => (
-            <TimelineItem key={index}>
-              <TimelineConnector />
-              <TimelineHeader>
-                <TimelineTime>{item.date}</TimelineTime>
-                <TimelineIcon />
-              </TimelineHeader>
-              <TimelineContent>
-                <Link href={`${configRoute.knowledge}/${item.id}`}>
-                  <CardBlog data={item} />
-                </Link>
-              </TimelineContent>
-            </TimelineItem>
-          ))}
-        </Timeline>
+      <div className='w-full flex flex-col items-center py-10 gap-4'>
+        {newData.map((item, index) => (
+          <Link key={index} href={`${configRoute.knowledge}/${item?.id}`} className='w-full'>
+            <CardBlog data={item} />
+          </Link>
+        ))}
       </div>
 
       {/* <PaginationCustom className='mt-16' totalPage={5} href='/knowledge' /> */}

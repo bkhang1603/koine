@@ -1,10 +1,10 @@
-import { NewDataType } from '@/app/(public)/knowledge/[id]/page'
+import { DataType } from '@/app/(public)/knowledge/[id]/page'
 import images from '@/assets/images'
 import { Bookmark, Ellipsis } from 'lucide-react'
 import Image from 'next/image'
 
-function CardBlog({ data }: { data: NewDataType }) {
-  const postedDate = new Date(data.date)
+function CardBlog({ data }: { data: DataType }) {
+  const postedDate = new Date(data?.date!)
   const currentDate = new Date()
   const differenceInTime = currentDate.getTime() - postedDate.getTime()
   const differenceInDays = Math.floor(differenceInTime / (1000 * 3600 * 24))
@@ -38,9 +38,9 @@ function CardBlog({ data }: { data: NewDataType }) {
             className='bg-gradient-to-r from-[#FF0059] via-[#FF597D] to-[#2945DE]
             text-transparent bg-clip-text text-2xl font-semibold line-clamp-1'
           >
-            {data.title}
+            {data?.title}
           </h2>
-          <h3 className='line-clamp-2'>{data.content.map((item) => item?.paragraphs?.[0]?.text?.[0]?.text)}</h3>
+          <h3 className='line-clamp-2'>{data?.description}</h3>
           <span className='font-medium text-sm'>
             {/* {new Date(data.date).toLocaleDateString('vi-VN', {
               year: 'numeric',
@@ -51,7 +51,7 @@ function CardBlog({ data }: { data: NewDataType }) {
           </span>
         </div>
         <Image
-          src={data.image}
+          src={data?.image!}
           alt='blog'
           width={500}
           height={500}
