@@ -35,7 +35,7 @@ function DesktopNavbar() {
     },
     { name: 'Kiến thức', href: configRoute.knowledge },
     { name: 'Tổng quan', href: configRoute.about },
-    { name: 'Dịch vụ', href: configRoute.service },
+    // { name: 'Dịch vụ', href: configRoute.service },
     { name: 'Liên hệ', href: configRoute.contact }
   ]
 

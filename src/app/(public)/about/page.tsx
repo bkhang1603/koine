@@ -42,14 +42,6 @@ function AboutPage() {
 
   const teamData = [
     {
-      name: 'Lê Bảo Khang',
-      role: 'CEO',
-      image: images.zyzy,
-      phone: '0123456789',
-      facebook: 'https://www.facebook.com/bong.ca.7315720',
-      instagram: 'https://www.facebook.com/bong.ca.7315720'
-    },
-    {
       name: 'Phạm Tường Vy',
       role: 'CMO',
       image: images.zyzy,
@@ -67,6 +59,14 @@ function AboutPage() {
     },
     {
       name: 'Vũ Đan Thùy Huyên',
+      role: 'CPO',
+      image: images.zyzy,
+      phone: '0123456789',
+      facebook: 'https://www.facebook.com/bong.ca.7315720',
+      instagram: 'https://www.facebook.com/bong.ca.7315720'
+    },
+    {
+      name: 'Đỗ Dương Đăng Khoa',
       role: 'CTO',
       image: images.zyzy,
       phone: '0123456789',
@@ -74,9 +74,9 @@ function AboutPage() {
       instagram: 'https://www.facebook.com/bong.ca.7315720'
     },
     {
-      name: 'Phạm Tường Vy',
-      role: 'CEO',
-      image: images.zyzy,
+      name: 'Nguyễn Phan Quỳnh Như',
+      role: 'CFO',
+      image: images.nhu,
       phone: '0123456789',
       facebook: 'https://www.facebook.com/bong.ca.7315720',
       instagram: 'https://www.facebook.com/bong.ca.7315720'

@@ -1,6 +1,6 @@
 'use client'
 
-import { Book, Building2, HandHelping, Home, LibraryBig, Phone } from 'lucide-react'
+import { Book, Building2, Home, LibraryBig, Phone } from 'lucide-react'
 import Link from 'next/link'
 import configRoute from '@/config/route'
 import { usePathname } from 'next/navigation'
@@ -13,7 +13,7 @@ function MobileNavbar() {
     { name: 'Khóa học', icon: LibraryBig, href: configRoute.course },
     { name: 'Kiến thức', icon: Book, href: configRoute.knowledge },
     { name: 'Tổng quan', icon: Building2, href: configRoute.about },
-    { name: 'Dịch vụ', icon: HandHelping, href: configRoute.service },
+    // { name: 'Dịch vụ', icon: HandHelping, href: configRoute.service },
     { name: 'Liên hệ', icon: Phone, href: configRoute.contact }
   ]
 

@@ -22,6 +22,7 @@ import searchImage from './search-image.png'
 import navbarBackground from './navbar-background.png'
 import zyzy from './zyzy.jpg'
 import momo from './momo.jpg'
+import nhu from './nhu.jpg'
 
 const images = {
   heroImage,
@@ -47,7 +48,8 @@ const images = {
   searchImage,
   navbarBackground,
   zyzy,
-  momo
+  momo,
+  nhu
 }
 
 export default images

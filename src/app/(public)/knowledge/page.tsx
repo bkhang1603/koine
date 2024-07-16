@@ -1,7 +1,7 @@
+import { NewDataType } from '@/app/(public)/knowledge/[id]/page'
 import images from '@/assets/images'
 import CardBlog from '@/components/card-blog'
 import Information from '@/components/home/information'
-import PaginationCustom from '@/components/pagination-custom'
 import Tag from '@/components/tag'
 import {
   Timeline,
@@ -13,9 +13,14 @@ import {
   TimelineTime
 } from '@/components/timeline'
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area'
+import configRoute from '@/config/route'
+import data from '@/data/data'
 import Image from 'next/image'
+import Link from 'next/link'
 
 function KnowledgePage() {
+  const newData = data as NewDataType[]
+
   return (
     <main>
       <figure className='py-24 relative'>
@@ -60,22 +65,24 @@ function KnowledgePage() {
 
       <div className='w-full flex items-center py-10'>
         <Timeline className='md:pl-28'>
-          {[...Array(8)].map((_, index) => (
+          {newData.map((item, index) => (
             <TimelineItem key={index}>
               <TimelineConnector />
               <TimelineHeader>
-                <TimelineTime>2024-03-07</TimelineTime>
+                <TimelineTime>{item.date}</TimelineTime>
                 <TimelineIcon />
               </TimelineHeader>
               <TimelineContent>
-                <CardBlog />
+                <Link href={`${configRoute.knowledge}/${item.id}`}>
+                  <CardBlog data={item} />
+                </Link>
               </TimelineContent>
             </TimelineItem>
           ))}
         </Timeline>
       </div>
 
-      <PaginationCustom className='mt-16' totalPage={5} href='/knowledge' />
+      {/* <PaginationCustom className='mt-16' totalPage={5} href='/knowledge' /> */}
 
       <Information className='mt-20' />
     </main>
