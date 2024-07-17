@@ -1,7 +1,7 @@
 const data = [
   {
     id: '1',
-    title: 'Cột mốc quan trọng trong đời - Tuổi dậy thì',
+    title: 'Cột mốc quan trọng trong đời - tuổi dậy thì',
     description:
       'Tuổi dậy thì là một giai đoạn quan trọng trong cuộc đời mỗi người, đánh dấu sự chuyển tiếp từ trẻ con sang người trưởng thành. Đây là thời kỳ có nhiều thay đổi mạnh mẽ về thể chất, tâm lý và xã hội. Ở giai đoạn này, cơ thể bắt đầu phát triển hoàn thiện các chức năng sinh sản, mặc dù tâm lý và trách nhiệm xã hội vẫn còn đang trong quá trình hoàn thiện. Việc giáo dục về sức khỏe sinh sản, quản lý các thay đổi tâm sinh lý và duy trì một môi trường sống lành mạnh là rất cần thiết để giúp thanh thiếu niên vượt qua giai đoạn này một cách thành công và phát triển toàn diện.',
     date: '2024-06-30',
@@ -414,13 +414,17 @@ const data = [
       'https://photo.znews.vn/w660/Uploaded/sgorvz/2022_06_04/gioi_han_thoi_gian_su_dung_thiet_bi_dien_tu_o_tre_5.jpg',
     content: [
       {
-        paragraph: [
+        content: [
           {
-            row: 'Smartphone đã trở thành vật dụng không thể thiếu đối với mọi lứa tuổi trong thời đại ngày nay. Tuy nhiên, trẻ em và trẻ vị thành niên thường không thể tự điều chỉnh thời gian sử dụng thiết bị điện tử một cách hợp lý.'
+            paragraph: [
+              {
+                row: 'Smartphone đã trở thành vật dụng không thể thiếu đối với mọi lứa tuổi trong thời đại ngày nay. Tuy nhiên, trẻ em và trẻ vị thành niên thường không thể tự điều chỉnh thời gian sử dụng thiết bị điện tử một cách hợp lý.'
+              }
+            ],
+            image:
+              'https://photo.znews.vn/w660/Uploaded/sgorvz/2022_06_04/gioi_han_thoi_gian_su_dung_thiet_bi_dien_tu_o_tre_5.jpg'
           }
-        ],
-        iamge:
-          'https://photo.znews.vn/w660/Uploaded/sgorvz/2022_06_04/gioi_han_thoi_gian_su_dung_thiet_bi_dien_tu_o_tre_5.jpg'
+        ]
       },
       {
         title: '1. Thực trạng sử dụng thiết bị điện tử của trẻ',
@@ -704,7 +708,7 @@ const data = [
         title: 'Giáo dục giới tính là gì?',
         content: [
           {
-            paragrapgh: [
+            paragraph: [
               {
                 row: 'Theo Tổ chức Y tế Thế giới (WHO), giáo dục giới tính là quá trình dạy và học để trang bị kiến thức, kỹ năng, thái độ, và các giá trị cần thiết về bản thân cho trẻ em và thanh thiếu niên. Nhờ đó, trẻ có thể hiểu rõ hơn về mối quan hệ xã hội và quan hệ tình dục dựa trên sự tôn trọng lẫn nhau. Đồng thời, việc này nâng cao nhận thức của trẻ về các lựa chọn của mình đối với người khác, giúp trẻ biết cách bảo vệ quyền lợi của bản thân trong suốt cuộc đời.'
               },
@@ -723,13 +727,9 @@ const data = [
         title: 'Tầm quan trọng của giáo dục giới tính cho trẻ em',
         content: [
           {
-            content: [
+            paragraph: [
               {
-                paragraph: [
-                  {
-                    row: 'Khi trẻ bước vào giai đoạn dậy thì, ngoài những thay đổi về mặt cơ thể, còn có nhiều thay đổi đến từ bên trong. Lúc này, trẻ sẽ cảm thấy bỡ ngỡ và có xu hướng tò mò, muốn khám phá. Việc trang bị kiến thức giáo dục giới tính kịp thời là cần thiết để tránh tình trạng trẻ tự tìm hiểu và tiếp thu thông tin sai lệch trên mạng xã hội, gây ra nhiều ảnh hưởng về sau.'
-                  }
-                ]
+                row: 'Khi trẻ bước vào giai đoạn dậy thì, ngoài những thay đổi về mặt cơ thể, còn có nhiều thay đổi đến từ bên trong. Lúc này, trẻ sẽ cảm thấy bỡ ngỡ và có xu hướng tò mò, muốn khám phá. Việc trang bị kiến thức giáo dục giới tính kịp thời là cần thiết để tránh tình trạng trẻ tự tìm hiểu và tiếp thu thông tin sai lệch trên mạng xã hội, gây ra nhiều ảnh hưởng về sau.'
               }
             ]
           },
@@ -760,17 +760,11 @@ const data = [
         title: 'Giáo dục giới tính cho trẻ em đúng cách',
         content: [
           {
-            contetn: [
+            paragraph: [
               {
-                paragraph: [
-                  {
-                    row: 'Sau đây là một số phương pháp giáo dục giới tính đúng đắn và hiệu quả mà phụ huynh có thể tham khảo: '
-                  }
-                ]
+                row: 'Sau đây là một số phương pháp giáo dục giới tính đúng đắn và hiệu quả mà phụ huynh có thể tham khảo: '
               }
-            ]
-          },
-          {
+            ],
             content: [
               {
                 paragraph: [
@@ -791,13 +785,9 @@ const data = [
             ]
           },
           {
-            contetn: [
+            paragraph: [
               {
-                paragraph: [
-                  {
-                    row: 'Koine tin rằng việc giáo dục giới tính cho trẻ đúng cách sẽ giúp các em phát triển toàn diện và tự tin hơn trong cuộc sống.'
-                  }
-                ]
+                row: 'Koine tin rằng việc giáo dục giới tính cho trẻ đúng cách sẽ giúp các em phát triển toàn diện và tự tin hơn trong cuộc sống.'
               }
             ]
           }
@@ -1026,7 +1016,7 @@ const data = [
           {
             paragraph: [
               {
-                row: ' "Trẻ em hiện nay chỉ cần học và nghỉ ngơi, không phải làm việc nặng nhọc, nhưng lại thường than mệt mỏi, trầm cảm, thậm chí dọa tự tử. Ngày xưa chúng ta chịu khổ mà vẫn lớn lên khỏe mạnh. Có phải trẻ em ngày nay quá nhạy cảm không?"'
+                row: '"Trẻ em hiện nay chỉ cần học và nghỉ ngơi, không phải làm việc nặng nhọc, nhưng lại thường than mệt mỏi, trầm cảm, thậm chí dọa tự tử. Ngày xưa chúng ta chịu khổ mà vẫn lớn lên khỏe mạnh. Có phải trẻ em ngày nay quá nhạy cảm không?"'
               },
               {
                 row: 'Tại Koine, chúng tôi thấu hiểu những lo lắng của phụ huynh về sự phát triển của con cái. Việc nuôi dạy con là một hành trình đầy thử thách, và không ai học làm cha mẹ trước khi có con, nên việc cảm thấy lúng túng khi đối mặt với các vấn đề là dễ hiểu. Hôm nay, chúng ta sẽ thảo luận nghiêm túc về vấn đề "TỰ TỬ" và các vấn đề liên quan.'
@@ -1344,6 +1334,680 @@ const data = [
                 ]
               }
             ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    id: '11',
+    title: '7 dấu hiệu nhận biết bạn đang trong một mối quan hệ độc hại',
+    description:
+      'Nhận biết 7 dấu hiệu bạn đang trong một mối quan hệ độc hại là bước quan trọng để bảo vệ sức khỏe tâm lý và tinh thần của bản thân. Thứ nhất, nếu bạn cảm thấy liên tục bị kiểm soát và giám sát bởi đối phương, đó là dấu hiệu rõ ràng của sự không lành mạnh. Thứ hai, thiếu sự tin tưởng và thường xuyên nghi ngờ lẫn nhau dẫn đến căng thẳng và mệt mỏi. Thứ ba, bạn cảm thấy mình phải thay đổi bản thân để làm hài lòng đối phương, thay vì được chấp nhận và yêu thương vì chính con người thật của mình. Thứ tư, mối quan hệ khiến bạn cảm thấy sợ hãi, lo lắng hoặc bị đe dọa. Thứ năm, thiếu sự tôn trọng trong giao tiếp, chẳng hạn như bị xúc phạm, chỉ trích hoặc coi thường ý kiến. Thứ sáu, bạn bị cô lập khỏi gia đình và bạn bè, không còn những mối quan hệ xã hội khác ngoài người đó. Cuối cùng, mối quan hệ khiến bạn cảm thấy kiệt sức về mặt cảm xúc và tinh thần. Nếu bạn nhận thấy những dấu hiệu này, hãy xem xét lại mối quan hệ và tìm kiếm sự hỗ trợ từ người thân hoặc chuyên gia để có quyết định đúng đắn.',
+    date: '2024-06-30',
+    image: 'https://gcs.tripi.vn/public-tripi/tripi-feed/img/476969jWy/anh-mo-ta.png',
+    content: [
+      {
+        content: [
+          {
+            paragraph: [
+              {
+                row: 'Mối quan hệ độc hại (Toxic Relationship) không phải là một khái niệm mới, và loại quan hệ này xuất hiện khá phổ biến trong cuộc sống. Tuy nhiên, việc nhận diện chúng lại không hề dễ dàng vì những “triệu chứng” không rõ ràng.'
+              }
+            ]
+          }
+        ]
+      },
+      {
+        title: 'Thế nào là một mối quan hệ độc hại?',
+        content: [
+          {
+            paragraph: [
+              {
+                row: 'Mối quan hệ này không nhất thiết phải là tình yêu mà có thể là tình bạn, quan hệ đồng nghiệp, hay gia đình. Sự khó khăn trong việc nhận ra mối quan hệ độc hại nằm ở chỗ người đó đã tạo dựng được lòng tin với bạn. Thời gian dài ở bên nhau có thể khiến bạn bỏ qua các dấu hiệu và nghĩ rằng “dù sao họ cũng là người tốt” hay “họ không cố ý làm điều đó”.'
+              }
+            ]
+          }
+        ]
+      },
+      {
+        title: 'Các dấu hiệu của một mối quan hệ độc hại',
+        content: [
+          {
+            title: '1. Cô lập bạn',
+            content: [
+              {
+                paragraph: [
+                  {
+                    row: 'Một ví dụ điển hình là trong mối quan hệ yêu đương, khi một người không cho đối phương đi chơi với bạn bè, dần dần cô lập họ, khiến đối phương phụ thuộc hoàn toàn vào mình. Điều này không diễn ra rõ ràng mà bắt đầu từ những lời nhận xét nhỏ nhặt như “A hay hút thuốc” hay “B đi chơi về muộn quá”. Theo thời gian, những lời nhận xét này sẽ tích tụ và khiến bạn nghĩ xấu về bạn bè, tự tách biệt và phụ thuộc vào người yêu hơn.'
+                  }
+                ],
+                image:
+                  'https://tamlymienhaidang.com/wp-content/uploads/2022/09/blaming-concept-illustration_114360-8890-800x800.jpg'
+              }
+            ]
+          },
+          {
+            title: '2. Khiến bạn cảm thấy tội lỗi',
+            content: [
+              {
+                paragraph: [
+                  {
+                    row: '"Thay vì đe dọa trực tiếp như “Nếu em bỏ anh, anh sẽ không để em yên”, người đó sẽ khiến bạn cảm thấy có lỗi và phải chịu trách nhiệm cho họ, ví dụ như “Nếu em bỏ anh, anh sẽ không muốn sống nữa”. Điều này làm bạn khó nhận ra sự độc hại vì bạn không muốn người ấy bị tổn thương."'
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            title: '3. Đổ lỗi cho bạn',
+            content: [
+              {
+                paragraph: [
+                  {
+                    row: 'Khi có vấn đề xảy ra, dù vấn đề bắt nguồn từ đối phương, họ luôn đổ lỗi cho bạn và yêu cầu bạn giải quyết. Đây là dấu hiệu dễ nhận biết và khiến bạn mệt mỏi nhất vì phải gánh chịu hậu quả từ lỗi lầm của người khác.'
+                  }
+                ],
+                image: 'https://gcs.tripi.vn/public-tripi/tripi-feed/img/476974NVo/anh-mo-ta.png'
+              }
+            ]
+          },
+          {
+            title: '4. Kiểm soát bạn',
+            content: [
+              {
+                paragraph: [
+                  {
+                    row: 'Đối phương có thói quen kiểm tra điện thoại và tài khoản mạng xã hội của bạn, kiểm soát mọi tin nhắn và cuộc gọi. Ban đầu, họ có thể nói rằng vì yêu bạn nên mới làm thế, nhưng dần dần sẽ trở thành sự chiếm hữu và hoang tưởng.'
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            title: '5. Coi nhẹ cảm xúc của bạn',
+            content: [
+              {
+                paragraph: [
+                  {
+                    row: 'Khi bạn gặp vấn đề và cảm thấy khó chịu, đối phương cố gắng khiến bạn cảm thấy mình đang làm quá lên và phải nhanh chóng vượt qua. Ví dụ, khi bạn tức giận vì xe bị xước, họ có thể nói "Có gì đâu, xe tao cũng bị xước suốt mà".'
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            title: '6. Lợi dụng bạn về vật chất',
+            content: [
+              {
+                paragraph: [
+                  {
+                    row: 'Người ấy có thể thường xuyên mượn tiền hoặc yêu cầu bạn chi trả cho mọi thứ, lợi dụng sự rộng lượng của bạn mà không có ý định trả lại hoặc đáp trả.'
+                  }
+                ],
+                image: 'https://community.thriveglobal.com/wp-content/uploads/2019/12/shutterstock_1437311942.jpg'
+              }
+            ]
+          },
+          {
+            title: '7. Trả lời những câu hỏi sau',
+            content: [
+              {
+                paragraph: [
+                  {
+                    row: 'Bạn không muốn trả lời tin nhắn hay nhận cuộc gọi của người kia?'
+                  },
+                  {
+                    row: 'Bạn thấy căng thẳng mỗi khi đi chơi với họ?'
+                  },
+                  {
+                    row: 'Họ có đe dọa bạn hoặc đe dọa tự làm hại bản thân?'
+                  },
+                  {
+                    row: 'Bạn cảm thấy không thể tự quyết định nếu thiếu họ?'
+                  },
+                  {
+                    row: 'Họ lợi dụng bạn về vật chất?'
+                  },
+                  {
+                    row: 'Họ nói xấu sau lưng bạn?'
+                  },
+                  {
+                    row: 'Bạn luôn phải cẩn trọng với cảm xúc của họ?'
+                  },
+                  {
+                    row: 'Nếu bạn trả lời “Có” cho nhiều câu hỏi trên, hãy cân nhắc xem có nên tiếp tục duy trì mối quan hệ này hay không.'
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            content: [
+              {
+                paragraph: [
+                  {
+                    row: 'Thi thoảng, nếu bạn cảm thấy mệt mỏi về mặt cảm xúc hay thể chất trong một mối quan hệ, hãy dừng lại và nhìn nhận một cách khách quan để xem liệu đó có phải là một mối quan hệ độc hại hay không. Koine khuyến khích bạn luôn lắng nghe và quan tâm đến cảm xúc của mình để bảo vệ sức khỏe tinh thần.'
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    id: '12',
+    title: '6 câu hỏi thường gặp về chu kỳ kinh nguyệt',
+    description:
+      'Chu kỳ kinh nguyệt là một hiện tượng sinh lý bình thường ở phụ nữ, thường bắt đầu khi các bạn nữ bước vào độ tuổi dậy thì. Chu kỳ kinh nguyệt cũng phản ánh sức khỏe sinh sản nên cần được theo dõi và kiểm tra thường xuyên.',
+    date: '2024-06-30',
+    image:
+      'https://static.vecteezy.com/system/resources/previews/017/348/840/non_2x/girl-with-menstrual-pains-women-menstruating-health-cycle-cramps-period-menstruation-concept-flat-vector.jpg',
+    content: [
+      {
+        title: 'Chu kỳ kinh nguyệt gồm mấy giai đoạn?',
+        content: [
+          {
+            paragraph: [
+              {
+                row: 'Chu kỳ kinh nguyệt trung bình kéo dài từ 28 đến 30 ngày, nhưng cũng có thể dao động từ 23 đến 32 ngày đối với một số người. Một chu kỳ gồm 4 giai đoạn:'
+              }
+            ],
+            image:
+              'https://thumbs.dreamstime.com/b/menstrual-cycle-chart-increase-decrease-hormones-graph-also-depicts-growth-follicle-fluctuation-137439594.jpg'
+          },
+          {
+            title: '1. Giai đoạn kinh nguyệt',
+            content: [
+              {
+                paragraph: [
+                  {
+                    row: 'Đây là giai đoạn đầu tiên của chu kỳ, xảy ra khi trứng từ chu kỳ trước không được thụ tinh, tức là không mang thai. Trứng sẽ được loại bỏ cùng với máu và chất nhầy, quá trình này kéo dài từ 3 đến 7 ngày. Các dấu hiệu bao gồm đau bụng, đau lưng dưới, tức ngực và thay đổi tâm trạng.'
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            title: '2. Giai đoạn nang trứng',
+            content: [
+              {
+                paragraph: [
+                  {
+                    row: 'Giai đoạn này diễn ra đồng thời với giai đoạn kinh nguyệt, kéo dài khoảng 13 ngày và kết thúc khi rụng trứng. Các nang trứng làm niêm mạc tử cung dày và xốp hơn, tạo môi trường thuận lợi cho quá trình thụ tinh và hình thành bào thai.'
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            title: '3. Giai đoạn rụng trứng',
+            content: [
+              {
+                paragraph: [
+                  {
+                    row: 'Giai đoạn rụng trứng là thời điểm bạn có thể mang thai, xảy ra khi trứng được phóng thích từ buồng trứng, thường vào ngày 14 của chu kỳ. Trứng chỉ tồn tại trong khoảng 12 đến 24 giờ, nhưng tinh trùng có thể tồn tại đến 5 ngày, nên khả năng mang thai cao nhất là từ ngày 10 đến ngày 15.'
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            title: '4. Giai đoạn hoàng thể',
+            content: [
+              {
+                paragraph: [
+                  {
+                    row: 'Diễn ra sau khi rụng trứng và kéo dài từ 11 đến 17 ngày. Thời gian có cơ hội thụ thai cao đã qua, và cơ thể chuẩn bị cho chu kỳ tiếp theo. Nếu không mang thai, bạn có thể gặp các triệu chứng tiền kinh nguyệt như đau ngực và thay đổi tâm trạng.'
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        title: "'Ngày đèn đỏ' thì có đi chùa được không?",
+        content: [
+          {
+            paragraph: [
+              {
+                row: 'Theo quan niệm dân gian, phụ nữ trong ngày “đèn đỏ” không nên đi lễ chùa vì bị coi là "không sạch sẽ". Tuy nhiên, thực tế kinh nguyệt là hiện tượng tự nhiên và bình thường của cơ thể, không có gì "bẩn" hay "không sạch sẽ". Phụ nữ không cần ngại hay mặc cảm khi đến chùa trong những ngày này.'
+              }
+            ],
+            image: 'https://img.freepik.com/premium-photo/cartoon-pagoda-with-word-kanji-front_863013-30242.jpg'
+          }
+        ]
+      },
+      {
+        title: 'Nên thay băng vệ sinh sau bao lâu?',
+        content: [
+          {
+            paragraph: [
+              {
+                row: 'Việc thay băng vệ sinh thường xuyên là cần thiết để đảm bảo vệ sinh vùng kín và tránh vi khuẩn xâm nhập. Thời gian thay băng vệ sinh nên từ 4 đến 8 tiếng, tùy thuộc vào lượng máu kinh. Ngay cả trong những ngày cuối kỳ, dù băng không đầy, bạn cũng nên thay thường xuyên.'
+              }
+            ]
+          }
+        ]
+      },
+      {
+        title: 'Dùng tampon có làm mất trinh không?',
+        content: [
+          {
+            paragraph: [
+              {
+                row: 'Đây là một câu hỏi phổ biến, đặc biệt ở tuổi teen. Câu trả lời là không. Màng trinh là một màng mỏng nhưng có lỗ lớn ở giữa để máu kinh nguyệt thoát ra, đủ lớn để chèn tampon mà không gây rách màng trinh.'
+              }
+            ],
+            image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQLawUHe_LdDyR82nyIM6FplyPTOV2JCRotcQ&s'
+          }
+        ]
+      },
+      {
+        title: 'Nước ấm có tốt cho kỳ kinh nguyệt không?',
+        content: [
+          {
+            paragraph: [
+              {
+                row: 'Có! Nước ấm giúp giảm đau bụng kinh. Mỗi ngày, nên uống từ 2 đến 3 lít nước, có thể thêm gừng, quế, uống trà xanh, trà hoa cúc, hoặc sữa chua để tăng cường hệ miễn dịch và giảm mệt mỏi. Tránh uống trà đặc, rượu bia và cà phê vì chúng có thể làm cơ thể mất nước và tăng cảm giác mệt mỏi.'
+              }
+            ]
+          }
+        ]
+      },
+      {
+        title: 'Tại sao cảm giác mệt mỏi trong kỳ kinh nguyệt?',
+        content: [
+          {
+            paragraph: [
+              {
+                row: 'Mệt mỏi trong kỳ kinh nguyệt là do sự thay đổi hormone trong cơ thể. Hormone prostaglandin gây co bóp tử cung để đẩy máu kinh ra ngoài, dẫn đến đau bụng và mệt mỏi. Bổ sung đủ nước, nghỉ ngơi và ăn uống cân bằng có thể giúp giảm bớt cảm giác này.'
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    id: '13',
+    title: '10 cách để bước ra khõi một mối quan hệ độc hại',
+    description:
+      'Nhận diện được một mối quan hệ độc hại đã khó, nhưng việc bước ra khỏi đó còn khó khăn hơn bởi đối phương thường là người bạn đã gắn kết lâu dài và có nhiều kỷ niệm vui vẻ.',
+    date: '2024-06-30',
+    image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSUDdH1YUjZEg6ZeiUFChwBQEDVEggJ6ziNdg&s',
+    content: [
+      {
+        title: '1. Nói ra vấn đề',
+        content: [
+          {
+            paragraph: [
+              {
+                row: 'Giao tiếp luôn là chìa khóa để giải quyết mọi vấn đề. Đôi khi, chính đối phương cũng không nhận ra rằng họ đang thao túng bạn hay làm bạn kiệt quệ về mặt cảm xúc. Khi bạn nói ra vấn đề, bạn sẽ cảm thấy nhẹ lòng hơn và nếu họ nhận trách nhiệm và có thiện chí sửa đổi, thì vấn đề đã được giải quyết. Nhưng nếu họ vẫn tiếp tục đổ lỗi cho bạn và không coi trọng bạn, thì bạn cần bước ra khỏi mối quan hệ đó.'
+              }
+            ],
+            image:
+              'https://static.vecteezy.com/system/resources/previews/004/862/763/non_2x/mental-health-concept-man-talking-to-a-psychologist-about-problems-psychotherapy-session-flat-illustration-vector.jpg'
+          }
+        ]
+      },
+      {
+        title: '2. Cắt đứt mối quan hệ',
+        content: [
+          {
+            paragraph: [
+              {
+                row: 'Nếu vấn đề không được giải quyết, hãy dứt khoát cắt đứt mọi phương thức liên lạc. Nếu đó là người bạn phải gặp hàng ngày, hãy giữ mối quan hệ ở mức xã giao, giảm tối đa mọi sự tương tác.'
+              }
+            ]
+          }
+        ]
+      },
+      {
+        title: '3. Bạn không phải chịu trách nhiệm cho hạnh phúc của ai hết',
+        content: [
+          {
+            paragraph: [
+              {
+                row: 'Người đó có thể đe dọa sẽ làm hại bản thân nếu bạn rời xa họ, hoặc nói rằng họ đang cố gắng hoặc có chuyện riêng nên có quyền đối xử với bạn như vậy. Nên nhớ rằng cảm xúc của bạn cũng quan trọng và bạn cần đối tốt với bản thân mình, bảo vệ những cảm xúc tích cực khỏi những mối quan hệ độc hại. Bạn cũng cần giúp đỡ người khác, nhưng hãy đề ra một ranh giới để có những mối quan hệ lành mạnh.'
+              }
+            ]
+          }
+        ]
+      },
+      {
+        title: '4. Có những mối quan hệ khác',
+        content: [
+          {
+            paragraph: [
+              {
+                row: 'Hãy xây dựng cho mình những mối quan hệ lành mạnh như gia đình, người thân, và bạn bè khác nhau để bạn không bị phụ thuộc vào một mối quan hệ duy nhất. Bạn có thể tham gia vào những cộng đồng, hội nhóm mới, thử có những người bạn và mối quan hệ mới.'
+              }
+            ],
+            image: 'https://images.freeimages.com/image/previews/377/family-love-set-5690782.jpg'
+          }
+        ]
+      },
+      {
+        title: '5. Xây dựng sự tự tin',
+        content: [
+          {
+            paragraph: [
+              {
+                row: 'Mọi người đều có lúc nghi ngờ về bản thân kể cả những kẻ thao túng hay kiểm soát người khác. Khi bạn tự tin vào chính mình và đặt mình ngang hàng với người khác, sẽ không có ai dám coi thường bạn.'
+              }
+            ]
+          }
+        ]
+      },
+      {
+        title: '6. Viết nhật ký',
+        content: [
+          {
+            paragraph: [
+              {
+                row: 'Bạn có thể bắt đầu việc viết nhật ký để trở nên chân thật với những cảm xúc vui buồn của mình. Khi bạn hiểu rõ bản thân, bạn sẽ có cái nhìn khách quan với mọi chuyện hơn và dễ dàng xử lý vấn đề hơn.'
+              }
+            ],
+            image:
+              'https://media.istockphoto.com/id/1415676185/vector/writing-in-planner.jpg?s=612x612&w=0&k=20&c=0ATRChlrjue5q_ytHqnqGEcqB94P6nbXSdtkUzwP0zM='
+          }
+        ]
+      },
+      {
+        title: '7. Dành thời gian cho bản thân',
+        content: [
+          {
+            paragraph: [
+              {
+                row: 'Bạn có thể tham gia các hoạt động ngoài trời như leo núi, chạy bộ, hít thở không khí trong lành hay đi du lịch, làm những điều mình thích để cân bằng lại cuộc sống.'
+              }
+            ]
+          }
+        ]
+      },
+      {
+        title: '8. Nhớ lý do bạn cắt đứt',
+        content: [
+          {
+            paragraph: [
+              {
+                row: 'Việc cắt đứt mối quan hệ với một người bạn chơi trong nhiều năm là một quyết định khó khăn. Nhưng nếu tiếp tục mối quan hệ chỉ làm cảm xúc của bạn tệ hơn, hãy nhắc lại với bản thân lý do bạn chấm dứt. Nếu vấn đề cốt lõi không được giải quyết, tuyệt đối không nối lại quan hệ để tránh sa vào vòng luẩn quẩn.'
+              }
+            ]
+          }
+        ]
+      },
+      {
+        title: '9. Tìm kiếm sự hỗ trợ từ chuyên gia',
+        content: [
+          {
+            paragraph: [
+              {
+                row: 'Nếu bạn gặp khó khăn trong việc thoát khỏi mối quan hệ độc hại, hãy tìm kiếm sự giúp đỡ từ chuyên gia tâm lý. Họ có thể cung cấp cho bạn những công cụ và lời khuyên hữu ích để đối phó và bước ra khỏi tình huống này.'
+              }
+            ],
+            image:
+              'https://png.pngtree.com/png-clipart/20240111/original/pngtree-support-experts-png-image_14086393.png'
+          }
+        ]
+      },
+      {
+        title: '10. Tham gia các hoạt động thể chất và tâm lý',
+        content: [
+          {
+            paragraph: [
+              {
+                row: 'Tham gia các hoạt động thể chất như yoga, thiền định hay tham gia các lớp học về phát triển cá nhân có thể giúp bạn lấy lại cân bằng và sức mạnh tinh thần. Điều này sẽ giúp bạn tự tin hơn trong việc quyết định và duy trì khoảng cách với mối quan hệ độc hại.'
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    id: '14',
+    title: 'Khám phá các khái niệm LGBTQ+',
+    description:
+      'Trong thời gian gần đây, các khái niệm về LGBTQ+ ngày càng được công nhận và hiểu biết rộng rãi trong xã hội. Tuy nhiên, không phải ai cũng nắm rõ từng khái niệm trong cộng đồng này. Bài viết dưới đây sẽ giúp bạn hiểu rõ hơn về LGBTQ+ và tầm quan trọng của sự chấp nhận và tôn trọng sự đa dạng về giới tính và xu hướng tình dục.',
+    date: '2024-06-30',
+    image:
+      'https://media.istockphoto.com/id/1324721801/vector/hands-with-lgbtq-flag-isolated-on-white-background.jpg?s=612x612&w=0&k=20&c=NK_3t9UlzBrL4xXMEmCguCCSLqvAVawATXAQ_ZfWXUw=',
+    content: [
+      {
+        title: 'LGBTQ+ là gì?',
+        content: [
+          {
+            paragraph: [
+              {
+                row: 'LGBTQ+ là viết tắt của các từ: Lesbian (Đồng tính nữ), Gay (Đồng tính nam), Bisexual (Song tính), Transgender (Người chuyển giới), Queer/Questioning (Người có giới tính hoặc xu hướng tình dục không theo chuẩn mực truyền thống/Người đang tìm hiểu về giới tính và xu hướng tình dục của mình), và dấu “+” đại diện cho các khái niệm khác như Pansexual, Asexual, Intersex, v.v.'
+              }
+            ]
+          },
+          {
+            title: 'Đồng Tính Nữ (Lesbian)',
+            content: [
+              {
+                paragraph: [
+                  {
+                    row: 'Đồng tính nữ là những phụ nữ cảm thấy hấp dẫn tình dục và cảm xúc với những người phụ nữ khác. Họ mong muốn xây dựng các mối quan hệ tình yêu và tình dục với người cùng giới.'
+                  }
+                ],
+                image:
+                  'https://img.freepik.com/free-vector/beautiful-lesbian-couple-with-lgbt-flag-illustrated_23-2148882365.jpg'
+              }
+            ]
+          },
+          {
+            title: 'Đồng Tính Nam (Gay)',
+            content: [
+              {
+                paragraph: [
+                  {
+                    row: 'Đồng tính nam là những người nam cảm thấy hấp dẫn tình dục và cảm xúc với những người nam khác. Tương tự như đồng tính nữ, họ cũng mong muốn có những mối quan hệ tình yêu và tình dục với người cùng giới.'
+                  }
+                ],
+                image:
+                  'https://png.pngtree.com/png-vector/20230803/ourmid/pngtree-gay-pride-clipart-two-gay-boy-holding-rainbow-flag-and-highfives-vector-png-image_6868559.png'
+              }
+            ]
+          },
+          {
+            title: 'Song Tính (Bisexual)',
+            content: [
+              {
+                paragraph: [
+                  {
+                    row: 'Người song tính cảm thấy hấp dẫn tình dục và tình cảm với cả nam và nữ. Xu hướng tình dục của họ không bị giới hạn ở một giới tính duy nhất.'
+                  }
+                ],
+                image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRygu2EAIc6KlXj1E4uu7C7YiHuSQHUm2kiQg&s'
+              }
+            ]
+          },
+          {
+            title: 'Người Chuyển Giới (Transgender)',
+            content: [
+              {
+                paragraph: [
+                  {
+                    row: 'Người chuyển giới có bản dạng giới khác với giới tính được xác định khi sinh. Họ có thể chọn sống và thể hiện giới tính mà họ cảm thấy phù hợp hơn, và có thể quyết định phẫu thuật chuyển giới để khớp với bản dạng giới của mình.'
+                  }
+                ],
+                image:
+                  'https://img.freepik.com/free-vector/organic-flat-transgender-person-illustrated_23-2148945541.jpg'
+              }
+            ]
+          },
+          {
+            title: 'Queer/Questioning)',
+            content: [
+              {
+                paragraph: [
+                  {
+                    row: 'Queer là thuật ngữ chỉ những người có xu hướng tình dục hoặc bản dạng giới không theo chuẩn mực truyền thống. Questioning là dành cho những người đang tìm hiểu và khám phá về giới tính và xu hướng tình dục của mình.'
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            title: 'Toàn Tính (Pansexual)',
+            content: [
+              {
+                paragraph: [
+                  {
+                    row: 'Người toàn tính cảm thấy hấp dẫn tình dục và tình cảm với người khác bất kể giới tính hay bản dạng giới của họ.'
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            title: 'Vô Tính (Asexual)',
+            content: [
+              {
+                paragraph: [
+                  {
+                    row: 'Người vô tính không có hoặc có rất ít ham muốn tình dục, nhưng họ vẫn có thể có các mối quan hệ tình cảm và yêu thương.'
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            title: 'Liên Giới Tính (Intersex)',
+            content: [
+              {
+                paragraph: [
+                  {
+                    row: 'Người liên giới tính sinh ra với các đặc điểm sinh dục không thuộc hoàn toàn vào một giới tính cụ thể, bao gồm sự kết hợp các yếu tố sinh học của cả nam và nữ.'
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        title: 'Tại Sao Hiểu Biết và Chấp Nhận LGBTQ+ Quan Trọng?',
+        content: [
+          {
+            paragraph: [
+              {
+                row: 'Hiểu biết và chấp nhận các khái niệm về LGBTQ+ giúp chúng ta tôn trọng sự đa dạng về giới tính và xu hướng tình dục, góp phần tạo ra một xã hội công bằng và bình đẳng hơn. Điều này giúp giảm bớt định kiến, phân biệt đối xử và bạo lực đối với cộng đồng LGBTQ+, đồng thời tạo điều kiện cho mọi người sống thật với chính mình và phát triển toàn diện.'
+              },
+              {
+                row: 'Hiểu rõ các khái niệm về LGBTQ+ là một bước quan trọng để xây dựng xã hội bao dung và tôn trọng lẫn nhau. Hãy cùng học hỏi, chia sẻ và tạo nên môi trường an toàn, thân thiện cho tất cả mọi người, bất kể họ là ai hay yêu ai.'
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    id: '15',
+    title: 'Hiểu về bản dạng giới và xu hướng tình dục',
+    description:
+      'Trong xã hội ngày nay, việc hiểu biết về bản dạng giới và xu hướng tình dục không chỉ giúp chúng ta tôn trọng sự đa dạng mà còn xây dựng một xã hội công bằng và bình đẳng. Bài viết này sẽ giải thích rõ hai khái niệm quan trọng này.',
+    date: '2024-06-30',
+    image:
+      'https://thumbs.dreamstime.com/b/couples-different-sexual-orientation-silhouettes-isolated-vector-graphic-couples-different-sexual-orientation-silhouettes-123552475.jpg',
+    content: [
+      {
+        title: 'Bản dạng giới (Gender Identity) Là Gì?',
+        content: [
+          {
+            paragraph: [
+              {
+                row: 'Bản dạng giới là cách mà một người cảm nhận và thể hiện giới tính của mình. Bản dạng giới không nhất thiết phải trùng khớp với giới tính được xác định khi sinh, mà có thể thay đổi theo thời gian và trải nghiệm của mỗi người.'
+              }
+            ],
+            image: 'https://www.shutterstock.com/image-vector/transgender-man-choosing-your-gender-260nw-1664679505.jpg'
+          },
+          {
+            paragraph: [
+              {
+                row: 'Nam (Male): Những người cảm nhận và xác định mình là nam.'
+              },
+              {
+                row: 'Nữ (Female): Những người cảm nhận và xác định mình là nữ.'
+              },
+              {
+                row: 'Người Chuyển Giới (Transgender): Những người có bản dạng giới khác với giới tính khi sinh ra.'
+              },
+              {
+                row: 'Phi Nhị Nguyên (Non-binary): Những người không hoàn toàn là nam hay nữ, có thể có bản dạng giới linh hoạt.'
+              }
+            ]
+          }
+        ]
+      },
+      {
+        title: 'Xu Hướng Tình Dục (Sexual Orientation) Là Gì?',
+        content: [
+          {
+            paragraph: [
+              {
+                row: 'Xu hướng tình dục là sự hấp dẫn về mặt tình cảm, tình dục hoặc tình yêu của một người đối với người khác. Các loại xu hướng tình dục bao gồm:'
+              }
+            ]
+          },
+          {
+            paragraph: [
+              {
+                row: 'Đồng Tính (Homosexual): Sự hấp dẫn với người cùng giới. Đồng tính nam (Gay) và đồng tính nữ (Lesbian) là ví dụ điển hình.'
+              },
+              {
+                row: 'Song Tính (Bisexual): Sự hấp dẫn với cả nam và nữ.'
+              },
+              {
+                row: 'Toàn Tính (Pansexual): Sự hấp dẫn với mọi người bất kể giới tính hay bản dạng giới của họ.'
+              },
+              {
+                row: 'Vô Tính (Asexual): Ít hoặc không có ham muốn tình dục, nhưng vẫn có thể có tình cảm.'
+              },
+              {
+                row: 'Dị Tính (Heterosexual): Sự hấp dẫn với người khác giới.'
+              }
+            ]
+          }
+        ]
+      },
+      {
+        title: 'Tại Sao Cần Hiểu Rõ Về Bản Dạng Giới và Xu Hướng Tình Dục?',
+        content: [
+          {
+            paragraph: [
+              {
+                row: 'Hiểu rõ hai khái niệm này giúp chúng ta:'
+              }
+            ]
+          },
+          {
+            paragraph: [
+              {
+                row: 'Tôn Trọng Sự Khác Biệt: Mỗi người có cách cảm nhận và thể hiện bản thân riêng, và sự hiểu biết giúp chúng ta tôn trọng và chấp nhận sự khác biệt đó.'
+              },
+              {
+                row: 'Giảm Thiểu Kỳ Thị: Khi hiểu biết, chúng ta sẽ ít có xu hướng phân biệt đối xử dựa trên giới tính hay xu hướng tình dục.'
+              },
+              {
+                row: 'Xây Dựng Xã Hội Công Bằng: Một xã hội hiểu biết và chấp nhận sự đa dạng sẽ trở nên công bằng và bình đẳng hơn.'
+              }
+            ]
+          }
+        ]
+      },
+      {
+        paragraph: [
+          {
+            row: 'Bản dạng giới và xu hướng tình dục là hai khái niệm quan trọng giúp chúng ta hiểu rõ hơn về bản thân và người khác. Sự hiểu biết và chấp nhận sẽ góp phần tạo ra một môi trường sống tốt đẹp và một xã hội công bằng.'
           }
         ]
       }

@@ -42,58 +42,60 @@ function AboutPage() {
 
   const teamData = [
     {
+      name: 'Lê Bảo Khang',
+      role: 'CEO',
+      image: images.zyzy,
+      phone: '0123456789',
+      facebook: 'https://www.facebook.com/bong.ca.7315720'
+    },
+    {
       name: 'Phạm Tường Vy',
       role: 'CMO',
       image: images.zyzy,
       phone: '0123456789',
-      facebook: 'https://www.facebook.com/bong.ca.7315720',
-      instagram: 'https://www.facebook.com/bong.ca.7315720'
+      facebook: 'https://www.facebook.com/bong.ca.7315720'
     },
     {
       name: 'Lê Văn Đào',
       role: 'CTO',
       image: images.momo,
       phone: '0123456789',
-      facebook: 'https://www.facebook.com/bong.ca.7315720',
-      instagram: 'https://www.facebook.com/bong.ca.7315720'
+      facebook: 'https://www.facebook.com/bong.ca.7315720'
     },
     {
       name: 'Vũ Đan Thùy Huyên',
       role: 'CPO',
       image: images.zyzy,
       phone: '0123456789',
-      facebook: 'https://www.facebook.com/bong.ca.7315720',
-      instagram: 'https://www.facebook.com/bong.ca.7315720'
+      facebook: 'https://www.facebook.com/bong.ca.7315720'
     },
     {
       name: 'Đỗ Dương Đăng Khoa',
       role: 'CTO',
       image: images.zyzy,
       phone: '0123456789',
-      facebook: 'https://www.facebook.com/bong.ca.7315720',
-      instagram: 'https://www.facebook.com/bong.ca.7315720'
+      facebook: 'https://www.facebook.com/bong.ca.7315720'
     },
     {
       name: 'Nguyễn Phan Quỳnh Như',
       role: 'CFO',
       image: images.nhu,
       phone: '0123456789',
-      facebook: 'https://www.facebook.com/bong.ca.7315720',
-      instagram: 'https://www.facebook.com/bong.ca.7315720'
+      facebook: 'https://www.facebook.com/bong.ca.7315720'
     }
   ]
 
   return (
     <main>
       <section className='container space-y-6 mt-24 flex flex-col items-center justify-center'>
-        <h2 className='text-gray-400 font-semibold'>Tổng quan về Koine</h2>
+        <h2 className='text-gray-400 font-semibold text-xl'>Tổng quan về Koine</h2>
         <h1
           className='bg-gradient-to-r from-[#FF0059] via-[#FF597D] to-[#2945DE]
-          text-transparent bg-clip-text text-xl md:text-2xl lg:text-4xl lg:h-14 font-bold'
+          text-transparent bg-clip-text text-xl md:text-2xl lg:text-4xl font-bold text-center'
         >
           Hành trình phát triển và những điều cần biết về Koine
         </h1>
-        <p className='text-sm max-w-[600px] text-center'>
+        <p className='text-lg max-w-[600px] text-center'>
           Mang trong mình một sứ mệnh cao cả, Koine đã và đang không ngừng phát triển để giúp đỡ trẻ em trên khắp mọi
           miền đất nước.
         </p>
@@ -112,7 +114,8 @@ function AboutPage() {
                   <TimelineIcon />
                 </TimelineHeader>
                 <TimelineContent>
-                  <div className='min-h-20'>{e.content}</div>
+                  <div className='md:hidden font-semibold text-lg text-primary'>{e.date}</div>
+                  <div className='min-h-20 text-lg'>{e.content}</div>
                 </TimelineContent>
               </TimelineItem>
             ))}
@@ -200,7 +203,7 @@ function AboutPage() {
       </section>
 
       <section className='bg-fourth mt-20 py-28'>
-        <div className='container grid grid-cols-5 gap-6'>
+        <div className='container grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-x-6 gap-y-8'>
           {teamData.map((e, index) => (
             <div
               key={index}

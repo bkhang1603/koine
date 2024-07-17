@@ -56,18 +56,18 @@ function page({ params }: { params: { id: string } }) {
 
       <h1
         className='bg-gradient-to-r from-[#FF0059] via-[#FF597D] to-[#2945DE]
-            text-transparent bg-clip-text text-2xl md:text-3xl lg:text-5xl lg:h-14 font-bold line-clamp-1 text-center'
+            text-transparent bg-clip-text text-2xl md:text-3xl lg:text-4xl font-bold text-center'
       >
         {newData?.title}
       </h1>
 
       {newData?.content.map((item, index) => (
-        <section key={index} className='pt-10'>
-          <h2 className='font-semibold text-lg md:text-xl mt-4'>{item.title}</h2>
+        <section key={index} className='pt-6'>
+          <h2 className='font-semibold text-lg md:text-xl'>{item.title}</h2>
           {item.content &&
             item.content.map((c, index) => (
-              <>
-                <div key={index} className='mt-6'>
+              <div key={index}>
+                <div className='mt-4'>
                   {c.title && <h3 className='font-semibold text-lg md:text-xl pl-8'>{c.title}</h3>}
                   {c.content &&
                     c.content.map((c, index) => {
@@ -100,7 +100,7 @@ function page({ params }: { params: { id: string } }) {
                         alt='image'
                         width={2000}
                         height={2000}
-                        className='w-full lg:max-w-[600px] object-cover rounded-2xl shadow-xl'
+                        className='w-full lg:max-w-[600px] object-cover rounded-2xl shadow-xl mb-6'
                       />
                     </article>
                   )}
@@ -108,7 +108,7 @@ function page({ params }: { params: { id: string } }) {
 
                 {c.content &&
                   c.content.map((c, index) => (
-                    <div key={index} className='mt-6'>
+                    <div key={index}>
                       <h3 className='font-semibold text-lg md:text-xl pl-8'>{c.title}</h3>
                       {c.paragraph && (
                         <div className='mt-4 grid grid-cols-1 gap-2 pl-8'>
@@ -126,13 +126,13 @@ function page({ params }: { params: { id: string } }) {
                             alt='image'
                             width={2000}
                             height={2000}
-                            className='w-full lg:max-w-[600px] object-cover rounded-2xl shadow-xl'
+                            className='w-full lg:max-w-[600px] object-cover rounded-2xl shadow-xl mb-6'
                           />
                         </article>
                       )}
                       {c.content &&
                         c.content.map((c, index) => (
-                          <div key={index} className='mt-6'>
+                          <div key={index}>
                             <h3 className='font-semibold text-lg md:text-xl pl-8'>{c.title}</h3>
                             <div className='mt-4 grid grid-cols-1 gap-2 pl-8'>
                               {c.paragraph.map((p, index) => (
@@ -148,7 +148,7 @@ function page({ params }: { params: { id: string } }) {
                                   alt='image'
                                   width={2000}
                                   height={2000}
-                                  className='w-full lg:max-w-[600px] object-cover rounded-2xl shadow-xl'
+                                  className='w-full lg:max-w-[600px] object-cover rounded-2xl shadow-xl mb-6'
                                 />
                               </article>
                             )}
@@ -156,7 +156,7 @@ function page({ params }: { params: { id: string } }) {
                         ))}
                     </div>
                   ))}
-              </>
+              </div>
             ))}
         </section>
       ))}
