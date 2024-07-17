@@ -1,13 +1,15 @@
 import { DataType } from '@/app/(public)/knowledge/[id]/page'
 import CardBlog from '@/components/card-blog'
 import Tag from '@/components/tag'
-import data from '@/data/data'
+import configRoute from '@/config/route'
+import topData from '@/data/topData'
+import Link from 'next/link'
 
 function Blog() {
-  const newData = data as unknown as DataType[]
+  const newData = topData as unknown as DataType[]
 
   return (
-    <section className='container flex justify-center items-center flex-col py-20'>
+    <div className='container flex justify-center items-center flex-col py-20'>
       <h3 className='font-semibold text-lg'>Bài viết mới nhất</h3>
 
       <h2
@@ -28,10 +30,12 @@ function Blog() {
 
       <div className='mt-10 lg:w-full flex justify-center items-center flex-col gap-3'>
         {newData.map((item) => (
-          <CardBlog key={item?.id} data={item} />
+          <Link className='w-full' key={item?.id} href={`${configRoute.knowledge}/${item?.id}`}>
+            <CardBlog data={item} />
+          </Link>
         ))}
       </div>
-    </section>
+    </div>
   )
 }
 
