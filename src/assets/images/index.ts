@@ -23,6 +23,7 @@ import navbarBackground from './navbar-background.png'
 import zyzy from './zyzy.jpg'
 import momo from './momo.jpg'
 import nhu from './nhu.jpg'
+import maintenance from './maintenance.png'
 
 const images = {
   heroImage,
@@ -49,7 +50,8 @@ const images = {
   navbarBackground,
   zyzy,
   momo,
-  nhu
+  nhu,
+  maintenance
 }
 
 export default images
