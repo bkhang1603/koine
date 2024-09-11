@@ -3,6 +3,7 @@ import type { NextRequest } from 'next/server'
 
 const maintenanceMode = false
 const privatePaths = ['/content-creator', '/content-creator/blog']
+const publicPaths = ['/', '/course', '/knowledge', '/about', '/contact']
 const unAuthPaths = ['/login', '/register']
 
 // This function can be marked `async` if using `await` inside
@@ -32,6 +33,14 @@ export function middleware(request: NextRequest) {
     }
 
     // 2.2 Nhưng access token lại hết hạn
+    if (publicPaths.some((path) => pathname.startsWith(path)) && !accessToken) {
+      const url = new URL('/refresh-token', request.url)
+      url.searchParams.set('refreshToken', refreshToken)
+      url.searchParams.set('redirect', pathname)
+      return NextResponse.redirect(url)
+    }
+
+    // 2.2 Nhưng access token lại hết hạn
     if (privatePaths.some((path) => pathname.startsWith(path)) && !accessToken) {
       const url = new URL('/refresh-token', request.url)
       url.searchParams.set('refreshToken', refreshToken)
@@ -47,5 +56,5 @@ export function middleware(request: NextRequest) {
 
 // See "Matching Paths" below to learn more
 export const config = {
-  matcher: ['/', '/login', '/register', '/content-creator', '/content-creator/blog']
+  matcher: ['/', '/login', '/register', '/course', '/about', '/knowledge', '/content-creator', '/content-creator/blog']
 }

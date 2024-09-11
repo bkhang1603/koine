@@ -38,6 +38,7 @@ const dropMenuItems = [
 function Navbar() {
   const role = useAppStore((state) => state.role)
   const setRole = useAppStore((state) => state.setRole)
+
   // Tôi muốn chỉ gọi api account profile khi role có giá trị
   const { data } = useAccountProfile({
     enabled: !!role
@@ -108,7 +109,7 @@ function Navbar() {
                   </AvatarFallback>
                 </Avatar>
               </PopoverTrigger>
-              <PopoverContent>
+              <PopoverContent align='end'>
                 <div className='border border-gray-300 rounded-lg overflow-hidden shadow-lg p-2 space-y-2'>
                   <div className='flex items-center gap-2 hover:bg-gray-100 px-3 py-3 cursor-pointer rounded-lg'>
                     <Avatar className='cursor-pointer w-9 h-9'>

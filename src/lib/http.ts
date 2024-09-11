@@ -7,14 +7,13 @@ import {
   setRefreshTokenToLocalStorage
 } from '@/lib/utils'
 import { LoginResType } from '@/schemaValidations/auth.schema'
-import Cookies from 'js-cookie'
 import { redirect } from 'next/navigation'
 type CustomOptions = Omit<RequestInit, 'method'> & {
   baseUrl?: string | undefined
 }
 
 const ENTITY_ERROR_STATUS = 422
-const AUTHENTICATION_ERROR_STATUS = 401
+const AUTHENTICATION_ERROR_STATUS = 402
 
 type EntityErrorPayload = {
   message: string
@@ -106,7 +105,6 @@ const request = async <Response>(
       )
     } else if (res.status === AUTHENTICATION_ERROR_STATUS) {
       if (isClient) {
-        const locale = Cookies.get('NEXT_LOCALE')
         if (!clientLogoutRequest) {
           clientLogoutRequest = fetch('/api/auth/logout', {
             method: 'POST',
@@ -125,7 +123,7 @@ const request = async <Response>(
             // Nếu không không được xử lý đúng cách
             // Vì nếu rơi vào trường hợp tại trang Login, chúng ta có gọi các API cần access token
             // Mà access token đã bị xóa thì nó lại nhảy vào đây, và cứ thế nó sẽ bị lặp
-            location.href = `/${locale}/login`
+            location.href = `/login`
           }
         }
       } else {
@@ -143,7 +141,7 @@ const request = async <Response>(
   // Đảm bảo logic dưới đây chỉ chạy ở phía client (browser)
   if (isClient) {
     const normalizeUrl = normalizePath(url)
-    if (['api/auth/login', 'api/guest/auth/login'].includes(normalizeUrl)) {
+    if (['api/auth/login'].includes(normalizeUrl)) {
       const { accessToken, refreshToken } = (payload as LoginResType).data
       setAccessTokenToLocalStorage(accessToken)
       setRefreshTokenToLocalStorage(refreshToken)
@@ -154,7 +152,7 @@ const request = async <Response>(
       }
       setAccessTokenToLocalStorage(accessToken)
       setRefreshTokenToLocalStorage(refreshToken)
-    } else if (['api/auth/logout', 'api/guest/auth/logout'].includes(normalizeUrl)) {
+    } else if (['api/auth/logout'].includes(normalizeUrl)) {
       removeTokensFromLocalStorage()
     }
   }

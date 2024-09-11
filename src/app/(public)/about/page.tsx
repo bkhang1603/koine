@@ -61,27 +61,6 @@ function AboutPage() {
       image: images.momo,
       phone: '0123456789',
       facebook: 'https://www.facebook.com/bong.ca.7315720'
-    },
-    {
-      name: 'Vũ Đan Thùy Huyên',
-      role: 'CPO',
-      image: images.zyzy,
-      phone: '0123456789',
-      facebook: 'https://www.facebook.com/bong.ca.7315720'
-    },
-    {
-      name: 'Đỗ Dương Đăng Khoa',
-      role: 'CTO',
-      image: images.zyzy,
-      phone: '0123456789',
-      facebook: 'https://www.facebook.com/bong.ca.7315720'
-    },
-    {
-      name: 'Nguyễn Phan Quỳnh Như',
-      role: 'CFO',
-      image: images.nhu,
-      phone: '0123456789',
-      facebook: 'https://www.facebook.com/bong.ca.7315720'
     }
   ]
 
