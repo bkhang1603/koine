@@ -11,7 +11,7 @@ function Feature() {
         >
           Câu chuyện của chúng tôi
         </h2>
-        <p className='mt-12 max-w-[700px] text-center'>
+        <p className='mt-12 max-w-[700px] text-center text-lg'>
           Trong nhiều năm ròng rã, chúng ta cố tìm hạnh phúc và nhiều lần tưởng đã đạt được nó để hưởng một cách lâu
           bền. Nhưng lần nào ta cũng thất vọng. Sau đó, ta lại tiếp tục chạy theo ảo ảnh đó như trước. Nếu biết dừng
           chân suy nghĩ, ta sẽ thấy chúng ta đuổi theo hạnh phúc nhưng không hề biết đến bản chất thật sự của nó, và

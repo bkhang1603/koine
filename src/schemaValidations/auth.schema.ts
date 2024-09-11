@@ -1,9 +1,9 @@
-import { RoleValues } from '@/constants/type'
+import { RoleValues, GenderValues } from '@/constants/type'
 import z from 'zod'
 
 export const LoginBody = z
   .object({
-    username: z
+    loginKey: z
       .string()
       .min(6, {
         message: 'Tên đăng nhập phải có ít nhất 6 ký tự.'
@@ -32,7 +32,8 @@ export const LoginRes = z.object({
       id: z.number(),
       name: z.string(),
       email: z.string(),
-      role: z.enum(RoleValues)
+      role: z.enum(RoleValues),
+      image: z.string()
     })
   }),
   message: z.string()
@@ -95,8 +96,8 @@ export const RegisterBody = z
       .max(100, {
         message: 'Mật khẩu không được quá 100 ký tự.'
       }),
-    gender: z.enum(['nam', 'nu', 'khac']),
-    yob: z.coerce
+    gender: z.enum(GenderValues),
+    dob: z.coerce
       .number()
       .min(1900, {
         message: 'Năm sinh không hợp lệ.'

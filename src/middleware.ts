@@ -1,13 +1,45 @@
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 
-const maintenanceMode = true
+const maintenanceMode = false
+const privatePaths = ['/content-creator', '/content-creator/blog']
+const unAuthPaths = ['/login', '/register']
 
 // This function can be marked `async` if using `await` inside
 export function middleware(request: NextRequest) {
+  const { pathname } = request.nextUrl
+
+  const refreshToken = request.cookies.get('refreshToken')?.value
+  const accessToken = request.cookies.get('accessToken')?.value
+
   if (maintenanceMode) {
     const url = new URL('/maintenance', request.url)
     return NextResponse.redirect(url)
+  }
+
+  // 1. Chưa đăng nhập thì không cho vào private paths
+  if (privatePaths.some((path) => pathname.startsWith(path)) && !refreshToken) {
+    const url = new URL('/login', request.url)
+    url.searchParams.set('clearTokens', 'true')
+    return NextResponse.redirect(url)
+  }
+
+  // 2. Trường hợp đã đăng nhập
+  if (refreshToken) {
+    // 2.1 Nếu cố tình vào trang login sẽ redirect về trang chủ
+    if (unAuthPaths.some((path) => pathname.startsWith(path))) {
+      return NextResponse.redirect(new URL('/', request.url))
+    }
+
+    // 2.2 Nhưng access token lại hết hạn
+    if (privatePaths.some((path) => pathname.startsWith(path)) && !accessToken) {
+      const url = new URL('/refresh-token', request.url)
+      url.searchParams.set('refreshToken', refreshToken)
+      url.searchParams.set('redirect', pathname)
+      return NextResponse.redirect(url)
+    }
+
+    return NextResponse.next()
   }
 
   return NextResponse.next()
@@ -15,5 +47,5 @@ export function middleware(request: NextRequest) {
 
 // See "Matching Paths" below to learn more
 export const config = {
-  matcher: ['/', '/about', '/contact', '/course', '/course/[slug]', '/knowledge', '/knowledge/[slug]']
+  matcher: ['/', '/login', '/register', '/content-creator', '/content-creator/blog']
 }

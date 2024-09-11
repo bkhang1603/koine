@@ -1,15 +1,15 @@
 import type { Metadata } from 'next'
-import { Inter as FontSans } from 'next/font/google'
 import './globals.css'
 import { cn } from '@/lib/utils'
 import { ThemeProvider } from '@/components/theme-provider'
 import { Toaster } from '@/components/ui/toaster'
 import AppProvider from '@/components/app-provider'
-import { locales } from '@/config'
+import { Roboto } from 'next/font/google'
 
-const fontSans = FontSans({
-  subsets: ['latin'],
-  variable: '--font-sans'
+const roboto = Roboto({
+  weight: ['100', '300', '400', '500', '700'],
+  style: ['normal'],
+  subsets: ['vietnamese', 'latin']
 })
 
 export const metadata: Metadata = {
@@ -52,10 +52,6 @@ export const metadata: Metadata = {
   metadataBase: new URL('https://koine.id.vn')
 }
 
-export function generateStaticParams() {
-  return locales.map((locale) => ({ locale }))
-}
-
 export default async function RootLayout({
   children
 }: Readonly<{
@@ -63,7 +59,7 @@ export default async function RootLayout({
 }>) {
   return (
     <html lang='en' suppressHydrationWarning>
-      <body className={cn('min-h-screen bg-background font-sans antialiased', fontSans.variable)}>
+      <body className={cn('min-h-screen bg-background antialiased', roboto.className)}>
         <AppProvider>
           <ThemeProvider attribute='class' defaultTheme='system' enableSystem disableTransitionOnChange>
             {children}

@@ -4,7 +4,9 @@ import {
   LoginResType,
   LogoutBodyType,
   RefreshTokenBodyType,
-  RefreshTokenResType
+  RefreshTokenResType,
+  RegisterBodyType,
+  RegisterResType
 } from '@/schemaValidations/auth.schema'
 
 const authApiRequest = {
@@ -47,7 +49,8 @@ const authApiRequest = {
     return result
   },
   setTokenToCookie: (body: { accessToken: string; refreshToken: string }) =>
-    http.post('/api/auth/token', body, { baseUrl: '' })
+    http.post('/api/auth/token', body, { baseUrl: '' }),
+  register: (body: RegisterBodyType) => http.post<RegisterResType>('/auth/register', body)
 }
 
 export default authApiRequest

@@ -16,7 +16,7 @@ function Hero() {
         <div className='w-full mt-10 flex items-center flex-col'>
           <Image src={images.cloud} alt='Cloud' width={500} height={500} className='md:max-w-[420px]' />
 
-          <h1 className='mt-6 max-w-[420px] text-lg text-center break-words'>
+          <h1 className='mt-6 max-w-[420px] text-lg font-medium text-center break-words text-black/65'>
             “Vun đắp tâm hồn, thấu hiểu cơ thể.
             <br /> Một nền tảng cho một cuộc sống hạnh phúc.”
           </h1>

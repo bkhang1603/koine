@@ -28,6 +28,7 @@ function LoginPage() {
         >
           Đăng nhập
         </h1>
+
         <LoginForm className='mt-7' />
 
         <div className='my-8 flex items-center w-full md:w-[600px]'>

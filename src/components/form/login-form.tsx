@@ -1,11 +1,9 @@
 'use client'
 
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useRouter } from 'next/navigation'
-import { useState } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { useForm } from 'react-hook-form'
 
-import authApiRequest from '@/apiRequests/auth'
 import { Button } from '@/components/ui/button'
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
@@ -14,26 +12,39 @@ import { cn, handleErrorApi } from '@/lib/utils'
 import { LoginBody, LoginBodyType } from '@/schemaValidations/auth.schema'
 import Link from 'next/link'
 import configRoute from '@/config/route'
+import { useLoginMutation } from '@/queries/useAuth'
+import InputPassword from '@/components/input-password'
+import { useEffect } from 'react'
+import { useAppStore } from '@/components/app-provider'
 
 export default function LoginForm({ className }: { className?: string }) {
-  const [loading, setLoading] = useState(false)
   const { toast } = useToast()
   const router = useRouter()
+  const loginMutation = useLoginMutation()
+  const searchParams = useSearchParams()
+  const clearTokens = searchParams.get('clearTokens')
+  const setRole = useAppStore((state) => state.setRole)
   const form = useForm<LoginBodyType>({
     resolver: zodResolver(LoginBody),
     defaultValues: {
-      username: '',
+      loginKey: '',
       password: ''
     }
   })
 
+  useEffect(() => {
+    if (clearTokens) {
+      setRole()
+    }
+  }, [clearTokens, setRole])
+
   // 2. Define a submit handler.
   async function onSubmit(values: LoginBodyType) {
-    if (loading) return
-    setLoading(true)
+    if (loginMutation.isPending) return
     try {
-      const result = await authApiRequest.login(values)
+      const result = await loginMutation.mutateAsync(values)
 
+      setRole(result.payload.data.account.role)
       toast({
         description: result.payload.message
       })
@@ -44,8 +55,6 @@ export default function LoginForm({ className }: { className?: string }) {
         error,
         setError: form.setError
       })
-    } finally {
-      setLoading(false)
     }
   }
 
@@ -58,7 +67,7 @@ export default function LoginForm({ className }: { className?: string }) {
       >
         <FormField
           control={form.control}
-          name='username'
+          name='loginKey'
           render={({ field }) => (
             <FormItem>
               <FormLabel>Tên đăng nhập</FormLabel>
@@ -76,7 +85,7 @@ export default function LoginForm({ className }: { className?: string }) {
             <FormItem>
               <FormLabel>Mật khẩu</FormLabel>
               <FormControl>
-                <Input className='h-10' placeholder='Mật khẩu' type='password' {...field} />
+                <InputPassword className='h-10' placeholder='Mật khẩu' {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>

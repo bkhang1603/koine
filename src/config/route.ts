@@ -7,7 +7,12 @@ const configRoute = {
   service: '/service',
   login: '/login',
   register: '/register',
-  forgotPassword: '/forgot-password'
+  forgotPassword: '/forgot-password',
+  setting: '/setting',
+  contentCreator: {
+    dashboard: '/content-creator/dashboard',
+    blog: '/content-creator/blog'
+  }
 }
 
 export default configRoute

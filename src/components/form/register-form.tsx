@@ -2,10 +2,8 @@
 
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useRouter } from 'next/navigation'
-import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 
-import authApiRequest from '@/apiRequests/auth'
 import { Button } from '@/components/ui/button'
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
@@ -14,11 +12,13 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import { cn, handleErrorApi } from '@/lib/utils'
 import { RegisterBody, RegisterBodyType } from '@/schemaValidations/auth.schema'
 import { Checkbox } from '@/components/ui/checkbox'
+import { useRegisterMutation } from '@/queries/useAuth'
+import InputPassword from '@/components/input-password'
 
 export default function RegisterForm({ className }: { className?: string }) {
-  const [loading, setLoading] = useState(false)
   const { toast } = useToast()
   const router = useRouter()
+  const registerMutation = useRegisterMutation()
   const form = useForm<RegisterBodyType>({
     resolver: zodResolver(RegisterBody),
     defaultValues: {
@@ -26,31 +26,28 @@ export default function RegisterForm({ className }: { className?: string }) {
       email: '',
       password: '',
       confirmPassword: '',
-      gender: 'nam',
-      yob: 1900,
+      gender: 'MALE',
+      dob: 1900,
       term: false
     }
   })
 
   // 2. Define a submit handler.
   async function onSubmit(values: RegisterBodyType) {
-    if (loading) return
-    setLoading(true)
+    if (registerMutation.isPending) return
     try {
-      const result = await authApiRequest.login(values)
+      const result = await registerMutation.mutateAsync(values)
 
       toast({
         description: result.payload.message
       })
-      router.push('/')
+      router.push('/login')
       router.refresh()
     } catch (error: any) {
       handleErrorApi({
         error,
         setError: form.setError
       })
-    } finally {
-      setLoading(false)
     }
   }
 
@@ -103,21 +100,21 @@ export default function RegisterForm({ className }: { className?: string }) {
                   >
                     <FormItem className='flex items-center space-x-3 space-y-0'>
                       <FormControl>
-                        <RadioGroupItem value='nam'>Nam</RadioGroupItem>
+                        <RadioGroupItem value='MALE'>Nam</RadioGroupItem>
                       </FormControl>
                       <FormLabel className='cursor-pointer'>Nam</FormLabel>
                     </FormItem>
 
                     <FormItem className='flex items-center space-x-3 space-y-0'>
                       <FormControl>
-                        <RadioGroupItem value='nu'>Nữ</RadioGroupItem>
+                        <RadioGroupItem value='NU'>Nữ</RadioGroupItem>
                       </FormControl>
                       <FormLabel className='cursor-pointer'>Nữ</FormLabel>
                     </FormItem>
 
                     <FormItem className='flex items-center space-x-3 space-y-0'>
                       <FormControl>
-                        <RadioGroupItem value='khac'>Khác</RadioGroupItem>
+                        <RadioGroupItem value='OTHER'>Khác</RadioGroupItem>
                       </FormControl>
                       <FormLabel className='cursor-pointer'>Khác</FormLabel>
                     </FormItem>
@@ -129,7 +126,7 @@ export default function RegisterForm({ className }: { className?: string }) {
           />
           <FormField
             control={form.control}
-            name='yob'
+            name='dob'
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Năm sinh</FormLabel>
@@ -148,7 +145,7 @@ export default function RegisterForm({ className }: { className?: string }) {
             <FormItem>
               <FormLabel>Mật khẩu</FormLabel>
               <FormControl>
-                <Input className='h-10' placeholder='Mật khẩu' type='password' {...field} />
+                <InputPassword className='h-10' placeholder='Mật khẩu' {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -161,7 +158,7 @@ export default function RegisterForm({ className }: { className?: string }) {
             <FormItem>
               <FormLabel>Xác nhận mật khẩu</FormLabel>
               <FormControl>
-                <Input className='h-10' placeholder='Xác nhận mật khẩu' type='password' {...field} />
+                <InputPassword className='h-10' placeholder='Xác nhận mật khẩu' {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>

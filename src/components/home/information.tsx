@@ -17,7 +17,7 @@ function Information({ className }: { className?: string }) {
         <Input className='focus-visible:ring-0 border-secondary rounded-lg' placeholder='Email' />
         <Button
           className='-ml-6 bg-gradient-to-r from-[#FF0059] via-[#FF597D] to-[#2945DE]
-        hover:bg-gradient-to-l rounded-lg'
+        rounded-lg'
         >
           Gửi liên hệ
         </Button>

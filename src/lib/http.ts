@@ -134,6 +134,8 @@ const request = async <Response>(
         const accessToken = (options?.headers as any)?.Authorization.split('Bearer ')[1]
         redirect(`/login?accessToken=${accessToken}`)
       }
+    } else if (res.status === 404) {
+      throw new HttpError(data)
     } else {
       throw new HttpError(data)
     }

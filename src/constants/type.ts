@@ -5,9 +5,17 @@ export const TokenType = {
 } as const
 
 export const Role = {
-  Admin: 'Admin',
-  Manager: 'Manager',
-  Customer: 'Customer'
+  Admin: 'ADULT',
+  Manager: 'LECTURER',
+  Customer: 'ADMIN'
 } as const
 
 export const RoleValues = [Role.Admin, Role.Manager, Role.Customer] as const
+
+export const Gender = {
+  Male: 'MALE',
+  Female: 'FEMALE',
+  Other: 'OTHER'
+} as const
+
+export const GenderValues = [Gender.Male, Gender.Female, Gender.Other] as const

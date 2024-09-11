@@ -2,18 +2,14 @@
 'use client'
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react'
-import {
-  decodeToken,
-  generateSocketInstance,
-  getAccessTokenFromLocalStorage,
-  removeTokensFromLocalStorage
-} from '@/lib/utils'
+import { useEffect, useRef } from 'react'
+import { decodeToken, getAccessTokenFromLocalStorage, removeTokensFromLocalStorage } from '@/lib/utils'
 import { RoleType } from '@/types/jwt.types'
 import type { Socket } from 'socket.io-client'
 import { create } from 'zustand'
-import ListenLogoutSocket from '@/components/listen-logout-socket'
 import RefreshToken from '@/components/refresh-token'
+import { LoginResType } from '@/schemaValidations/auth.schema'
+import { useAccountProfile } from '@/queries/useAccount'
 
 // Default
 // staleTime: 0
@@ -67,7 +63,7 @@ export const useAppStore = create<AppStoreType>((set) => ({
 // }
 export default function AppProvider({ children }: { children: React.ReactNode }) {
   const setRole = useAppStore((state) => state.setRole)
-  const setSocket = useAppStore((state) => state.setSocket)
+
   // const [socket, setSocket] = useState<Socket | undefined>()
   // const [role, setRoleState] = useState<RoleType | undefined>()
   const count = useRef(0)
@@ -78,11 +74,10 @@ export default function AppProvider({ children }: { children: React.ReactNode })
       if (accessToken) {
         const role = decodeToken(accessToken).role
         setRole(role)
-        setSocket(generateSocketInstance(accessToken))
       }
       count.current++
     }
-  }, [setRole, setSocket])
+  }, [setRole])
 
   // const disconnectSocket = useCallback(() => {
   //   socket?.disconnect()
@@ -105,7 +100,7 @@ export default function AppProvider({ children }: { children: React.ReactNode })
     <QueryClientProvider client={queryClient}>
       {children}
       <RefreshToken />
-      <ListenLogoutSocket />
+      {/* <ListenLogoutSocket /> */}
       <ReactQueryDevtools initialIsOpen={false} />
     </QueryClientProvider>
     // </AppContext.Provider>
