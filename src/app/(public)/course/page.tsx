@@ -1,10 +1,7 @@
 import images from '@/assets/images'
 import CardCategory from '@/components/card-category'
-import CardCourse from '@/components/card-course'
 import Information from '@/components/home/information'
-import Tag from '@/components/tag'
 import { Input } from '@/components/ui/input'
-import { ArrowRight } from 'lucide-react'
 import Image from 'next/image'
 
 function CoursePage() {
@@ -47,7 +44,12 @@ function CoursePage() {
         />
       </section>
 
-      <section className='mt-10 md:mt-20'>
+      <section className='flex flex-col justify-center items-center mt-20 gap-4'>
+        <p className='text-2xl font-medium'>Hiện tất cả các khóa học đang được bảo trì</p>
+        <Image src={images.maintenance} alt='' width={600} height={600} />
+      </section>
+
+      {/* <section className='mt-10 md:mt-20'>
         <div className='flex justify-between items-center'>
           <Tag className='font-semibold text-sm md:text-xl md:py-2 md:px-6'>Phổ biến</Tag>
 
@@ -107,7 +109,7 @@ function CoursePage() {
           <CardCourse images={images.children1} />
           <CardCourse images={images.children2} />
         </div>
-      </section>
+      </section> */}
 
       <Information />
     </main>

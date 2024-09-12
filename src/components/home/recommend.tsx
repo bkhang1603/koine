@@ -1,7 +1,5 @@
 import icons from '@/assets/icons'
 import images from '@/assets/images'
-import CardCourse from '@/components/card-course'
-import { ArrowRight } from 'lucide-react'
 import Image from 'next/image'
 
 function Recommend() {
@@ -22,7 +20,12 @@ function Recommend() {
         className='hidden sm:block absolute top-20 left-14 mt-32'
       />
 
-      <div className='mt-10 sm:mt-20 p-4 w-full flex items-center justify-end gap-2 cursor-pointer text-gray-500 hover:text-secondary'>
+      <section className='flex flex-col justify-center items-center mt-20 gap-4'>
+        <p className='text-2xl font-medium'>Hiện tất cả các khóa học đang được bảo trì</p>
+        <Image src={images.maintenance} alt='' width={600} height={600} />
+      </section>
+
+      {/* <div className='mt-10 sm:mt-20 p-4 w-full flex items-center justify-end gap-2 cursor-pointer text-gray-500 hover:text-secondary'>
         <span className='font-semibold text-sm sm:text-lg'>Xem thêm</span>
         <ArrowRight className='w-4 h-4 sm:w-6 sm:h-6' />
       </div>
@@ -30,7 +33,7 @@ function Recommend() {
         <CardCourse images={images.children} />
         <CardCourse images={images.children1} />
         <CardCourse images={images.children2} />
-      </div>
+      </div> */}
     </section>
   )
 }

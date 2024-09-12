@@ -182,7 +182,7 @@ function AboutPage() {
       </section>
 
       <section className='bg-fourth mt-20 py-28'>
-        <div className='container grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-x-6 gap-y-8'>
+        <div className='container grid grid-cols-1 sm:grid-cols-5 md:grid-cols-5 gap-x-6 gap-y-8'>
           {teamData.map((e, index) => (
             <div
               key={index}
