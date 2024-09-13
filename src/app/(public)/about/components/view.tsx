@@ -36,7 +36,7 @@ const viewData = [
 
 function View() {
   return (
-    <section className='container grid grid-rows-4 grid-cols-12 grid-flow-col gap-4 h-[600px] mt-20'>
+    <section className='container grid grid-rows-4 grid-cols-12 grid-flow-col gap-4 h-[300px] lg:h-[600px] mt-20'>
       {viewData.map((data, index) => (
         <div key={index} className={data.className}>
           <Image

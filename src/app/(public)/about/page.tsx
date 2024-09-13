@@ -1,6 +1,6 @@
 import Team from '@/app/(public)/about/components/team'
 import View from '@/app/(public)/about/components/view'
-import Information from '@/components/home/information'
+import Information from '@/app/(public)/components/information'
 import {
   Timeline,
   TimelineConnector,
@@ -57,7 +57,7 @@ function AboutPage() {
       <section className='container mt-28'>
         <h2 className='text-secondary text-7xl font-bold'>2024</h2>
 
-        <div className='container w-full flex items-center py-10'>
+        <div className='w-full flex items-center py-10'>
           <Timeline className='md:pl-28'>
             {data.map((e, index) => (
               <TimelineItem key={index}>
@@ -67,8 +67,8 @@ function AboutPage() {
                   <TimelineIcon />
                 </TimelineHeader>
                 <TimelineContent>
-                  <div className='md:hidden font-semibold text-lg text-primary'>{e.date}</div>
-                  <div className='min-h-20 text-lg'>{e.content}</div>
+                  <div className='md:hidden font-semibold text-sm sm:text-xl text-primary'>{e.date}</div>
+                  <div className='min-h-20 text-xs sm:text-lg'>{e.content}</div>
                 </TimelineContent>
               </TimelineItem>
             ))}

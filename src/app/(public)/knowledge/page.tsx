@@ -1,7 +1,7 @@
 import { DataType } from '@/app/(public)/knowledge/[id]/page'
 import images from '@/assets/images'
 import CardBlog from '@/components/card-blog'
-import Information from '@/components/home/information'
+import Information from '@/app/(public)/components/information'
 import Tag from '@/components/tag'
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area'
 import configRoute from '@/config/route'

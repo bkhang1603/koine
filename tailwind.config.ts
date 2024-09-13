@@ -92,8 +92,16 @@ const config = {
         sans: ['var(--font-sans)', ...fontFamily.sans]
       },
       flexBasis: {
+        '1/7': '14.2857143%',
         '1/8': '12.5%',
+        '1/9': '11.1111111%',
         '1/10': '10%'
+      },
+      lineHeight: {
+        '11': '2.75rem',
+        '12': '3rem',
+        '13': '3.25rem',
+        '14': '3.5rem'
       }
     }
   },

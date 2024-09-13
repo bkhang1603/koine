@@ -6,7 +6,6 @@ import children1 from './children-1.png'
 import children2 from './children-2.png'
 import loginVector from './login-vector.png'
 import avatar from './avatar.png'
-import sharing from './sharing.png'
 import sharingBackground from './sharing-background.png'
 import footer from './footer.png'
 import knowledgeBackground from './knowledge-background.png'
@@ -33,6 +32,7 @@ import about3 from './about-3.png'
 import about4 from './about-4.png'
 import about5 from './about-5.png'
 import about6 from './about-6.png'
+import product from './product.png'
 
 const images = {
   heroImage,
@@ -43,7 +43,6 @@ const images = {
   children2,
   loginVector,
   avatar,
-  sharing,
   sharingBackground,
   footer,
   knowledgeBackground,
@@ -69,7 +68,8 @@ const images = {
   about3,
   about4,
   about5,
-  about6
+  about6,
+  product
 }
 
 export default images

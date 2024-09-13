@@ -1,6 +1,6 @@
 import images from '@/assets/images'
 import CardCategory from '@/components/card-category'
-import Information from '@/components/home/information'
+import Information from '@/app/(public)/components/information'
 import { Input } from '@/components/ui/input'
 import Image from 'next/image'
 

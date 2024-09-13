@@ -1,10 +1,11 @@
-import Blog from '@/components/home/blog'
-import Feature from '@/components/home/feature'
-import Hero from '@/components/home/hero'
-import Information from '@/components/home/information'
-import Recommend from '@/components/home/recommend'
-import Service from '@/components/home/service'
-import Sharing from '@/components/home/sharing'
+import Achievement from '@/app/(public)/components/achievement'
+import Blog from '@/app/(public)/components/blog'
+import Feature from '@/app/(public)/components/feature'
+import Hero from '@/app/(public)/components/hero'
+import Information from '@/app/(public)/components/information'
+import Promo from '@/app/(public)/components/promo'
+import Recommend from '@/app/(public)/components/recommend'
+import Service from '@/app/(public)/components/service'
 
 function Home() {
   return (
@@ -14,7 +15,8 @@ function Home() {
       <Recommend />
       <Service />
       <Blog />
-      <Sharing />
+      <Promo />
+      <Achievement />
       <Information />
     </>
   )

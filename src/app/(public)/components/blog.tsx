@@ -9,7 +9,7 @@ function Blog() {
   const newData = topData as unknown as DataType[]
 
   return (
-    <div className='container flex justify-center items-center flex-col py-20'>
+    <div className='container flex justify-center items-center flex-col py-32'>
       <h3 className='font-semibold text-lg'>Bài viết mới nhất</h3>
 
       <h2

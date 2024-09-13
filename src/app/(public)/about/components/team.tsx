@@ -72,8 +72,8 @@ function Team() {
   return (
     <section className='bg-fourth py-32 mt-44'>
       <div className='container text-center mb-12'>
-        <h2 className='text-4xl font-bold text-secondary'>Thành viên của Koine</h2>
-        <p className='text-base text-gray-500 mt-4'>
+        <h2 className='text-2xl sm:text-3xl lg:text-4xl font-bold text-secondary'>Thành viên của Koine</h2>
+        <p className='text-xs sm:text-sm lg:text-base text-gray-500 mt-4'>
           Đây là những người sáng lập và phát triển sản phẩm của Koine <br />
           Một đội ngũ trẻ trung, năng động và sáng tạo
         </p>
@@ -82,10 +82,10 @@ function Team() {
       <Carousel className='w-full container' opts={{ loop: true }} plugins={[AutoScroll({ stopOnInteraction: false })]}>
         <CarouselContent className='-ml-1'>
           {teamMembers.map((member, index) => (
-            <CarouselItem key={index} className='pl-1 md:basis-1/4 lg:basis-1/8'>
+            <CarouselItem key={index} className='pl-1 basis-1/2 sm:basis-1/4 md:basis-1/5 lg:basis-1/6 xl:basis-1/7'>
               <div className='p-1'>
                 <div
-                  className='flex items-center justify-center p-0 rounded-t-[80px]
+                  className='flex items-center justify-center p-0 rounded-t-[300px]
                 rounded-b-2xl overflow-hidden h-72 relative cursor-pointer'
                 >
                   <Image
