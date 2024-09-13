@@ -90,6 +90,10 @@ const config = {
       },
       fontFamily: {
         sans: ['var(--font-sans)', ...fontFamily.sans]
+      },
+      flexBasis: {
+        '1/8': '12.5%',
+        '1/10': '10%'
       }
     }
   },

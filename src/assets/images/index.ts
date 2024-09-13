@@ -20,10 +20,19 @@ import course5 from './course-5.png'
 import course6 from './course-6.png'
 import searchImage from './search-image.png'
 import navbarBackground from './navbar-background.png'
-import zyzy from './zyzy.jpg'
-import momo from './momo.jpg'
-import nhu from './nhu.jpg'
 import maintenance from './maintenance.png'
+import teamDao from './team-dao.jpg'
+import teamHuyen from './team-huyen.jpg'
+import teamVanh from './team-vanh.jpg'
+import teamKhang from './team-khang.jpg'
+import teamKhoa from './team-khoa.jpg'
+import teamVy from './team-vy.jpg'
+import about1 from './about-1.png'
+import about2 from './about-2.png'
+import about3 from './about-3.png'
+import about4 from './about-4.png'
+import about5 from './about-5.png'
+import about6 from './about-6.png'
 
 const images = {
   heroImage,
@@ -48,10 +57,19 @@ const images = {
   course6,
   searchImage,
   navbarBackground,
-  zyzy,
-  momo,
-  nhu,
-  maintenance
+  maintenance,
+  teamDao,
+  teamHuyen,
+  teamVanh,
+  teamKhang,
+  teamKhoa,
+  teamVy,
+  about1,
+  about2,
+  about3,
+  about4,
+  about5,
+  about6
 }
 
 export default images

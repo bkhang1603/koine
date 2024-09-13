@@ -1,5 +1,5 @@
-import icons from '@/assets/icons'
-import images from '@/assets/images'
+import Team from '@/app/(public)/about/components/team'
+import View from '@/app/(public)/about/components/view'
 import Information from '@/components/home/information'
 import {
   Timeline,
@@ -10,8 +10,6 @@ import {
   TimelineItem,
   TimelineTime
 } from '@/components/timeline'
-import Image from 'next/image'
-import Link from 'next/link'
 
 function AboutPage() {
   const data = [
@@ -37,30 +35,6 @@ function AboutPage() {
       date: '2024-10-07',
       content:
         'Koine bắt đầu đăng tải những bài viết đầu tiên, bao gồm những kiến thức bổ ích và những câu chuyện chia sẻ do chính những thành viên của Koine đã từng trải qua.'
-    }
-  ]
-
-  const teamData = [
-    {
-      name: 'Lê Bảo Khang',
-      role: 'CEO',
-      image: images.zyzy,
-      phone: '0123456789',
-      facebook: 'https://www.facebook.com/bong.ca.7315720'
-    },
-    {
-      name: 'Phạm Tường Vy',
-      role: 'CMO',
-      image: images.zyzy,
-      phone: '0123456789',
-      facebook: 'https://www.facebook.com/bong.ca.7315720'
-    },
-    {
-      name: 'Lê Văn Đào',
-      role: 'CTO',
-      image: images.momo,
-      phone: '0123456789',
-      facebook: 'https://www.facebook.com/bong.ca.7315720'
     }
   ]
 
@@ -113,130 +87,9 @@ function AboutPage() {
         <p className='text-center'>Những chặng đường và các hoạt động mà Koine đã trải qua.</p>
       </section>
 
-      <section className='container grid grid-rows-4 grid-cols-12 grid-flow-col gap-4 h-96 mt-20'>
-        <div className='row-span-4 col-span-4'>
-          <Image
-            src={images.children}
-            alt='Image 1'
-            width={500}
-            height={500}
-            className='w-full h-full object-cover rounded-xl'
-          />
-        </div>
-        <div className='row-span-2 col-span-3'>
-          <Image
-            src={images.children}
-            alt='Image 1'
-            width={500}
-            height={500}
-            className='w-full h-full object-cover rounded-xl'
-          />
-        </div>
-        <div className='row-span-2 col-span-3'>
-          <Image
-            src={images.children}
-            alt='Image 1'
-            width={500}
-            height={500}
-            className='w-full h-full object-cover rounded-xl'
-          />
-        </div>
-        <div className='row-span-1 col-span-2'>
-          <Image
-            src={images.children}
-            alt='Image 1'
-            width={500}
-            height={500}
-            className='w-full h-full object-cover rounded-xl'
-          />
-        </div>
-        <div className='row-span-3 col-span-5'>
-          <Image
-            src={images.children}
-            alt='Image 1'
-            width={500}
-            height={500}
-            className='w-full h-full object-cover rounded-xl'
-          />
-        </div>
-        <div className='row-span-1 col-span-3'>
-          <Image
-            src={images.children}
-            alt='Image 1'
-            width={500}
-            height={500}
-            className='w-full h-full object-cover rounded-xl'
-          />
-        </div>
-      </section>
+      <View />
 
-      <section className='container mt-24 space-y-2'>
-        <p className='text-center font-semibold text-gray-400'>Thành viên</p>
-        <h2
-          className='bg-gradient-to-r from-[#FF0059] via-[#FF597D] to-[#2945DE]
-              text-transparent bg-clip-text text-xl md:text-2xl
-              lg:text-4xl font-bold text-center lg:h-14'
-        >
-          Các nhà sáng lập của Koine
-        </h2>
-      </section>
-
-      <section className='bg-fourth mt-20 py-28'>
-        <div className='container grid grid-cols-1 sm:grid-cols-5 md:grid-cols-5 gap-x-6 gap-y-8'>
-          {teamData.map((e, index) => (
-            <div
-              key={index}
-              className='flex flex-col justify-center items-center gap-4
-              cursor-pointer group'
-            >
-              <div className='h-80 w-full rounded-xl overflow-hidden'>
-                <Image
-                  src={e.image}
-                  alt='Koine'
-                  height={1000}
-                  width={1000}
-                  className='object-cover h-full w-full group-hover:scale-105 duration-700'
-                />
-              </div>
-
-              <div className='flex justify-between items-center flex-col'>
-                <p className='font-medium'>{e.role}</p>
-                <h3 className='text-lg font-semibold'>{e.name}</h3>
-
-                <div className='flex items-center justify-center gap-3 mt-4'>
-                  <Link href={'https://www.facebook.com/bong.ca.7315720'}>
-                    <Image
-                      src={icons.phone}
-                      alt='phone'
-                      height={1000}
-                      width={1000}
-                      className='cursor-pointer w-6 h-6'
-                    />
-                  </Link>
-                  <Link href={'https://www.facebook.com/bong.ca.7315720'}>
-                    <Image
-                      src={icons.facebook}
-                      alt='facebook'
-                      height={1000}
-                      width={1000}
-                      className='cursor-pointer w-6 h-6'
-                    />
-                  </Link>
-                  <Link href={'https://www.facebook.com/bong.ca.7315720'}>
-                    <Image
-                      src={icons.instagram}
-                      alt='instagram'
-                      height={1000}
-                      width={1000}
-                      className='cursor-pointer w-6 h-6'
-                    />
-                  </Link>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-      </section>
+      <Team />
 
       <Information className='mt-20' />
     </main>

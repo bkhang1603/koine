@@ -6,6 +6,36 @@ import configRoute from '@/config/route'
 import Image from 'next/image'
 import Link from 'next/link'
 
+const footerLinks = [
+  {
+    title: 'Giới thiệu',
+    links: [
+      { name: 'Trang chủ', href: configRoute.home, icon: null },
+      { name: 'Khóa học', href: configRoute.course, icon: null },
+      { name: 'Kiến thức', href: configRoute.knowledge, icon: null },
+      { name: 'Tổng quan', href: configRoute.about, icon: null },
+      { name: 'Sản phẩm', href: configRoute.product, icon: null },
+      { name: 'Liên hệ', href: configRoute.contact, icon: null }
+    ]
+  },
+  {
+    title: 'Trợ giúp',
+    links: [
+      { name: 'Hỏi & đáp', href: '#', icon: null },
+      { name: 'Tin tức', href: '#', icon: null },
+      { name: 'Báo tường', href: '#', icon: null }
+    ]
+  },
+  {
+    title: 'Mạng xã hội',
+    links: [
+      { name: 'Facebook', href: 'https://www.facebook.com/', icon: icons.facebook },
+      { name: 'Instagram', href: 'https://www.instagram.com/', icon: icons.instagram },
+      { name: 'Twitter', href: 'https://www.twitter.com/', icon: icons.x }
+    ]
+  }
+]
+
 function Footer() {
   return (
     <footer className='mt-10'>
@@ -14,83 +44,29 @@ function Footer() {
       <div className='bg-fourth'>
         <section className='container'>
           <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-x-4 gap-y-8 py-20'>
-            <div>
-              <h3 className='font-semibold text-sm sm:text-xl'>Giới thiệu</h3>
+            {footerLinks.map((footerLink, index) => (
+              <div key={index}>
+                <h3 className='font-semibold text-sm sm:text-xl'>{footerLink.title}</h3>
 
-              <ul className='space-y-3 mt-4 text-xs sm:text-base'>
-                <li>
-                  <Link className='hover:text-black/70' href={configRoute.home}>
-                    Trang chủ
-                  </Link>
-                </li>
-                <li>
-                  <Link className='hover:text-black/70' href={configRoute.course}>
-                    Khóa học
-                  </Link>
-                </li>
-                <li>
-                  <Link className='hover:text-black/70' href={configRoute.knowledge}>
-                    Kiến thức
-                  </Link>
-                </li>
-                <li>
-                  <Link className='hover:text-black/70' href={configRoute.about}>
-                    Tổng quan
-                  </Link>
-                </li>
-                <li>
-                  <Link className='hover:text-black/70' href={configRoute.service}>
-                    Dịch vụ
-                  </Link>
-                </li>
-                <li>
-                  <Link className='hover:text-black/70' href={configRoute.contact}>
-                    Liên hệ
-                  </Link>
-                </li>
-              </ul>
-            </div>
-
-            <div>
-              <h3 className='font-semibold text-sm sm:text-xl'>Trợ giúp</h3>
-
-              <ul className='space-y-3 mt-4 cursor-pointer text-xs sm:text-base'>
-                <li>
-                  <span className='hover:text-black/70'>Hỏi & đáp</span>
-                </li>
-                <li>
-                  <span className='hover:text-black/70'>Tin tức</span>
-                </li>
-                <li>
-                  <span className='hover:text-black/70'>Báo tường</span>
-                </li>
-              </ul>
-            </div>
-
-            <div>
-              <h3 className='font-semibold text-sm sm:text-xl'>Mạng xã hội</h3>
-
-              <ul className='space-y-3 mt-4 text-xs sm:text-base'>
-                <li>
-                  <Link href={'https://www.facebook.com/'} className='flex items-center gap-3 hover:text-black/70'>
-                    <Image src={icons.facebook} alt='facebook' width={100} height={100} className='w-5 h-5' />
-                    <span>Facebook</span>
-                  </Link>
-                </li>
-                <li>
-                  <Link href={'https://www.facebook.com/'} className='flex items-center gap-3 hover:text-black/70'>
-                    <Image src={icons.instagram} alt='instagram' width={100} height={100} className='w-5 h-5' />
-                    <span>Instagram</span>
-                  </Link>
-                </li>
-                <li>
-                  <Link href={'https://www.facebook.com/'} className='flex items-center gap-3 hover:text-black/70'>
-                    <Image src={icons.x} alt='instagram' width={100} height={100} className='w-5 h-5' />
-                    <span>Twitter</span>
-                  </Link>
-                </li>
-              </ul>
-            </div>
+                <ul className='space-y-3 mt-4 text-xs sm:text-base'>
+                  {footerLink.links.map((link, index) => (
+                    <li key={index}>
+                      {!link.icon && (
+                        <Link className='hover:text-black/70' href={link.href}>
+                          {link.name}
+                        </Link>
+                      )}
+                      {link.icon && (
+                        <Link href={link.href} className='flex items-center gap-3 hover:text-black/70'>
+                          <Image src={link.icon} alt={link.name} width={100} height={100} className='w-5 h-5' />
+                          <span>{link.name}</span>
+                        </Link>
+                      )}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
 
             <div>
               <h3 className='font-semibold text-sm sm:text-xl'>Liên hệ</h3>

@@ -1,6 +1,6 @@
 import images from '@/assets/images'
 import data from '@/data/data'
-import { Bookmark, Ellipsis, Forward, Heart, MessageCircle } from 'lucide-react'
+import { Bookmark, Ellipsis } from 'lucide-react'
 import { StaticImport } from 'next/dist/shared/lib/get-img-props'
 import Image from 'next/image'
 
@@ -160,18 +160,6 @@ function page({ params }: { params: { id: string } }) {
             ))}
         </section>
       ))}
-
-      <section className='pt-20 flex justify-between items-center'>
-        <div className='flex items-center gap-4 text-secondary'>
-          <Heart className='md:w-8 md:h-8 cursor-pointer hover:fill-secondary' />
-          <MessageCircle className='md:w-8 md:h-8 cursor-pointer hover:fill-secondary' />
-        </div>
-
-        <div className='flex items-center gap-2 text-secondary cursor-pointer hover:text-secondary/80'>
-          <p className='text-lg md:text-xl font-semibold'>Share</p>
-          <Forward className='md:w-8 md:h-8' />
-        </div>
-      </section>
     </div>
   )
 }

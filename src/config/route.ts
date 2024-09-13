@@ -5,6 +5,7 @@ const configRoute = {
   course: '/course',
   knowledge: '/knowledge',
   service: '/service',
+  product: '/product',
   login: '/login',
   register: '/register',
   forgotPassword: '/forgot-password',
