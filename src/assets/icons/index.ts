@@ -17,6 +17,7 @@ import blueCurly from './blue-curly.png'
 import purpleCurly from './purple-curly.png'
 import phone from './phone.svg'
 import emoji from './emoji.png'
+import quote from './quote.png'
 
 const icons = {
   logo,
@@ -37,7 +38,8 @@ const icons = {
   blueCurly,
   purpleCurly,
   phone,
-  emoji
+  emoji,
+  quote
 }
 
 export default icons

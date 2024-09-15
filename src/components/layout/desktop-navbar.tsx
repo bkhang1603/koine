@@ -8,13 +8,13 @@ function DesktopNavbar() {
   const pathname = usePathname()
   const menuItems = [
     { name: 'Trang chủ', href: configRoute.home },
+    { name: 'Sản phẩm', href: configRoute.product },
     {
       name: 'Khóa học',
       href: configRoute.course
     },
     { name: 'Kiến thức', href: configRoute.knowledge },
     { name: 'Tổng quan', href: configRoute.about },
-    // { name: 'Dịch vụ', href: configRoute.service },
     { name: 'Liên hệ', href: configRoute.contact }
   ]
 

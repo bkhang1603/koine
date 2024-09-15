@@ -1,6 +1,7 @@
 import Team from '@/app/(public)/about/components/team'
 import View from '@/app/(public)/about/components/view'
 import Information from '@/app/(public)/components/information'
+import images from '@/assets/images'
 import {
   Timeline,
   TimelineConnector,
@@ -10,6 +11,7 @@ import {
   TimelineItem,
   TimelineTime
 } from '@/components/timeline'
+import Image from 'next/image'
 
 function AboutPage() {
   const data = [
@@ -40,18 +42,28 @@ function AboutPage() {
 
   return (
     <main>
-      <section className='container space-y-6 mt-24 flex flex-col items-center justify-center'>
-        <h2 className='text-gray-400 font-semibold text-xl'>Tổng quan về Koine</h2>
-        <h1
-          className='bg-gradient-to-r from-[#FF0059] via-[#FF597D] to-[#2945DE]
-          text-transparent bg-clip-text text-xl md:text-2xl lg:text-4xl font-bold text-center'
-        >
-          Hành trình phát triển và những điều cần biết về Koine
-        </h1>
-        <p className='text-lg max-w-[600px] text-center'>
-          Mang trong mình một sứ mệnh cao cả, Koine đã và đang không ngừng phát triển để giúp đỡ trẻ em trên khắp mọi
-          miền đất nước.
-        </p>
+      <section className='bg-fourth py-24 relative'>
+        <Image
+          src={images.knowledgeBackground}
+          alt='Knowledge Background'
+          width={2000}
+          height={2000}
+          className='hidden sm:block object-cover w-full container'
+        />
+
+        <div className='container space-y-6 flex flex-col items-center justify-center absolute inset-0'>
+          <h2 className='text-primary font-semibold text-xl'>Tổng quan về Koine</h2>
+          <h1
+            className='bg-gradient-to-r from-[#FF0059] via-[#FF597D] to-[#2945DE]
+            text-transparent bg-clip-text text-xl md:text-2xl lg:text-4xl font-bold text-center'
+          >
+            Hành trình phát triển và những điều cần biết về Koine
+          </h1>
+          <p className='text-lg max-w-[600px] text-center text-gray-600'>
+            Mang trong mình một sứ mệnh cao cả, Koine đã và đang không ngừng phát triển để giúp đỡ trẻ em trên khắp mọi
+            miền đất nước.
+          </p>
+        </div>
       </section>
 
       <section className='container mt-28'>
@@ -76,20 +88,11 @@ function AboutPage() {
         </div>
       </section>
 
-      <section className='container'>
-        <h2
-          className='bg-gradient-to-r from-[#FF0059] via-[#FF597D] to-[#2945DE]
-            text-transparent bg-clip-text text-xl md:text-2xl
-            lg:text-4xl font-bold text-center mt-24 lg:h-14'
-        >
-          Những hình ảnh hoạt động của Koine
-        </h2>
-        <p className='text-center'>Những chặng đường và các hoạt động mà Koine đã trải qua.</p>
-      </section>
+      <Team />
 
       <View />
 
-      <Team />
+      <div className='container py-10 border-fifth border-b-4'></div>
 
       <Information className='mt-20' />
     </main>

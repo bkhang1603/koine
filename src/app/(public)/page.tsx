@@ -6,6 +6,7 @@ import Information from '@/app/(public)/components/information'
 import Promo from '@/app/(public)/components/promo'
 import Recommend from '@/app/(public)/components/recommend'
 import Service from '@/app/(public)/components/service'
+import Sharing from '@/app/(public)/components/sharing'
 
 function Home() {
   return (
@@ -17,6 +18,7 @@ function Home() {
       <Blog />
       <Promo />
       <Achievement />
+      <Sharing />
       <Information />
     </>
   )

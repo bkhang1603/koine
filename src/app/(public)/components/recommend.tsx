@@ -24,16 +24,6 @@ function Recommend() {
         <p className='text-2xl font-medium'>Hiện tất cả các khóa học đang được bảo trì</p>
         <Image src={images.maintenance} alt='' width={600} height={600} />
       </section>
-
-      {/* <div className='mt-10 sm:mt-20 p-4 w-full flex items-center justify-end gap-2 cursor-pointer text-gray-500 hover:text-secondary'>
-        <span className='font-semibold text-sm sm:text-lg'>Xem thêm</span>
-        <ArrowRight className='w-4 h-4 sm:w-6 sm:h-6' />
-      </div>
-      <div className='grid grid-cols-2 lg:grid-cols-3 gap-4'>
-        <CardCourse images={images.children} />
-        <CardCourse images={images.children1} />
-        <CardCourse images={images.children2} />
-      </div> */}
     </section>
   )
 }

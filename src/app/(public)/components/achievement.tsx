@@ -23,7 +23,7 @@ const achievementData = [
 
 function Achievement() {
   return (
-    <section className='container py-20 text-center'>
+    <section className='container py-36 text-center'>
       <h3>Thành tích đã đạt được</h3>
       <h2
         className='bg-gradient-to-r from-[#FF0059] via-[#FF597D] to-[#2945DE]

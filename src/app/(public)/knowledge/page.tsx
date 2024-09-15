@@ -33,7 +33,7 @@ function KnowledgePage() {
             alt='Underline'
             width={500}
             height={500}
-            className='w-40 lg:w-52 absolute top-[50%] right-[42%] transform
+            className='w-40 lg:w-52 absolute top-[50%] right-[50%] transform
             translate-x-1/2 translate-y-8 z-[-1] hidden lg:block'
           />
         </h1>

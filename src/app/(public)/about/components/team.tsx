@@ -70,16 +70,26 @@ const teamMembers = [
 
 function Team() {
   return (
-    <section className='bg-fourth py-32 mt-44'>
+    <section className='bg-fifth py-32 mt-32'>
       <div className='container text-center mb-12'>
-        <h2 className='text-2xl sm:text-3xl lg:text-4xl font-bold text-secondary'>Thành viên của Koine</h2>
+        <h2
+          className='bg-gradient-to-r from-[#FF0059] via-[#FF597D] to-[#2945DE]
+          text-transparent bg-clip-text text-xl md:text-3xl
+          lg:text-5xl font-bold text-center lg:leading-16'
+        >
+          Thành viên của Koine
+        </h2>
         <p className='text-xs sm:text-sm lg:text-base text-gray-500 mt-4'>
           Đây là những người sáng lập và phát triển sản phẩm của Koine <br />
           Một đội ngũ trẻ trung, năng động và sáng tạo
         </p>
       </div>
 
-      <Carousel className='w-full container' opts={{ loop: true }} plugins={[AutoScroll({ stopOnInteraction: false })]}>
+      <Carousel
+        className='w-full container'
+        opts={{ loop: true }}
+        plugins={[AutoScroll({ stopOnInteraction: false, speed: 1 })]}
+      >
         <CarouselContent className='-ml-1'>
           {teamMembers.map((member, index) => (
             <CarouselItem key={index} className='pl-1 basis-1/2 sm:basis-1/4 md:basis-1/5 lg:basis-1/6 xl:basis-1/7'>
