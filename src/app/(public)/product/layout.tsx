@@ -1,0 +1,5 @@
+function ProductLayout({ children }: { children: React.ReactNode }) {
+  return <div className='pt-[60px] md:pt-[100px] container'>{children}</div>
+}
+
+export default ProductLayout

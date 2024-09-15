@@ -42,7 +42,7 @@ function AboutPage() {
 
   return (
     <main>
-      <section className='bg-fourth py-24 relative'>
+      <section className='py-24 relative'>
         <Image
           src={images.knowledgeBackground}
           alt='Knowledge Background'

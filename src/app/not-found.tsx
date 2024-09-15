@@ -1,4 +1,3 @@
-import icons from '@/assets/icons'
 import images from '@/assets/images'
 import { Button } from '@/components/ui/button'
 import configRoute from '@/config/route'
@@ -9,12 +8,6 @@ import Link from 'next/link'
 function NotFoundPage() {
   return (
     <section className='h-screen flex flex-col justify-between relative'>
-      {/* <div className='container min-h-[100px] flex items-center'>
-        <Link href={configRoute.home}>
-          <Image src={icons.logo} alt='Koine logo' width={100} height={100} quality={100} />
-        </Link>
-      </div> */}
-
       <div className='container pt-36'>
         <Image src={images.notFound404} alt='404' width={300} height={300} quality={100} />
 
