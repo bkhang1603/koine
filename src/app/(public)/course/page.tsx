@@ -49,68 +49,6 @@ function CoursePage() {
         <Image src={images.maintenance} alt='' width={600} height={600} />
       </section>
 
-      {/* <section className='mt-10 md:mt-20'>
-        <div className='flex justify-between items-center'>
-          <Tag className='font-semibold text-sm md:text-xl md:py-2 md:px-6'>Phổ biến</Tag>
-
-          <div
-            className='flex items-center gap-1 font-semibold hover:text-secondary
-          transform duration-500 ease-in-out cursor-pointer text-sm md:text-base'
-          >
-            <span>Xem thêm</span>
-            <ArrowRight className='w-4 h-4 md:w-6 md:h-6' />
-          </div>
-        </div>
-
-        <div className='grid grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-4 mt-6 sm:mt-10'>
-          <CardCourse images={images.children2} />
-          <CardCourse images={images.children1} />
-          <CardCourse images={images.children} />
-        </div>
-      </section>
-
-      <section className='mt-10 md:mt-20'>
-        <div className='flex justify-between items-center'>
-          <Tag className='font-semibold text-sm md:text-xl md:py-2 md:px-6 bg-primary hover:bg-primary/80'>
-            Thịnh hành
-          </Tag>
-
-          <div
-            className='flex items-center gap-1 font-semibold hover:text-secondary
-          transform duration-500 ease-in-out cursor-pointer text-sm md:text-base'
-          >
-            <span>Xem thêm</span>
-            <ArrowRight className='w-4 h-4 md:w-6 md:h-6' />
-          </div>
-        </div>
-
-        <div className='grid grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-4 mt-6 sm:mt-10'>
-          <CardCourse images={images.children1} />
-          <CardCourse images={images.children} />
-          <CardCourse images={images.children2} />
-        </div>
-      </section>
-
-      <section className='mt-10 md:mt-20'>
-        <div className='flex justify-between items-center'>
-          <Tag className='font-semibold text-sm md:text-xl md:py-2 md:px-6 bg-seventh hover:bg-seventh/80'>Đề xuất</Tag>
-
-          <div
-            className='flex items-center gap-1 font-semibold hover:text-secondary
-          transform duration-500 ease-in-out cursor-pointer text-sm md:text-base'
-          >
-            <span>Xem thêm</span>
-            <ArrowRight className='w-4 h-4 md:w-6 md:h-6' />
-          </div>
-        </div>
-
-        <div className='grid grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-4 mt-6 sm:mt-10'>
-          <CardCourse images={images.children} />
-          <CardCourse images={images.children1} />
-          <CardCourse images={images.children2} />
-        </div>
-      </section> */}
-
       <Information />
     </main>
   )

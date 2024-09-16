@@ -13,7 +13,7 @@ import { Slider } from '@/components/ui/slider'
 const formSchema = z.object({
   categories: z.array(z.string()),
   target: z.array(z.string()),
-  price: z.number().min(0).max(1000000)
+  price: z.coerce.number().min(0).max(1000000)
 })
 
 function Filter() {
@@ -22,7 +22,7 @@ function Filter() {
     defaultValues: {
       categories: [],
       target: [],
-      price: 100000
+      price: 500000
     }
   })
 
@@ -31,9 +31,9 @@ function Filter() {
   }
 
   return (
-    <div>
+    <div className='col-span-1'>
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)}>
+        <form onSubmit={form.handleSubmit(onSubmit)} className='border-2 border-gray-200 p-4 rounded-lg sticky top-28'>
           <Accordion type='multiple' className='w-full' defaultValue={['item-1', 'item-2']}>
             <AccordionItem value='item-1'>
               <AccordionTrigger className='hover:no-underline'>Thể loại</AccordionTrigger>
@@ -188,7 +188,14 @@ function Filter() {
               <FormItem className='mt-3'>
                 <FormLabel>Giá tiền</FormLabel>
                 <FormControl>
-                  <Slider min={0} max={1000000} step={1000} defaultValue={[value]} onValueChange={onChange} />
+                  <Slider
+                    className='cursor-pointer'
+                    min={0}
+                    max={1000000}
+                    step={1000}
+                    defaultValue={[value]}
+                    onValueChange={onChange}
+                  />
                 </FormControl>
                 <FormDescription>Sản phẩm có giá từ 0 đến {value.toLocaleString()} VNĐ</FormDescription>
                 <FormMessage />
