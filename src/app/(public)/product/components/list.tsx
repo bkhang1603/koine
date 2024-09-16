@@ -91,7 +91,7 @@ const listData = [
 function List() {
   return (
     <div className='col-span-3'>
-      <div className='grid grid-cols-4 gap-4'>
+      <div className='grid grid-cols-4 gap-4 mt-10'>
         {listData.map((item) => (
           <article key={item.id} className='cursor-pointer  group/product'>
             <div className='w-full aspect-square rounded-lg overflow-hidden relative'>

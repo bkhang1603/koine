@@ -5,7 +5,7 @@ import Image from 'next/image'
 
 function ProductPage() {
   return (
-    <main className=''>
+    <main className='pb-28'>
       <Image
         src={images.product}
         alt='Banner'
@@ -14,7 +14,7 @@ function ProductPage() {
         className='h-[30vh] w-full object-cover rounded-xl'
       />
 
-      <div className='grid grid-cols-4 gap-6 mt-6'>
+      <div className='grid grid-cols-4 gap-6'>
         <Filter />
 
         <List />
