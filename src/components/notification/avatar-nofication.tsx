@@ -1,21 +1,38 @@
 'use client'
 
-import Link from 'next/link'
-
+import { useAppStore } from '@/components/app-provider'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
-
-import { handleErrorApi, redirectSettingRole, translateRole } from '@/lib/utils'
-import configRoute from '@/config/route'
-import { useAppStore } from '@/components/app-provider'
-import { useAccountProfile } from '@/queries/useAccount'
-import { useLogoutMutation } from '@/queries/useAuth'
-import { useRouter } from 'next/navigation'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { Separator } from '@/components/ui/separator'
+import configRoute from '@/config/route'
+import { handleErrorApi } from '@/lib/utils'
+import { useAccountProfile } from '@/queries/useAccount'
+import { useLogoutMutation } from '@/queries/useAuth'
 import { ChevronRight, LogOut, MessageCircleQuestion, Settings } from 'lucide-react'
+import Link from 'next/link'
+import { useRouter } from 'next/navigation'
+import React from 'react'
 
-export default function DropdownAvatar() {
+const dropMenuItems = [
+  {
+    title: 'Cài đặt',
+    icon: <Settings />,
+    href: configRoute.setting
+  },
+  {
+    title: 'Trợ giúp',
+    icon: <MessageCircleQuestion />,
+    href: configRoute.setting
+  },
+  {
+    title: 'Đăng xuất',
+    icon: <LogOut />,
+    href: null
+  }
+]
+
+function AvatarNotification() {
   const role = useAppStore((state) => state.role)
   const setRole = useAppStore((state) => state.setRole)
 
@@ -27,24 +44,6 @@ export default function DropdownAvatar() {
   const account = data?.payload.data
   const logoutMutation = useLogoutMutation()
   const router = useRouter()
-
-  const dropMenuItems = [
-    {
-      title: 'Cài đặt',
-      icon: <Settings />,
-      href: redirectSettingRole(role!)
-    },
-    {
-      title: 'Trợ giúp',
-      icon: <MessageCircleQuestion />,
-      href: configRoute.setting
-    },
-    {
-      title: 'Đăng xuất',
-      icon: <LogOut />,
-      href: null
-    }
-  ]
 
   const handleLogout = async () => {
     try {
@@ -60,7 +59,7 @@ export default function DropdownAvatar() {
   return (
     <Popover>
       <PopoverTrigger asChild>
-        <Avatar className='cursor-pointer w-9 h-9'>
+        <Avatar className='cursor-pointer'>
           <AvatarImage src={account?.avatarUrl} alt='avatar' />
           <AvatarFallback>
             {account?.username.slice(0, 2).toUpperCase() || account?.email.slice(0, 2).toUpperCase()}
@@ -77,14 +76,11 @@ export default function DropdownAvatar() {
               </AvatarFallback>
             </Avatar>
 
-            <div>
-              <p className='font-medium text-base'>{account?.username || account?.email}</p>
-              <p className='text-gray-400 text-xs'>{translateRole(account?.role!)}</p>
-            </div>
+            <p className='font-medium text-base'>{account?.username || account?.email}</p>
           </div>
           <Separator />
           <Button asChild variant={'custom'} className='w-full'>
-            <Link href={configRoute.parent.dashboard}>Quay trở lại trang chủ</Link>
+            <Link href={configRoute.parent.dashboard}>Xem các tài khoản quản lý</Link>
           </Button>
         </div>
 
@@ -117,3 +113,5 @@ export default function DropdownAvatar() {
     </Popover>
   )
 }
+
+export default AvatarNotification

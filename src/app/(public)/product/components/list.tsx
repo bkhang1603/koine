@@ -1,4 +1,7 @@
+import CustomInput from '@/app/(public)/components/custom-input'
 import images from '@/assets/images'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { Gift } from 'lucide-react'
 import Image from 'next/image'
 
 const listData = [
@@ -14,14 +17,14 @@ const listData = [
     title: 'Thấu hiểu bản thân',
     price: 100000,
     oldPrice: 200000,
-    category: 'Khóa học, Trẻ em'
+    category: 'Quà tặng'
   },
   {
     id: 3,
     title: 'Thấu hiểu bản thân',
     price: 100000,
     oldPrice: 200000,
-    category: 'Khóa học, Trẻ em'
+    category: 'Quà tặng'
   },
   {
     id: 4,
@@ -35,14 +38,14 @@ const listData = [
     title: 'Thấu hiểu bản thân',
     price: 100000,
     oldPrice: 200000,
-    category: 'Khóa học, Trẻ em'
+    category: 'Quà tặng'
   },
   {
     id: 6,
     title: 'Thấu hiểu bản thân',
     price: 100000,
     oldPrice: 200000,
-    category: 'Khóa học, Trẻ em'
+    category: 'Quà tặng'
   },
   {
     id: 7,
@@ -70,14 +73,14 @@ const listData = [
     title: 'Thấu hiểu bản thân',
     price: 100000,
     oldPrice: 200000,
-    category: 'Khóa học, Trẻ em'
+    category: 'Quà tặng'
   },
   {
     id: 11,
     title: 'Thấu hiểu bản thân',
     price: 100000,
     oldPrice: 200000,
-    category: 'Khóa học, Trẻ em'
+    category: 'Quà tặng'
   },
   {
     id: 12,
@@ -91,7 +94,22 @@ const listData = [
 function List() {
   return (
     <div className='col-span-3'>
-      <div className='grid grid-cols-4 gap-4 mt-10'>
+      <div className='flex justify-between items-center gap-4'>
+        <CustomInput className='max-w-[400px] h-9' placeholder='Tìm kiếm sản phẩm...' />
+
+        <Select>
+          <SelectTrigger className='w-[180px]'>
+            <SelectValue placeholder='Sắp xếp theo' />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value='price-asc'>Giá thấp đến cao</SelectItem>
+            <SelectItem value='price-desc'>Giá cao đến thấp</SelectItem>
+            <SelectItem value='most-popular'>Phổ biến nhất</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+
+      <div className='grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mt-6'>
         {listData.map((item) => (
           <article key={item.id} className='cursor-pointer  group/product'>
             <div className='w-full aspect-square rounded-lg overflow-hidden relative'>
@@ -108,8 +126,17 @@ function List() {
               group-hover/product:bottom-0 group-hover/product:opacity-100
               flex justify-center items-center transition-all duration-500'
               >
-                <p className='text-fourth'>Xem them</p>
+                <p className='text-fourth'>Xem thêm</p>
               </div>
+
+              {item.category === 'Quà tặng' && (
+                <div
+                  className='absolute top-0 right-0 bg-secondary text-white
+              w-7 h-7 flex justify-center items-center rounded-bl-md'
+                >
+                  <Gift />
+                </div>
+              )}
             </div>
 
             <div className='p-2'>

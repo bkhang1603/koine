@@ -128,3 +128,29 @@ export const wrapServerApi = async <T>(fn: () => Promise<T>) => {
   }
   return result
 }
+
+export const translateRole = (role: string) => {
+  switch (role) {
+    case 'ADULT':
+      return 'Phụ huynh'
+    case 'TEACHER':
+      return 'Giáo viên'
+    case 'ADMIN':
+      return 'Quản trị viên'
+    default:
+      return role
+  }
+}
+
+export const redirectSettingRole = (role: string) => {
+  switch (role) {
+    case 'ADULT':
+      return '/setting'
+    case 'TEACHER':
+      return '/teacher/setting'
+    case 'ADMIN':
+      return '/admin/setting'
+    default:
+      return '/'
+  }
+}

@@ -5,7 +5,19 @@ export default function robots(): MetadataRoute.Robots {
   return {
     rules: {
       userAgent: '*',
-      allow: '/'
+      allow: '/',
+      disallow: [
+        '/content-creator/',
+        '/parent/',
+        '/admin/',
+        '/setting/',
+        '/profile/',
+        '/cart/',
+        '/checkout/',
+        '/order/',
+        '/404',
+        '/500'
+      ]
     },
     sitemap: `${envConfig.NEXT_PUBLIC_URL}/sitemap.xml`
   }

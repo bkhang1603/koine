@@ -22,7 +22,7 @@ function CardCategory({ title, images }: { title: string; images: string | Stati
 
       <div
         className='transition-opacity duration-500 ease-in-out opacity-0 group-hover:opacity-100
-    absolute bottom-0 right-0 z-10 bg-secondary px-3 py-1 rounded-md'
+    absolute bottom-0 right-0 z-0 bg-secondary px-3 py-1 rounded-md'
       >
         <h3 className='text-center font-normal text-white'>Xem thêm</h3>
       </div>

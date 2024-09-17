@@ -14,7 +14,7 @@ function ProductPage() {
         className='h-[30vh] w-full object-cover rounded-xl'
       />
 
-      <div className='grid grid-cols-4 gap-6'>
+      <div className='grid grid-cols-4 gap-6 mt-8'>
         <Filter />
 
         <List />

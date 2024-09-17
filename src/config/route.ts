@@ -13,6 +13,11 @@ const configRoute = {
   contentCreator: {
     dashboard: '/content-creator/dashboard',
     blog: '/content-creator/blog'
+  },
+  parent: {
+    dashboard: '/parent',
+    child: '/parent/child',
+    bookmark: '/parent/bookmark'
   }
 }
 
