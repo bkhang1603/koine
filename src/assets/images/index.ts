@@ -11,11 +11,14 @@ import knowledgeBackground from './knowledge-background.png'
 import underline from './underline.png'
 import contactImage from './contact-image.png'
 import course from './course.png'
+import course1 from './course-1.png'
 import course2 from './course-2.png'
 import course3 from './course-3.png'
 import course4 from './course-4.png'
 import course5 from './course-5.png'
 import course6 from './course-6.png'
+import course7 from './course-7.png'
+import course8 from './course-8.png'
 import searchImage from './search-image.png'
 import navbarBackground from './navbar-background.png'
 import maintenance from './maintenance.png'
@@ -55,11 +58,14 @@ const images = {
   underline,
   contactImage,
   course,
+  course1,
   course2,
   course3,
   course4,
   course5,
   course6,
+  course7,
+  course8,
   searchImage,
   navbarBackground,
   maintenance,
