@@ -2,17 +2,16 @@ import CustomInput from '@/app/(public)/components/custom-input'
 import images from '@/assets/images'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import configRoute from '@/config/route'
-import { Gift } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
 
 const listData = [
   {
     id: 1,
-    title: 'Thấu hiểu bản thân',
-    price: 100000,
-    oldPrice: 200000,
-    category: 'Khóa học, Trẻ em',
+    title: 'Da khoẻ, bé tự tin',
+    price: 189000,
+    oldPrice: 329000,
+    category: 'Quà tặng, Sức khỏe',
     image: images.product
   },
   {
@@ -22,86 +21,6 @@ const listData = [
     oldPrice: 200000,
     category: 'Quà tặng',
     image: images.product2
-  },
-  {
-    id: 3,
-    title: 'Thấu hiểu bản thân',
-    price: 100000,
-    oldPrice: 200000,
-    category: 'Quà tặng',
-    image: images.product2
-  },
-  {
-    id: 4,
-    title: 'Thấu hiểu bản thân',
-    price: 100000,
-    oldPrice: 200000,
-    category: 'Khóa học, Trẻ em',
-    image: images.product3
-  },
-  {
-    id: 5,
-    title: 'Thấu hiểu bản thân',
-    price: 100000,
-    oldPrice: 200000,
-    category: 'Quà tặng',
-    image: images.product2
-  },
-  {
-    id: 6,
-    title: 'Thấu hiểu bản thân',
-    price: 100000,
-    oldPrice: 200000,
-    category: 'Quà tặng',
-    image: images.product4
-  },
-  {
-    id: 7,
-    title: 'Thấu hiểu bản thân',
-    price: 100000,
-    oldPrice: 200000,
-    category: 'Khóa học, Trẻ em',
-    image: images.product2
-  },
-  {
-    id: 8,
-    title: 'Thấu hiểu bản thân',
-    price: 100000,
-    oldPrice: 200000,
-    category: 'Khóa học, Trẻ em',
-    image: images.product3
-  },
-  {
-    id: 9,
-    title: 'Thấu hiểu bản thân',
-    price: 100000,
-    oldPrice: 200000,
-    category: 'Khóa học, Trẻ em',
-    image: images.product
-  },
-  {
-    id: 10,
-    title: 'Thấu hiểu bản thân',
-    price: 100000,
-    oldPrice: 200000,
-    category: 'Quà tặng',
-    image: images.product2
-  },
-  {
-    id: 11,
-    title: 'Thấu hiểu bản thân',
-    price: 100000,
-    oldPrice: 200000,
-    category: 'Quà tặng',
-    image: images.product4
-  },
-  {
-    id: 12,
-    title: 'Thấu hiểu bản thân',
-    price: 100000,
-    oldPrice: 200000,
-    category: 'Khóa học, Trẻ em',
-    image: images.product3
   }
 ]
 
@@ -130,7 +49,7 @@ function List() {
               <div className='w-full aspect-square rounded-lg overflow-hidden relative'>
                 <Image
                   src={item.image}
-                  alt=''
+                  alt='koine image'
                   width={400}
                   height={400}
                   className='w-full aspect-square object-cover rounded-lg'
@@ -144,14 +63,14 @@ function List() {
                   <p className='text-fourth'>Xem thêm</p>
                 </div>
 
-                {item.category === 'Quà tặng' && (
+                {/* {item.category === 'Quà tặng' && (
                   <div
                     className='absolute top-0 right-0 bg-secondary text-white
                 w-7 h-7 flex justify-center items-center rounded-bl-md'
                   >
                     <Gift />
                   </div>
-                )}
+                )} */}
               </div>
 
               <div className='p-2'>

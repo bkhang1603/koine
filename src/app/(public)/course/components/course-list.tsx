@@ -68,7 +68,7 @@ const courseData = [
 
 function CourseList() {
   return (
-    <section className='py-20 space-y-10'>
+    <section className='py-16 space-y-14'>
       {courseData.map((category) => (
         <div key={category.id}>
           <h2 className='text-4xl'>{category.title}</h2>

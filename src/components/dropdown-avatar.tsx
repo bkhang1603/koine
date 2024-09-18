@@ -84,7 +84,7 @@ export default function DropdownAvatar() {
           </div>
           <Separator />
           <Button asChild variant={'custom'} className='w-full'>
-            <Link href={configRoute.parent.dashboard}>Quay trở lại trang chủ</Link>
+            <Link href={configRoute.home}>Quay trở lại trang chủ</Link>
           </Button>
         </div>
 

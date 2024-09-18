@@ -1,4 +1,3 @@
-import Information from '@/app/(public)/components/information'
 import CourseList from '@/app/(public)/course/components/course-list'
 import images from '@/assets/images'
 import Image from 'next/image'
@@ -18,8 +17,6 @@ function CoursePage() {
       <section className='container'>
         <CourseList />
       </section>
-
-      <Information />
     </main>
   )
 }
