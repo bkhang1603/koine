@@ -36,6 +36,10 @@ import sharing from './sharing.png'
 import notFound from './not-found.png'
 import notFound404 from './404.png'
 import ghost from './ghost.png'
+import product2 from './product-2.png'
+import product3 from './product-3.png'
+import product4 from './product-4.png'
+import banner from './banner.png'
 
 const images = {
   heroImage,
@@ -75,7 +79,11 @@ const images = {
   sharing,
   notFound,
   notFound404,
-  ghost
+  ghost,
+  product2,
+  product3,
+  product4,
+  banner
 }
 
 export default images

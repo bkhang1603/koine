@@ -7,14 +7,15 @@ function ProductPage() {
   return (
     <main className='pb-28'>
       <Image
-        src={images.product}
+        src={images.banner}
         alt='Banner'
         width={1920}
         height={400}
-        className='h-[30vh] w-full object-cover rounded-xl'
+        quality={100}
+        className='h-[30vh] w-full object-cover'
       />
 
-      <div className='grid grid-cols-4 gap-6 mt-8'>
+      <div className='grid grid-cols-4 gap-6 mt-8 container'>
         <Filter />
 
         <List />

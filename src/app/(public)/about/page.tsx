@@ -42,7 +42,16 @@ function AboutPage() {
 
   return (
     <main>
-      <section className='py-24 relative'>
+      <Image
+        src={images.banner}
+        alt='Banner'
+        width={1920}
+        height={400}
+        quality={100}
+        className='h-[30vh] w-full object-cover'
+      />
+
+      {/* <section className='py-24 relative'>
         <Image
           src={images.knowledgeBackground}
           alt='Knowledge Background'
@@ -64,9 +73,9 @@ function AboutPage() {
             miền đất nước.
           </p>
         </div>
-      </section>
+      </section> */}
 
-      <section className='container mt-28'>
+      <section className='container mt-20'>
         <h2 className='text-secondary text-7xl font-bold'>2024</h2>
 
         <div className='w-full flex items-center py-10'>

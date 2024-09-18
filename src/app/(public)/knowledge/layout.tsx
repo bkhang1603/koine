@@ -7,7 +7,7 @@ export const metadata: Metadata = {
 }
 
 function KnowledgeLayout({ children }: { children: React.ReactNode }) {
-  return <div className='pt-[60px] md:pt-[100px] container'>{children}</div>
+  return <div className='pt-[60px] md:pt-[100px]'>{children}</div>
 }
 
 export default KnowledgeLayout

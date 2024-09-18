@@ -48,17 +48,17 @@ function Filter() {
                           <div className='flex items-center gap-3'>
                             <Checkbox
                               {...field}
-                              id='course'
-                              value={'course'}
-                              checked={Array.isArray(field.value) && field.value.includes('course')}
+                              id='bestSeller'
+                              value={'bestSeller'}
+                              checked={Array.isArray(field.value) && field.value.includes('bestSeller')}
                               onCheckedChange={(checked) => {
                                 const newValue = checked
-                                  ? [...field.value, 'course']
-                                  : field.value.filter((val) => val !== 'course')
+                                  ? [...field.value, 'bestSeller']
+                                  : field.value.filter((val) => val !== 'bestSeller')
                                 field.onChange(newValue)
                               }}
                             />
-                            <label htmlFor='course'>Khóa học</label>
+                            <label htmlFor='bestSeller'>Sản phẩm chạy nhất</label>
                           </div>
 
                           <div className='flex items-center gap-3'>
@@ -92,6 +92,38 @@ function Filter() {
                             />
                             <label htmlFor='souvenir'>Quà lưu niệm</label>
                           </div>
+
+                          <div className='flex items-center gap-3'>
+                            <Checkbox
+                              {...field}
+                              id='retail'
+                              value={'retail'}
+                              checked={Array.isArray(field.value) && field.value.includes('retail')}
+                              onCheckedChange={(checked) => {
+                                const newValue = checked
+                                  ? [...field.value, 'retail']
+                                  : field.value.filter((val) => val !== 'retail')
+                                field.onChange(newValue)
+                              }}
+                            />
+                            <label htmlFor='retail'>Sản phẩm lẻ</label>
+                          </div>
+
+                          <div className='flex items-center gap-3'>
+                            <Checkbox
+                              {...field}
+                              id='wholesale'
+                              value={'wholesale'}
+                              checked={Array.isArray(field.value) && field.value.includes('wholesale')}
+                              onCheckedChange={(checked) => {
+                                const newValue = checked
+                                  ? [...field.value, 'wholesale']
+                                  : field.value.filter((val) => val !== 'wholesale')
+                                field.onChange(newValue)
+                              }}
+                            />
+                            <label htmlFor='wholesale'>Sản phẩm theo &quot;Côm bồ&quot;</label>
+                          </div>
                         </div>
                       </FormControl>
                     </FormItem>
@@ -112,38 +144,6 @@ function Filter() {
                           <div className='flex items-center gap-3'>
                             <Checkbox
                               {...field}
-                              id='parent'
-                              value={'parent'}
-                              checked={Array.isArray(field.value) && field.value.includes('parent')}
-                              onCheckedChange={(checked) => {
-                                const newValue = checked
-                                  ? [...field.value, 'parent']
-                                  : field.value.filter((val) => val !== 'parent')
-                                field.onChange(newValue)
-                              }}
-                            />
-                            <label htmlFor='parent'>Phụ huynh</label>
-                          </div>
-
-                          <div className='flex items-center gap-3'>
-                            <Checkbox
-                              {...field}
-                              id='student'
-                              value={'student'}
-                              checked={Array.isArray(field.value) && field.value.includes('student')}
-                              onCheckedChange={(checked) => {
-                                const newValue = checked
-                                  ? [...field.value, 'student']
-                                  : field.value.filter((val) => val !== 'student')
-                                field.onChange(newValue)
-                              }}
-                            />
-                            <label htmlFor='student'>Học sinh</label>
-                          </div>
-
-                          <div className='flex items-center gap-3'>
-                            <Checkbox
-                              {...field}
                               id='girl'
                               value={'girl'}
                               checked={Array.isArray(field.value) && field.value.includes('girl')}
@@ -154,7 +154,7 @@ function Filter() {
                                 field.onChange(newValue)
                               }}
                             />
-                            <label htmlFor='girl'>Con gái</label>
+                            <label htmlFor='girl'>Bé gái</label>
                           </div>
 
                           <div className='flex items-center gap-3'>
@@ -170,7 +170,7 @@ function Filter() {
                                 field.onChange(newValue)
                               }}
                             />
-                            <label htmlFor='boy'>Con trai</label>
+                            <label htmlFor='boy'>Bé trai</label>
                           </div>
                         </div>
                       </FormControl>

@@ -1,8 +1,10 @@
 import CustomInput from '@/app/(public)/components/custom-input'
 import images from '@/assets/images'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import configRoute from '@/config/route'
 import { Gift } from 'lucide-react'
 import Image from 'next/image'
+import Link from 'next/link'
 
 const listData = [
   {
@@ -10,84 +12,96 @@ const listData = [
     title: 'Thấu hiểu bản thân',
     price: 100000,
     oldPrice: 200000,
-    category: 'Khóa học, Trẻ em'
+    category: 'Khóa học, Trẻ em',
+    image: images.product
   },
   {
     id: 2,
     title: 'Thấu hiểu bản thân',
     price: 100000,
     oldPrice: 200000,
-    category: 'Quà tặng'
+    category: 'Quà tặng',
+    image: images.product2
   },
   {
     id: 3,
     title: 'Thấu hiểu bản thân',
     price: 100000,
     oldPrice: 200000,
-    category: 'Quà tặng'
+    category: 'Quà tặng',
+    image: images.product2
   },
   {
     id: 4,
     title: 'Thấu hiểu bản thân',
     price: 100000,
     oldPrice: 200000,
-    category: 'Khóa học, Trẻ em'
+    category: 'Khóa học, Trẻ em',
+    image: images.product3
   },
   {
     id: 5,
     title: 'Thấu hiểu bản thân',
     price: 100000,
     oldPrice: 200000,
-    category: 'Quà tặng'
+    category: 'Quà tặng',
+    image: images.product2
   },
   {
     id: 6,
     title: 'Thấu hiểu bản thân',
     price: 100000,
     oldPrice: 200000,
-    category: 'Quà tặng'
+    category: 'Quà tặng',
+    image: images.product4
   },
   {
     id: 7,
     title: 'Thấu hiểu bản thân',
     price: 100000,
     oldPrice: 200000,
-    category: 'Khóa học, Trẻ em'
+    category: 'Khóa học, Trẻ em',
+    image: images.product2
   },
   {
     id: 8,
     title: 'Thấu hiểu bản thân',
     price: 100000,
     oldPrice: 200000,
-    category: 'Khóa học, Trẻ em'
+    category: 'Khóa học, Trẻ em',
+    image: images.product3
   },
   {
     id: 9,
     title: 'Thấu hiểu bản thân',
     price: 100000,
     oldPrice: 200000,
-    category: 'Khóa học, Trẻ em'
+    category: 'Khóa học, Trẻ em',
+    image: images.product
   },
   {
     id: 10,
     title: 'Thấu hiểu bản thân',
     price: 100000,
     oldPrice: 200000,
-    category: 'Quà tặng'
+    category: 'Quà tặng',
+    image: images.product2
   },
   {
     id: 11,
     title: 'Thấu hiểu bản thân',
     price: 100000,
     oldPrice: 200000,
-    category: 'Quà tặng'
+    category: 'Quà tặng',
+    image: images.product4
   },
   {
     id: 12,
     title: 'Thấu hiểu bản thân',
     price: 100000,
     oldPrice: 200000,
-    category: 'Khóa học, Trẻ em'
+    category: 'Khóa học, Trẻ em',
+    image: images.product3
   }
 ]
 
@@ -98,7 +112,7 @@ function List() {
         <CustomInput className='max-w-[400px] h-9' placeholder='Tìm kiếm sản phẩm...' />
 
         <Select>
-          <SelectTrigger className='w-[180px]'>
+          <SelectTrigger className='w-[180px] focus:ring-0'>
             <SelectValue placeholder='Sắp xếp theo' />
           </SelectTrigger>
           <SelectContent>
@@ -111,44 +125,46 @@ function List() {
 
       <div className='grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mt-6'>
         {listData.map((item) => (
-          <article key={item.id} className='cursor-pointer  group/product'>
-            <div className='w-full aspect-square rounded-lg overflow-hidden relative'>
-              <Image
-                src={images.product}
-                alt=''
-                width={400}
-                height={400}
-                className='w-full aspect-square object-cover rounded-lg'
-              />
+          <Link href={`${configRoute.product}/${item.id}`} key={item.id}>
+            <article className='cursor-pointer  group/product'>
+              <div className='w-full aspect-square rounded-lg overflow-hidden relative'>
+                <Image
+                  src={item.image}
+                  alt=''
+                  width={400}
+                  height={400}
+                  className='w-full aspect-square object-cover rounded-lg'
+                />
 
-              <div
-                className='absolute w-full h-10 bg-black/50 opacity-0 -bottom-10
-              group-hover/product:bottom-0 group-hover/product:opacity-100
-              flex justify-center items-center transition-all duration-500'
-              >
-                <p className='text-fourth'>Xem thêm</p>
-              </div>
-
-              {item.category === 'Quà tặng' && (
                 <div
-                  className='absolute top-0 right-0 bg-secondary text-white
-              w-7 h-7 flex justify-center items-center rounded-bl-md'
+                  className='absolute w-full h-10 bg-black/50 opacity-0 -bottom-10
+                group-hover/product:bottom-0 group-hover/product:opacity-100
+                flex justify-center items-center transition-all duration-500'
                 >
-                  <Gift />
+                  <p className='text-fourth'>Xem thêm</p>
                 </div>
-              )}
-            </div>
 
-            <div className='p-2'>
-              <p className='text-xs text-gray-500'>{item.category}</p>
-              <h3 className='text-lg font-semibold'>{item.title}</h3>
-
-              <div className='flex items-center gap-2 mt-2'>
-                <span className='text-base font-semibold'>{item.price.toLocaleString()}đ</span>
-                <span className='text-gray-400 text-sm line-through'>{item.oldPrice.toLocaleString()}đ</span>
+                {item.category === 'Quà tặng' && (
+                  <div
+                    className='absolute top-0 right-0 bg-secondary text-white
+                w-7 h-7 flex justify-center items-center rounded-bl-md'
+                  >
+                    <Gift />
+                  </div>
+                )}
               </div>
-            </div>
-          </article>
+
+              <div className='p-2'>
+                <p className='text-xs text-gray-500'>{item.category}</p>
+                <h3 className='text-lg font-semibold'>{item.title}</h3>
+
+                <div className='flex items-center gap-2 mt-2'>
+                  <span className='text-base font-semibold'>{item.price.toLocaleString()}đ</span>
+                  <span className='text-gray-400 text-sm line-through'>{item.oldPrice.toLocaleString()}đ</span>
+                </div>
+              </div>
+            </article>
+          </Link>
         ))}
       </div>
     </div>

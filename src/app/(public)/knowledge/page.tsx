@@ -14,7 +14,15 @@ function KnowledgePage() {
 
   return (
     <main>
-      <figure className='py-24 relative'>
+      <Image
+        src={images.banner}
+        alt='Banner'
+        width={1920}
+        height={400}
+        quality={100}
+        className='h-[30vh] w-full object-cover'
+      />
+      {/* <figure className='py-24 relative'>
         <Image
           src={images.knowledgeBackground}
           alt='Knowledge Background'
@@ -37,34 +45,36 @@ function KnowledgePage() {
             translate-x-1/2 translate-y-8 z-[-1] hidden lg:block'
           />
         </h1>
-      </figure>
+      </figure> */}
 
-      <ScrollArea className='w-full bg-fourth rounded-2xl'>
-        <div className='flex items-center space-x-2 p-4'>
-          <Tag className='bg-sixth hover:bg-sixth/80'>Tất cả</Tag>
-          <Tag>Mới</Tag>
-          <Tag>Cũ</Tag>
-          <Tag>Phổ biến</Tag>
-          <Tag>Thanh thiếu niên</Tag>
-          <Tag>Trẻ em</Tag>
-          <Tag>Bé gái</Tag>
-          <Tag>Bé trai</Tag>
+      <section className='container mt-10'>
+        <ScrollArea className='w-full bg-fourth rounded-2xl'>
+          <div className='flex items-center space-x-2 p-4'>
+            <Tag className='bg-sixth hover:bg-sixth/80'>Tất cả</Tag>
+            <Tag>Mới</Tag>
+            <Tag>Cũ</Tag>
+            <Tag>Phổ biến</Tag>
+            <Tag>Thanh thiếu niên</Tag>
+            <Tag>Trẻ em</Tag>
+            <Tag>Bé gái</Tag>
+            <Tag>Bé trai</Tag>
+          </div>
+
+          <ScrollBar orientation='horizontal' />
+        </ScrollArea>
+
+        <div className='w-full flex flex-col items-center py-10 gap-4'>
+          {newData.map((item, index) => (
+            <Link key={index} href={`${configRoute.knowledge}/${item?.id}`} className='w-full'>
+              <CardBlog data={item} />
+            </Link>
+          ))}
         </div>
 
-        <ScrollBar orientation='horizontal' />
-      </ScrollArea>
+        {/* <PaginationCustom className='mt-16' totalPage={5} href='/knowledge' /> */}
 
-      <div className='w-full flex flex-col items-center py-10 gap-4'>
-        {newData.map((item, index) => (
-          <Link key={index} href={`${configRoute.knowledge}/${item?.id}`} className='w-full'>
-            <CardBlog data={item} />
-          </Link>
-        ))}
-      </div>
-
-      {/* <PaginationCustom className='mt-16' totalPage={5} href='/knowledge' /> */}
-
-      <Information className='mt-20' />
+        <Information className='mt-20' />
+      </section>
     </main>
   )
 }
