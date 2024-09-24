@@ -8,12 +8,12 @@ import { Button } from '@/components/ui/button'
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { useToast } from '@/components/ui/use-toast'
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import { cn, handleErrorApi } from '@/lib/utils'
 import { RegisterBody, RegisterBodyType } from '@/schemaValidations/auth.schema'
 import { Checkbox } from '@/components/ui/checkbox'
 import { useRegisterMutation } from '@/queries/useAuth'
 import InputPassword from '@/components/input-password'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 
 export default function RegisterForm({ className }: { className?: string }) {
   const { toast } = useToast()
@@ -92,33 +92,18 @@ export default function RegisterForm({ className }: { className?: string }) {
               <FormItem>
                 <FormLabel>Giới tính</FormLabel>
                 <FormControl>
-                  <RadioGroup
-                    className='flex items-center space-x-14 sm:space-x-16 h-10'
-                    {...field}
-                    onValueChange={field.onChange}
-                    defaultValue={field.value}
-                  >
-                    <FormItem className='flex items-center space-x-3 space-y-0'>
-                      <FormControl>
-                        <RadioGroupItem value='MALE'>Nam</RadioGroupItem>
-                      </FormControl>
-                      <FormLabel className='cursor-pointer'>Nam</FormLabel>
-                    </FormItem>
-
-                    <FormItem className='flex items-center space-x-3 space-y-0'>
-                      <FormControl>
-                        <RadioGroupItem value='NU'>Nữ</RadioGroupItem>
-                      </FormControl>
-                      <FormLabel className='cursor-pointer'>Nữ</FormLabel>
-                    </FormItem>
-
-                    <FormItem className='flex items-center space-x-3 space-y-0'>
-                      <FormControl>
-                        <RadioGroupItem value='OTHER'>Khác</RadioGroupItem>
-                      </FormControl>
-                      <FormLabel className='cursor-pointer'>Khác</FormLabel>
-                    </FormItem>
-                  </RadioGroup>
+                  <Select {...field} onValueChange={field.onChange} defaultValue={field.value}>
+                    <FormControl>
+                      <SelectTrigger className='w-80'>
+                        <SelectValue placeholder='Hãy chọn giới tính của bạn' />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      <SelectItem value='MALE'>Nam</SelectItem>
+                      <SelectItem value='FEMALE'>Nữ</SelectItem>
+                      <SelectItem value='OTHER'>Khác</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -131,7 +116,7 @@ export default function RegisterForm({ className }: { className?: string }) {
               <FormItem>
                 <FormLabel>Năm sinh</FormLabel>
                 <FormControl>
-                  <Input className='h-10' placeholder='Năm sinh' type='number' {...field} />
+                  <Input className='h-10 w-60' placeholder='Năm sinh' type='number' {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>

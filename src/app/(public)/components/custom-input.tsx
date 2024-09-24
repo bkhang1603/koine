@@ -10,7 +10,7 @@ function CustomInput({ className, placeholder }: { className?: string; placehold
       )}
     >
       <Search className='h-5 w-5 text-gray-300' />
-      <input type='text' placeholder={placeholder ?? 'Tìm kiếm...'} className='w-full p-2 outline-none' />
+      <input type='text' placeholder={placeholder ?? 'Tìm kiếm...'} className='w-full p-2 outline-none bg-white' />
     </div>
   )
 }

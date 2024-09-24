@@ -43,6 +43,14 @@ import product2 from './product-2.png'
 import product3 from './product-3.png'
 import product4 from './product-4.png'
 import banner from './banner.png'
+import courseBanner from './course-banner.png'
+import courseSkinCare from './course-skin-care.png'
+import courseMongTinh from './course-mong-tinh.png'
+import courseRungTrung from './course-rung-trung.png'
+import coursePoster from './course-poster.png'
+import blogBanner from './blog-banner.png'
+import aboutBanner from './about-banner.png'
+import courseSkinCareBanner from './course-skin-care-banner.png'
 
 const images = {
   heroImage,
@@ -89,7 +97,15 @@ const images = {
   product2,
   product3,
   product4,
-  banner
+  banner,
+  courseBanner,
+  courseSkinCare,
+  courseMongTinh,
+  courseRungTrung,
+  coursePoster,
+  blogBanner,
+  aboutBanner,
+  courseSkinCareBanner
 }
 
 export default images

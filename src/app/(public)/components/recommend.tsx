@@ -17,12 +17,19 @@ function Recommend() {
         alt='pink-stars'
         width={200}
         height={200}
-        className='hidden sm:block absolute top-20 left-14 mt-32'
+        className='hidden sm:block absolute top-20 left-14 mt-32 h-48 w-48'
       />
 
       <section className='flex flex-col justify-center items-center mt-20 gap-4'>
         <p className='text-2xl font-medium'>Hiện tất cả các khóa học đang được bảo trì</p>
-        <Image src={images.maintenance} alt='' width={600} height={600} />
+        <Image
+          src={images.maintenance}
+          alt='koine maintenance'
+          width={600}
+          height={600}
+          priority
+          className='object-cover h-64 w-auto'
+        />
       </section>
     </section>
   )

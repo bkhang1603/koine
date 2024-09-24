@@ -20,7 +20,8 @@ const buttonVariants = cva(
         third: 'bg-third text-third-foreground shadow-sm hover:bg-third/90',
         fourth: 'bg-fourth text-fourth-foreground shadow-sm hover:bg-fourth/90',
         fifth: 'bg-fifth text-fifth-foreground shadow-sm hover:bg-fifth/90',
-        outlineSecondary: 'border-2 border-secondary text-secondary bg-fourth shadow-sm hover:bg-secondary/15'
+        outlineSecondary: 'border-2 border-secondary text-secondary bg-fourth shadow-sm hover:bg-secondary/15',
+        icon: 'hover:bg-slate-200/40 rounded-full'
       },
       size: {
         default: 'h-9 px-4 py-2',

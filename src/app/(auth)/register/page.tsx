@@ -28,6 +28,7 @@ function RegisterPage() {
         >
           Đăng ký
         </h1>
+
         <RegisterForm className='mt-7' />
 
         <div className='my-8 flex items-center w-full md:w-[600px]'>
@@ -74,7 +75,6 @@ function RegisterPage() {
           height={50}
           className='hidden sm:block absolute -z-10 bottom-0 left-0 ml-60 mb-10'
         />
-
         <Image
           src={icons.pinkStar}
           alt='Koine'

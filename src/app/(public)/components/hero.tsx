@@ -42,6 +42,7 @@ function Hero() {
           alt='Hero image'
           width={1920}
           height={1080}
+          priority
           className='max-h-[calc(100vh-100px)]'
         />
       </div>

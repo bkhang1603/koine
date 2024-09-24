@@ -16,25 +16,25 @@ import Image from 'next/image'
 function AboutPage() {
   const data = [
     {
-      date: '2024-03-06',
+      date: '03-06-2024',
       content:
         'Ngày khởi đầu của một hành trình mới - một hành trình đầy thách thức và khó khăn. Ngày mà Koine được sinh ra, mang trong mình sứ mệnh bảo bọc và giúp đỡ tất cả trẻ em trên khắp mọi miền đất nước.'
     },
     {
-      date: '2024-15-06',
+      date: '15-06-2024',
       content: 'Koine chập chững bước từng bước trên hành trình gây dựng một nền tảng giáo dục tốt nhất cho trẻ em.'
     },
     {
-      date: '2024-30-06',
+      date: '30-06-2024',
       content: 'Fanpage đầu tiên của Koine được tạo ra, đánh dấu sự xuất hiện của Koine trên mạng xã hội.'
     },
     {
-      date: '2024-04-07',
+      date: '04-07-2024',
       content:
         'Koine chính thức xuất hiện trên website, góp phần giúp trẻ em tiếp cận kiến thức một cách dễ dàng hơn. Đồng thời cũng bắt đầu tiếp nhận những góp ý từ tất cả mọi người.'
     },
     {
-      date: '2024-10-07',
+      date: '10-07-2024',
       content:
         'Koine bắt đầu đăng tải những bài viết đầu tiên, bao gồm những kiến thức bổ ích và những câu chuyện chia sẻ do chính những thành viên của Koine đã từng trải qua.'
     }
@@ -43,7 +43,7 @@ function AboutPage() {
   return (
     <main>
       <Image
-        src={images.banner}
+        src={images.aboutBanner}
         alt='Banner'
         width={1920}
         height={400}

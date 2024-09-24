@@ -11,9 +11,10 @@ function Promo() {
       <div className='container grid grid-cols-1 lg:grid-cols-2 gap-4 relative'>
         <Image
           src={images.product}
-          alt='sharing'
+          alt='product'
           width={500}
           height={500}
+          priority
           className='w-full max-h-[500px] object-cover rounded-[20px]'
         />
 
@@ -50,7 +51,8 @@ function Promo() {
           alt='pink stars'
           width={200}
           height={200}
-          className='hidden lg:block absolute left-0 bottom-0 translate-x-[-50%] translate-y-[50%]'
+          className='hidden lg:block absolute left-0 bottom-0
+          translate-x-[-50%] translate-y-[50%] h-52 w-52'
         />
       </div>
     </section>

@@ -1,26 +1,50 @@
+'use client'
+
 import Image from 'next/image'
 import { Star, Heart, Share2, Minus, Plus } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import images from '@/assets/images'
+import { useState } from 'react'
+import BreadCrumbCustom from '@/components/breadcrumb-custom'
+
+const imageData = [
+  { src: images.product2, alt: 'Product' },
+  { src: images.product, alt: 'Product' },
+  { src: images.product2, alt: 'Product' },
+  { src: images.product, alt: 'Product' }
+]
 
 export default function ProductDetail() {
+  const [mainImage, setMainImage] = useState(imageData[0].src)
+
   return (
-    <section className='container px-4 py-8'>
+    <section className='container py-8'>
+      <BreadCrumbCustom />
+
       {/* Product details */}
-      <div className='grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-4'>
+      <div className='grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-4 mt-6'>
         {/* Product images */}
         <div className='flex flex-col gap-2'>
-          <Image src={images.product} alt='' width={1000} height={1000} className='w-full h-auto' />
+          <Image
+            src={mainImage}
+            alt='Koine product'
+            width={1000}
+            height={1000}
+            quality={100}
+            className='w-full h-96 object-cover rounded-lg'
+          />
           <div className='grid grid-cols-4 gap-2'>
-            {[1, 2, 3, 4].map((i) => (
+            {imageData.map((image, index) => (
               <Image
-                key={i}
-                src={images.product}
-                alt={`Thumbnail ${i}`}
+                key={index}
+                src={image.src}
+                alt={image.alt}
                 width={1000}
                 height={1000}
-                className='w-full h-full object-cover cursor-pointer rounded-lg'
+                quality={100}
+                className='w-full h-28 object-cover cursor-pointer rounded-lg'
+                onClick={() => setMainImage(image.src)}
               />
             ))}
           </div>
@@ -51,7 +75,7 @@ export default function ProductDetail() {
               <Minus className='h-4 w-4' />
             </Button>
 
-            <Input type='text' value={1} className='w-16 text-center' />
+            <Input type='text' defaultValue={1} className='w-16 text-center' />
 
             <Button variant='outline' size='icon'>
               <Plus className='h-4 w-4' />

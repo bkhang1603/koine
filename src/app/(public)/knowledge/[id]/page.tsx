@@ -1,6 +1,5 @@
-import images from '@/assets/images'
+import BlogComments from '@/app/(public)/knowledge/components/blog-comments'
 import data from '@/data/data'
-import { Bookmark, Ellipsis } from 'lucide-react'
 import { StaticImport } from 'next/dist/shared/lib/get-img-props'
 import Image from 'next/image'
 
@@ -35,12 +34,12 @@ function page({ params }: { params: { id: string } }) {
   const newData = data.find((item) => item.id === params.id) as DataType
 
   return (
-    <div className='py-20 border-b-4 border-fifth'>
-      <section className='flex justify-between items-center pb-10'>
+    <div className='py-20 container'>
+      {/* <section className='flex justify-between items-center pb-10'>
         <article className='flex items-center gap-4'>
           <Image
             src={images.avatar}
-            alt='avatar'
+            alt='user avatar'
             width={50}
             height={50}
             className='w-10 h-10 md:w-12 md:h-12 object-cover'
@@ -52,7 +51,7 @@ function page({ params }: { params: { id: string } }) {
           <Bookmark className='md:w-8 md:h-8 cursor-pointer hover:fill-secondary' />
           <Ellipsis className='md:w-8 md:h-8 cursor-pointer' />
         </div>
-      </section>
+      </section> */}
 
       <h1
         className='bg-gradient-to-r from-[#FF0059] via-[#FF597D] to-[#2945DE]
@@ -160,6 +159,10 @@ function page({ params }: { params: { id: string } }) {
             ))}
         </section>
       ))}
+
+      {/* <div className='border-b-4 border-fifth'></div> */}
+
+      <BlogComments />
     </div>
   )
 }

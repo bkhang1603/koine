@@ -13,8 +13,8 @@ export const LoginBody = z
       }),
     password: z
       .string()
-      .min(6, {
-        message: 'Mật khẩu phải có ít nhất 6 ký tự.'
+      .min(8, {
+        message: 'Mật khẩu phải có ít nhất 8 ký tự.'
       })
       .max(100, {
         message: 'Mật khẩu không được quá 100 ký tự.'
@@ -69,6 +69,7 @@ export type LogoutBodyType = z.TypeOf<typeof LogoutBody>
 
 export const RegisterBody = z
   .object({
+    // Tên đăng nhập không được chứa khoảng trắng, dấu tiếng việt.
     username: z
       .string()
       .min(6, {
@@ -76,27 +77,43 @@ export const RegisterBody = z
       })
       .max(100, {
         message: 'Tên đăng nhập không được quá 100 ký tự.'
+      })
+      .regex(/^[a-zA-Z0-9]+$/, {
+        message: 'Tên đăng nhập không được chứa khoảng trắng, dấu tiếng việt.'
       }),
     email: z.string().email({
       message: 'Email không hợp lệ.'
     }),
+    // Tôi muốn password bao gồm chữ hoa, chữ thường, số và ký tự đặc biệt
     password: z
       .string()
-      .min(6, {
-        message: 'Mật khẩu phải có ít nhất 6 ký tự.'
+      .min(8, {
+        message: 'Mật khẩu phải có ít nhất 8 ký tự.'
       })
       .max(100, {
         message: 'Mật khẩu không được quá 100 ký tự.'
-      }),
+      })
+      .regex(
+        /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+}{":;'?/>.<,])(?=.*[a-zA-Z0-9!@#$%^&*()_+}{":;'?/>.<,]).{8,}$/,
+        {
+          message: 'Mật khẩu phải chứa ít nhất một chữ hoa, một chữ thường, một số và một ký tự đặc biệt.'
+        }
+      ),
     confirmPassword: z
       .string()
-      .min(6, {
-        message: 'Mật khẩu phải có ít nhất 6 ký tự.'
+      .min(8, {
+        message: 'Mật khẩu phải có ít nhất 8 ký tự.'
       })
       .max(100, {
         message: 'Mật khẩu không được quá 100 ký tự.'
-      }),
-    gender: z.enum(GenderValues),
+      })
+      .regex(
+        /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+}{":;'?/>.<,])(?=.*[a-zA-Z0-9!@#$%^&*()_+}{":;'?/>.<,]).{8,}$/,
+        {
+          message: 'Mật khẩu phải chứa ít nhất một chữ hoa, một chữ thường, một số và một ký tự đặc biệt.'
+        }
+      ),
+    gender: z.enum(GenderValues, { message: 'Hãy chọn giới tính của bạn.' }),
     dob: z.coerce
       .number()
       .min(1900, {

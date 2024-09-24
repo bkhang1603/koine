@@ -155,3 +155,12 @@ export const redirectSettingRole = (role: string) => {
       return '/'
   }
 }
+
+export const translatePathname = (pathname: string) => {
+  switch (pathname) {
+    case 'product':
+      return 'Sản phẩm'
+    default:
+      return 'Chi tiết sản phẩm'
+  }
+}

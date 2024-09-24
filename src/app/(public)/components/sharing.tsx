@@ -67,7 +67,7 @@ function Sharing() {
                 width={35}
                 height={35}
                 quality={100}
-                className='absolute top-5 left-5'
+                className='absolute top-5 left-5 w-9 h-auto'
               />
 
               <Image
@@ -75,6 +75,7 @@ function Sharing() {
                 alt='koine image'
                 width={1000}
                 height={1000}
+                priority
                 className='rounded-full w-44 h-44 sm:w-60 sm:h-60 object-cover'
               />
               <div className='pt-6'>
@@ -88,7 +89,7 @@ function Sharing() {
                 width={35}
                 height={35}
                 quality={100}
-                className='absolute bottom-5 right-5 rotate-180'
+                className='absolute bottom-5 right-5 rotate-180 w-9 h-auto'
               />
             </article>
           ))}
@@ -121,7 +122,7 @@ function Sharing() {
         </div>
 
         <div className='xl:col-span-3'>
-          <Image src={images.sharing} alt='koine image' width={1000} height={1000} />
+          <Image src={images.sharing} alt='koine image' width={1000} height={1000} priority />
         </div>
       </div>
     </section>

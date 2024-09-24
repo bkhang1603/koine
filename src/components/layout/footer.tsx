@@ -39,7 +39,7 @@ const footerLinks = [
 function Footer() {
   return (
     <footer className='mt-10'>
-      <Image src={images.footer} alt='footer' width={3000} height={3000} className='w-[100vw]' />
+      <Image src={images.footer} alt='footer' width={3000} height={3000} priority className='w-[100vw]' />
 
       <div className='bg-fourth'>
         <section className='container'>

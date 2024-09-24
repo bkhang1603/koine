@@ -15,7 +15,7 @@ function KnowledgePage() {
   return (
     <main>
       <Image
-        src={images.banner}
+        src={images.blogBanner}
         alt='Banner'
         width={1920}
         height={400}
