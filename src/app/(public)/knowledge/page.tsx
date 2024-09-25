@@ -71,8 +71,6 @@ function KnowledgePage() {
           ))}
         </div>
 
-        {/* <PaginationCustom className='mt-16' totalPage={5} href='/knowledge' /> */}
-
         <Information className='mt-20' />
       </section>
     </main>

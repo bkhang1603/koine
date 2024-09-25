@@ -11,10 +11,10 @@ const footerLinks = [
     title: 'Giới thiệu',
     links: [
       { name: 'Trang chủ', href: configRoute.home, icon: null },
+      { name: 'Sản phẩm', href: configRoute.product, icon: null },
       { name: 'Khóa học', href: configRoute.course, icon: null },
       { name: 'Kiến thức', href: configRoute.knowledge, icon: null },
       { name: 'Tổng quan', href: configRoute.about, icon: null },
-      { name: 'Sản phẩm', href: configRoute.product, icon: null },
       { name: 'Liên hệ', href: configRoute.contact, icon: null }
     ]
   },

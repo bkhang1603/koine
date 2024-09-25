@@ -74,7 +74,7 @@ function CommentItem({ comment, level = 0 }: { comment: Comment; level?: number 
   }
 
   return (
-    <div className={'flex items-start gap-3 pt-4'}>
+    <div className='flex items-start gap-3 pt-4'>
       <Avatar className={level > 0 ? 'w-8 h-8' : ''}>
         <AvatarImage
           src={`https://api.dicebear.com/6.x/initials/svg?seed=${comment.author}`}
@@ -89,7 +89,7 @@ function CommentItem({ comment, level = 0 }: { comment: Comment; level?: number 
           <p className='text-gray-500'>{comment.content}</p>
         </div>
 
-        <div className='flex items-center mt-1'>
+        <div className='flex items-center mt-0'>
           <Button variant={'link'} className='text-gray-500 px-2'>
             <span>{comment.timestamp}</span>
           </Button>
@@ -182,15 +182,15 @@ function BlogComments() {
 
   return (
     <section>
-      <div className='flex justify-between items-center py-4'>
+      <div className='flex justify-start items-center py-4 gap-4'>
         <div className='flex items-center gap-2'>
           <Heart className='text-secondary w-6 h-6' />
-          <span className='text-gray-500 text-lg'>10 lượt thích</span>
+          <span className='text-gray-500 text-lg'>10</span>
         </div>
 
         <div className='flex items-center gap-2'>
           <MessageCircle className='text-secondary w-6 h-6' />
-          <span className='text-gray-500 text-lg'>10 bình luận</span>
+          <span className='text-gray-500 text-lg'>10</span>
         </div>
       </div>
 

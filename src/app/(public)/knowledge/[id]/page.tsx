@@ -160,8 +160,6 @@ function page({ params }: { params: { id: string } }) {
         </section>
       ))}
 
-      {/* <div className='border-b-4 border-fifth'></div> */}
-
       <BlogComments />
     </div>
   )

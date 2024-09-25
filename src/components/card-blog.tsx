@@ -1,6 +1,6 @@
 import { DataType } from '@/app/(public)/knowledge/[id]/page'
 import images from '@/assets/images'
-import { Bookmark, Ellipsis } from 'lucide-react'
+import { Ellipsis } from 'lucide-react'
 import Image from 'next/image'
 
 function CardBlog({ data }: { data: DataType }) {
@@ -27,7 +27,6 @@ function CardBlog({ data }: { data: DataType }) {
         </div>
 
         <div className='flex items-center gap-4 text-secondary'>
-          <Bookmark className='hover:fill-secondary' />
           <Ellipsis />
         </div>
       </div>
