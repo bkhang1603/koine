@@ -14,6 +14,11 @@ function CardBlog({ blog }: { blog: BlogResType['data'] }) {
     const commentDate = new Date(year, month - 1, day, hour, minute, second)
     const currentDate = new Date()
     const diff = currentDate.getTime() - commentDate.getTime()
+
+    if (diff < 0) {
+      return 'Vừa xong'
+    }
+
     const seconds = Math.floor(diff / 1000)
     const minutes = Math.floor(seconds / 60)
     const hours = Math.floor(minutes / 60)
