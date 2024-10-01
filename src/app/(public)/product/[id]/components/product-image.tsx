@@ -1,12 +1,13 @@
 'use client'
 
+import { ProductResType } from '@/schemaValidations/product.schema'
 import Image from 'next/image'
 import React, { useState } from 'react'
 
 function ProductImage({
   imageData
 }: {
-  imageData: string[]
+  imageData: ProductResType['data']['images']
   // eslint-disable-next-line no-unused-vars
 }) {
   const [mainImage, setMainImage] = useState(imageData[0])
@@ -19,21 +20,23 @@ function ProductImage({
   return (
     <div className='flex flex-col gap-2'>
       <Image
-        src={mainImage}
-        alt='Koine product'
+        src={mainImage.imageUrl}
+        alt={mainImage.name}
         width={800}
         height={800}
         className='w-full h-96 object-cover rounded-lg'
+        priority={true}
       />
       <div className={`grid ${gridCols} gap-2`}>
         {imageData.map((image, index) => (
           <Image
             key={index}
-            src={image}
-            alt={image}
+            src={image.imageUrl}
+            alt={image.name}
             width={800}
             height={800}
             className='w-full h-28 object-cover cursor-pointer rounded-lg'
+            priority={true}
             onClick={() => setMainImage(image)}
           />
         ))}

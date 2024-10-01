@@ -8,7 +8,12 @@ export const ProductData = z
     description: z.string(),
     discount: z.number(),
     stockQuantity: z.number(),
-    images: z.array(z.string()),
+    images: z.array(
+      z.object({
+        name: z.string(),
+        imageUrl: z.string()
+      })
+    ),
     categoryId: z.string(),
     category: z.object({
       id: z.number(),

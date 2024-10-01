@@ -44,11 +44,12 @@ async function List({ searchParams }: { searchParams: searchParams | undefined }
                 <div className='w-full aspect-square rounded-lg overflow-hidden relative'>
                   {item.images && item.images.length > 0 ? (
                     <Image
-                      src={item.images[0]}
-                      alt='koine image'
+                      src={item.images[0].imageUrl}
+                      alt={item.images[0].name}
                       width={400}
                       height={400}
                       className='w-full h-full object-cover rounded-lg'
+                      priority={true}
                     />
                   ) : (
                     <div className='w-full aspect-square bg-gray-200 rounded-lg flex items-center justify-center'>
