@@ -24,7 +24,6 @@ function ProductImage({
         width={800}
         height={800}
         className='w-full h-96 object-cover rounded-lg'
-        priority={true}
       />
       <div className={`grid ${gridCols} gap-2`}>
         {imageData.map((image, index) => (
@@ -35,7 +34,6 @@ function ProductImage({
             width={800}
             height={800}
             className='w-full h-28 object-cover cursor-pointer rounded-lg'
-            priority={true}
             onClick={() => setMainImage(image)}
           />
         ))}

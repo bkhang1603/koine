@@ -49,7 +49,6 @@ async function List({ searchParams }: { searchParams: searchParams | undefined }
                       width={400}
                       height={400}
                       className='w-full h-full object-cover rounded-lg'
-                      priority={true}
                     />
                   ) : (
                     <div className='w-full aspect-square bg-gray-200 rounded-lg flex items-center justify-center'>
