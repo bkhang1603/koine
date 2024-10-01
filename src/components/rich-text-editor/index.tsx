@@ -30,7 +30,7 @@ export default function RichTextEditor({ content, onChange }: { content: any; on
       }),
       BulletList.configure({
         HTMLAttributes: {
-          class: 'list-disc ml-3'
+          class: 'ml-3'
         }
       }),
       Highlight,
