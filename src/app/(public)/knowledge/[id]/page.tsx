@@ -2,11 +2,11 @@ import blogApiRequest from '@/apiRequests/blog'
 import BlogComments from '@/app/(public)/knowledge/components/blog-comments'
 import { BlogResType } from '@/schemaValidations/blog.schema'
 
-async function page({ params }: { params: { id: string } }) {
+async function page({ params: { id } }: { params: { id: string } }) {
   let blog: BlogResType['data'] | null = null
 
   try {
-    const { payload } = await blogApiRequest.getBlog(params.id)
+    const { payload } = await blogApiRequest.getBlog(id)
     blog = payload.data
   } catch (error) {
     console.log(error)
@@ -23,7 +23,7 @@ async function page({ params }: { params: { id: string } }) {
 
       <div className='mt-12' dangerouslySetInnerHTML={{ __html: blog?.content! }} />
 
-      <BlogComments />
+      <BlogComments id={id} />
     </div>
   )
 }

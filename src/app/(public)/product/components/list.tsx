@@ -44,7 +44,7 @@ async function List({ searchParams }: { searchParams: searchParams | undefined }
                 <div className='w-full aspect-square rounded-lg overflow-hidden relative'>
                   {item.images && item.images.length > 0 ? (
                     <Image
-                      src={item.images[0].imageUrl}
+                      src={item.images[0].imageUrl === 'image' ? '/no-image.png' : item.images[0].imageUrl}
                       alt={item.images[0].name}
                       width={400}
                       height={400}

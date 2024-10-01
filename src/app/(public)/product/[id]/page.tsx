@@ -10,11 +10,8 @@ export default async function ProductDetail({ params: { id } }: { params: { id: 
   let product: ProductResType['data'] | null = null
 
   try {
-    console.log(1)
     const { payload } = await productApiRequest.getProduct(id)
-    console.log(payload)
     product = payload.data
-    console.log(product)
   } catch (error) {
     console.log(error)
   }
