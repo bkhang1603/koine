@@ -34,7 +34,11 @@ export default function RichTextEditor({ content, onChange }: { content: any; on
         }
       }),
       Highlight,
-      Image,
+      Image.configure({
+        HTMLAttributes: {
+          class: 'rounded-md'
+        }
+      }),
       ImageResize,
       FileHandler.configure({
         allowedMimeTypes: ['image/png', 'image/jpeg', 'image/gif', 'image/webp'],

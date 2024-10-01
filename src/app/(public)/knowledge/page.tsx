@@ -1,16 +1,30 @@
-import { DataType } from '@/app/(public)/knowledge/[id]/page'
 import images from '@/assets/images'
 import CardBlog from '@/components/card-blog'
 import Information from '@/app/(public)/components/information'
 import Tag from '@/components/tag'
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area'
 import configRoute from '@/config/route'
-import data from '@/data/data'
 import Image from 'next/image'
 import Link from 'next/link'
+import blogApiRequest from '@/apiRequests/blog'
+import { BlogsResType } from '@/schemaValidations/blog.schema'
 
-function KnowledgePage() {
-  const newData = data as unknown as DataType[]
+async function KnowledgePage() {
+  let blogs: BlogsResType['data'] = []
+
+  try {
+    const { payload } = await blogApiRequest.getBlogs({
+      page_index: 1,
+      search: ''
+    })
+    blogs = payload.data
+  } catch (error) {
+    console.log(error)
+  }
+
+  if (!blogs) {
+    return <div>No blogs available</div>
+  }
 
   return (
     <main>
@@ -22,30 +36,6 @@ function KnowledgePage() {
         quality={100}
         className='h-[30vh] w-full object-cover'
       />
-      {/* <figure className='py-24 relative'>
-        <Image
-          src={images.knowledgeBackground}
-          alt='Knowledge Background'
-          width={2000}
-          height={2000}
-          className='hidden sm:block object-cover w-full'
-        />
-
-        <h1
-          className='text-secondary font-bold text-xl sm:text-3xl lg:text-4xl text-center
-        absolute inset-0 flex items-center justify-center mx-auto max-w-[700px]'
-        >
-          “Có kiến thức bảo vệ bản thân để tạo nên hạnh phúc”
-          <Image
-            src={images.underline}
-            alt='Underline'
-            width={500}
-            height={500}
-            className='w-40 lg:w-52 absolute top-[50%] right-[50%] transform
-            translate-x-1/2 translate-y-8 z-[-1] hidden lg:block'
-          />
-        </h1>
-      </figure> */}
 
       <section className='container mt-10'>
         <ScrollArea className='w-full bg-fourth rounded-2xl'>
@@ -64,9 +54,9 @@ function KnowledgePage() {
         </ScrollArea>
 
         <div className='w-full flex flex-col items-center py-10 gap-4'>
-          {newData.map((item, index) => (
+          {blogs.map((item, index) => (
             <Link key={index} href={`${configRoute.knowledge}/${item?.id}`} className='w-full'>
-              <CardBlog data={item} />
+              <CardBlog blog={item} />
             </Link>
           ))}
         </div>
