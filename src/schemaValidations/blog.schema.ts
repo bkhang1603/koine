@@ -70,6 +70,12 @@ export const BlogCommentRes = z.object({
   statusCode: z.number()
 })
 
+export const BlogCommentCreateReq = z.object({
+  blogId: z.string(),
+  content: z.string(),
+  replyId: z.string().nullable()
+})
+
 export type BlogsResType = z.TypeOf<typeof BlogsRes>
 
 export type BlogResType = z.TypeOf<typeof BlogRes>
@@ -77,3 +83,5 @@ export type BlogResType = z.TypeOf<typeof BlogRes>
 export type BlogCommentsResType = z.TypeOf<typeof BlogCommentsRes>
 
 export type BlogCommentResType = z.TypeOf<typeof BlogCommentRes>
+
+export type BlogCommentCreateReqType = z.TypeOf<typeof BlogCommentCreateReq>

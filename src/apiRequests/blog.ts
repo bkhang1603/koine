@@ -1,5 +1,10 @@
 import http from '@/lib/http'
-import { BlogCommentsResType, BlogResType, BlogsResType } from '@/schemaValidations/blog.schema'
+import {
+  BlogCommentCreateReqType,
+  BlogCommentsResType,
+  BlogResType,
+  BlogsResType
+} from '@/schemaValidations/blog.schema'
 
 const blogApiRequest = {
   getBlogs: ({
@@ -24,7 +29,7 @@ const blogApiRequest = {
     page_index?: number | undefined
     page_size?: number | undefined
   }) => http.get<BlogCommentsResType>(`/blog-comments/${id}?page_index=${page_index}&page_size=${page_size}`),
-  createBlogComment: (data: any) => http.post('/blog-comments', data)
+  createBlogComment: (data: BlogCommentCreateReqType) => http.post('/blog-comments', data)
 }
 
 export default blogApiRequest

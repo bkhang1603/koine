@@ -1,0 +1,138 @@
+import CommentItem from '@/app/(public)/knowledge/components/comment-item'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { Button } from '@/components/ui/button'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle
+} from '@/components/ui/dialog'
+import { handleErrorApi } from '@/lib/utils'
+import { useBlogCommentCreateMutation } from '@/queries/useBlog'
+import { BlogCommentsResType } from '@/schemaValidations/blog.schema'
+import { RoleType } from '@/types/jwt.types'
+import { Camera, SendHorizontal, Smile } from 'lucide-react'
+import { useRef, useState } from 'react'
+
+function CommentModal({
+  openModal,
+  setOpenModal,
+  comments,
+  role,
+  id,
+  refetch
+}: {
+  openModal: boolean
+  // eslint-disable-next-line no-unused-vars
+  setOpenModal: (openModal: boolean) => void
+  comments: BlogCommentsResType['data']
+  role: RoleType | undefined
+  id: string
+  refetch: () => void
+}) {
+  const [content, setContent] = useState('')
+  const [showEmojiPicker, setShowEmojiPicker] = useState(false)
+  const commentMutation = useBlogCommentCreateMutation()
+  const inputRef = useRef<HTMLTextAreaElement>(null)
+
+  const handleKeyDown = async (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault()
+      if (content.trim()) {
+        try {
+          await commentMutation.mutateAsync({
+            content,
+            blogId: id,
+            replyId: null
+          })
+          setContent('')
+          refetch()
+        } catch (error) {
+          handleErrorApi({
+            error
+          })
+        }
+      }
+    }
+  }
+
+  const handleActionClick = async () => {
+    if (content.trim()) {
+      try {
+        await commentMutation.mutateAsync({
+          content,
+          blogId: id,
+          replyId: null
+        })
+        setContent('')
+        refetch()
+      } catch (error) {
+        handleErrorApi({
+          error
+        })
+      }
+    }
+  }
+
+  return (
+    <Dialog open={openModal} onOpenChange={setOpenModal}>
+      <DialogContent className='min-w-[50vw]'>
+        <DialogHeader>
+          <DialogTitle>Tất cả bình luận</DialogTitle>
+        </DialogHeader>
+        <DialogDescription className='max-h-[600px] overflow-y-auto'>
+          {comments.map((comment) => (
+            <CommentItem key={comment.id} comment={comment} login={role} />
+          ))}
+        </DialogDescription>
+
+        <DialogFooter>
+          <div className='w-full flex justify-between items-start gap-3 py-4'>
+            <Avatar>
+              <AvatarImage src='' alt='user avatar' />
+              <AvatarFallback>User</AvatarFallback>
+            </Avatar>
+
+            <div className='w-full bg-slate-50 rounded-3xl px-3 py-2 flex flex-col gap-1'>
+              <textarea
+                ref={inputRef}
+                value={content}
+                onChange={(e) => setContent(e.target.value)}
+                onKeyDown={handleKeyDown}
+                placeholder='Viết bình luận...'
+                className='w-full bg-transparent border-none focus:outline-none resize-none overflow-hidden px-2'
+                rows={1}
+              />
+
+              <div className='flex justify-between items-center text-slate-400'>
+                <div className='flex justify-center items-center'>
+                  <Button onClick={() => setShowEmojiPicker(!showEmojiPicker)} variant={'icon'} size={'icon'}>
+                    <Smile className='w-5 h-5' />
+                  </Button>
+
+                  <Button variant={'icon'} size={'icon'}>
+                    <Camera className='w-5 h-5' />
+                  </Button>
+                </div>
+
+                <Button
+                  className={content.trim() ? 'text-primary' : 'text-gray-400'}
+                  disabled={!content.trim()}
+                  variant={'icon'}
+                  size={'icon'}
+                  onClick={handleActionClick}
+                >
+                  <SendHorizontal />
+                </Button>
+              </div>
+            </div>
+          </div>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  )
+}
+
+export default CommentModal

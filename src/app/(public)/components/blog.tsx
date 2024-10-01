@@ -1,12 +1,26 @@
-import { DataType } from '@/app/(public)/knowledge/[id]/page'
+import blogApiRequest from '@/apiRequests/blog'
 import CardBlog from '@/components/card-blog'
 import Tag from '@/components/tag'
 import configRoute from '@/config/route'
-import topData from '@/data/topData'
+import { BlogsResType } from '@/schemaValidations/blog.schema'
 import Link from 'next/link'
 
-function Blog() {
-  const newData = topData as unknown as DataType[]
+async function Blog() {
+  let blogs: BlogsResType['data'] = []
+
+  try {
+    const { payload } = await blogApiRequest.getBlogs({
+      page_index: 1,
+      search: ''
+    })
+    blogs = payload.data
+  } catch (error) {
+    console.log(error)
+  }
+
+  if (!blogs) {
+    return <div>No blogs available</div>
+  }
 
   return (
     <div className='container flex justify-center items-center flex-col py-32'>
@@ -29,9 +43,9 @@ function Blog() {
       </div>
 
       <div className='mt-10 lg:w-full flex justify-center items-center flex-col gap-3'>
-        {newData.map((item) => (
-          <Link className='w-full' key={item?.id} href={`${configRoute.knowledge}/${item?.id}`}>
-            <CardBlog data={item} />
+        {blogs.map((item, index) => (
+          <Link key={index} href={`${configRoute.knowledge}/${item?.id}`} className='w-full'>
+            <CardBlog blog={item} />
           </Link>
         ))}
       </div>

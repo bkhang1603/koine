@@ -9,15 +9,19 @@ import CommentItem from '@/app/(public)/knowledge/components/comment-item'
 import { useAppStore } from '@/components/app-provider'
 import { useBlogCommentCreateMutation, useBlogCommentsQuery } from '@/queries/useBlog'
 import { handleErrorApi } from '@/lib/utils'
+import { useRouter } from 'next/navigation'
+import CommentModal from '@/app/(public)/knowledge/components/comment-modal'
 
 function BlogComments({ id }: { id: string }) {
   const role = useAppStore((state) => state.role)
   const [content, setContent] = useState('')
   const textareaRef = useRef<HTMLTextAreaElement>(null)
   const [showEmojiPicker, setShowEmojiPicker] = useState(false)
-  const { data, isFetching, refetch } = useBlogCommentsQuery(id)
+  const { data, isFetching, refetch } = useBlogCommentsQuery({ id, page_index: 1, page_size: 3 })
   const comments = data?.payload?.data || []
   const commentMutation = useBlogCommentCreateMutation()
+  const router = useRouter()
+  const [openModal, setOpenModal] = useState(false)
 
   useEffect(() => {
     if (textareaRef.current) {
@@ -31,7 +35,11 @@ function BlogComments({ id }: { id: string }) {
       e.preventDefault()
       if (content.trim()) {
         try {
-          await commentMutation.mutateAsync({ content, blog_id: id })
+          await commentMutation.mutateAsync({
+            content,
+            blogId: id,
+            replyId: null
+          })
           setContent('')
           refetch()
         } catch (error) {
@@ -48,46 +56,84 @@ function BlogComments({ id }: { id: string }) {
     setShowEmojiPicker(false)
   }
 
-  const handleActionClick = () => {}
+  const handleActionClick = async () => {
+    if (content.trim()) {
+      try {
+        await commentMutation.mutateAsync({
+          content,
+          blogId: id,
+          replyId: null
+        })
+        setContent('')
+        refetch()
+      } catch (error) {
+        handleErrorApi({
+          error
+        })
+      }
+    }
+  }
+
+  const handleOpenModal = () => {
+    if (!role) {
+      router.push('/login')
+    } else {
+      setOpenModal(true)
+    }
+  }
 
   return (
     <section>
-      <div className='flex justify-start items-center py-4 gap-4'>
-        <div className='flex items-center gap-2'>
-          <Heart className='text-secondary w-6 h-6' />
-          <span className='text-gray-500 text-lg'>10</span>
+      <div className='flex justify-between items-center border-t-2 border-b-2 py-2 mt-8'>
+        <div className='flex justify-start items-center gap-4'>
+          <div className='flex items-center gap-2'>
+            <Heart className='text-secondary w-6 h-6' />
+            <span className='text-gray-500 text-lg'>10</span>
+          </div>
+
+          <div className='flex items-center gap-2'>
+            <MessageCircle className='text-secondary w-6 h-6' />
+            <span className='text-gray-500 text-lg'>10</span>
+          </div>
         </div>
 
-        <div className='flex items-center gap-2'>
-          <MessageCircle className='text-secondary w-6 h-6' />
-          <span className='text-gray-500 text-lg'>10</span>
+        <div className='flex items-center justify-between'>
+          <Button variant={'ghost'} className='w-full flex items-center justify-center gap-2 text-gray-500'>
+            <Heart className='w-5 h-5' />
+            <span>Yêu thích</span>
+          </Button>
+
+          <Button
+            variant={'ghost'}
+            className='w-full flex items-center justify-center gap-2 text-gray-500'
+            onClick={handleOpenModal}
+          >
+            <MessageCircle className='w-5 h-5' />
+            <span>Bình luận</span>
+          </Button>
+
+          <Button variant={'ghost'} className='w-full flex items-center justify-center gap-2 text-gray-500'>
+            <Redo className='w-5 h-5' />
+            <span>Chia sẻ</span>
+          </Button>
         </div>
       </div>
 
-      <div className='flex items-center justify-between border-t-2 border-b-2'>
-        <Button variant={'ghost'} className='w-full flex items-center justify-center gap-2 text-gray-500'>
-          <Heart className='w-5 h-5' />
-          <span>Yêu thích</span>
-        </Button>
+      {isFetching && <div className='mt-2'>Loading...</div>}
 
-        <Button variant={'ghost'} className='w-full flex items-center justify-center gap-2 text-gray-500'>
-          <MessageCircle className='w-5 h-5' />
-          <span>Bình luận</span>
+      {!isFetching && comments.length > 3 && (
+        <Button className='px-0 mt-4' variant='link' onClick={handleOpenModal}>
+          Xem tất cả {comments.length} bình luận
         </Button>
-
-        <Button variant={'ghost'} className='w-full flex items-center justify-center gap-2 text-gray-500'>
-          <Redo className='w-5 h-5' />
-          <span>Chia sẻ</span>
-        </Button>
-      </div>
-
-      {isFetching && <div>Loading...</div>}
+      )}
 
       {!isFetching && comments.length === 0 && <div>Chưa có bình luận nào</div>}
 
       {!isFetching &&
         comments.length > 0 &&
-        comments.map((comment) => <CommentItem key={comment.id} comment={comment} login={role} />)}
+        comments
+          .slice(0, 2)
+          .map((comment) => <CommentItem refetch={refetch} key={comment.id} comment={comment} login={role} />)}
 
       {role && (
         <div className='flex justify-between items-start gap-3 py-4'>
@@ -123,6 +169,7 @@ function BlogComments({ id }: { id: string }) {
                 disabled={!content.trim()}
                 variant={'icon'}
                 size={'icon'}
+                onClick={handleActionClick}
               >
                 <SendHorizontal />
               </Button>
@@ -136,6 +183,15 @@ function BlogComments({ id }: { id: string }) {
           <Picker data={data} onEmojiSelect={handleEmojiSelect} />
         </div>
       )}
+
+      <CommentModal
+        id={id}
+        refetch={refetch}
+        role={role}
+        openModal={openModal}
+        setOpenModal={setOpenModal}
+        comments={comments}
+      />
     </section>
   )
 }

@@ -6,20 +6,26 @@ import { useEffect, useRef, useState } from 'react'
 import data from '@emoji-mart/data'
 import Picker from '@emoji-mart/react'
 import { RoleType } from '@/types/jwt.types'
+import { useBlogCommentCreateMutation } from '@/queries/useBlog'
+import { handleErrorApi } from '@/lib/utils'
 
 export default function CommentItem({
   comment,
   level = 0,
-  login
+  login,
+  refetch
 }: {
   comment: BlogCommentResType['data']
   level?: number
   login?: RoleType | undefined
+  refetch?: () => void
 }) {
   const [showReplyInput, setShowReplyInput] = useState(false)
   const [replyContent, setReplyContent] = useState('')
   const [showEmojiPicker, setShowEmojiPicker] = useState(false)
   const replyTextareaRef = useRef<HTMLTextAreaElement>(null)
+  const [showReplies, setShowReplies] = useState(false)
+  const commentMutation = useBlogCommentCreateMutation()
 
   useEffect(() => {
     if (replyTextareaRef.current) {
@@ -28,13 +34,43 @@ export default function CommentItem({
     }
   }, [replyContent])
 
-  const handleReplyKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+  const handleReplyKeyDown = async (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault()
       if (replyContent.trim()) {
-        console.log('Đã gửi phản hồi:', replyContent)
+        try {
+          await commentMutation.mutateAsync({
+            content: replyContent,
+            blogId: comment.blogId,
+            replyId: comment.id
+          })
+          setReplyContent('')
+          refetch && refetch()
+          setShowReplyInput(false)
+        } catch (error) {
+          handleErrorApi({
+            error
+          })
+        }
+      }
+    }
+  }
+
+  const handleActionClick = async () => {
+    if (replyContent.trim()) {
+      try {
+        await commentMutation.mutateAsync({
+          content: replyContent,
+          blogId: comment.blogId,
+          replyId: comment.id
+        })
         setReplyContent('')
+        refetch && refetch()
         setShowReplyInput(false)
+      } catch (error) {
+        handleErrorApi({
+          error
+        })
       }
     }
   }
@@ -53,6 +89,11 @@ export default function CommentItem({
     const commentDate = new Date(year, month - 1, day, hour, minute, second)
     const currentDate = new Date()
     const diff = currentDate.getTime() - commentDate.getTime()
+
+    if (diff < 0) {
+      return 'Vừa xong'
+    }
+
     const seconds = Math.floor(diff / 1000)
     const minutes = Math.floor(seconds / 60)
     const hours = Math.floor(minutes / 60)
@@ -149,6 +190,7 @@ export default function CommentItem({
                   disabled={!replyContent.trim()}
                   variant={'icon'}
                   size={'icon'}
+                  onClick={handleActionClick}
                 >
                   <SendHorizontal />
                 </Button>
@@ -163,8 +205,17 @@ export default function CommentItem({
           </div>
         )}
 
-        {comment.replies &&
-          comment.replies.map((reply: any) => <CommentItem key={reply.id} comment={reply} level={level + 1} />)}
+        {comment.replies && comment.replies.length > 0 && (
+          <>
+            <Button className='px-1' variant='link' onClick={() => setShowReplies(!showReplies)}>
+              {showReplies ? 'Ẩn phản hồi' : `Xem ${comment.replies.length} phản hồi`}
+            </Button>
+            {showReplies &&
+              comment.replies.map((reply: any) => (
+                <CommentItem refetch={refetch} key={reply.id} comment={reply} level={level + 1} login={login} />
+              ))}
+          </>
+        )}
       </div>
     </div>
   )

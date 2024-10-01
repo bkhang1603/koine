@@ -13,7 +13,7 @@ async function page({ params: { id } }: { params: { id: string } }) {
   }
 
   return (
-    <div className='py-20 container max-w-5xl'>
+    <div className='py-16 container max-w-5xl'>
       <h1
         className='bg-gradient-to-r from-[#FF0059] via-[#FF597D] to-[#2945DE]
             text-transparent bg-clip-text text-2xl md:text-3xl lg:text-4xl font-bold text-center'
