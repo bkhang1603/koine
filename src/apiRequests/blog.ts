@@ -15,7 +15,10 @@ const blogApiRequest = {
     page_index?: number | undefined
     search?: string | string[] | undefined
     page_size?: number | undefined
-  }) => http.get<BlogsResType>(`/blogs?page_index=${page_index}&keyword=${search}&page_size=${page_size}`),
+  }) =>
+    http.get<BlogsResType>(`/blogs?page_index=${page_index}&keyword=${search}&page_size=${page_size}`, {
+      cache: 'no-cache'
+    }),
   getBlog: (id: string) => http.get<BlogResType>(`/blogs/${id}`),
   createBlog: (data: any) => http.post('/blogs', data),
   updateBlog: (id: string, data: any) => http.put(`/blogs/${id}`, data),
