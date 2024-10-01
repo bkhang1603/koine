@@ -10,6 +10,7 @@ import OrderedList from '@tiptap/extension-ordered-list'
 import ImageResize from 'tiptap-extension-resize-image'
 import ToolBar from '@/components/rich-text-editor/toolbar'
 import FileHandler from '@tiptap-pro/extension-file-handler'
+import HardBreak from '@tiptap/extension-hard-break'
 
 export default function RichTextEditor({ content, onChange }: { content: any; onChange: any }) {
   const editor = useEditor({
@@ -18,6 +19,7 @@ export default function RichTextEditor({ content, onChange }: { content: any; on
       TextAlign.configure({
         types: ['heading', 'paragraph']
       }),
+      HardBreak.configure(),
       Heading.configure({
         levels: [1, 2, 3]
       }),
@@ -86,12 +88,12 @@ export default function RichTextEditor({ content, onChange }: { content: any; on
     content: content,
     editorProps: {
       attributes: {
-        class: 'max-h-[600px] overflow-scroll border rounded-md bg-slate-50 py-3 px-4'
+        class: 'max-h-[500px] overflow-scroll border rounded-md bg-slate-50 py-3 px-4 focus-visible:outline-none'
       }
     },
     onUpdate: ({ editor }) => {
-      console.log(editor.getHTML())
-      onChange(editor.getHTML())
+      const html = editor.getHTML()
+      onChange(html)
     }
   })
 

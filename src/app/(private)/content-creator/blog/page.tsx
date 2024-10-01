@@ -18,15 +18,13 @@ function BlogPage() {
   const { bodyColumns, headerColumns } = UseBlog()
 
   return (
-    <>
-      <TableCustom
-        title='Bài viết'
-        data={data}
-        headerColumn={headerColumns}
-        bodyColumn={bodyColumns}
-        href={configRoute.home}
-      />
-    </>
+    <TableCustom
+      title='Bài viết'
+      data={data}
+      headerColumn={headerColumns}
+      bodyColumn={bodyColumns}
+      href={configRoute.home}
+    />
   )
 }
 

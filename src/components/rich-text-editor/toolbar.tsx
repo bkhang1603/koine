@@ -1,6 +1,6 @@
 'use client'
 import { Toggle } from '@/components/ui/toggle'
-import { List } from 'lucide-react'
+import { List, WrapText } from 'lucide-react'
 import {
   Heading1,
   Heading2,
@@ -78,6 +78,12 @@ export default function ToolBar({ editor }: { editor: any }) {
       icon: <Highlighter className='size-4' />,
       onClick: () => editor.chain().focus().toggleHighlight().run(),
       pressed: editor.isActive('highlight')
+    },
+    {
+      // HardBreak
+      icon: <WrapText className='size-4' />,
+      onClick: () => editor.chain().focus().setHardBreak().run(),
+      pressed: false
     }
   ]
 

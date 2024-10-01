@@ -1,13 +1,21 @@
+'use client'
+
 import images from '@/assets/images'
 import { Button } from '@/components/ui/button'
 import configRoute from '@/config/route'
 import Image from 'next/image'
 import Link from 'next/link'
+import { motion } from 'framer-motion'
 
 function Hero() {
   return (
     <section className='container pt-[60px] md:pt-[100px] grid grid-cols-1 lg:grid-cols-2 h-[100vh]'>
-      <div className='mr-0 lg:mr-10 flex justify-center items-center'>
+      <motion.div
+        className='mr-0 lg:mr-10 flex justify-center items-center'
+        initial={{ opacity: 0, scale: 0.8 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.8 }}
+      >
         <div className='w-full flex items-center flex-col relative'>
           <Image src={images.cloud} alt='Cloud' width={500} height={500} className='md:max-w-[420px]' />
 
@@ -35,17 +43,19 @@ function Hero() {
             className='absolute bottom-40 right-5 object-contain -z-10'
           />
         </div>
-      </div>
-      <div className='w-[calc(50vw-4px)] hidden lg:block'>
-        <Image
-          src={images.heroImage}
-          alt='Hero image'
-          width={1920}
-          height={1080}
-          priority
-          className='max-h-[calc(100vh-100px)]'
-        />
-      </div>
+      </motion.div>
+      <motion.div initial={{ opacity: 0, x: 50 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.8 }}>
+        <div className='w-[calc(50vw-4px)] hidden lg:block'>
+          <Image
+            src={images.heroImage}
+            alt='Hero image'
+            width={1920}
+            height={1080}
+            priority
+            className='max-h-[calc(100vh-100px)]'
+          />
+        </div>
+      </motion.div>
     </section>
   )
 }

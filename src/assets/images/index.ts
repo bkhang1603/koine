@@ -51,6 +51,7 @@ import coursePoster from './course-poster.png'
 import blogBanner from './blog-banner.png'
 import aboutBanner from './about-banner.png'
 import courseSkinCareBanner from './course-skin-care-banner.png'
+import productPoster from './product-poster.png'
 
 const images = {
   heroImage,
@@ -105,7 +106,8 @@ const images = {
   coursePoster,
   blogBanner,
   aboutBanner,
-  courseSkinCareBanner
+  courseSkinCareBanner,
+  productPoster
 }
 
 export default images

@@ -1,34 +1,29 @@
+'use client'
+
+import { useState } from 'react'
+import RichTextEditor from '@/components/rich-text-editor'
+
 function Page() {
+  const [htmlContent, setHtmlContent] = useState('')
+
+  const handleCopy = () => {
+    const parser = new DOMParser()
+    const doc = parser.parseFromString(htmlContent, 'text/html')
+    const serializedContent = new XMLSerializer().serializeToString(doc.body)
+    const contentWithSingleQuotes = serializedContent.replace(/"/g, "'")
+    navigator.clipboard.writeText(contentWithSingleQuotes)
+  }
+
   return (
     <>
-      <div
-        style={{
-          maxWidth: 600,
-          margin: '20px auto',
-          padding: 20,
-          border: '2px solid #007bff',
-          borderRadius: 8,
-          backgroundColor: '#fff',
-          fontFamily: '"Arial", sans-serif'
-        }}
-      >
-        <h2 style={{ color: '#007bff' }}>Koine - Nền tảng giáo dục giới tính cho trẻ em</h2>
-        <p style={{ marginBottom: 20 }}>Click this link to register your account at Koine:</p>
-        <a
-          href='${confirmLink}'
-          style={{
-            display: 'inline-block',
-            padding: '10px 20px',
-            textDecoration: 'none',
-            backgroundColor: '#007bff',
-            color: '#fff',
-            borderRadius: 5
-          }}
-          target='_blank'
-        >
-          Link active your account
-        </a>
+      <RichTextEditor content='' onChange={setHtmlContent} />
+      <div className='mt-4 p-4 border rounded-md bg-white'>
+        <h2 className='text-lg font-bold mb-2'>Rendered Content:</h2>
+        <div dangerouslySetInnerHTML={{ __html: htmlContent }} />
       </div>
+      <button onClick={handleCopy} className='mt-4 p-2 bg-blue-500 text-white rounded'>
+        Copy Content
+      </button>
     </>
   )
 }

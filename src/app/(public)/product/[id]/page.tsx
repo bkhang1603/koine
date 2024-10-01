@@ -1,22 +1,27 @@
-'use client'
-
-import Image from 'next/image'
 import { Star, Heart, Share2, Minus, Plus } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import images from '@/assets/images'
-import { useState } from 'react'
 import BreadCrumbCustom from '@/components/breadcrumb-custom'
+import ProductImage from '@/app/(public)/product/[id]/components/product-image'
+import productApiRequest from '@/apiRequests/product'
+import { ProductResType } from '@/schemaValidations/product.schema'
 
-const imageData = [
-  { src: images.product2, alt: 'Product' },
-  { src: images.product, alt: 'Product' },
-  { src: images.product2, alt: 'Product' },
-  { src: images.product, alt: 'Product' }
-]
+export default async function ProductDetail({ params: { id } }: { params: { id: string } }) {
+  let product: ProductResType['data'] | null = null
 
-export default function ProductDetail() {
-  const [mainImage, setMainImage] = useState(imageData[0].src)
+  try {
+    console.log(1)
+    const { payload } = await productApiRequest.getProduct(id)
+    console.log(payload)
+    product = payload.data
+    console.log(product)
+  } catch (error) {
+    console.log(error)
+  }
+
+  if (!product) {
+    return <div>Product not found</div>
+  }
 
   return (
     <section className='container py-8'>
@@ -25,41 +30,15 @@ export default function ProductDetail() {
       {/* Product details */}
       <div className='grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-4 mt-6'>
         {/* Product images */}
-        <div className='flex flex-col gap-2'>
-          <Image
-            src={mainImage}
-            alt='Koine product'
-            width={1000}
-            height={1000}
-            quality={100}
-            className='w-full h-96 object-cover rounded-lg'
-          />
-          <div className='grid grid-cols-4 gap-2'>
-            {imageData.map((image, index) => (
-              <Image
-                key={index}
-                src={image.src}
-                alt={image.alt}
-                width={1000}
-                height={1000}
-                quality={100}
-                className='w-full h-28 object-cover cursor-pointer rounded-lg'
-                onClick={() => setMainImage(image.src)}
-              />
-            ))}
-          </div>
-        </div>
+        <ProductImage imageData={product.images} />
 
         {/* Product info */}
         <div>
-          <p className='text-gray-500 mb-2'>Quà tặng</p>
-          <h2 className='text-4xl mb-4'>&quot;Trưởng thành là gì?&quot;</h2>
-          <p className='text-2xl mb-4'>299.000đ</p>
+          <p className='text-gray-500 mb-2'>{product.category.name}</p>
+          <h2 className='text-4xl mb-4'>{product.name}</h2>
+          <p className='text-2xl mb-4'>{product.price.toLocaleString()}đ</p>
 
-          <p className='mb-6'>
-            Hộp trưởng thành là một món quà ý nghĩa dành cho những người thân yêu của bạn. Hãy để chúng tôi giúp bạn đem
-            món quà này đến với họ. Hãy để họ biết rằng bạn luôn ở bên họ, luôn ủng hộ họ và luôn yêu thương họ.
-          </p>
+          <p className='mb-6 line-clamp-3'>{product.description}</p>
 
           <div className='flex items-center mb-6'>
             {[1, 2, 3, 4, 5].map((i) => (
@@ -93,8 +72,8 @@ export default function ProductDetail() {
           </div>
 
           <div className='space-y-2 text-sm'>
-            <p>Mã số sản phẩm: GEM-015-8392</p>
-            <p>Thể loại: Quà tặng</p>
+            <p>Mã số sản phẩm: {product.id}</p>
+            <p>Thể loại: {product.category.name}</p>
           </div>
         </div>
       </div>
