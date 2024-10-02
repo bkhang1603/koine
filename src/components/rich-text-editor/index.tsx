@@ -1,5 +1,5 @@
 'use client'
-import { useEditor, EditorContent } from '@tiptap/react'
+import { useEditor, EditorContent, BubbleMenu } from '@tiptap/react'
 import StarterKit from '@tiptap/starter-kit'
 import TextAlign from '@tiptap/extension-text-align'
 import Heading from '@tiptap/extension-heading'
@@ -11,6 +11,8 @@ import ImageResize from 'tiptap-extension-resize-image'
 import ToolBar from '@/components/rich-text-editor/toolbar'
 import FileHandler from '@tiptap-pro/extension-file-handler'
 import HardBreak from '@tiptap/extension-hard-break'
+import { Column, Columns } from '@/components/rich-text-editor/custom-extension'
+import ColumnsMenu from '@/components/rich-text-editor/column-menu'
 
 export default function RichTextEditor({ content, onChange }: { content: any; onChange: any }) {
   const editor = useEditor({
@@ -87,12 +89,15 @@ export default function RichTextEditor({ content, onChange }: { content: any; on
             }
           })
         }
-      })
+      }),
+      Column,
+      Columns
+      // CustomColumn
     ],
     content: content,
     editorProps: {
       attributes: {
-        class: 'max-h-[500px] overflow-scroll border rounded-md bg-slate-50 py-3 px-4 focus-visible:outline-none'
+        class: 'max-h-[500px] overflow-scroll border rounded-md bg-slate-50 pb-2 pt-7 px-4 focus-visible:outline-none'
       }
     },
     onUpdate: ({ editor }) => {
@@ -103,6 +108,16 @@ export default function RichTextEditor({ content, onChange }: { content: any; on
 
   return (
     <div>
+      {/* {editor && <CustomBubbleMenu editor={editor} />} */}
+      {editor && (
+        <BubbleMenu
+          editor={editor}
+          tippyOptions={{ duration: 100, moveTransition: 'transform 0.2s ease-out' }}
+          shouldShow={({ editor }) => editor.isActive('columns')}
+        >
+          <ColumnsMenu editor={editor} />
+        </BubbleMenu>
+      )}
       <ToolBar editor={editor} />
       <EditorContent editor={editor} />
     </div>

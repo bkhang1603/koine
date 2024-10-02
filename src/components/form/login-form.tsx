@@ -48,7 +48,7 @@ export default function LoginForm({ className }: { className?: string }) {
       toast({
         description: result.payload.message
       })
-      router.push('/')
+      router.back()
       router.refresh()
     } catch (error: any) {
       handleErrorApi({

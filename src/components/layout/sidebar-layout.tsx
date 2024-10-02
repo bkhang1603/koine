@@ -17,10 +17,7 @@ export default function SidebarLayout({ children, sidebarData }: { children: Rea
       <div className='hidden border-r bg-muted/40 md:block'>
         <div className='flex h-full max-h-screen flex-col gap-2'>
           <div className='flex h-14 items-center border-b px-4 lg:h-[60px] lg:px-6'>
-            <Link
-              href={configRoute.contentCreator.dashboard}
-              className='flex items-center gap-2 font-semibold text-primary text-xl'
-            >
+            <Link href={configRoute.home} className='flex items-center gap-2 font-semibold text-primary text-xl'>
               <Image
                 src={icons.logo}
                 alt='Koine'
@@ -48,7 +45,7 @@ export default function SidebarLayout({ children, sidebarData }: { children: Rea
             <SheetContent side='left' className='flex flex-col'>
               <nav className='grid gap-2 text-lg font-medium'>
                 <Link
-                  href={configRoute.contentCreator.dashboard}
+                  href={configRoute.home}
                   className='flex items-center gap-2 text-2xl font-semibold text-primary mb-2'
                 >
                   <Image

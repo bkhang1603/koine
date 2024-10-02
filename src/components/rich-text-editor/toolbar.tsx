@@ -1,6 +1,6 @@
 'use client'
+
 import { Toggle } from '@/components/ui/toggle'
-import { List, WrapText } from 'lucide-react'
 import {
   Heading1,
   Heading2,
@@ -11,9 +11,12 @@ import {
   AlignCenter,
   AlignLeft,
   AlignRight,
-  Highlighter
+  Highlighter,
+  List,
+  WrapText,
+  ListOrdered,
+  Columns
 } from 'lucide-react'
-import { ListOrdered } from 'lucide-react'
 
 export default function ToolBar({ editor }: { editor: any }) {
   if (!editor) return null
@@ -84,16 +87,23 @@ export default function ToolBar({ editor }: { editor: any }) {
       icon: <WrapText className='size-4' />,
       onClick: () => editor.chain().focus().setHardBreak().run(),
       pressed: false
+    },
+    {
+      // CustomColumn
+      icon: <Columns className='size-4' />,
+      onClick: () => editor.chain().focus().setColumns().run(),
+      pressed: false
     }
   ]
 
   return (
-    <div className='border rounded-md p-1.5 mb-1 bg-slate-50 space-x-1 sticky  top-10 z-50'>
+    <div className='border rounded-md p-1.5 mb-1 bg-slate-50 space-x-1 sticky top-10 z-50'>
       {Options.map((option, i) => (
         <Toggle key={i} size='sm' pressed={option.pressed} onPressedChange={option.onClick}>
           {option.icon}
         </Toggle>
       ))}
     </div>
+    // <div className='border rounded-md flex space-x-1'>
   )
 }
