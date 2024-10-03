@@ -11,13 +11,14 @@ import { useBlogCommentCreateMutation, useBlogCommentsQuery } from '@/queries/us
 import { handleErrorApi } from '@/lib/utils'
 import { useRouter } from 'next/navigation'
 import CommentModal from '@/app/(public)/knowledge/components/comment-modal'
+import Loading from '@/components/loading'
 
 function BlogComments({ id }: { id: string }) {
   const role = useAppStore((state) => state.role)
   const [content, setContent] = useState('')
   const textareaRef = useRef<HTMLTextAreaElement>(null)
   const [showEmojiPicker, setShowEmojiPicker] = useState(false)
-  const { data, isFetching, refetch } = useBlogCommentsQuery({ id, page_index: 1, page_size: 3 })
+  const { data, isFetching, refetch } = useBlogCommentsQuery({ id, page_index: 1, page_size: 2 })
   const comments = data?.payload?.data || []
   const commentMutation = useBlogCommentCreateMutation()
   const router = useRouter()
@@ -119,7 +120,11 @@ function BlogComments({ id }: { id: string }) {
         </div>
       </div>
 
-      {isFetching && <div className='mt-2'>Loading...</div>}
+      {isFetching && (
+        <div className='flex justify-center items-center h-20'>
+          <Loading />
+        </div>
+      )}
 
       {!isFetching && comments.length > 3 && (
         <Button className='px-0 mt-4' variant='link' onClick={handleOpenModal}>
@@ -127,13 +132,11 @@ function BlogComments({ id }: { id: string }) {
         </Button>
       )}
 
-      {!isFetching && comments.length === 0 && <div>Chưa có bình luận nào</div>}
+      {/* {!isFetching && comments.length === 0 && <div>Chưa có bình luận nào</div>} */}
 
       {!isFetching &&
         comments.length > 0 &&
-        comments
-          .slice(0, 2)
-          .map((comment) => <CommentItem refetch={refetch} key={comment.id} comment={comment} login={role} />)}
+        comments.map((comment) => <CommentItem refetch={refetch} key={comment.id} comment={comment} login={role} />)}
 
       {role && (
         <div className='flex justify-between items-start gap-3 py-4'>
@@ -184,14 +187,7 @@ function BlogComments({ id }: { id: string }) {
         </div>
       )}
 
-      <CommentModal
-        id={id}
-        refetch={refetch}
-        role={role}
-        openModal={openModal}
-        setOpenModal={setOpenModal}
-        comments={comments}
-      />
+      <CommentModal id={id} refetch={refetch} role={role} openModal={openModal} setOpenModal={setOpenModal} />
     </section>
   )
 }

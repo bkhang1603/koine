@@ -19,10 +19,10 @@ export default function CartPopover({ data }: { data: CartDetailResType['data'] 
       <ScrollArea className='h-[300px] pr-2'>
         {data['cartDetails'].map((data) => (
           <div key={data.id} className='flex items-center space-x-4 mb-4 last:mb-0'>
-            {data.product.imageUrl && (
+            {data.product.images && (
               <>
                 <Image
-                  src={data.product.imageUrl}
+                  src={data.product.images[0].imageUrl}
                   alt={data.product.name}
                   width={1000}
                   height={1000}

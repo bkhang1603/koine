@@ -30,8 +30,10 @@ export default function RefreshToken() {
     onRefreshToken()
     // Timeout interval phải bé hơn thời gian hết hạn của access token
     // Ví dụ thời gian hết hạn access token là 10s thì 1s mình sẽ cho check 1 lần
-    const TIMEOUT = 1000
-    interval = setInterval(onRefreshToken, TIMEOUT)
+    // const TIMEOUT = 1000
+    // Ví dụ thời gian hết hạn của access token là 30p thì mình sẽ cho check 1 lần sau 25p
+    const NEW_TIMEOUT = 25 * 60 * 1000
+    interval = setInterval(onRefreshToken, NEW_TIMEOUT)
 
     if (socket?.connected) {
       onConnect()

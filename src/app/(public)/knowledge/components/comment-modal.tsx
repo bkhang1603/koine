@@ -1,4 +1,5 @@
 import CommentItem from '@/app/(public)/knowledge/components/comment-item'
+import Loading from '@/components/loading'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
 import {
@@ -10,8 +11,7 @@ import {
   DialogTitle
 } from '@/components/ui/dialog'
 import { handleErrorApi } from '@/lib/utils'
-import { useBlogCommentCreateMutation } from '@/queries/useBlog'
-import { BlogCommentsResType } from '@/schemaValidations/blog.schema'
+import { useBlogCommentCreateMutation, useBlogCommentsQuery } from '@/queries/useBlog'
 import { RoleType } from '@/types/jwt.types'
 import { Camera, SendHorizontal, Smile } from 'lucide-react'
 import { useRef, useState } from 'react'
@@ -19,7 +19,6 @@ import { useRef, useState } from 'react'
 function CommentModal({
   openModal,
   setOpenModal,
-  comments,
   role,
   id,
   refetch
@@ -27,7 +26,6 @@ function CommentModal({
   openModal: boolean
   // eslint-disable-next-line no-unused-vars
   setOpenModal: (openModal: boolean) => void
-  comments: BlogCommentsResType['data']
   role: RoleType | undefined
   id: string
   refetch: () => void
@@ -36,6 +34,8 @@ function CommentModal({
   const [showEmojiPicker, setShowEmojiPicker] = useState(false)
   const commentMutation = useBlogCommentCreateMutation()
   const inputRef = useRef<HTMLTextAreaElement>(null)
+  const { data, isFetching, refetch: refetch2 } = useBlogCommentsQuery({ id, page_index: 1, page_size: 10 }) // Thay đổi page_size thành 10
+  const modalComments = data?.payload?.data || []
 
   const handleKeyDown = async (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === 'Enter' && !e.shiftKey) {
@@ -49,6 +49,7 @@ function CommentModal({
           })
           setContent('')
           refetch()
+          refetch2()
         } catch (error) {
           handleErrorApi({
             error
@@ -68,6 +69,7 @@ function CommentModal({
         })
         setContent('')
         refetch()
+        refetch2()
       } catch (error) {
         handleErrorApi({
           error
@@ -83,9 +85,16 @@ function CommentModal({
           <DialogTitle>Tất cả bình luận</DialogTitle>
         </DialogHeader>
         <DialogDescription className='max-h-[600px] overflow-y-auto'>
-          {comments.map((comment) => (
-            <CommentItem key={comment.id} comment={comment} login={role} />
-          ))}
+          {isFetching && (
+            <div className='flex justify-center items-center h-20'>
+              <Loading />
+            </div>
+          )}
+
+          {!isFetching &&
+            modalComments.map((comment) => (
+              <CommentItem refetch={refetch2} key={comment.id} comment={comment} login={role} />
+            ))}
         </DialogDescription>
 
         <DialogFooter>

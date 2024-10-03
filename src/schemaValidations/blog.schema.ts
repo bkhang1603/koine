@@ -10,7 +10,8 @@ export const BlogData = z
     imageUrl: z.string(),
     creator: z.object({
       id: z.string(),
-      username: z.string()
+      username: z.string(),
+      avatarUrl: z.string()
     }),
     createdAt: z.string(),
     updatedAt: z.string()
@@ -44,9 +45,11 @@ export const BlogCommentsData = z.object({
   content: z.string(),
   user: z.object({
     id: z.string(),
-    username: z.string()
+    username: z.string(),
+    avatarUrl: z.string()
   }),
   replies: z.array(z.object({})),
+  isReact: z.boolean(),
   createdAt: z.string(),
   updatedAt: z.string()
 })

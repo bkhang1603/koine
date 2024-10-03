@@ -1,4 +1,4 @@
-import images from '@/assets/images'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { BlogResType } from '@/schemaValidations/blog.schema'
 import { Ellipsis } from 'lucide-react'
 import Image from 'next/image'
@@ -57,7 +57,10 @@ function CardBlog({ blog }: { blog: BlogResType['data'] }) {
     <article className='w-full py-7 px-6 cursor-pointer hover:bg-fourth/80 shadow-lg rounded-2xl transition duration-500 ease-in-out'>
       <div className='flex justify-between items-center'>
         <div className='flex items-center gap-3'>
-          <Image src={images.avatar} alt='avatar' width={35} height={35} />
+          <Avatar className='w-9 h-9'>
+            <AvatarImage src={blog?.creator?.avatarUrl} />
+            <AvatarFallback>{blog?.creator.username}</AvatarFallback>
+          </Avatar>
           <span className='font-semibold'>{blog?.creator.username}</span>
         </div>
 
@@ -75,15 +78,7 @@ function CardBlog({ blog }: { blog: BlogResType['data'] }) {
             {blog?.title}
           </h2>
           <h4 className='line-clamp-2'>{blog?.description}</h4>
-          {/* <div className='line-clamp-3' dangerouslySetInnerHTML={{ __html: blog?.content }} /> */}
-          <span className='font-medium text-sm'>
-            {/* {new Date(data.date).toLocaleDateString('vi-VN', {
-              year: 'numeric',
-              month: 'long',
-              day: 'numeric'
-            })} */}
-            {changeDate(blog?.createdAt!)}
-          </span>
+          <span className='font-medium text-sm'>{changeDate(blog?.createdAt!)}</span>
         </div>
         <Image
           src={blog?.imageUrl!}

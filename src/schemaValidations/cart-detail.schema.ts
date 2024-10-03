@@ -1,4 +1,4 @@
-import z from 'zod'
+import z, { object } from 'zod'
 
 export const CartDetailData = z
   .object({
@@ -12,7 +12,12 @@ export const CartDetailData = z
     product: z.object({
       id: z.string(),
       name: z.string(),
-      imageUrl: z.string()
+      images: z.array(
+        object({
+          name: z.string(),
+          imageUrl: z.string()
+        })
+      )
     }),
     course: z.object({
       id: z.string(),
