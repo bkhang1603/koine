@@ -5,6 +5,7 @@ import {
   BlogResType,
   BlogsResType
 } from '@/schemaValidations/blog.schema'
+import { ReactDataType } from '@/schemaValidations/course.schema'
 
 const blogApiRequest = {
   getBlogs: ({
@@ -32,7 +33,8 @@ const blogApiRequest = {
     page_index?: number | undefined
     page_size?: number | undefined
   }) => http.get<BlogCommentsResType>(`/blog-comments/${id}?page_index=${page_index}&page_size=${page_size}`),
-  createBlogComment: (data: BlogCommentCreateReqType) => http.post('/blog-comments', data)
+  createBlogComment: (data: BlogCommentCreateReqType) => http.post('/blog-comments', data),
+  updateReactComment: (data: ReactDataType) => http.put('/blog-reacts', data)
 }
 
 export default blogApiRequest

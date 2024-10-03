@@ -43,4 +43,13 @@ export const CourseRes = z.object({
   })
 })
 
+export const ReactData = z
+  .object({
+    blogId: z.string(),
+    isReact: z.boolean()
+  })
+  .strict()
+
 export type CourseResType = z.infer<typeof CourseRes>
+
+export type ReactDataType = z.infer<typeof ReactData>

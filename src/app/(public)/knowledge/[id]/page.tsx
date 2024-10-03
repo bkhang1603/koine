@@ -21,7 +21,7 @@ async function page({ params: { id } }: { params: { id: string } }) {
         {blog?.title}
       </h1>
 
-      <div className='mt-12' dangerouslySetInnerHTML={{ __html: blog?.content! }} />
+      <div className='mt-12 tiptap-editor' dangerouslySetInnerHTML={{ __html: blog?.content! }} />
 
       <BlogComments id={id} />
     </div>

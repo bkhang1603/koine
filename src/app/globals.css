@@ -166,6 +166,9 @@
   .ProseMirror p {
     @apply pt-2 break-all;
   }
+  .tiptap-editor img {
+    @apply rounded-xl;
+  }
 
   /* [data-type='column'] {
     @apply flex-1 p-2 border-dashed border border-gray-300 rounded-md;
