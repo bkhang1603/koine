@@ -38,6 +38,10 @@ type AppStoreType = {
   socket: Socket | undefined
   setSocket: (socket?: Socket | undefined) => void
   disconnectSocket: () => void
+  avatar: string | undefined
+  setAvatar: (avatar?: string | undefined) => void
+  username: string | undefined
+  setUsername: (username?: string | undefined) => void
 }
 
 export const useAppStore = create<AppStoreType>((set) => ({
@@ -55,7 +59,11 @@ export const useAppStore = create<AppStoreType>((set) => ({
     set((state) => {
       state.socket?.disconnect()
       return { socket: undefined }
-    })
+    }),
+  avatar: undefined,
+  setAvatar: (avatar?: string | undefined) => set({ avatar }),
+  username: undefined,
+  setUsername: (username?: string | undefined) => set({ username })
 }))
 
 // export const useAppContext = () => {

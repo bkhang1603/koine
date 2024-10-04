@@ -1,5 +1,5 @@
 import blogApiRequest from '@/apiRequests/blog'
-import { useMutation, useQuery } from '@tanstack/react-query'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 
 export const useBlogCommentsQuery = ({
   id,
@@ -17,7 +17,34 @@ export const useBlogCommentsQuery = ({
 }
 
 export const useBlogCommentCreateMutation = () => {
+  const queryClient = useQueryClient()
+
   return useMutation({
-    mutationFn: blogApiRequest.createBlogComment
+    mutationFn: blogApiRequest.createBlogComment,
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ['blogComments']
+      })
+    }
+  })
+}
+
+export const useBlogReactQuery = ({ id }: { id: string }) => {
+  return useQuery({
+    queryKey: ['reactBlog', id],
+    queryFn: () => blogApiRequest.getReactComment(id)
+  })
+}
+
+export const useBlogReactUpdateMutation = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: blogApiRequest.updateReactComment,
+    onSettled: () => {
+      queryClient.invalidateQueries({
+        queryKey: ['reactBlog']
+      })
+    }
   })
 }

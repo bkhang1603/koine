@@ -5,8 +5,19 @@ import { Separator } from '@/components/ui/separator'
 import Link from 'next/link'
 import Image from 'next/image'
 import { CartDetailResType } from '@/schemaValidations/cart-detail.schema'
+import { useCartDetailDeleteMutation } from '@/queries/useCartDetail'
 
 export default function CartPopover({ data }: { data: CartDetailResType['data'] }) {
+  const deleteMutation = useCartDetailDeleteMutation()
+
+  const handleDelete = async (id: string) => {
+    try {
+      await deleteMutation.mutateAsync({ id })
+    } catch (error) {
+      console.error(error)
+    }
+  }
+
   // const removeProduct = (id: number) => {
   //   setProducts(products.filter((product) => product.id !== id))
   // }
@@ -19,10 +30,10 @@ export default function CartPopover({ data }: { data: CartDetailResType['data'] 
       <ScrollArea className='h-[300px] pr-2'>
         {data['cartDetails'].map((data) => (
           <div key={data.id} className='flex items-center space-x-4 mb-4 last:mb-0'>
-            {data.product.images && (
+            {data.product && data.product.imageUrls && (
               <>
                 <Image
-                  src={data.product.images[0].imageUrl}
+                  src={data.product.imageUrls[0].imageUrl}
                   alt={data.product.name}
                   width={1000}
                   height={1000}
@@ -38,7 +49,7 @@ export default function CartPopover({ data }: { data: CartDetailResType['data'] 
               </>
             )}
 
-            {data.course.imageUrl && (
+            {data.course && data.course.imageUrl && (
               <>
                 <Image
                   src={data.course.imageUrl}
@@ -52,12 +63,14 @@ export default function CartPopover({ data }: { data: CartDetailResType['data'] 
                 <div className='flex-1'>
                   <h4 className='font-medium'>{data.course.title}</h4>
                   <p className='text-sm text-gray-500'>Số lượng: {data.quantity}</p>
-                  <p className='text-secondary font-medium'>{data.unitPrice.toLocaleString()} đ</p>
+                  <p className='text-secondary font-medium'>
+                    {data.unitPrice === 0 ? 'Miễn phí' : data.unitPrice.toLocaleString() + ' đ'}
+                  </p>
                 </div>
               </>
             )}
 
-            <Button className='focus-visible:ring-0' variant='ghost' size='icon' onClick={() => {}}>
+            <Button className='focus-visible:ring-0' variant='ghost' size='icon' onClick={() => handleDelete(data.id)}>
               <X className='h-4 w-4' />
             </Button>
           </div>
@@ -66,7 +79,7 @@ export default function CartPopover({ data }: { data: CartDetailResType['data'] 
       <Separator className='my-4' />
       <div className='flex justify-between items-center font-semibold mb-4'>
         <span>Tổng cộng:</span>
-        <span>0 đ</span>
+        <span>{data.totalAmount.toLocaleString()} đ</span>
       </div>
       <div className='space-y-2'>
         <Link href='/cart' passHref>

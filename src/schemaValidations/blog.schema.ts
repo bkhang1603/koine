@@ -55,7 +55,10 @@ export const BlogCommentsData = z.object({
 })
 
 export const BlogCommentsRes = z.object({
-  data: z.array(BlogCommentsData),
+  data: z.object({
+    commentsWithReplies: z.array(BlogCommentsData),
+    totalComments: z.number()
+  }),
   message: z.string(),
   statusCode: z.number(),
   pagination: z.object({

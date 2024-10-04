@@ -20,22 +20,20 @@ function CommentModal({
   openModal,
   setOpenModal,
   role,
-  id,
-  refetch
+  id
 }: {
   openModal: boolean
   // eslint-disable-next-line no-unused-vars
   setOpenModal: (openModal: boolean) => void
   role: RoleType | undefined
   id: string
-  refetch: () => void
 }) {
   const [content, setContent] = useState('')
   const [showEmojiPicker, setShowEmojiPicker] = useState(false)
   const commentMutation = useBlogCommentCreateMutation()
   const inputRef = useRef<HTMLTextAreaElement>(null)
-  const { data, isFetching, refetch: refetch2 } = useBlogCommentsQuery({ id, page_index: 1, page_size: 10 }) // Thay đổi page_size thành 10
-  const modalComments = data?.payload?.data || []
+  const { data, isFetching } = useBlogCommentsQuery({ id, page_index: 1, page_size: 10 }) // Thay đổi page_size thành 10
+  const modalComments = data?.payload?.data.commentsWithReplies || []
 
   const handleKeyDown = async (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === 'Enter' && !e.shiftKey) {
@@ -48,8 +46,6 @@ function CommentModal({
             replyId: null
           })
           setContent('')
-          refetch()
-          refetch2()
         } catch (error) {
           handleErrorApi({
             error
@@ -68,8 +64,6 @@ function CommentModal({
           replyId: null
         })
         setContent('')
-        refetch()
-        refetch2()
       } catch (error) {
         handleErrorApi({
           error
@@ -92,9 +86,7 @@ function CommentModal({
           )}
 
           {!isFetching &&
-            modalComments.map((comment) => (
-              <CommentItem refetch={refetch2} key={comment.id} comment={comment} login={role} />
-            ))}
+            modalComments.map((comment) => <CommentItem key={comment.id} comment={comment} login={role} />)}
         </DialogDescription>
 
         <DialogFooter>

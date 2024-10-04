@@ -12,13 +12,11 @@ import { handleErrorApi } from '@/lib/utils'
 export default function CommentItem({
   comment,
   level = 0,
-  login,
-  refetch
+  login
 }: {
   comment: BlogCommentResType['data']
   level?: number
   login?: RoleType | undefined
-  refetch?: () => void
 }) {
   const [showReplyInput, setShowReplyInput] = useState(false)
   const [replyContent, setReplyContent] = useState('')
@@ -45,7 +43,6 @@ export default function CommentItem({
             replyId: comment.id
           })
           setReplyContent('')
-          refetch && refetch()
           setShowReplyInput(false)
         } catch (error) {
           handleErrorApi({
@@ -65,7 +62,6 @@ export default function CommentItem({
           replyId: comment.id
         })
         setReplyContent('')
-        refetch && refetch()
         setShowReplyInput(false)
       } catch (error) {
         handleErrorApi({
@@ -212,7 +208,7 @@ export default function CommentItem({
             </Button>
             {showReplies &&
               comment.replies.map((reply: any) => (
-                <CommentItem refetch={refetch} key={reply.id} comment={reply} level={level + 1} login={login} />
+                <CommentItem key={reply.id} comment={reply} level={level + 1} login={login} />
               ))}
           </>
         )}

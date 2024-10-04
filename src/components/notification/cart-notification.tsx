@@ -15,7 +15,7 @@ function CartNotification() {
           <ShoppingBag />
 
           {cartTotal > 0 && (
-            <div className='absolute -top-2 -right-2 bg-secondary text-white w-5 h-5 flex justify-center items-center rounded-full text-sm'>
+            <div className='absolute -top-2 -right-2 bg-secondary text-white w-5 h-5 flex justify-center items-center rounded-full text-sm cursor-pointer select-none'>
               {cartTotal}
             </div>
           )}

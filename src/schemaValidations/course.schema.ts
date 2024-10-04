@@ -45,6 +45,19 @@ export const CourseRes = z.object({
 
 export const ReactData = z
   .object({
+    totalReacts: z.number(),
+    isReact: z.boolean()
+  })
+  .strict()
+
+export const ReactDataRes = z.object({
+  data: ReactData,
+  message: z.string(),
+  statusCode: z.number()
+})
+
+export const UpdateReactData = z
+  .object({
     blogId: z.string(),
     isReact: z.boolean()
   })
@@ -52,4 +65,6 @@ export const ReactData = z
 
 export type CourseResType = z.infer<typeof CourseRes>
 
-export type ReactDataType = z.infer<typeof ReactData>
+export type ReactDataResType = z.infer<typeof ReactDataRes>
+
+export type UpdateReactDataType = z.infer<typeof UpdateReactData>

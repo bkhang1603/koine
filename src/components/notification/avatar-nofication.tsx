@@ -12,7 +12,7 @@ import { useLogoutMutation } from '@/queries/useAuth'
 import { ChevronRight, LogOut, MessageCircleQuestion, Settings } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import React from 'react'
+import React, { useEffect } from 'react'
 
 const dropMenuItems = [
   {
@@ -35,13 +35,22 @@ const dropMenuItems = [
 function AvatarNotification() {
   const role = useAppStore((state) => state.role)
   const setRole = useAppStore((state) => state.setRole)
+  const setAvatar = useAppStore((state) => state.setAvatar)
+  const setUsername = useAppStore((state) => state.setUsername)
 
   // Tôi muốn chỉ gọi api account profile khi role có giá trị
   const { data } = useAccountProfile({
     enabled: !!role
   })
-
   const account = data?.payload.data
+
+  useEffect(() => {
+    if (account) {
+      setAvatar(account.avatarUrl || '')
+      setUsername(account.username || '')
+    }
+  }, [account, setAvatar, setUsername])
+
   const logoutMutation = useLogoutMutation()
   const router = useRouter()
 
@@ -49,6 +58,8 @@ function AvatarNotification() {
     try {
       await logoutMutation.mutateAsync()
       setRole()
+      setAvatar()
+      setUsername()
       router.push(configRoute.home)
       router.refresh()
     } catch (error: any) {
@@ -59,7 +70,7 @@ function AvatarNotification() {
   return (
     <Popover>
       <PopoverTrigger asChild>
-        <Avatar className='cursor-pointer'>
+        <Avatar className='cursor-pointer select-none'>
           <AvatarImage src={account?.avatarUrl} alt='avatar' />
           <AvatarFallback>
             {account?.username.slice(0, 2).toUpperCase() || account?.email.slice(0, 2).toUpperCase()}

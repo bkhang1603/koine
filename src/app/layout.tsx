@@ -5,6 +5,7 @@ import { ThemeProvider } from '@/components/theme-provider'
 import { Toaster } from '@/components/ui/toaster'
 import AppProvider from '@/components/app-provider'
 import { Roboto } from 'next/font/google'
+import envConfig from '@/config'
 
 const roboto = Roboto({
   weight: ['100', '300', '400', '500', '700'],
@@ -20,7 +21,24 @@ export const metadata: Metadata = {
   description:
     'Koine là nền tảng giáo dục giới tính cho trẻ em với các khóa học chất lượng cao từ các chuyên gia hàng đầu. Hãy tham gia ngay để giúp con bạn phát triển toàn diện nhất!',
   authors: [{ name: 'Koine', url: 'https://koine.id.vn' }],
-  keywords: ['Koine', 'Koine Giáo dục cho trẻ em', 'Koine Online', 'Koine Học trực tuyến', 'Koine Giáo dục giới tính'],
+  keywords: [
+    'Koine',
+    'Website giáo dục giới tính',
+    'Website giao duc gioi tinh',
+    'Trẻ em',
+    'Tre em',
+    'Website giáo dục',
+    'Website giao duc',
+    'Website giáo dục cho trẻ em',
+    'Website giao duc cho tre em',
+    'Koine giáo dục cho trẻ em',
+    'Koine giao duc cho tre em',
+    'Koine Online',
+    'Koine học trực tuyến',
+    'Koine hoc truc tuyen',
+    'Koine giáo dục giới tính',
+    'Koine giao duc gioi tinh'
+  ],
   creator: 'Koine',
   publisher: 'Koine',
   robots: {
@@ -37,7 +55,7 @@ export const metadata: Metadata = {
     url: 'https://koine.id.vn',
     images: [
       {
-        url: '/images/welcome.png'
+        url: `${envConfig.NEXT_PUBLIC_URL}/images/welcome.png`
       }
     ]
   },
