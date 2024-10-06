@@ -5,7 +5,7 @@ import { checkAndRefreshToken } from '@/lib/utils'
 import { usePathname, useRouter } from 'next/navigation'
 import { useEffect } from 'react'
 
-// Những page sau sẽ không check refesh token
+// Những page sau sẽ không check refresh token
 const UNAUTHENTICATED_PATH = ['/login', '/logout', '/refresh-token']
 export default function RefreshToken() {
   const pathname = usePathname()
@@ -30,8 +30,9 @@ export default function RefreshToken() {
     onRefreshToken()
     // Timeout interval phải bé hơn thời gian hết hạn của access token
     // Ví dụ thời gian hết hạn access token là 10s thì 1s mình sẽ cho check 1 lần
-    // Ví dụ thời gian hết hạn access token là 2h thì 1/3 thời gian hết hạn mình sẽ cho check 1 lần
-    const TIMEOUT = (1000 * 60 * 2 * 60) / 3 // 2h
+    // const TIMEOUT = (1000 * 60 * 60) / 5 // 1h
+    // Ví dụ thời gian hết hạn là 1h thì mình sẽ cho check 1 lần mỗi 10p
+    const TIMEOUT = 1000 * 60 * 10 // 10p
 
     interval = setInterval(onRefreshToken, TIMEOUT)
 

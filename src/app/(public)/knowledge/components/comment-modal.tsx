@@ -1,4 +1,5 @@
 import CommentItem from '@/app/(public)/knowledge/components/comment-item'
+import { useAppStore } from '@/components/app-provider'
 import Loading from '@/components/loading'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
@@ -15,6 +16,8 @@ import { useBlogCommentCreateMutation, useBlogCommentsQuery } from '@/queries/us
 import { RoleType } from '@/types/jwt.types'
 import { Camera, SendHorizontal, Smile } from 'lucide-react'
 import { useRef, useState } from 'react'
+import data from '@emoji-mart/data'
+import Picker from '@emoji-mart/react'
 
 function CommentModal({
   openModal,
@@ -28,12 +31,14 @@ function CommentModal({
   role: RoleType | undefined
   id: string
 }) {
+  const avatar = useAppStore((state) => state.avatar)
+  const username = useAppStore((state) => state.username)
   const [content, setContent] = useState('')
   const [showEmojiPicker, setShowEmojiPicker] = useState(false)
   const commentMutation = useBlogCommentCreateMutation()
   const inputRef = useRef<HTMLTextAreaElement>(null)
-  const { data, isFetching } = useBlogCommentsQuery({ id, page_index: 1, page_size: 10 }) // Thay đổi page_size thành 10
-  const modalComments = data?.payload?.data.commentsWithReplies || []
+  const { data: data1, isFetching } = useBlogCommentsQuery({ id, page_index: 1, page_size: 10 }) // Thay đổi page_size thành 10
+  const modalComments = data1?.payload?.data.commentsWithReplies || []
 
   const handleKeyDown = async (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === 'Enter' && !e.shiftKey) {
@@ -72,6 +77,11 @@ function CommentModal({
     }
   }
 
+  const handleEmojiSelect = (emoji: any) => {
+    setContent((prev) => prev + emoji.native)
+    setShowEmojiPicker(false)
+  }
+
   return (
     <Dialog open={openModal} onOpenChange={setOpenModal}>
       <DialogContent className='min-w-[50vw]'>
@@ -92,8 +102,8 @@ function CommentModal({
         <DialogFooter>
           <div className='w-full flex justify-between items-start gap-3 py-4'>
             <Avatar>
-              <AvatarImage src='' alt='user avatar' />
-              <AvatarFallback>User</AvatarFallback>
+              <AvatarImage src={avatar} alt={username} />
+              <AvatarFallback>{username}</AvatarFallback>
             </Avatar>
 
             <div className='w-full bg-slate-50 rounded-3xl px-3 py-2 flex flex-col gap-1'>
@@ -128,6 +138,12 @@ function CommentModal({
                   <SendHorizontal />
                 </Button>
               </div>
+
+              {showEmojiPicker && (
+                <div className='absolute z-10 mt-16'>
+                  <Picker data={data} onEmojiSelect={handleEmojiSelect} />
+                </div>
+              )}
             </div>
           </div>
         </DialogFooter>

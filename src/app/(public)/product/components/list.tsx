@@ -72,7 +72,6 @@ async function List({ searchParams }: { searchParams: searchParams | undefined }
 
                   <div className='flex items-center gap-2 mt-2'>
                     <span className='text-base font-semibold'>{item.price.toLocaleString()}đ</span>
-                    {/* <span className='text-gray-400 text-sm line-through'>{item.oldPrice.toLocaleString()}đ</span> */}
                   </div>
                 </div>
               </article>

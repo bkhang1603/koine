@@ -9,6 +9,7 @@ export const CourseData = z
     description: z.string(),
     price: z.number(),
     imageUrl: z.string(),
+    imageBanner: z.string(),
     totalOfStudent: z.number(),
     aveRating: z.number(),
     creator: z.object({
@@ -30,7 +31,7 @@ export const CourseData = z
   })
   .strict()
 
-export const CourseRes = z.object({
+export const CoursesRes = z.object({
   data: z.array(CourseData),
   message: z.string(),
   statusCode: z.number(),
@@ -41,6 +42,12 @@ export const CourseRes = z.object({
     maxPageSize: z.number(),
     totalPage: z.number()
   })
+})
+
+export const CourseRes = z.object({
+  data: CourseData,
+  message: z.string(),
+  statusCode: z.number()
 })
 
 export const ReactData = z
@@ -64,6 +71,8 @@ export const UpdateReactData = z
   .strict()
 
 export type CourseResType = z.infer<typeof CourseRes>
+
+export type CoursesResType = z.infer<typeof CoursesRes>
 
 export type ReactDataResType = z.infer<typeof ReactDataRes>
 

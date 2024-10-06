@@ -22,8 +22,15 @@ export const useCartDetailCreateMutation = () => {
 }
 
 export const useCartDetailUpdateMutation = () => {
+  const queryClient = useQueryClient()
+
   return useMutation({
-    mutationFn: cartDetailApiRequest.updateCart
+    mutationFn: cartDetailApiRequest.updateCart,
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ['cartDetails']
+      })
+    }
   })
 }
 

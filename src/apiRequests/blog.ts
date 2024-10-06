@@ -20,7 +20,10 @@ const blogApiRequest = {
     http.get<BlogsResType>(`/blogs?page_index=${page_index}&keyword=${search}&page_size=${page_size}`, {
       cache: 'no-cache'
     }),
-  getBlog: (id: string) => http.get<BlogResType>(`/blogs/${id}`),
+  getBlog: (id: string) =>
+    http.get<BlogResType>(`/blogs/${id}`, {
+      cache: 'no-cache'
+    }),
   createBlog: (data: any) => http.post('/blogs', data),
   updateBlog: (id: string, data: any) => http.put(`/blogs/${id}`, data),
   deleteBlog: (id: string) => http.delete(`/blogs/${id}`),

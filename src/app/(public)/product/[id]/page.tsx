@@ -1,10 +1,10 @@
-import { Star, Heart, Share2, Minus, Plus } from 'lucide-react'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
+import { Star, Heart, Share2 } from 'lucide-react'
 import BreadCrumbCustom from '@/components/breadcrumb-custom'
 import ProductImage from '@/app/(public)/product/[id]/components/product-image'
 import productApiRequest from '@/apiRequests/product'
 import { ProductResType } from '@/schemaValidations/product.schema'
+import AddToCartButton from '@/app/(public)/product/[id]/components/add-to-cart-button'
+import ProductDescription from '@/app/(public)/product/[id]/components/product-description'
 
 export default async function ProductDetail({ params: { id } }: { params: { id: string } }) {
   let product: ProductResType['data'] | null = null
@@ -45,28 +45,8 @@ export default async function ProductDetail({ params: { id } }: { params: { id: 
             <Heart className='ml-4 w-5 h-5' />
             <Share2 className='ml-4 w-5 h-5' />
           </div>
-          <div className='flex items-center space-x-4 mb-6'>
-            <span>Số lượng</span>
-            <Button variant='outline' size='icon'>
-              <Minus className='h-4 w-4' />
-            </Button>
 
-            <Input type='text' defaultValue={1} className='w-16 text-center' />
-
-            <Button variant='outline' size='icon'>
-              <Plus className='h-4 w-4' />
-            </Button>
-          </div>
-
-          <div className='flex justify-between gap-4'>
-            <Button variant={'outlineSecondary'} className='w-full mb-6'>
-              Thêm vào giỏ hàng
-            </Button>
-
-            <Button variant={'secondary'} className='w-full mb-6'>
-              Mua ngay
-            </Button>
-          </div>
+          <AddToCartButton product={product} />
 
           <div className='space-y-2 text-sm'>
             <p>Mã số sản phẩm: {product.id}</p>
@@ -74,6 +54,8 @@ export default async function ProductDetail({ params: { id } }: { params: { id: 
           </div>
         </div>
       </div>
+
+      <ProductDescription description={product.description} />
     </section>
   )
 }

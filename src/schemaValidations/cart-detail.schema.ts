@@ -13,6 +13,8 @@ export const CartDetailData = z
       .object({
         id: z.string(),
         name: z.string(),
+        discount: z.number().nullable(),
+        stockQuantity: z.number(),
         imageUrls: z.array(
           object({
             name: z.string(),

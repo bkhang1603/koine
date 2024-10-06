@@ -7,14 +7,17 @@ import Image from 'next/image'
 function ProductPage({ searchParams }: { searchParams?: searchParams }) {
   return (
     <main className='pb-28'>
-      <Image
-        src={images.banner}
-        alt='Banner'
-        width={1920}
-        height={400}
-        quality={100}
-        className='h-[30vh] w-full object-cover'
-      />
+      <div className='h-[30vh] w-full'>
+        <Image
+          src={images.banner}
+          alt='Banner'
+          width={1920}
+          height={400}
+          quality={100}
+          className='h-full w-full object-cover'
+          priority={true}
+        />
+      </div>
 
       <div className='grid grid-cols-4 gap-6 mt-8 container'>
         <Filter />

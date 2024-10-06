@@ -160,7 +160,13 @@ export const translatePathname = (pathname: string) => {
   switch (pathname) {
     case 'product':
       return 'Sản phẩm'
-    default:
+    case 'product-detail':
       return 'Chi tiết sản phẩm'
+    case 'course':
+      return 'Khóa học'
+    case 'course-detail':
+      return 'Chi tiết khóa học'
+    default:
+      return 'Chi tiết'
   }
 }

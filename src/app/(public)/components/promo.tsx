@@ -1,5 +1,6 @@
 import icons from '@/assets/icons'
 import images from '@/assets/images'
+import { Button } from '@/components/ui/button'
 import configRoute from '@/config/route'
 import { CircleArrowRight } from 'lucide-react'
 import Image from 'next/image'
@@ -9,14 +10,16 @@ function Promo() {
   return (
     <section className='bg-fourth py-10 sm:py-24'>
       <div className='container grid grid-cols-1 lg:grid-cols-2 gap-4 relative'>
-        <Image
-          src={images.product}
-          alt='product'
-          width={500}
-          height={500}
-          priority
-          className='w-full max-h-[500px] object-cover rounded-[20px]'
-        />
+        <div className='flex justify-center items-center'>
+          <Image
+            src={images.product}
+            alt='product'
+            width={500}
+            height={500}
+            priority
+            className='w-full max-h-[500px] object-cover rounded-[20px]'
+          />
+        </div>
 
         <div className='flex items-center justify-between flex-col py-10 xl:py-16 gap-y-6'>
           <div className='text-center'>
@@ -38,11 +41,13 @@ function Promo() {
           </p>
 
           <Link
-            href={configRoute.register}
-            className='w-full p-4 flex items-center justify-center gap-2 text-secondary hover:text-secondary/80'
+            href={configRoute.product}
+            // className='w-full p-4 flex items-center justify-center gap-2 text-secondary hover:text-secondary/80'
           >
-            <span className='font-semibold text-base sm:text-xl'>Mua hàng</span>
-            <CircleArrowRight className='w-5 h-5 sm:h-6 sm:w-6' />
+            <Button variant={'secondary'} className='w-60 flex justify-center items-center gap-2 mt-6'>
+              <span className='text-base sm:text-lg'>Mua hàng</span>
+              <CircleArrowRight className='w-4 h-4 sm:h-5 sm:w-5' />
+            </Button>
           </Link>
         </div>
 

@@ -41,7 +41,7 @@ function Footer() {
     <footer className='mt-10'>
       <Image src={images.footer} alt='footer' width={3000} height={3000} priority className='w-[100vw]' />
 
-      <div className='bg-fourth'>
+      <div className='bg-fourth -mt-2'>
         <section className='container'>
           <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-x-4 gap-y-8 py-20'>
             {footerLinks.map((footerLink, index) => (

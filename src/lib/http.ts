@@ -105,7 +105,7 @@ const request = async <Response>(
       )
     } else if (res.status === AUTHENTICATION_ERROR_STATUS) {
       if (isClient) {
-        if (!clientLogoutRequest && clientLogoutRequest === 'haha') {
+        if (!clientLogoutRequest && clientLogoutRequest === 'hello') {
           clientLogoutRequest = fetch('/api/auth/logout', {
             method: 'POST',
             body: null, // Logout mình sẽ cho phép luôn luôn thành công
@@ -127,20 +127,10 @@ const request = async <Response>(
           }
         }
       } else {
-        if ((options?.headers as any)?.Authorization) {
-          // Đây là trường hợp khi mà chúng ta vẫn còn access token (còn hạn)
-          // Và chúng ta gọi API ở Next.js Server (Route Handler, Server Component) đến Server Backend
-          const accessToken = (options?.headers as any)?.Authorization.split('Bearer ')[1]
-          // console.log('options', options)
-          // console.log('accessToken', accessToken)
-          // console.log('header', options?.headers)
-          // console.log('authorization', (options?.headers as any)?.Authorization)
-          redirect(`/login?accessToken=${accessToken}`)
-        } else {
-          // Đây là trường hợp khi mà chúng ta không có access token (hết hạn)
-          // Và chúng ta gọi API ở Next.js Server (Route Handler, Server Component) đến Server Backend
-          redirect(`/login`)
-        }
+        // Đây là trường hợp khi mà chúng ta vẫn còn access token (còn hạn)
+        // Và chúng ta gọi API ở Next.js Server (Route Handler, Server Component) đến Server Backend
+        const accessToken = (options?.headers as any)?.Authorization.split('Bearer ')[1]
+        redirect(`/login?accessToken=${accessToken}`)
       }
     } else if (res.status === 404) {
       throw new HttpError(data)

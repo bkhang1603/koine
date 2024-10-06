@@ -18,12 +18,6 @@ export default function CartPopover({ data }: { data: CartDetailResType['data'] 
     }
   }
 
-  // const removeProduct = (id: number) => {
-  //   setProducts(products.filter((product) => product.id !== id))
-  // }
-
-  // const total = products.reduce((sum, product) => sum + product.price * product.quantity, 0)
-
   return (
     <div className='py-2'>
       <h3 className='font-medium text-lg mb-4'>Giỏ hàng của bạn</h3>
@@ -42,9 +36,11 @@ export default function CartPopover({ data }: { data: CartDetailResType['data'] 
                 />
 
                 <div className='flex-1'>
-                  <h4 className='font-medium'>{data.product.name}</h4>
+                  <h4 className='font-medium line-clamp-1'>{data.product.name}</h4>
                   <p className='text-sm text-gray-500'>Số lượng: {data.quantity}</p>
-                  <p className='text-secondary font-medium'>{data.unitPrice.toLocaleString()} đ</p>
+                  <p className='text-secondary font-medium'>
+                    {data.unitPrice === 0 ? 'Miễn phí' : data.totalPrice.toLocaleString() + ' đ'}
+                  </p>
                 </div>
               </>
             )}
@@ -64,7 +60,7 @@ export default function CartPopover({ data }: { data: CartDetailResType['data'] 
                   <h4 className='font-medium'>{data.course.title}</h4>
                   <p className='text-sm text-gray-500'>Số lượng: {data.quantity}</p>
                   <p className='text-secondary font-medium'>
-                    {data.unitPrice === 0 ? 'Miễn phí' : data.unitPrice.toLocaleString() + ' đ'}
+                    {data.unitPrice === 0 ? 'Miễn phí' : data.totalPrice.toLocaleString() + ' đ'}
                   </p>
                 </div>
               </>

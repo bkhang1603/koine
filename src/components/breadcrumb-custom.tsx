@@ -13,23 +13,24 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { Fragment } from 'react'
 
-function BreadCrumbCustom() {
+function BreadCrumbCustom({ className }: { className?: string }) {
   const paths = usePathname()
   const pathnames = paths.split('/').filter((path) => path)
   const pathItems = pathnames.map((path, index) => ({
     name: path,
+    rootName: pathnames[0],
     path: pathnames.slice(0, index + 1).join('/'),
     currentPath: index === pathnames.length - 1
   }))
 
   return (
-    <Breadcrumb>
+    <Breadcrumb className={className}>
       <BreadcrumbList>
         {pathItems.map((item, index) => (
           <Fragment key={index}>
             {item.currentPath ? (
               <BreadcrumbItem>
-                <BreadcrumbPage>{translatePathname(item.name)}</BreadcrumbPage>
+                <BreadcrumbPage>{translatePathname(item.rootName + '-detail')}</BreadcrumbPage>
               </BreadcrumbItem>
             ) : (
               <BreadcrumbItem>

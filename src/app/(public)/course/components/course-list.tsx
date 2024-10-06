@@ -1,12 +1,12 @@
 import courseApiRequest from '@/apiRequests/course'
 import { Separator } from '@/components/ui/separator'
-import { CourseResType } from '@/schemaValidations/course.schema'
+import { CoursesResType } from '@/schemaValidations/course.schema'
 import { AlarmClock, Sparkle, Users } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
 
 async function CourseList() {
-  let courseData: CourseResType['data'] = []
+  let courseData: CoursesResType['data'] = []
 
   try {
     const { payload } = await courseApiRequest.getCourses()

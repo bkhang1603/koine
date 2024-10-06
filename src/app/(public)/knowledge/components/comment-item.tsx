@@ -8,6 +8,7 @@ import Picker from '@emoji-mart/react'
 import { RoleType } from '@/types/jwt.types'
 import { useBlogCommentCreateMutation } from '@/queries/useBlog'
 import { handleErrorApi } from '@/lib/utils'
+import { useAppStore } from '@/components/app-provider'
 
 export default function CommentItem({
   comment,
@@ -18,6 +19,8 @@ export default function CommentItem({
   level?: number
   login?: RoleType | undefined
 }) {
+  const avatar = useAppStore((state) => state.avatar)
+  const username = useAppStore((state) => state.username)
   const [showReplyInput, setShowReplyInput] = useState(false)
   const [replyContent, setReplyContent] = useState('')
   const [showEmojiPicker, setShowEmojiPicker] = useState(false)
@@ -31,6 +34,12 @@ export default function CommentItem({
       replyTextareaRef.current.style.height = `${replyTextareaRef.current.scrollHeight}px`
     }
   }, [replyContent])
+
+  useEffect(() => {
+    if (showReplyInput && replyTextareaRef.current) {
+      replyTextareaRef.current.focus()
+    }
+  }, [showReplyInput])
 
   const handleReplyKeyDown = async (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === 'Enter' && !e.shiftKey) {
@@ -127,10 +136,7 @@ export default function CommentItem({
   return (
     <div className='flex items-start gap-3 pt-4'>
       <Avatar className={level > 0 ? 'w-8 h-8' : ''}>
-        <AvatarImage
-          src={`https://api.dicebear.com/6.x/initials/svg?seed=${comment.user.username}`}
-          alt={`${comment.user.username} avatar`}
-        />
+        <AvatarImage src={comment.user.avatarUrl} alt={comment.user.username} />
         <AvatarFallback>{comment.user.username}</AvatarFallback>
       </Avatar>
 
@@ -155,8 +161,8 @@ export default function CommentItem({
         {showReplyInput && (
           <div className='flex justify-between items-start gap-3 py-4'>
             <Avatar>
-              <AvatarImage src='' alt='user avatar' />
-              <AvatarFallback>You</AvatarFallback>
+              <AvatarImage src={avatar} alt={username} />
+              <AvatarFallback>{username}</AvatarFallback>
             </Avatar>
 
             <div className='w-full bg-slate-50 rounded-3xl px-3 py-2 flex flex-col gap-1'>

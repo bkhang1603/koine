@@ -14,7 +14,7 @@ function ProductImage({
   const gridCols = `grid-cols-${imageData.length}`
 
   if (!imageData || !Array.isArray(imageData)) {
-    return <div>No images available</div>
+    return <p>No images available</p>
   }
 
   return (
@@ -29,16 +29,17 @@ function ProductImage({
       />
       <div className={`grid ${gridCols} gap-2`}>
         {imageData.map((image, index) => (
-          <Image
-            key={index}
-            src={image.imageUrl}
-            alt={image.name}
-            width={800}
-            height={800}
-            className='w-full h-28 object-cover cursor-pointer rounded-lg'
-            priority={true}
-            onClick={() => setMainImage(image)}
-          />
+          <div key={index} className='w-full h-28 overflow-hidden cursor-pointer rounded-lg'>
+            <Image
+              src={image.imageUrl}
+              alt={image.name}
+              width={800}
+              height={800}
+              className='w-full h-full object-cover hover:opacity-80 transition-opacity duration-200'
+              priority={true}
+              onClick={() => setMainImage(image)}
+            />
+          </div>
         ))}
       </div>
     </div>

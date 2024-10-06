@@ -4,6 +4,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
 import { Camera, Heart, MessageCircle, SendHorizontal, Smile } from 'lucide-react'
 import React, { useEffect, useRef, useState } from 'react'
+import data from '@emoji-mart/data'
 import Picker from '@emoji-mart/react'
 import CommentItem from '@/app/(public)/knowledge/components/comment-item'
 import { useAppStore } from '@/components/app-provider'
@@ -32,9 +33,9 @@ function BlogComments({ id }: { id: string }) {
   const [showEmojiPicker, setShowEmojiPicker] = useState(false)
   const [openModal, setOpenModal] = useState(false)
 
-  const { data, isFetching } = useBlogCommentsQuery({ id, page_index: 1, page_size: 2 })
-  const comments = data?.payload?.data.commentsWithReplies || []
-  const totalComments = data?.payload?.data.totalComments || 0
+  const { data: data1, isFetching } = useBlogCommentsQuery({ id, page_index: 1, page_size: 2 })
+  const comments = data1?.payload?.data.commentsWithReplies || []
+  const totalComments = data1?.payload?.data.totalComments || 0
   const commentMutation = useBlogCommentCreateMutation()
   const { data: data2 } = useBlogReactQuery({ id })
   const totalReacts = data2?.payload?.data.totalReacts || 0
@@ -111,12 +112,15 @@ function BlogComments({ id }: { id: string }) {
     <section>
       <div className='flex justify-between items-center border-t-2 border-b-2 py-2 mt-8'>
         <div className='flex justify-start items-center gap-4'>
-          <div className='flex items-center gap-2 cursor-pointer text-secondary'>
+          <div className='flex items-center gap-2 cursor-pointer text-secondary hover:underline' onClick={handleReact}>
             {isReacted ? <Heart className='w-6 h-6 fill-secondary' /> : <Heart className='w-6 h-6' />}
             {totalReacts !== 0 && <span className='text-lg'>{totalReacts}</span>}
           </div>
 
-          <div className='flex items-center gap-2 cursor-pointer select-none text-primary' onClick={handleOpenModal}>
+          <div
+            className='flex items-center gap-2 cursor-pointer select-none text-primary hover:underline'
+            onClick={handleOpenModal}
+          >
             <MessageCircle className='w-6 h-6' />
             <span className='text-lg'>
               {totalComments} {totalComments > 1 ? 'bình luận' : 'bình luận'}

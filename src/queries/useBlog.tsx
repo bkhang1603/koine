@@ -41,7 +41,7 @@ export const useBlogReactUpdateMutation = () => {
 
   return useMutation({
     mutationFn: blogApiRequest.updateReactComment,
-    onSettled: () => {
+    onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: ['reactBlog']
       })

@@ -5,6 +5,10 @@ import { Clock, BookOpen } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import Image from 'next/image'
 import images from '@/assets/images'
+import { handleErrorApi } from '@/lib/utils'
+import courseApiRequest from '@/apiRequests/course'
+import { CourseResType } from '@/schemaValidations/course.schema'
+import BreadCrumbCustom from '@/components/breadcrumb-custom'
 
 const data = {
   bannerImage: images.courseSkinCareBanner,
@@ -36,12 +40,25 @@ const data = {
   ]
 }
 
-export default function CourseDetail() {
+export default async function CourseDetail({ params: { id } }: { params: { id: string } }) {
+  let courseData: CourseResType['data'] | null = null
+
+  try {
+    const { payload } = await courseApiRequest.getCourse(id)
+    courseData = payload.data
+  } catch (error) {
+    handleErrorApi({ error })
+  }
+
+  if (!courseData) {
+    return <p>Không tìm thấy khóa học</p>
+  }
+
   return (
     <div className='container'>
-      <div className='h-80 rounded-lg overflow-hidden mb-6 shadow-xl'>
+      <div className='h-80 rounded-lg overflow-hidden shadow-md'>
         <Image
-          src={data.bannerImage}
+          src={courseData.imageBanner}
           alt='Course banner'
           width={2000}
           height={2000}
@@ -50,17 +67,19 @@ export default function CourseDetail() {
         />
       </div>
 
+      <BreadCrumbCustom className='my-6' />
+
       <div className='grid gap-6 md:grid-cols-3'>
         <div className='md:col-span-2 space-y-6'>
           <Card>
             <CardHeader>
-              <CardTitle className='text-xl'>{data.title}</CardTitle>
+              <CardTitle className='text-xl'>{courseData.title}</CardTitle>
             </CardHeader>
             <CardContent>
-              <p className='text-sm text-gray-500 dark:text-gray-400 mb-4'>{data.description}</p>
+              <p className='text-sm text-gray-500 dark:text-gray-400 mb-4'>{courseData.description}</p>
               <div className='flex flex-wrap gap-2 mb-4'>
                 {data.tags.map((tag, index) => (
-                  <Badge key={index} variant='secondary'>
+                  <Badge key={index} variant='default'>
                     {tag}
                   </Badge>
                 ))}
@@ -111,10 +130,12 @@ export default function CourseDetail() {
         <div className='space-y-6'>
           <Card className='sticky top-28'>
             <CardHeader>
-              <CardTitle className='text-3xl font-bold'>{data.price === 0 ? 'Miễn phí' : `$${data.price}`}</CardTitle>
+              <CardTitle className='text-3xl font-bold'>
+                {courseData.price === 0 ? 'Miễn phí' : `$${data.price}`}
+              </CardTitle>
             </CardHeader>
             <CardContent>
-              <Button variant={'secondary'} className='w-full mb-4' size='lg'>
+              <Button variant={'default'} className='w-full mb-4' size='lg'>
                 Đăng ký ngay
               </Button>
 
