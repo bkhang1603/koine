@@ -6,6 +6,7 @@ import { Toaster } from '@/components/ui/toaster'
 import AppProvider from '@/components/app-provider'
 import { Roboto } from 'next/font/google'
 import envConfig from '@/config'
+import { Analytics } from '@vercel/analytics/react'
 
 const roboto = Roboto({
   weight: ['100', '300', '400', '500', '700'],
@@ -82,6 +83,7 @@ export default async function RootLayout({
           <ThemeProvider attribute='class' defaultTheme='system' enableSystem disableTransitionOnChange>
             {children}
             <Toaster />
+            <Analytics />
           </ThemeProvider>
         </AppProvider>
       </body>
