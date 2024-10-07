@@ -7,6 +7,7 @@ import AppProvider from '@/components/app-provider'
 import { Roboto } from 'next/font/google'
 import envConfig from '@/config'
 import { Analytics } from '@vercel/analytics/react'
+import { SpeedInsights } from '@vercel/speed-insights/next'
 
 const roboto = Roboto({
   weight: ['100', '300', '400', '500', '700'],
@@ -84,6 +85,7 @@ export default async function RootLayout({
             {children}
             <Toaster />
             <Analytics />
+            <SpeedInsights />
           </ThemeProvider>
         </AppProvider>
       </body>
