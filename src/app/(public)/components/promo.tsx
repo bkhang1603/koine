@@ -56,8 +56,7 @@ function Promo() {
           alt='pink stars'
           width={200}
           height={200}
-          className='hidden lg:block absolute left-0 bottom-0
-          translate-x-[-50%] translate-y-[50%] h-52 w-52'
+          className='hidden lg:block absolute left-12 bottom-4 translate-x-[-50%] translate-y-[50%] h-32 w-auto'
         />
       </div>
     </section>

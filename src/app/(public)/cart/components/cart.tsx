@@ -76,7 +76,7 @@ export default function ModernShoppingCart() {
   }
 
   return (
-    <section>
+    <section className='mb-40'>
       <h1 className='text-2xl font-bold my-4'>Giỏ hàng của bạn</h1>
       <div className='flex flex-col lg:flex-row gap-8'>
         <div className='lg:w-2/3'>

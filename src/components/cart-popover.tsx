@@ -1,4 +1,4 @@
-import { X } from 'lucide-react'
+import { ShoppingBag, X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Separator } from '@/components/ui/separator'
@@ -11,6 +11,8 @@ export default function CartPopover({ data }: { data: CartDetailResType['data'] 
   const deleteMutation = useCartDetailDeleteMutation()
 
   const handleDelete = async (id: string) => {
+    if (deleteMutation.isPending) return
+
     try {
       await deleteMutation.mutateAsync({ id })
     } catch (error) {
@@ -21,7 +23,14 @@ export default function CartPopover({ data }: { data: CartDetailResType['data'] 
   return (
     <div className='py-2'>
       <h3 className='font-medium text-lg mb-4'>Giỏ hàng của bạn</h3>
-      <ScrollArea className='h-[300px] pr-2'>
+      <ScrollArea className='min-h-[150px] max-h-[300px] pr-2'>
+        {data['cartDetails'].length === 0 && (
+          <div className='flex flex-col gap-2 items-center justify-center h-[150px]'>
+            <ShoppingBag className='w-16 h-16 text-gray-300' />
+            <p className='text-gray-500'>Giỏ hàng trống</p>
+          </div>
+        )}
+
         {data['cartDetails'].map((data) => (
           <div key={data.id} className='flex items-center space-x-4 mb-4 last:mb-0'>
             {data.product && data.product.imageUrls && (
