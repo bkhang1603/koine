@@ -1,18 +1,22 @@
 'use client'
 
+import { useAppStore } from '@/components/app-provider'
 import { Button } from '@/components/ui/button'
 import { Form, FormControl, FormField, FormItem } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { toast } from '@/components/ui/use-toast'
+import configRoute from '@/config/route'
 import { useCartDetailCreateMutation } from '@/queries/useCartDetail'
 import { AddCartDetailReq, AddCartDetailReqType } from '@/schemaValidations/cart-detail.schema'
 import { ProductResType } from '@/schemaValidations/product.schema'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Minus, Plus } from 'lucide-react'
+import Link from 'next/link'
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 
 function AddToCartButton({ product }: { product: ProductResType['data'] }) {
+  const role = useAppStore((state) => state.role)
   const addToCartMutation = useCartDetailCreateMutation()
   const [quantity, setQuantity] = useState(1)
   const form = useForm<AddCartDetailReqType>({
@@ -110,9 +114,19 @@ function AddToCartButton({ product }: { product: ProductResType['data'] }) {
         />
 
         <div className='flex justify-between gap-4'>
-          <Button variant={'outlineSecondary'} className='w-full mb-6' type='submit'>
-            Thêm vào giỏ hàng
-          </Button>
+          {!role && (
+            <Link href={configRoute.login}>
+              <Button type='button' variant={'outlineSecondary'} className='w-full mb-6'>
+                Thêm vào giỏ hàng
+              </Button>
+            </Link>
+          )}
+
+          {role && (
+            <Button variant={'outlineSecondary'} className='w-full mb-6' type='submit'>
+              Thêm vào giỏ hàng
+            </Button>
+          )}
 
           <Button type='button' variant={'secondary'} className='w-full mb-6'>
             Mua ngay
