@@ -34,6 +34,19 @@ export const useCartDetailUpdateMutation = () => {
   })
 }
 
+export const useCartDetailDeleteListMutation = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: cartDetailApiRequest.deleteCartList,
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ['cartDetails']
+      })
+    }
+  })
+}
+
 export const useCartDetailDeleteMutation = () => {
   const queryClient = useQueryClient()
 

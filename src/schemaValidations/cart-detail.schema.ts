@@ -65,8 +65,16 @@ export const UpdateCartDetailReq = z
   })
   .strict()
 
+export const UpdateCartDetailListReq = z
+  .object({
+    cartDetailIds: z.array(z.string())
+  })
+  .strict()
+
 export type CartDetailResType = z.infer<typeof CartDetailRes>
 
 export type AddCartDetailReqType = z.infer<typeof AddCartDetailReq>
 
 export type UpdateCartDetailReqType = z.infer<typeof UpdateCartDetailReq>
+
+export type UpdateCartDetailListReqType = z.infer<typeof UpdateCartDetailListReq>
