@@ -1,7 +1,7 @@
 import courseApiRequest from '@/apiRequests/course'
 import { Separator } from '@/components/ui/separator'
 import { CoursesResType } from '@/schemaValidations/course.schema'
-import { AlarmClock, Sparkle, Users } from 'lucide-react'
+import { AlarmClock, Star, Users } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
 
@@ -52,7 +52,7 @@ async function CourseList() {
 
                   <div className='flex justify-between items-center text-primary/80 font-medium'>
                     <div className='flex justify-center items-center gap-1'>
-                      <Sparkle className='w-4 h-4' />
+                      <Star className='w-4 h-4' />
                       <p className='text-sm'>{course.aveRating === 0 ? 5 : course.aveRating}</p>
                     </div>
 

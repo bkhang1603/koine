@@ -19,3 +19,11 @@ export const Gender = {
 } as const
 
 export const GenderValues = [Gender.Male, Gender.Female, Gender.Other] as const
+
+export const TypeResource = {
+  Video: 'VIDEO',
+  Document: 'DOCUMENT',
+  Both: 'BOTH'
+} as const
+
+export const TypeResourceValues = [TypeResource.Video, TypeResource.Document, TypeResource.Both] as const

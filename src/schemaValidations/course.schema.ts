@@ -1,3 +1,4 @@
+import { TypeResourceValues } from '@/constants/type'
 import z from 'zod'
 
 export const CourseData = z
@@ -25,6 +26,25 @@ export const CourseData = z
       z.object({
         id: z.string(),
         name: z.string()
+      })
+    ),
+    lessons: z.array(
+      z.object({
+        id: z.string(),
+        title: z.string(),
+        description: z.string(),
+        sequence: z.number(),
+        courseResources: z.array(
+          z.object({
+            id: z.string(),
+            title: z.string(),
+            description: z.string(),
+            content: z.string().nullable(),
+            type: z.enum(TypeResourceValues),
+            videoUrl: z.string().nullable(),
+            sequence: z.number()
+          })
+        )
       })
     ),
     createdAt: z.string(),

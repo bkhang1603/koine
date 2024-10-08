@@ -14,6 +14,7 @@ const buttonVariants = cva(
         outline: 'border border-input bg-background shadow-sm hover:bg-accent hover:text-accent-foreground',
         secondary: 'bg-secondary text-secondary-foreground shadow-sm hover:bg-secondary/90',
         ghost: 'hover:bg-accent hover:text-accent-foreground',
+        ghostBlur: 'hover:bg-gray-200 text-gray-500',
         link: 'text-primary underline-offset-4 hover:underline',
         custom: 'focus-visible:ring-0 bg-gray-100 hover:bg-gray-200',
         customOutline: 'border-2 border-input bg-background shadow-sm hover:bg-accent hover:text-accent-foreground',
@@ -21,7 +22,8 @@ const buttonVariants = cva(
         fourth: 'bg-fourth text-fourth-foreground shadow-sm hover:bg-fourth/90',
         fifth: 'bg-fifth text-fifth-foreground shadow-sm hover:bg-fifth/90',
         outlineSecondary: 'border-2 border-secondary text-secondary bg-fourth shadow-sm hover:bg-secondary/15',
-        icon: 'hover:bg-slate-200/40 rounded-full'
+        icon: 'hover:bg-slate-200/40 rounded-full',
+        linkNoUnderline: 'text-primary underline-offset-4 hover:bg-primary/10'
       },
       size: {
         default: 'h-9 px-4 py-2',

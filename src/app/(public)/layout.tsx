@@ -3,11 +3,11 @@ import Navbar from '@/components/layout/navbar'
 
 function PublicLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div>
+    <main>
       <Navbar />
       {children}
       <Footer />
-    </div>
+    </main>
   )
 }
 
