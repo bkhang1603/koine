@@ -12,6 +12,7 @@ export const CourseData = z
     imageBanner: z.string(),
     totalOfStudent: z.number(),
     aveRating: z.number(),
+    durations: z.number(),
     creator: z.object({
       id: z.string(),
       name: z.string()

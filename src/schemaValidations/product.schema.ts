@@ -15,10 +15,12 @@ export const ProductData = z
       })
     ),
     categoryId: z.string(),
-    category: z.object({
-      id: z.number(),
-      name: z.string()
-    }),
+    categories: z.array(
+      z.object({
+        id: z.number(),
+        name: z.string()
+      })
+    ),
     createdAt: z.string(),
     updatedAt: z.string(),
     deletedAt: z.string().nullable()

@@ -19,6 +19,10 @@ async function List({ searchParams }: { searchParams: searchParams | undefined }
     console.log(error)
   }
 
+  const changeCategoriesToString = (categories: string[]) => {
+    return categories.join(', ')
+  }
+
   return (
     <div className='col-span-3'>
       <div className='flex justify-between items-center gap-4'>
@@ -67,7 +71,9 @@ async function List({ searchParams }: { searchParams: searchParams | undefined }
                 </div>
 
                 <div className='p-2'>
-                  <p className='text-xs text-gray-500'>{item.category.name}</p>
+                  <p className='text-xs text-gray-500'>
+                    {changeCategoriesToString(item.categories.map((category) => category.name))}
+                  </p>
                   <h3 className='text-lg font-semibold line-clamp-1'>{item.name}</h3>
 
                   <div className='flex items-center gap-2 mt-2'>

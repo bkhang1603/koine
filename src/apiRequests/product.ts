@@ -6,7 +6,10 @@ const productApiRequest = {
     http.get<ProductsResType>(`/products?page_index=${page_index}&keyword=${search}`, {
       cache: 'no-cache'
     }),
-  getProduct: (id: string) => http.get<ProductResType>(`/products/${id}`),
+  getProduct: (id: string) =>
+    http.get<ProductResType>(`/products/${id}`, {
+      cache: 'no-cache'
+    }),
   createProduct: (data: any) => http.post('/products', data),
   updateProduct: (id: string, data: any) => http.put(`/products/${id}`, data),
   deleteProduct: (id: string) => http.delete(`/products/${id}`)

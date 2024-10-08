@@ -20,6 +20,10 @@ export default async function ProductDetail({ params: { id } }: { params: { id: 
     return <div>Product not found</div>
   }
 
+  const changeCategoriesToString = (categories: string[]) => {
+    return categories.join(', ')
+  }
+
   return (
     <section className='container py-8'>
       <BreadCrumbCustom />
@@ -31,7 +35,9 @@ export default async function ProductDetail({ params: { id } }: { params: { id: 
 
         {/* Product info */}
         <div>
-          <p className='text-gray-500 mb-2'>{product.category.name}</p>
+          <p className='text-gray-500 mb-2'>
+            {product.categories && changeCategoriesToString(product.categories.map((category) => category.name))}
+          </p>
           <h2 className='text-4xl mb-4'>{product.name}</h2>
           <p className='text-2xl mb-4'>{product.price.toLocaleString()}đ</p>
 
@@ -50,7 +56,10 @@ export default async function ProductDetail({ params: { id } }: { params: { id: 
 
           <div className='space-y-2 text-sm'>
             <p>Mã số sản phẩm: {product.id}</p>
-            <p>Thể loại: {product.category.name}</p>
+            <p>
+              Thể loại:{' '}
+              {product.categories && changeCategoriesToString(product.categories.map((category) => category.name))}
+            </p>
           </div>
         </div>
       </div>
