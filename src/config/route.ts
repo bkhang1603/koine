@@ -10,6 +10,7 @@ const configRoute = {
   register: '/register',
   forgotPassword: '/forgot-password',
   setting: '/setting',
+  profile: '/profile',
   contentCreator: {
     dashboard: '/content-creator/dashboard',
     blog: '/content-creator/blog'

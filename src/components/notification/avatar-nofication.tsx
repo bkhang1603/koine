@@ -37,6 +37,7 @@ function AvatarNotification() {
   const setRole = useAppStore((state) => state.setRole)
   const setAvatar = useAppStore((state) => state.setAvatar)
   const setUsername = useAppStore((state) => state.setUsername)
+  const setUser = useAppStore((state) => state.setUser)
 
   // Tôi muốn chỉ gọi api account profile khi role có giá trị
   const { data } = useAccountProfile({
@@ -48,8 +49,9 @@ function AvatarNotification() {
     if (account) {
       setAvatar(account.avatarUrl || '')
       setUsername(account.username || '')
+      setUser(account)
     }
-  }, [account, setAvatar, setUsername])
+  }, [account, setAvatar, setUsername, setUser])
 
   const logoutMutation = useLogoutMutation()
   const router = useRouter()
@@ -60,6 +62,7 @@ function AvatarNotification() {
       setRole()
       setAvatar()
       setUsername()
+      setUser()
       router.push(configRoute.home)
       router.refresh()
     } catch (error: any) {
@@ -79,7 +82,10 @@ function AvatarNotification() {
       </PopoverTrigger>
       <PopoverContent align='end'>
         <div className='border border-gray-300 rounded-lg overflow-hidden shadow-lg p-2 space-y-2'>
-          <div className='flex items-center gap-2 hover:bg-gray-100 px-3 py-3 cursor-pointer rounded-lg'>
+          <Link
+            href={configRoute.profile}
+            className='flex items-center gap-2 hover:bg-gray-100 px-3 py-3 cursor-pointer rounded-lg'
+          >
             <Avatar className='cursor-pointer w-9 h-9'>
               <AvatarImage src={account?.avatarUrl} />
               <AvatarFallback>
@@ -88,7 +94,7 @@ function AvatarNotification() {
             </Avatar>
 
             <p className='font-medium text-base'>{account?.username || account?.email}</p>
-          </div>
+          </Link>
           <Separator />
           <Button asChild variant={'custom'} className='w-full'>
             <Link href={configRoute.parent.dashboard}>Xem các tài khoản quản lý</Link>

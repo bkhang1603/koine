@@ -12,27 +12,31 @@ const sharingData = [
     id: 1,
     image: images.teamVy,
     name: 'Nguyễn Phương',
-    content: 'Tôi đã học được rất nhiều điều mới mẻ, những kiến thức mà trước đây tôi chưa từng biết.'
+    content:
+      'Chỉ muốn chia sẻ một chút về khóa học giới tính Koine! Con mình đã có một trải nghiệm tuyệt vời, học hỏi được nhiều điều hay ho và bổ ích. Nội dung rất gần gũi và dễ hiểu. Cảm ơn Koine đã mang đến một khóa học thú vị như vậy! Hy vọng sẽ có nhiều điều thú vị trong tương lai nhé! 🌟❤️'
   },
   {
     id: 2,
     image: images.teamHuyen,
     name: 'Minh Hằng',
-    content: 'Trải nghiệm cùng với Koine thật sự tuyệt vời. Tôi rất hài lòng với khóa học này.',
+    content:
+      'Wow, vừa kết thúc khóa học giới tính Koine và thật sự rất ấn tượng! Con mình đã học được nhiều điều bổ ích và thú vị. Nội dung dễ hiểu, gần gũi, giúp bé tự tin hơn khi nói về những vấn đề này.',
     class: 'hidden sm:flex'
   },
   {
     id: 3,
     image: images.teamDao,
     name: 'Mai Anh',
-    content: 'Đây là một khóa học rất tuyệt vời, tôi chưa từng thấy khóa học nào tốt như vậy trước đây.',
+    content:
+      'Vừa xong khóa học giới tính Koine và mình thật sự rất hài lòng! Con mình không chỉ học được kiến thức mới mà còn trở nên tự tin hơn khi nói về giới tính. ',
     class: 'hidden lg:flex'
   },
   {
     id: 4,
     image: images.teamKhoa,
     name: 'Ngọc Hằng',
-    content: 'Đây là lần đầu tiên tôi thấy có một khóa học phù hợp với bé nhỏ của tôi như vậy.',
+    content:
+      'Vừa kết thúc khóa học giới tính Koine và có một vài điều muốn chia sẻ! Mặc dù con mình đã học được một số kiến thức bổ ích, nhưng mình cảm thấy một số phần nội dung có thể sâu hơn nữa. Hy vọng trong các khóa tới, chương trình sẽ được nâng cấp để phong phú hơn. Cảm ơn ban tổ chức đã tạo ra không gian an toàn cho các bạn trẻ! Mong chờ những cải thiện trong tương lai! 🌱😊',
     class: 'hidden xl:flex'
   }
 ]
@@ -78,9 +82,9 @@ function Sharing() {
                 priority
                 className='rounded-full w-44 h-44 sm:w-60 sm:h-60 object-cover'
               />
-              <div className='pt-6'>
+              <div className='py-6'>
                 <h3>{item.name}</h3>
-                <p className='pb-6 pt-2 px-2 text-sm text-gray-500'>{item.content}</p>
+                <p className='pt-2 px-3 text-sm text-gray-500 line-clamp-3'>{item.content}</p>
               </div>
 
               <Image

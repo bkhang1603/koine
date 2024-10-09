@@ -48,6 +48,8 @@ export class EntityError extends HttpError {
 
 let clientLogoutRequest: null | Promise<any> = null
 const isClient = typeof window !== 'undefined'
+let refreshTokenRequest: null | Promise<any> = null
+
 const request = async <Response>(
   method: 'GET' | 'POST' | 'PUT' | 'DELETE',
   url: string,
@@ -146,12 +148,26 @@ const request = async <Response>(
       setAccessTokenToLocalStorage(accessToken)
       setRefreshTokenToLocalStorage(refreshToken)
     } else if ('api/auth/token' === normalizeUrl) {
-      const { accessToken, refreshToken } = payload as {
-        accessToken: string
-        refreshToken: string
+      // const { accessToken, refreshToken } = payload as {
+      //   accessToken: string
+      //   refreshToken: string
+      // }
+      // setAccessTokenToLocalStorage(accessToken)
+      // setRefreshTokenToLocalStorage(refreshToken)
+      if (!refreshTokenRequest) {
+        refreshTokenRequest = (async () => {
+          const { accessToken, refreshToken } = payload as {
+            accessToken: string
+            refreshToken: string
+          }
+          setAccessTokenToLocalStorage(accessToken)
+          setRefreshTokenToLocalStorage(refreshToken)
+          refreshTokenRequest = null
+        })()
+        await refreshTokenRequest
+      } else {
+        await refreshTokenRequest
       }
-      setAccessTokenToLocalStorage(accessToken)
-      setRefreshTokenToLocalStorage(refreshToken)
     } else if (['api/auth/logout'].includes(normalizeUrl)) {
       removeTokensFromLocalStorage()
     }

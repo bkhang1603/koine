@@ -10,6 +10,7 @@ import { create } from 'zustand'
 import RefreshToken from '@/components/refresh-token'
 import { LoginResType } from '@/schemaValidations/auth.schema'
 import { useAccountProfile } from '@/queries/useAccount'
+import { AccountResType } from '@/schemaValidations/account.schema'
 
 // Default
 // staleTime: 0
@@ -42,6 +43,8 @@ type AppStoreType = {
   setAvatar: (avatar?: string | undefined) => void
   username: string | undefined
   setUsername: (username?: string | undefined) => void
+  user: AccountResType['data'] | undefined
+  setUser: (user?: AccountResType['data'] | undefined) => void
 }
 
 export const useAppStore = create<AppStoreType>((set) => ({
@@ -63,7 +66,9 @@ export const useAppStore = create<AppStoreType>((set) => ({
   avatar: undefined,
   setAvatar: (avatar?: string | undefined) => set({ avatar }),
   username: undefined,
-  setUsername: (username?: string | undefined) => set({ username })
+  setUsername: (username?: string | undefined) => set({ username }),
+  user: undefined,
+  setUser: (user?: AccountResType['data'] | undefined) => set({ user })
 }))
 
 // export const useAppContext = () => {

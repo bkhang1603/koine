@@ -59,6 +59,7 @@ export const removeTokensFromLocalStorage = () => {
   isBrowser && localStorage.removeItem('accessToken')
   isBrowser && localStorage.removeItem('refreshToken')
 }
+
 export const checkAndRefreshToken = async (param?: {
   onError?: () => void
   onSuccess?: () => void
@@ -89,6 +90,7 @@ export const checkAndRefreshToken = async (param?: {
     // Gọi API refresh token
     try {
       const res = await authApiRequest.refreshToken()
+      console.log('Refresh token success', res)
       setAccessTokenToLocalStorage(res.payload.data.accessToken)
       setRefreshTokenToLocalStorage(res.payload.data.refreshToken)
       param?.onSuccess && param.onSuccess()

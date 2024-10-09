@@ -58,7 +58,7 @@ async function CourseList() {
 
                     <div className='flex justify-center items-center gap-1'>
                       <AlarmClock className='w-4 h-4' />
-                      <p className='text-sm'>1h</p>
+                      <p className='text-sm'>{course.durations}</p>
                     </div>
 
                     <div className='flex justify-center items-center gap-1'>

@@ -17,4 +17,21 @@ export const accountRes = z.object({
   message: z.string()
 })
 
+export const courseByAccountRes = z.object({
+  data: z.array(
+    z.object({
+      id: z.number(),
+      course: z.object({
+        id: z.number(),
+        title: z.string(),
+        imageUrl: z.string(),
+        description: z.string()
+      })
+    })
+  ),
+  message: z.string()
+})
+
 export type AccountResType = z.TypeOf<typeof accountRes>
+
+export type CourseByAccountResType = z.TypeOf<typeof courseByAccountRes>

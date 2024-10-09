@@ -8,3 +8,11 @@ export const useAccountProfile = ({ enabled }: { enabled?: boolean }) => {
     enabled
   })
 }
+
+export const useCourseByAccount = ({ enabled }: { enabled?: boolean }) => {
+  return useQuery({
+    queryKey: ['course-by-account'],
+    queryFn: accountApiRequest.getCourseAccount,
+    enabled
+  })
+}
