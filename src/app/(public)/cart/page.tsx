@@ -1,8 +1,7 @@
-import TikiShoppingCart from '@/app/(public)/cart/components/cart-test'
-import React from 'react'
+import Cart from '@/app/(public)/cart/components/cart'
 
 function CartPage() {
-  return <TikiShoppingCart />
+  return <Cart />
 }
 
 export default CartPage
