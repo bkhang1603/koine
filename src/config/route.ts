@@ -19,7 +19,8 @@ const configRoute = {
     dashboard: '/parent',
     child: '/parent/child',
     bookmark: '/parent/bookmark'
-  }
+  },
+  learn: '/learn'
 }
 
 export default configRoute

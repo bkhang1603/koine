@@ -5,12 +5,14 @@ import { Button } from '@/components/ui/button'
 import { toast } from '@/components/ui/use-toast'
 import configRoute from '@/config/route'
 import { handleErrorApi } from '@/lib/utils'
-import { useEnrollCourseMutation } from '@/queries/useCourse'
+import { useEnrollCourseMutation, useGetUserCoursesQuery } from '@/queries/useCourse'
 import Link from 'next/link'
 
 function EnrollButton({ id }: { id: string }) {
   const role = useAppStore((state) => state.role)
   const enrollMutation = useEnrollCourseMutation()
+  const { data } = useGetUserCoursesQuery()
+  const isEnrolled = data?.payload.data.some((course) => course.courseId === id)
 
   const handleEnroll = async () => {
     if (enrollMutation.isPending) return
@@ -29,7 +31,7 @@ function EnrollButton({ id }: { id: string }) {
 
   return (
     <>
-      {role && (
+      {role && !isEnrolled && (
         <Button onClick={handleEnroll} variant={'default'} className='w-full mb-4' size='lg'>
           Đăng ký ngay
         </Button>
@@ -38,6 +40,13 @@ function EnrollButton({ id }: { id: string }) {
         <Link href={configRoute.login}>
           <Button variant={'default'} className='w-full mb-4' size='lg'>
             Đăng ký ngay
+          </Button>
+        </Link>
+      )}
+      {isEnrolled && (
+        <Link href={`${configRoute.learn}/${id}`}>
+          <Button variant={'default'} className='w-full mb-4' size='lg'>
+            Tham gia khóa học
           </Button>
         </Link>
       )}
