@@ -129,7 +129,7 @@ function AddToCartButton({ product }: { product: ProductResType['data'] }) {
           )}
 
           {!role && (
-            <Link href={configRoute.home} className='w-full mb-6'>
+            <Link href={configRoute.login} className='w-full mb-6'>
               <Button type='button' variant={'secondary'} className='w-full'>
                 Mua ngay
               </Button>

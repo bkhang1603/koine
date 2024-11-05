@@ -3,14 +3,20 @@
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { useEffect, useRef } from 'react'
-import { decodeToken, getAccessTokenFromLocalStorage, removeTokensFromLocalStorage } from '@/lib/utils'
+import {
+  decodeToken,
+  getAccessTokenFromLocalStorage,
+  removeTokensFromLocalStorage,
+  setCheckoutDataToLocalStorage,
+  getCheckoutDataFromLocalStorage,
+  removeCheckoutDataFromLocalStorage
+} from '@/lib/utils'
 import { RoleType } from '@/types/jwt.types'
 import type { Socket } from 'socket.io-client'
 import { create } from 'zustand'
 import RefreshToken from '@/components/refresh-token'
-import { LoginResType } from '@/schemaValidations/auth.schema'
-import { useAccountProfile } from '@/queries/useAccount'
 import { AccountResType } from '@/schemaValidations/account.schema'
+import { CartDetailResType } from '@/schemaValidations/cart-detail.schema'
 
 // Default
 // staleTime: 0
@@ -45,6 +51,8 @@ type AppStoreType = {
   setUsername: (username?: string | undefined) => void
   user: AccountResType['data'] | undefined
   setUser: (user?: AccountResType['data'] | undefined) => void
+  checkoutData: CartDetailResType['data'] | undefined
+  setCheckoutData: (data?: CartDetailResType['data'] | undefined) => void
 }
 
 export const useAppStore = create<AppStoreType>((set) => ({
@@ -68,7 +76,17 @@ export const useAppStore = create<AppStoreType>((set) => ({
   username: undefined,
   setUsername: (username?: string | undefined) => set({ username }),
   user: undefined,
-  setUser: (user?: AccountResType['data'] | undefined) => set({ user })
+  setUser: (user?: AccountResType['data'] | undefined) => set({ user }),
+  checkoutData: undefined as CartDetailResType['data'] | undefined,
+  setCheckoutData: (data?: CartDetailResType['data'] | undefined) => {
+    set({ checkoutData: data })
+
+    if (data) {
+      setCheckoutDataToLocalStorage(data)
+    } else {
+      removeCheckoutDataFromLocalStorage()
+    }
+  }
 }))
 
 // export const useAppContext = () => {
@@ -76,6 +94,7 @@ export const useAppStore = create<AppStoreType>((set) => ({
 // }
 export default function AppProvider({ children }: { children: React.ReactNode }) {
   const setRole = useAppStore((state) => state.setRole)
+  const setCheckoutData = useAppStore((state) => state.setCheckoutData)
 
   // const [socket, setSocket] = useState<Socket | undefined>()
   // const [role, setRoleState] = useState<RoleType | undefined>()
@@ -84,13 +103,27 @@ export default function AppProvider({ children }: { children: React.ReactNode })
   useEffect(() => {
     if (count.current === 0) {
       const accessToken = getAccessTokenFromLocalStorage()
+
       if (accessToken) {
         const role = decodeToken(accessToken).role
         setRole(role)
       }
+
+      const checkoutData = getCheckoutDataFromLocalStorage()
+      if (checkoutData) {
+        setCheckoutData(checkoutData)
+      }
+
       count.current++
     }
-  }, [setRole])
+  }, [setRole, setCheckoutData])
+
+  // useEffect(() => {
+  //   const checkoutData = getCheckoutDataFromLocalStorage()
+  //   if (checkoutData) {
+  //     setCheckoutData(checkoutData)
+  //   }
+  // }, [setCheckoutData])
 
   // const disconnectSocket = useCallback(() => {
   //   socket?.disconnect()

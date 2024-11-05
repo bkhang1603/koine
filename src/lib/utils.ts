@@ -172,3 +172,16 @@ export const translatePathname = (pathname: string) => {
       return 'Chi tiết'
   }
 }
+
+export const setCheckoutDataToLocalStorage = (data: any) => {
+  isBrowser && localStorage.setItem('checkoutData', JSON.stringify(data))
+}
+
+export const getCheckoutDataFromLocalStorage = () => {
+  const data = isBrowser && localStorage.getItem('checkoutData')
+  return data ? JSON.parse(data) : null
+}
+
+export const removeCheckoutDataFromLocalStorage = () => {
+  isBrowser && localStorage.removeItem('checkoutData')
+}

@@ -8,6 +8,7 @@ import courseApiRequest from '@/apiRequests/course'
 import { CourseResType } from '@/schemaValidations/course.schema'
 import BreadCrumbCustom from '@/components/breadcrumb-custom'
 import EnrollButton from '@/app/(public)/course/[id]/components/enroll-button'
+import CourseButton from '@/app/(public)/course/[id]/components/course-button'
 
 export default async function CourseDetail({ params: { id } }: { params: { id: string } }) {
   let courseData: CourseResType['data'] | null = null
@@ -114,11 +115,13 @@ export default async function CourseDetail({ params: { id } }: { params: { id: s
           <Card className='sticky top-28'>
             <CardHeader>
               <CardTitle className='text-2xl font-semibold'>
-                {courseData.price === 0 ? 'Miễn phí' : `$${courseData.price}`}
+                {courseData.price === 0 ? 'Miễn phí' : `${courseData.price.toLocaleString()}đ`}
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <EnrollButton id={id} />
+              {courseData.price === 0 && <EnrollButton id={id} />}
+
+              {courseData.price !== 0 && <CourseButton id={id} />}
 
               <p className='text-sm text-gray-500 dark:text-gray-400 mb-4'>
                 Trải nghiệm miễn phí khóa học chăm sóc da cơ bản.

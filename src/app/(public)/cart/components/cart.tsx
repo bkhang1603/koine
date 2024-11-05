@@ -25,6 +25,8 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger
 } from '@/components/ui/alert-dialog'
+import { useAppStore } from '@/components/app-provider'
+import { useRouter } from 'next/navigation'
 
 export default function Cart() {
   const { data } = useCartDetailQuery()
@@ -36,19 +38,33 @@ export default function Cart() {
   const [quantities, setQuantities] = useState<{ [key: string]: number }>({})
   const debounceTimeout = useRef<{ [key: string]: NodeJS.Timeout }>({})
 
+  const router = useRouter()
+
   useEffect(() => {
     if (data) {
       const inStockItems = data.payload.data.cartDetails
-        .filter((item) => item.product?.stockQuantity! > 0)
+        .filter((item) => item.product?.stockQuantity! > 0 || item.course !== null)
         .map((item) => item.id)
       setSelectedItems(new Set(inStockItems))
     }
   }, [data])
 
+  // const toggleSelectAll = useCallback(() => {
+  //   if (!data) return
+  //   const inStockItems = data.payload.data.cartDetails
+  //     .filter((item) => item.product?.stockQuantity! > 0)
+  //     .map((item) => item.id)
+  //   if (selectedItems.size === inStockItems.length) {
+  //     setSelectedItems(new Set())
+  //   } else {
+  //     setSelectedItems(new Set(inStockItems))
+  //   }
+  // }, [data, selectedItems])
+
   const toggleSelectAll = useCallback(() => {
     if (!data) return
     const inStockItems = data.payload.data.cartDetails
-      .filter((item) => item.product?.stockQuantity! > 0)
+      .filter((item) => item.product?.stockQuantity! > 0 || item.course !== null)
       .map((item) => item.id)
     if (selectedItems.size === inStockItems.length) {
       setSelectedItems(new Set())
@@ -148,6 +164,18 @@ export default function Cart() {
 
   const cartDetails = data?.payload.data.cartDetails || []
 
+  const setCheckoutData = useAppStore((state) => state.setCheckoutData)
+
+  const handleCheckout = () => {
+    const selectedItemsData = cartDetails.filter((item) => selectedItems.has(item.id))
+    setCheckoutData({
+      cartDetails: selectedItemsData,
+      totalAmount: selectedItemsData.reduce((sum, item) => sum + item.totalPrice, 0)
+    })
+
+    router.push('/checkout')
+  }
+
   return (
     <div className='pt-4 pb-40'>
       <h1 className='text-2xl font-bold mb-4'>GIỎ HÀNG</h1>
@@ -160,7 +188,8 @@ export default function Cart() {
                   <Checkbox
                     id='select-all'
                     checked={
-                      selectedItems.size === cartDetails.filter((item) => item.product?.stockQuantity! > 0).length
+                      selectedItems.size ===
+                      cartDetails.filter((item) => item.product?.stockQuantity! > 0 || item.course !== null).length
                     }
                     onCheckedChange={toggleSelectAll}
                   />
@@ -200,72 +229,116 @@ export default function Cart() {
               </div>
               {cartDetails.map((item, index) => (
                 <div key={item.id} className={`p-4 ${index !== cartDetails.length - 1 ? 'border-b' : ''}`}>
-                  <div className='flex items-start'>
-                    <div className='flex w-1/2'>
-                      <div className='flex items-center'>
-                        <Checkbox
-                          checked={selectedItems.has(item.id)}
-                          onCheckedChange={() => toggleSelectItem(item.id)}
-                          disabled={item.product?.stockQuantity === 0}
-                        />
-                        <Image
-                          src={item.product?.imageUrls[0].imageUrl || '/placeholder.svg'}
-                          alt={item.product?.name || 'Product image'}
-                          width={500}
-                          height={500}
-                          className='ml-4 w-20 h-20 object-cover rounded-md'
-                        />
-                      </div>
-                      <div className='ml-4 flex-grow h-full'>
-                        <h3 className='font-medium text-sm'>{item.product?.name}</h3>
+                  {item.product !== null && (
+                    <div className='flex items-start'>
+                      <div className='flex w-1/2'>
+                        <div className='flex items-center'>
+                          <Checkbox
+                            checked={selectedItems.has(item.id)}
+                            onCheckedChange={() => toggleSelectItem(item.id)}
+                            disabled={item.product?.stockQuantity === 0}
+                          />
+                          <Image
+                            src={item.product?.imageUrls[0].imageUrl || '/placeholder.svg'}
+                            alt={item.product?.name || 'Product image'}
+                            width={500}
+                            height={500}
+                            className='ml-4 w-20 h-20 object-cover rounded-md'
+                          />
+                        </div>
+                        <div className='ml-4 flex-grow h-full'>
+                          <h3 className='font-medium text-sm'>{item.product?.name}</h3>
 
-                        <p className='text-sm text-gray-500 mt-1'>{item.product ? 'Sản phẩm' : 'Khóa học'}</p>
-                        {item.product?.stockQuantity === 0 && <p className='text-red-500 text-sm mt-1'>Hết hàng</p>}
+                          <p className='text-sm text-gray-500 mt-1'>{item.product ? 'Sản phẩm' : 'Khóa học'}</p>
+                          {item.product?.stockQuantity === 0 && <p className='text-red-500 text-sm mt-1'>Hết hàng</p>}
+                        </div>
+                      </div>
+                      <div className='grid grid-cols-4 gap-4 w-1/2 items-center'>
+                        <span className='text-center text-sm'>{item.unitPrice.toLocaleString()}đ</span>
+                        <div className='flex items-center justify-center'>
+                          {item.product?.stockQuantity! > 0 ? (
+                            <>
+                              <Button
+                                variant={'icon'}
+                                disabled={item?.quantity === 1}
+                                onClick={() => handleQuantityChange(item?.id, -1)}
+                                className='p-1 h-full rounded-full hover:bg-gray-100 transition duration-200'
+                              >
+                                <Minus className='w-4 h-4' />
+                              </Button>
+                              <span className='mx-2 w-6 text-center text-sm'>
+                                {quantities[item?.id] ?? item?.quantity}
+                              </span>
+                              <Button
+                                variant={'icon'}
+                                disabled={item?.quantity === item?.product?.stockQuantity}
+                                onClick={() => handleQuantityChange(item?.id, 1)}
+                                className='p-1 h-full rounded-full hover:bg-gray-100 transition duration-200'
+                              >
+                                <Plus className='w-4 h-4' />
+                              </Button>
+                            </>
+                          ) : (
+                            <span className='text-red-500 text-sm'>Hết hàng</span>
+                          )}
+                        </div>
+                        <span className='text-center text-sm font-medium text-red-600'>
+                          {item.totalPrice.toLocaleString()}đ
+                        </span>
+                        <div className='flex justify-center'>
+                          <Button variant='ghost' size='icon' className='h-8 w-8' onClick={() => removeItem(item.id)}>
+                            <Trash2 className='h-4 w-4' />
+                          </Button>
+                        </div>
                       </div>
                     </div>
-                    <div className='grid grid-cols-4 gap-4 w-1/2 items-center'>
-                      <span className='text-center text-sm'>{item.unitPrice.toLocaleString()}đ</span>
-                      <div className='flex items-center justify-center'>
-                        {item.product?.stockQuantity! > 0 ? (
-                          <>
-                            <Button
-                              variant={'icon'}
-                              disabled={item?.quantity === 1}
-                              onClick={() => handleQuantityChange(item?.id, -1)}
-                              className='p-1 h-full rounded-full hover:bg-gray-100 transition duration-200'
-                            >
-                              <Minus className='w-4 h-4' />
-                            </Button>
-                            <span className='mx-2 w-6 text-center text-sm'>
-                              {quantities[item?.id] ?? item?.quantity}
-                            </span>
-                            <Button
-                              variant={'icon'}
-                              disabled={item?.quantity === item?.product?.stockQuantity}
-                              onClick={() => handleQuantityChange(item?.id, 1)}
-                              className='p-1 h-full rounded-full hover:bg-gray-100 transition duration-200'
-                            >
-                              <Plus className='w-4 h-4' />
-                            </Button>
-                          </>
-                        ) : (
-                          <span className='text-red-500 text-sm'>Hết hàng</span>
-                        )}
+                  )}
+
+                  {item.course !== null && (
+                    <div className='flex items-start'>
+                      <div className='flex w-1/2'>
+                        <div className='flex items-center'>
+                          <Checkbox
+                            checked={selectedItems.has(item.id)}
+                            onCheckedChange={() => toggleSelectItem(item.id)}
+                          />
+                          <Image
+                            src={item.course?.imageUrl || '/placeholder.svg'}
+                            alt={item.course?.title || 'Course image'}
+                            width={500}
+                            height={500}
+                            className='ml-4 w-20 h-20 object-cover rounded-md'
+                          />
+                        </div>
+                        <div className='ml-4 flex-grow h-full'>
+                          <h3 className='font-medium text-sm'>{item.course?.title}</h3>
+
+                          <p className='text-sm text-gray-500 mt-1'>{item.product ? 'Sản phẩm' : 'Khóa học'}</p>
+                        </div>
                       </div>
-                      <span className='text-center text-sm font-medium text-red-600'>
-                        {item.totalPrice.toLocaleString()}đ
-                      </span>
-                      <div className='flex justify-center'>
-                        <Button variant='ghost' size='icon' className='h-8 w-8' onClick={() => removeItem(item.id)}>
-                          <Trash2 className='h-4 w-4' />
-                        </Button>
+                      <div className='grid grid-cols-4 gap-4 w-1/2 items-center'>
+                        <span className='text-center text-sm'>{item.unitPrice.toLocaleString()}đ</span>
+                        <div className='flex items-center justify-center'>
+                          <span className='mx-2 w-6 text-center text-sm'>1</span>
+                        </div>
+
+                        <span className='text-center text-sm font-medium text-red-600'>
+                          {item.totalPrice.toLocaleString()}đ
+                        </span>
+
+                        <div className='flex justify-center'>
+                          <Button variant='ghost' size='icon' className='h-8 w-8' onClick={() => removeItem(item.id)}>
+                            <Trash2 className='h-4 w-4' />
+                          </Button>
+                        </div>
                       </div>
                     </div>
-                  </div>
+                  )}
                 </div>
               ))}
             </CardContent>
           </Card>
+
           <div className='bg-blue-50 p-4 rounded-lg flex items-center'>
             <ShoppingCart className='text-blue-500 mr-2' />
             <span className='text-sm text-blue-700'>Mua thêm các sản phẩm khác</span>
@@ -305,15 +378,15 @@ export default function Cart() {
           </Card> */}
           <Card>
             <CardContent className='p-4'>
-              <div className='space-y-2 mb-4'>
+              <div className='space-y-2 mb-2 border-b border-gray-300 pb-2'>
                 <div className='flex justify-between text-sm'>
                   <span className='text-gray-600'>Tạm tính</span>
                   <span>{calculateSelectedTotal.toLocaleString()}đ</span>
                 </div>
-                <div className='flex justify-between text-sm'>
+                {/* <div className='flex justify-between text-sm'>
                   <span className='text-gray-600'>Giảm giá</span>
                   <span>0đ</span>
-                </div>
+                </div> */}
               </div>
               <div className='flex justify-between font-medium'>
                 <span>Tổng tiền</span>
@@ -321,7 +394,7 @@ export default function Cart() {
               </div>
               <p className='text-right text-xs text-gray-500 mt-1'>(Đã bao gồm VAT nếu có)</p>
 
-              <Button className='w-full mt-4 font-medium' disabled={selectedItems.size === 0}>
+              <Button className='w-full mt-4 font-medium' disabled={selectedItems.size === 0} onClick={handleCheckout}>
                 Mua hàng ({selectedItems.size})
               </Button>
             </CardContent>
