@@ -93,7 +93,7 @@ function AvatarNotification() {
               </AvatarFallback>
             </Avatar>
 
-            <p className='font-medium text-base'>{account?.username || account?.email}</p>
+            <p className='font-medium text-base line-clamp-1'>{account?.username || account?.email}</p>
           </Link>
           <Separator />
           <Button asChild variant={'custom'} className='w-full'>

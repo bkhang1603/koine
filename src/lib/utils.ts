@@ -70,13 +70,24 @@ export const checkAndRefreshToken = async (param?: {
   // Tránh hiện tượng bug nó lấy access và refresh token cũ ở lần đầu rồi gọi cho các lần tiếp theo
   const accessToken = getAccessTokenFromLocalStorage()
   const refreshToken = getRefreshTokenFromLocalStorage()
+
   // Chưa đăng nhập thì cũng không cho chạy
   if (!accessToken || !refreshToken) return
   const decodedAccessToken = decodeToken(accessToken)
   const decodedRefreshToken = decodeToken(refreshToken)
+
   // Thời điểm hết hạn của token là tính theo epoch time (s)
   // Còn khi các bạn dùng cú pháp new Date().getTime() thì nó sẽ trả về epoch time (ms)
   const now = Math.round(new Date().getTime() / 1000)
+
+  // const formatTimestamp = (timestamp: number) => {
+  //   const date = new Date(timestamp * 1000) // Convert to milliseconds
+  //   return date.toLocaleString() // Convert to human-readable format
+  // }
+
+  // console.log('now', formatTimestamp(now))
+  // console.log('decodedAccessToken.exp', formatTimestamp(decodedAccessToken.exp))
+  // console.log('decodedRefreshToken.exp', formatTimestamp(decodedRefreshToken.exp))
   // trường hợp refresh token hết hạn thì cho logout
   if (decodedRefreshToken.exp <= now) {
     removeTokensFromLocalStorage()
@@ -184,4 +195,46 @@ export const getCheckoutDataFromLocalStorage = () => {
 
 export const removeCheckoutDataFromLocalStorage = () => {
   isBrowser && localStorage.removeItem('checkoutData')
+}
+
+export const checkAndSetTokenToCookieByLoginGoogle = async ({
+  accessToken,
+  refreshToken,
+  onError,
+  onSuccess
+}: {
+  accessToken: string
+  refreshToken: string
+  onError?: () => void
+  onSuccess?: () => void
+}) => {
+  try {
+    await authApiRequest.setTokenToCookie({
+      accessToken,
+      refreshToken
+    })
+    setAccessTokenToLocalStorage(accessToken)
+    setRefreshTokenToLocalStorage(refreshToken)
+    onSuccess && onSuccess()
+  } catch (error) {
+    removeTokensFromLocalStorage()
+    onError && onError()
+  }
+
+  // const decodedAccessToken = jwtDecode(accessToken) as { exp: number }
+  // const decodedRefreshToken = jwtDecode(refreshToken) as { exp: number }
+  // const role = (jwtDecode(accessToken) as { role: string }).role
+  // authApiRequest.setTokenToCookie({
+  //   accessToken,
+  //   refreshToken
+  // })
+  // setAccessTokenToLocalStorage(accessToken)
+  // setRefreshTokenToLocalStorage(refreshToken)
+  // return {
+  //   accessToken,
+  //   refreshToken,
+  //   expires: decodedAccessToken.exp * 1000,
+  //   expiresRefresh: decodedRefreshToken.exp * 1000,
+  //   role
+  // }
 }

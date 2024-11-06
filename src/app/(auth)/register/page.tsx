@@ -6,6 +6,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import type { Metadata } from 'next'
 import RegisterForm from '@/components/form/register-form'
+import envConfig from '@/config'
 
 export const metadata: Metadata = {
   title: 'Đăng ký',
@@ -37,15 +38,17 @@ function RegisterPage() {
           <div className='border-t border-sixth/80 w-full' />
         </div>
 
-        <Button variant='outline' className='w-full md:w-[600px] text-base h-10'>
+        <Button variant='outline' className='w-full md:w-[600px] text-base h-10' disabled>
           <Image src={icons.facebook} alt='Google' width={24} height={24} className='mr-3' />
           Đăng nhập với Facebook
         </Button>
 
-        <Button variant='outline' className='w-full md:w-[600px] text-base h-10 mt-5'>
-          <Image src={icons.google} alt='Google' width={24} height={24} className='mr-3' />
-          Đăng nhập với Google
-        </Button>
+        <Link href={envConfig.NEXT_PUBLIC_GOOGLE_URL_LOCAL}>
+          <Button variant='outline' className='w-full md:w-[600px] text-base h-10 mt-5'>
+            <Image src={icons.google} alt='Google' width={24} height={24} className='mr-3' />
+            Đăng nhập với Google
+          </Button>
+        </Link>
 
         <p className='text-secondary font-semibold mt-4 text-center text-sm sm:text-base'>
           Bạn đã có tài khoản? {''}

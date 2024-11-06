@@ -6,6 +6,7 @@ import configRoute from '@/config/route'
 import Image from 'next/image'
 import Link from 'next/link'
 import type { Metadata } from 'next'
+import envConfig from '@/config'
 
 export const metadata: Metadata = {
   title: 'Đăng nhập',
@@ -37,12 +38,14 @@ function LoginPage() {
           <div className='border-t border-sixth/80 w-full' />
         </div>
 
-        <Button variant='outline' className='w-full md:w-[600px] text-base h-10'>
+        {/* <Link href={'http://localhost:9090/api/auth/facebook'}> */}
+        <Button variant='outline' className='w-full md:w-[600px] text-base h-10' disabled>
           <Image src={icons.facebook} alt='Google' width={24} height={24} className='mr-3' />
           Đăng nhập với Facebook
         </Button>
+        {/* </Link> */}
 
-        <Link href={'https://koinebackend.site/api/auth/google'}>
+        <Link href={envConfig.NEXT_PUBLIC_GOOGLE_URL_LOCAL}>
           <Button variant='outline' className='w-full md:w-[600px] text-base h-10 mt-5'>
             <Image src={icons.google} alt='Google' width={24} height={24} className='mr-3' />
             Đăng nhập với Google

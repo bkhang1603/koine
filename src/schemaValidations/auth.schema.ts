@@ -158,3 +158,28 @@ export const ForgotPasswordBody = z.object({
 })
 
 export type ForgotPasswordBodyType = z.TypeOf<typeof ForgotPasswordBody>
+
+export const LoginGoogleBody = z
+  .object({
+    accessToken: z.string(),
+    refreshToken: z.string()
+  })
+  .strict()
+
+export type LoginGoogleBodyType = z.TypeOf<typeof LoginGoogleBody>
+
+export const LoginGoogleRes = z.object({
+  data: z.object({
+    accessToken: z.string(),
+    refreshToken: z.string(),
+    account: z.object({
+      id: z.number(),
+      name: z.string(),
+      email: z.string(),
+      role: z.enum(RoleValues)
+    })
+  }),
+  message: z.string()
+})
+
+export type LoginGoogleResType = z.TypeOf<typeof LoginGoogleRes>
