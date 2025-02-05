@@ -1,18 +1,55 @@
 import http from '@/lib/http'
-import { ProductResType, ProductsResType } from '@/schemaValidations/product.schema'
+import {
+  CategoryProductsResType,
+  ProductResType,
+  ProductReviewsResType,
+  ProductsResType
+} from '@/schemaValidations/product.schema'
 
 const productApiRequest = {
-  getProducts: ({ page_index, search }: { page_index?: number | undefined; search?: string | string[] | undefined }) =>
-    http.get<ProductsResType>(`/products?page_index=${page_index}&keyword=${search}`, {
-      cache: 'no-cache'
-    }),
+  getProducts: ({
+    page_index,
+    page_size,
+    search,
+    range,
+    category,
+    sort
+  }: {
+    page_index?: number | undefined
+    page_size?: number | undefined
+    search?: string | string[] | undefined
+    range?: number | undefined
+    category?: string | undefined
+    sort?: string | string[] | ['pa' | 'pd' | 'na' | 'nd'] | undefined
+  }) =>
+    http.get<ProductsResType>(
+      `/products?page_index=${page_index}&page_size=${page_size}&keyword=${search}&range=${range}&category=${category}&sort=${sort}`,
+      {
+        cache: 'no-cache'
+      }
+    ),
   getProduct: (id: string) =>
     http.get<ProductResType>(`/products/${id}`, {
       cache: 'no-cache'
     }),
   createProduct: (data: any) => http.post('/products', data),
   updateProduct: (id: string, data: any) => http.put(`/products/${id}`, data),
-  deleteProduct: (id: string) => http.delete(`/products/${id}`)
+  deleteProduct: (id: string) => http.delete(`/products/${id}`),
+  getCategoryProducts: () => http.get<CategoryProductsResType>('/category-products'),
+  getProductReviews: ({
+    id,
+    star,
+    page_index,
+    page_size
+  }: {
+    id: string
+    star?: number | undefined
+    page_index?: number | undefined | 0
+    page_size?: number | undefined | 10
+  }) =>
+    http.get<ProductReviewsResType>(
+      `/products/${id}/reviews?star=${star}&page_index=${page_index}&page_size=${page_size}`
+    )
 }
 
 export default productApiRequest

@@ -8,10 +8,12 @@ import ProductDescription from '@/app/(public)/product/[id]/components/product-d
 
 export default async function ProductDetail({ params: { id } }: { params: { id: string } }) {
   let product: ProductResType['data'] | null = null
+  let overallRating = 0
 
   try {
     const { payload } = await productApiRequest.getProduct(id)
     product = payload.data
+    overallRating = payload.data.averageRating
   } catch (error) {
     console.log(error)
   }
@@ -45,9 +47,12 @@ export default async function ProductDetail({ params: { id } }: { params: { id: 
 
           <div className='flex items-center mb-6'>
             {[1, 2, 3, 4, 5].map((i) => (
-              <Star key={i} className='w-5 h-5 text-yellow-400 fill-current' />
+              <Star
+                key={i}
+                className={`w-5 h-5 ${i <= Math.ceil(overallRating) ? 'text-yellow-400 fill-current' : 'text-gray-400 fill-current'}`}
+              />
             ))}
-            <span className='ml-2 text-gray-600'>(154 nhận xét)</span>
+            <span className='ml-2 text-gray-600'>({product.totalRating} đánh giá)</span>
             <Heart className='ml-4 w-5 h-5' />
             <Share2 className='ml-4 w-5 h-5' />
           </div>
@@ -64,7 +69,7 @@ export default async function ProductDetail({ params: { id } }: { params: { id: 
         </div>
       </div>
 
-      <ProductDescription description={product.description} />
+      <ProductDescription description={product.description} detail={product.detail} guide={product.guide} id={id} />
     </section>
   )
 }

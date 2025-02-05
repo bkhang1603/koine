@@ -115,11 +115,11 @@ function AddToCartButton({ product }: { product: ProductResType['data'] }) {
 
         <div className='flex justify-between gap-4'>
           {!role && (
-            <Link href={configRoute.login} className='w-full mb-6'>
-              <Button type='button' variant={'outlineSecondary'} className='w-full'>
+            <Button type='button' variant={'outlineSecondary'} className='w-full mb-6' asChild>
+              <Link href={configRoute.login} className='w-full'>
                 Thêm vào giỏ hàng
-              </Button>
-            </Link>
+              </Link>
+            </Button>
           )}
 
           {role && (
@@ -129,19 +129,19 @@ function AddToCartButton({ product }: { product: ProductResType['data'] }) {
           )}
 
           {!role && (
-            <Link href={configRoute.login} className='w-full mb-6'>
-              <Button type='button' variant={'secondary'} className='w-full'>
+            <Button type='button' variant={'secondary'} className='w-full mb-6' asChild>
+              <Link href={configRoute.login} className='w-full'>
                 Mua ngay
-              </Button>
-            </Link>
+              </Link>
+            </Button>
           )}
 
           {role && (
-            <Link href={``} className='w-full mb-6'>
-              <Button type='button' variant={'secondary'} className='w-full'>
+            <Button type='button' variant={'secondary'} className='w-full mb-6' asChild>
+              <Link href={``} className='w-full'>
                 Mua ngay
-              </Button>
-            </Link>
+              </Link>
+            </Button>
           )}
         </div>
       </form>

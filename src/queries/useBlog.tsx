@@ -1,5 +1,5 @@
 import blogApiRequest from '@/apiRequests/blog'
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQuery, useQueryClient, useInfiniteQuery } from '@tanstack/react-query'
 
 export const useBlogCommentsQuery = ({
   id,
@@ -13,6 +13,39 @@ export const useBlogCommentsQuery = ({
   return useQuery({
     queryKey: ['blogComments', id, page_index, page_size],
     queryFn: () => blogApiRequest.getBlogComments({ id, page_index, page_size })
+  })
+}
+
+// export const useGetInfinitiveBlogCommentsQuery = ({ id }: { id: string }) => {
+//   return useInfiniteQuery({
+//     queryKey: ['blogComments', id],
+//     queryFn: ({ pageParam = 1 }) => blogApiRequest.getBlogComments({ id, page_index: pageParam, page_size: 10 }),
+//     getNextPageParam: (lastPage) => {
+//       if (lastPage.payload.pagination.currentPage < lastPage.payload.pagination.totalPage) {
+//         return lastPage.payload.pagination.currentPage + 1
+//       }
+//     },
+//     initialPageParam: 1
+//   })
+// }
+
+export const useGetInfinitiveBlogCommentsQuery = ({ id }: { id: string }) => {
+  return useInfiniteQuery({
+    queryKey: ['blogComments', id],
+    queryFn: async ({ pageParam = 1 }) => {
+      try {
+        const response = await blogApiRequest.getBlogComments({ id, page_index: pageParam, page_size: 10 })
+        return response
+      } catch (error) {
+        throw new Error('Error fetching blog comments')
+      }
+    },
+    getNextPageParam: (lastPage) => {
+      if (lastPage?.payload?.pagination?.currentPage < lastPage?.payload?.pagination?.totalPage) {
+        return lastPage.payload.pagination.currentPage + 1
+      }
+    },
+    initialPageParam: 1
   })
 }
 
@@ -44,6 +77,32 @@ export const useBlogReactUpdateMutation = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: ['reactBlog']
+      })
+    }
+  })
+}
+
+export const useBlogCommentDeleteMutation = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: blogApiRequest.deleteBlogComment,
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ['blogComments']
+      })
+    }
+  })
+}
+
+export const useBlogCommentUpdateMutation = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: blogApiRequest.updateBlogComment,
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ['blogComments']
       })
     }
   })

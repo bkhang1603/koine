@@ -2,6 +2,7 @@ import http from '@/lib/http'
 import {
   BlogCommentCreateReqType,
   BlogCommentsResType,
+  BlogCommentUpdateResType,
   BlogResType,
   BlogsResType
 } from '@/schemaValidations/blog.schema'
@@ -38,7 +39,10 @@ const blogApiRequest = {
   }) => http.get<BlogCommentsResType>(`/blog-comments/${id}?page_index=${page_index}&page_size=${page_size}`),
   createBlogComment: (data: BlogCommentCreateReqType) => http.post('/blog-comments', data),
   getReactComment: (id: string) => http.get<ReactDataResType>(`/blog-reacts/check/${id}`),
-  updateReactComment: (data: UpdateReactDataType) => http.post('/blog-reacts', data)
+  updateReactComment: (data: UpdateReactDataType) => http.post('/blog-reacts', data),
+  deleteBlogComment: (id: string) => http.delete(`/blog-comments/${id}`),
+  updateBlogComment: ({ id, data }: { id: string; data: BlogCommentUpdateResType }) =>
+    http.put(`/blog-comments/${id}`, data)
 }
 
 export default blogApiRequest

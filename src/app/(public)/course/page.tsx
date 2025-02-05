@@ -1,8 +1,10 @@
-import CourseList from '@/app/(public)/course/components/course-list'
+import CourseList from '@/components/public/parent/course/course-list'
 import images from '@/assets/images'
 import Image from 'next/image'
+import CourseFilter from '@/components/public/parent/course/course-filter'
+import { searchParams } from '@/types/query'
 
-function CoursePage() {
+function CoursePage({ searchParams }: { searchParams?: searchParams }) {
   return (
     <main>
       <Image
@@ -14,9 +16,13 @@ function CoursePage() {
         className='h-[30vh] w-full object-cover'
       />
 
-      <section className='container py-16'>
-        <CourseList />
-      </section>
+      <div className='grid grid-cols-3 md:grid-cols-4 gap-6 mt-8 container'>
+        <div className='md:col-span-1 hidden md:block'>
+          <CourseFilter />
+        </div>
+
+        <CourseList searchParams={searchParams} />
+      </div>
 
       <section className='container py-20'>
         <Image

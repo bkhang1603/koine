@@ -51,6 +51,8 @@ export default function LoginForm({ className }: { className?: string }) {
       router.back()
       router.refresh()
     } catch (error: any) {
+      console.log(error.payload)
+
       handleErrorApi({
         error,
         setError: form.setError

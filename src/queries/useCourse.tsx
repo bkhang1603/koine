@@ -48,9 +48,37 @@ export const useUpdateCourseProgressMutation = () => {
   })
 }
 
-export const useGetCourseResourceQuery = ({ id }: { id: string }) => {
+export const useGetCategoryCoursesQuery = () => {
   return useQuery({
-    queryKey: ['courseResource', id],
-    queryFn: () => courseApiRequest.getCourseResource(id)
+    queryKey: ['categoryCourses'],
+    queryFn: courseApiRequest.getCategoryCourses
+  })
+}
+
+export const useActiveCourseMutation = () => {
+  return useMutation({
+    mutationFn: courseApiRequest.activeCourse
+  })
+}
+
+export const useGetChaptersQuery = ({ id }: { id: string }) => {
+  return useQuery({
+    queryKey: ['chapters', id],
+    queryFn: () => courseApiRequest.getChapters(id)
+  })
+}
+
+export const useGetLessonsQuery = ({ id }: { id: string }) => {
+  return useQuery({
+    queryKey: ['lessons', id],
+    queryFn: () => courseApiRequest.getLessons(id)
+  })
+}
+
+export const useGetLessonQuery = ({ id, enabled }: { id: string; enabled?: boolean }) => {
+  return useQuery({
+    queryKey: ['lesson', id],
+    queryFn: () => courseApiRequest.getLesson(id),
+    enabled
   })
 }

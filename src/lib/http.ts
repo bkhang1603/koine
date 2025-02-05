@@ -14,6 +14,10 @@ type CustomOptions = Omit<RequestInit, 'method'> & {
 
 const ENTITY_ERROR_STATUS = 422
 const AUTHENTICATION_ERROR_STATUS = 401
+// 409: Conflict
+const CONFLICT_ERROR_STATUS = 409
+// 404: Not Found
+const NOT_FOUND_ERROR_STATUS = 404
 
 type EntityErrorPayload = {
   message: string
@@ -134,7 +138,9 @@ const request = async <Response>(
         const accessToken = (options?.headers as any)?.Authorization.split('Bearer ')[1]
         redirect(`/login?accessToken=${accessToken}`)
       }
-    } else if (res.status === 404) {
+    } else if (res.status === NOT_FOUND_ERROR_STATUS) {
+      throw new HttpError(data)
+    } else if (res.status === CONFLICT_ERROR_STATUS) {
       throw new HttpError(data)
     } else {
       throw new HttpError(data)

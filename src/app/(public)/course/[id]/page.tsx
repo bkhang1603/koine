@@ -63,7 +63,7 @@ export default async function CourseDetail({ params: { id } }: { params: { id: s
                 <div className='flex items-center gap-2'>
                   <BookOpen className='w-4 h-4' />
                   <span>
-                    {courseData.lessons.length} {courseData.lessons.length > 1 ? 'chương' : 'chương'}
+                    {courseData.chapters.length} {courseData.chapters.length > 1 ? 'chương' : 'chương'}
                   </span>
                 </div>
 
@@ -74,7 +74,7 @@ export default async function CourseDetail({ params: { id } }: { params: { id: s
 
                 <div className='flex items-center gap-2'>
                   <Users className='w-4 h-4' />
-                  <span>{courseData.totalOfStudent} học viên</span>
+                  <span>{courseData.totalEnrollment} học viên</span>
                 </div>
               </div>
             </CardContent>
@@ -85,19 +85,19 @@ export default async function CourseDetail({ params: { id } }: { params: { id: s
               <CardTitle className='text-xl'>Nội dung khóa học</CardTitle>
             </CardHeader>
             <CardContent>
-              {courseData.lessons.length !== 0 && (
+              {courseData.chapters.length !== 0 && (
                 <Accordion type='multiple' className='w-full'>
-                  {courseData.lessons.map((lesson, index) => (
+                  {courseData.chapters.map((chapter, index) => (
                     <AccordionItem key={index} value={`module-${index + 1}`}>
                       <AccordionTrigger>
                         <div className='flex justify-between items-center'>
-                          <div>{lesson.title}</div>
+                          <div>{chapter.title}</div>
                         </div>
                       </AccordionTrigger>
                       <AccordionContent>
                         <ul className='pl-4 space-y-2 list-disc list-inside text-sm text-gray-500'>
-                          {lesson.courseResources.map((resource, index) => (
-                            <li key={index}>{resource.title}</li>
+                          {chapter.lessons.map((lesson, index) => (
+                            <li key={index}>{lesson.title}</li>
                           ))}
                         </ul>
                       </AccordionContent>
@@ -106,7 +106,7 @@ export default async function CourseDetail({ params: { id } }: { params: { id: s
                 </Accordion>
               )}
 
-              {courseData.lessons.length === 0 && <p>Không có dữ liệu</p>}
+              {courseData.chapters.length === 0 && <p>Không có dữ liệu</p>}
             </CardContent>
           </Card>
         </div>
@@ -119,9 +119,9 @@ export default async function CourseDetail({ params: { id } }: { params: { id: s
               </CardTitle>
             </CardHeader>
             <CardContent>
-              {courseData.price === 0 && <EnrollButton id={id} />}
+              {courseData.price === 0 && <EnrollButton id={courseData.id} />}
 
-              {courseData.price !== 0 && <CourseButton id={id} />}
+              {courseData.price !== 0 && <CourseButton id={courseData.id} />}
 
               <p className='text-sm text-gray-500 dark:text-gray-400 mb-4'>
                 Trải nghiệm miễn phí khóa học chăm sóc da cơ bản.

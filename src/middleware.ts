@@ -2,7 +2,9 @@ import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 
 const maintenanceMode = false
-const privatePaths = ['/content-creator', '/content-creator/blog']
+// const privatePaths = ['/content-creator', '/content-creator/blog']
+const privatePaths = ['/haha']
+
 const publicPaths = ['/', '/course', '/knowledge', '/about', '/contact']
 const unAuthPaths = ['/login', '/register']
 

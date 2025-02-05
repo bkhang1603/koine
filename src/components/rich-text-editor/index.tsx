@@ -11,6 +11,7 @@ import ImageResize from 'tiptap-extension-resize-image'
 import ToolBar from '@/components/rich-text-editor/toolbar'
 import FileHandler from '@tiptap-pro/extension-file-handler'
 import HardBreak from '@tiptap/extension-hard-break'
+import Link from '@tiptap/extension-link'
 import { Column, Columns } from '@/components/rich-text-editor/custom-extension'
 import ColumnsMenu from '@/components/rich-text-editor/column-menu'
 
@@ -42,6 +43,12 @@ export default function RichTextEditor({ content, onChange }: { content: any; on
         }
       }),
       ImageResize,
+      Link.configure({
+        openOnClick: false,
+        HTMLAttributes: {
+          class: 'text-blue-500 underline'
+        }
+      }),
       FileHandler.configure({
         allowedMimeTypes: ['image/png', 'image/jpeg', 'image/gif', 'image/webp'],
         onDrop: (currentEditor, files, pos) => {
@@ -97,13 +104,15 @@ export default function RichTextEditor({ content, onChange }: { content: any; on
     content: content,
     editorProps: {
       attributes: {
-        class: 'max-h-[500px] overflow-scroll border rounded-md bg-slate-50 pb-2 pt-7 px-4 focus-visible:outline-none'
+        // class: 'max-h-[500px] overflow-scroll border rounded-md bg-white pb-2 pt-7 px-4 focus-visible:outline-none'
+        class: 'max-h-[1000px] overflow-auto border rounded-md bg-white py-4 px-6 my-6 focus-visible:outline-none'
       }
     },
     onUpdate: ({ editor }) => {
       const html = editor.getHTML()
       onChange(html)
-    }
+    },
+    immediatelyRender: false
   })
 
   return (

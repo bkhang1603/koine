@@ -33,10 +33,10 @@ export default function CartPopover({ data }: { data: CartDetailResType['data'] 
 
         {data['cartDetails'].map((data) => (
           <div key={data.id} className='flex items-center space-x-4 mb-4 last:mb-0'>
-            {data.product && data.product.imageUrls && (
+            {data.product && data.product.imageUrl && (
               <>
                 <Image
-                  src={data.product.imageUrls[0].imageUrl}
+                  src={data.product.imageUrl}
                   alt={data.product.name}
                   width={1000}
                   height={1000}
@@ -48,7 +48,7 @@ export default function CartPopover({ data }: { data: CartDetailResType['data'] 
                   <h4 className='font-medium line-clamp-1'>{data.product.name}</h4>
                   <p className='text-sm text-gray-500'>Số lượng: {data.quantity}</p>
                   <p className='text-secondary font-medium'>
-                    {data.unitPrice === 0 ? 'Miễn phí' : data.totalPrice.toLocaleString() + ' đ'}
+                    {data.unitPrice === 0 ? 'Miễn phí' : data.unitPrice.toLocaleString() + ' đ'}
                   </p>
                 </div>
               </>
@@ -69,7 +69,7 @@ export default function CartPopover({ data }: { data: CartDetailResType['data'] 
                   <h4 className='font-medium'>{data.course.title}</h4>
                   <p className='text-sm text-gray-500'>Số lượng: {data.quantity}</p>
                   <p className='text-secondary font-medium'>
-                    {data.unitPrice === 0 ? 'Miễn phí' : data.totalPrice.toLocaleString() + ' đ'}
+                    {data.unitPrice === 0 ? 'Miễn phí' : data.unitPrice.toLocaleString() + ' đ'}
                   </p>
                 </div>
               </>

@@ -5,8 +5,17 @@ import { ShoppingBag } from 'lucide-react'
 
 function CartNotification() {
   const { data } = useCartDetailQuery()
-  const cartData = data?.payload?.data || { cartDetails: [], totalAmount: 0 }
-  const cartTotal = data?.payload?.pagination?.totalItem || 0
+  const cartData = data?.payload?.data || {
+    cartDetails: [],
+    totalAmount: 0,
+    id: '',
+    isDeleted: false,
+    createdAt: '',
+    updatedAt: '',
+    userId: '',
+    totalItems: 0
+  }
+  const cartTotal = data?.payload?.data.totalItems || 0
 
   return (
     <Popover>

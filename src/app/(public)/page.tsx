@@ -1,12 +1,12 @@
-import Achievement from '@/app/(public)/components/achievement'
-import Blog from '@/app/(public)/components/blog'
-import Feature from '@/app/(public)/components/feature'
-import Hero from '@/app/(public)/components/hero'
-import Information from '@/app/(public)/components/information'
-import Promo from '@/app/(public)/components/promo'
-import Recommend from '@/app/(public)/components/recommend'
-import Service from '@/app/(public)/components/service'
-import Sharing from '@/app/(public)/components/sharing'
+import Achievement from '@/components/public/parent/home/achievement'
+import Blog from '@/components/public/parent/home/blog'
+import Feature from '@/components/public/parent/home/feature'
+import Hero from '@/components/public/parent/home/hero'
+import Information from '@/components/public/parent/home/information'
+import Promo from '@/components/public/parent/home/promo'
+import Recommend from '@/components/public/parent/home/recommend'
+import Service from '@/components/public/parent/home/service'
+import Sharing from '@/components/public/parent/home/sharing'
 
 function Home() {
   return (

@@ -1,6 +1,6 @@
 import Team from '@/app/(public)/about/components/team'
 import View from '@/app/(public)/about/components/view'
-import Information from '@/app/(public)/components/information'
+import Information from '@/components/public/parent/home/information'
 import images from '@/assets/images'
 import {
   Timeline,

@@ -1,6 +1,6 @@
 import images from '@/assets/images'
 import CardBlog from '@/components/card-blog'
-import Information from '@/app/(public)/components/information'
+import Information from '@/components/public/parent/home/information'
 import Tag from '@/components/tag'
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area'
 import configRoute from '@/config/route'
@@ -15,6 +15,7 @@ async function KnowledgePage() {
   try {
     const { payload } = await blogApiRequest.getBlogs({
       page_index: 1,
+      page_size: 10,
       search: ''
     })
     blogs = payload.data
@@ -55,7 +56,7 @@ async function KnowledgePage() {
 
         <div className='w-full flex flex-col items-center py-10 gap-4'>
           {blogs.map((item, index) => (
-            <Link key={index} href={`${configRoute.knowledge}/${item?.id}`} className='w-full'>
+            <Link key={index} href={`${configRoute.knowledge}/${item?.slug}`} className='w-full'>
               <CardBlog blog={item} />
             </Link>
           ))}

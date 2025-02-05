@@ -5,20 +5,23 @@ import { Button } from '@/components/ui/button'
 import { toast } from '@/components/ui/use-toast'
 import configRoute from '@/config/route'
 import { handleErrorApi } from '@/lib/utils'
-import { useEnrollCourseMutation, useGetUserCoursesQuery } from '@/queries/useCourse'
+import { useActiveCourseMutation, useGetUserCoursesQuery } from '@/queries/useCourse'
 import Link from 'next/link'
 
 function EnrollButton({ id }: { id: string }) {
   const role = useAppStore((state) => state.role)
-  const enrollMutation = useEnrollCourseMutation()
+  const enrollMutation = useActiveCourseMutation()
   const { data } = useGetUserCoursesQuery()
-  const isEnrolled = data?.payload.data.some((course) => course.courseId === id)
+  const isEnrolled = data?.payload.data.some((course) => course.id === id)
 
   const handleEnroll = async () => {
     if (enrollMutation.isPending) return
 
     try {
-      await enrollMutation.mutateAsync(id)
+      await enrollMutation.mutateAsync({
+        courseId: id,
+        childId: null
+      })
 
       toast({
         title: 'Đăng ký khóa học thành công',

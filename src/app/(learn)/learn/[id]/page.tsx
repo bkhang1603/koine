@@ -6,42 +6,42 @@ import { ChevronDown, ArrowLeft, ArrowRight, ChevronLeft } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Progress } from '@/components/ui/progress'
-import { useGetCourseProgressQuery, useGetCourseQuery, useGetCourseResourceQuery } from '@/queries/useCourse'
 import { useParams, useRouter, useSearchParams } from 'next/navigation'
 import LearnSidebar from '@/app/(learn)/learn/[id]/components/sidebar'
 import Image from 'next/image'
 import icons from '@/assets/icons'
 import Link from 'next/link'
 import configRoute from '@/config/route'
+import { useGetCourseProgressQuery, useGetLessonQuery } from '@/queries/useCourse'
 
 export default function CoursePage() {
   const { id } = useParams()
   const search = useSearchParams()
-  const rId = search.get('rId')
   const router = useRouter()
-  const { data } = useGetCourseQuery({ id: id as string })
-  const courseData = data?.payload.data
+
   const { data: courseProgress } = useGetCourseProgressQuery({ id: id as string })
-  const courseProgressData = courseProgress?.payload.data ?? []
-  const { data: courseResource } = useGetCourseResourceQuery({ id: rId as string })
-  const resource = courseResource?.payload.data ?? courseData?.lessons.flatMap((lesson) => lesson.courseResources)[0]
+  const courseProgressData = courseProgress?.payload?.data?.chapters ?? []
+  const progress = courseProgress?.payload.data.courseCompletionPercentage
+  const totalLesson = courseProgress?.payload.data.totalLessonsInCourse
+  const totalCompletedLesson = courseProgress?.payload.data.totalCompletedLessonsInCourse
+
+  const rId = search.get('rId') ?? courseProgressData[0]?.lessons[0]?.id
+
+  const { data: lesson } = useGetLessonQuery({ id: rId, enabled: !!rId })
+  const lessonData = lesson?.payload.data
 
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const playerRef = useRef<HTMLDivElement>(null)
-
-  // const resource =
-  //   courseData?.lessons.flatMap((lesson) => lesson.courseResources).find((resource) => resource.id === rId) ??
-  //   courseData?.lessons.flatMap((lesson) => lesson.courseResources)[0]
 
   const toggleSidebar = useCallback(() => {
     setSidebarOpen((prev) => !prev)
   }, [])
 
   useEffect(() => {
-    if (playerRef.current && (resource?.type === 'VIDEO' || resource?.type === 'BOTH') && resource?.videoUrl) {
+    if (playerRef.current && (lessonData?.type === 'VIDEO' || lessonData?.type === 'BOTH') && lessonData?.videoUrl) {
       const art = new Artplayer({
         container: playerRef.current,
-        url: resource?.videoUrl,
+        url: lessonData?.videoUrl,
         volume: 0.5,
         autoplay: false,
         pip: true,
@@ -70,24 +70,7 @@ export default function CoursePage() {
         }
       }
     }
-  }, [resource?.type, resource?.videoUrl])
-
-  const navigateResource = useCallback(
-    (direction: 'prev' | 'next') => {
-      const resources = courseData?.lessons.flatMap((lesson) => lesson.courseResources) || []
-      const currentIndex = resources.findIndex((r) => r.id === rId)
-      const nextIndex = direction === 'prev' ? currentIndex - 1 : currentIndex + 1
-
-      if (resources[nextIndex]) {
-        router.push(`/learn/${id}?rId=${resources[nextIndex].id}`)
-      }
-    },
-    [courseData?.lessons, id, rId, router]
-  )
-
-  const totalResources = courseData?.lessons.reduce((sum, lesson) => sum + lesson.courseResources.length, 0) || 0
-  const completedResources: string[] = [] // You'll need to implement this based on your data structure
-  const progress = (completedResources.length / totalResources) * 100
+  }, [lessonData?.type, lessonData?.videoUrl])
 
   return (
     <div className='flex flex-col h-screen bg-background'>
@@ -102,18 +85,18 @@ export default function CoursePage() {
             <Image src={icons.logo} alt='Koine logo' width={80} height={80} />
           </Link>
 
-          <h1 className='text-xl font-medium truncate'>{courseData?.title}</h1>
+          <h1 className='text-xl font-medium truncate'>{lessonData?.title}</h1>
         </div>
         <div className='flex items-center space-x-2 md:space-x-4'>
           <div className='text-sm hidden md:block'>
-            Tiến trình: {completedResources.length}/{totalResources}
+            Tiến trình: {totalCompletedLesson}/{totalLesson}
           </div>
           <Progress value={progress} className='w-[60px] md:w-[100px]' />
           <Button
             variant='ghost'
             size='icon'
             onClick={() => {
-              navigateResource('prev')
+              // navigateResource('prev')
             }}
           >
             <ArrowLeft className='h-4 w-4' />
@@ -122,7 +105,7 @@ export default function CoursePage() {
             variant='ghost'
             size='icon'
             onClick={() => {
-              navigateResource('next')
+              // navigateResource('next')
             }}
           >
             <ArrowRight className='h-4 w-4' />
@@ -139,18 +122,18 @@ export default function CoursePage() {
         <div className='flex-1 overflow-hidden'>
           <ScrollArea className='h-[calc(100vh-4rem)] bg-gray-100'>
             <div className='max-w-4xl mx-auto bg-white min-h-[calc(100vh-4rem)]'>
-              {(resource?.type === 'VIDEO' || resource?.type === 'BOTH') && (
+              {(lessonData?.type === 'VIDEO' || lessonData?.type === 'BOTH') && (
                 <div className='aspect-video relative z-0'>
                   <div ref={playerRef} className='w-full h-full'></div>
                 </div>
               )}
 
               <div className='p-6'>
-                <h2 className='text-2xl font-medium'>{resource?.title}</h2>
-                <p className='text-gray-500'>{resource?.description}</p>
+                <h2 className='text-2xl font-medium'>{lessonData?.title}</h2>
+                <p className='text-gray-500'>{lessonData?.description}</p>
 
-                {(resource?.type === 'DOCUMENT' || resource?.type === 'BOTH') && (
-                  <div className='mt-4'>{resource?.content}</div>
+                {(lessonData?.type === 'DOCUMENT' || lessonData?.type === 'BOTH') && (
+                  <div className='mt-4'>{lessonData?.content}</div>
                 )}
               </div>
             </div>

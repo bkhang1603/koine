@@ -18,12 +18,12 @@ const dropMenuItems = [
   {
     title: 'Cài đặt',
     icon: <Settings />,
-    href: configRoute.setting
+    href: configRoute.setting.password
   },
   {
     title: 'Trợ giúp',
     icon: <MessageCircleQuestion />,
-    href: configRoute.setting
+    href: configRoute.setting.profile
   },
   {
     title: 'Đăng xuất',
@@ -83,7 +83,7 @@ function AvatarNotification() {
       <PopoverContent align='end'>
         <div className='border border-gray-300 rounded-lg overflow-hidden shadow-lg p-2 space-y-2'>
           <Link
-            href={configRoute.profile}
+            href={configRoute.setting.profile}
             className='flex items-center gap-2 hover:bg-gray-100 px-3 py-3 cursor-pointer rounded-lg'
           >
             <Avatar className='cursor-pointer w-9 h-9'>

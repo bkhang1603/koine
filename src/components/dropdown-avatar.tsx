@@ -91,7 +91,7 @@ export default function DropdownAvatar() {
         <div className='flex flex-col mt-4 space-y-2'>
           {dropMenuItems.map((item, index) =>
             item.href ? (
-              <Link key={index} href={item.href}>
+              <Link key={index} href={typeof item.href === 'string' ? item.href : ''}>
                 <div className='flex justify-between items-center hover:bg-gray-100 p-2 rounded-xl'>
                   <div className='flex items-center gap-2'>
                     {item.icon}

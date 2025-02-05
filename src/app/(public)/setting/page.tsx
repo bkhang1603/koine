@@ -1,4 +1,4 @@
-import { ProfileForm } from '@/app/(public)/setting/components/profile-form'
+import { ProfileForm } from '@/components/public/parent/setting/profile-form'
 import { Separator } from '@/components/ui/separator'
 
 async function page() {

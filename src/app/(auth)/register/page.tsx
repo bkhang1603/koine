@@ -43,12 +43,12 @@ function RegisterPage() {
           Đăng nhập với Facebook
         </Button>
 
-        <Link href={envConfig.NEXT_PUBLIC_GOOGLE_URL_LOCAL}>
-          <Button variant='outline' className='w-full md:w-[600px] text-base h-10 mt-5'>
+        <Button variant='outline' className='w-full md:w-[600px] text-base h-10 mt-5'>
+          <Link href={envConfig.NEXT_PUBLIC_GOOGLE_URL_LOCAL} className='flex items-center justify-center'>
             <Image src={icons.google} alt='Google' width={24} height={24} className='mr-3' />
             Đăng nhập với Google
-          </Button>
-        </Link>
+          </Link>
+        </Button>
 
         <p className='text-secondary font-semibold mt-4 text-center text-sm sm:text-base'>
           Bạn đã có tài khoản? {''}

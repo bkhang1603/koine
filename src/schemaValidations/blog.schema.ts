@@ -8,11 +8,14 @@ export const BlogData = z
     description: z.string(),
     content: z.string(),
     imageUrl: z.string(),
-    creator: z.object({
+    creatorInfo: z.object({
       id: z.string(),
-      username: z.string(),
+      firstName: z.string(),
       avatarUrl: z.string()
     }),
+    totalReact: z.number(),
+    totalComment: z.number(),
+    slug: z.string(),
     createdAt: z.string(),
     updatedAt: z.string()
   })
@@ -46,6 +49,7 @@ export const BlogCommentsData = z.object({
   user: z.object({
     id: z.string(),
     username: z.string(),
+    firstName: z.string(),
     avatarUrl: z.string()
   }),
   replies: z.array(z.object({})),
@@ -77,9 +81,13 @@ export const BlogCommentRes = z.object({
 })
 
 export const BlogCommentCreateReq = z.object({
-  blogId: z.string(),
+  identifier: z.string(),
   content: z.string(),
   replyId: z.string().nullable()
+})
+
+export const BlogCommentUpdateRes = z.object({
+  content: z.string()
 })
 
 export type BlogsResType = z.TypeOf<typeof BlogsRes>
@@ -91,3 +99,5 @@ export type BlogCommentsResType = z.TypeOf<typeof BlogCommentsRes>
 export type BlogCommentResType = z.TypeOf<typeof BlogCommentRes>
 
 export type BlogCommentCreateReqType = z.TypeOf<typeof BlogCommentCreateReq>
+
+export type BlogCommentUpdateResType = z.TypeOf<typeof BlogCommentUpdateRes>

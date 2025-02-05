@@ -1,4 +1,4 @@
-import Information from '@/app/(public)/components/information'
+import Information from '@/components/public/parent/home/information'
 import React from 'react'
 
 function layout({ children }: { children: React.ReactNode }) {

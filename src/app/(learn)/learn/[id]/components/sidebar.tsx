@@ -7,15 +7,15 @@ import { UserCourseProgressResType } from '@/schemaValidations/course.schema'
 import { Check, FileText, MonitorPlay } from 'lucide-react'
 import { useParams, useRouter, useSearchParams } from 'next/navigation'
 
-type CourseResource = UserCourseProgressResType['data'][0]['courseResources'][0]
-type Lesson = UserCourseProgressResType['data'][0]
+type Lesson = UserCourseProgressResType['data']['chapters'][0]['lessons'][0]
+type Chapter = UserCourseProgressResType['data']['chapters'][0]
 
 function LearnSidebar({
   sidebarOpen,
   courseProgressData
 }: {
   sidebarOpen: boolean
-  courseProgressData: UserCourseProgressResType['data']
+  courseProgressData: UserCourseProgressResType['data']['chapters']
 }) {
   const { id } = useParams()
   const search = useSearchParams()
@@ -25,24 +25,24 @@ function LearnSidebar({
   const updateCourseProgressMutation = useUpdateCourseProgressMutation()
 
   // Tìm resource NOTYET đầu tiên trong toàn bộ courseProgressData
-  const firstNotYetResourceId = courseProgressData
-    .flatMap((lesson) => lesson.courseResources)
-    .find((resource) => resource.status === 'NOTYET')?.id
+  const firstNotYetChapterId = courseProgressData
+    .flatMap((chapter) => chapter.lessons)
+    .find((lesson) => lesson.status === 'NOTYET')?.id
 
-  const handleUpdate = async ({ resourceId, status }: { resourceId: string; status: string }) => {
+  const handleUpdate = async ({ lessonId, status }: { lessonId: string; status: string }) => {
     try {
       if (status === 'NOTYET') {
-        await updateCourseProgressMutation.mutateAsync(resourceId)
+        await updateCourseProgressMutation.mutateAsync(lessonId)
       }
 
-      router.push(`/learn/${id}?rId=${resourceId}`)
+      router.push(`/learn/${id}?rId=${lessonId}`)
     } catch (error) {
       handleErrorApi({ error })
     }
   }
 
   const defaultLessonId = rId
-    ? [courseProgressData?.find((lesson) => lesson.courseResources.some((resource) => resource.id === rId))?.id || '']
+    ? [courseProgressData?.find((lesson) => lesson.lessons.some((resource) => resource.id === rId))?.id || '']
     : [courseProgressData?.map((lesson) => lesson.id)[0]]
 
   return (
@@ -51,26 +51,26 @@ function LearnSidebar({
     >
       <ScrollArea className='h-[calc(100vh-4rem)]'>
         <Accordion type='multiple' className='w-full border-l' defaultValue={defaultLessonId}>
-          {courseProgressData?.map((lesson: Lesson) => (
-            <AccordionItem value={lesson.id} key={lesson.id}>
-              <AccordionTrigger className='px-4'>{lesson.title}</AccordionTrigger>
+          {courseProgressData?.map((chapter: Chapter) => (
+            <AccordionItem value={chapter.id} key={chapter.id}>
+              <AccordionTrigger className='px-4'>{chapter.title}</AccordionTrigger>
               <AccordionContent className='px-4'>
                 <ul>
-                  {lesson.courseResources.map((resource: CourseResource, index: number) => (
-                    <li key={resource.id} className='flex items-center'>
+                  {chapter.lessons.map((lesson: Lesson, index: number) => (
+                    <li key={lesson.id} className='flex items-center'>
                       <Button
-                        variant={rId === resource.id || (!rId && index === 0) ? 'linkNoUnderline' : 'ghostBlur'}
+                        variant={rId === lesson.id || (!rId && index === 0) ? 'linkNoUnderline' : 'ghostBlur'}
                         className='w-full justify-start px-4 pr-8 py-2 h-12 text-sm font-normal'
-                        onClick={() => handleUpdate({ resourceId: resource.id, status: resource.status })}
-                        disabled={resource.status === 'NOTYET' && resource.id !== firstNotYetResourceId}
+                        onClick={() => handleUpdate({ lessonId: lesson.id, status: lesson.status })}
+                        disabled={lesson.status === 'NOTYET' && lesson.id !== firstNotYetChapterId}
                       >
                         <div className='flex items-center'>
-                          {resource.type === 'VIDEO' && <MonitorPlay className='h-5 w-5 mr-2' />}
-                          {resource.type === 'DOCUMENT' && <FileText className='h-5 w-5 mr-2' />}
-                          {resource.type === 'BOTH' && <MonitorPlay className='h-5 w-5 mr-2' />}
-                          <span className='truncate'>{resource.title}</span>
+                          {lesson.type === 'VIDEO' && <MonitorPlay className='h-5 w-5 mr-2' />}
+                          {lesson.type === 'DOCUMENT' && <FileText className='h-5 w-5 mr-2' />}
+                          {lesson.type === 'BOTH' && <MonitorPlay className='h-5 w-5 mr-2' />}
+                          <span className='truncate'>{lesson.title}</span>
                         </div>
-                        {resource.status === 'YET' && <Check className='h-5 w-5 ml-2 flex-shrink-0' />}
+                        {lesson.status === 'YET' && <Check className='h-5 w-5 ml-2 flex-shrink-0' />}
                       </Button>
                     </li>
                   ))}

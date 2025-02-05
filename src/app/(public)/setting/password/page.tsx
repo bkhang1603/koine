@@ -1,4 +1,4 @@
-import { PasswordForm } from '@/app/(public)/setting/components/password-form'
+import { PasswordForm } from '@/components/public/parent/setting/password-form'
 import { Separator } from '@/components/ui/separator'
 
 function page() {

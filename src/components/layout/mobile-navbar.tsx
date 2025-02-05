@@ -1,6 +1,6 @@
 'use client'
 
-import { Book, Building2, Home, LibraryBig, Phone } from 'lucide-react'
+import { Book, Building2, Home, LibraryBig, PackageSearch, Phone } from 'lucide-react'
 import Link from 'next/link'
 import configRoute from '@/config/route'
 import { usePathname } from 'next/navigation'
@@ -10,6 +10,7 @@ function MobileNavbar() {
   const pathname = usePathname()
   const menuItems = [
     { name: 'Trang chủ', icon: Home, href: configRoute.home },
+    { name: 'Sản phẩm', icon: PackageSearch, href: configRoute.product },
     { name: 'Khóa học', icon: LibraryBig, href: configRoute.course },
     { name: 'Kiến thức', icon: Book, href: configRoute.knowledge },
     { name: 'Tổng quan', icon: Building2, href: configRoute.about },

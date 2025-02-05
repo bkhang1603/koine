@@ -1,47 +1,47 @@
+'use client'
+
+import Loading from '@/components/loading'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Progress } from '@/components/ui/progress'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { useGetProductReviewsQuery } from '@/queries/useProduct'
 import { Star } from 'lucide-react'
+import { useState } from 'react'
 
-function ProductDescription({ description }: { description: string }) {
-  const overallRating = 4.5
-  const totalReviews = 100
-  const ratingCounts = { 5: 60, 4: 30, 3: 5, 2: 3, 1: 2 }
-  const reviews = [
-    {
-      id: 1,
-      name: 'Nguyễn Phương',
-      rating: 5,
-      comment: 'Tôi đã học được rất nhiều điều mới mẻ, những kiến thức mà trước đây tôi chưa từng biết.',
-      verified: true,
-      date: '2 ngày trước'
-    },
-    {
-      id: 2,
-      name: 'Minh Hằng',
-      rating: 4,
-      comment: 'Trải nghiệm cùng với Koine thật sự tuyệt vời. Tôi rất hài lòng với khóa học này.',
-      verified: true,
-      date: '4 ngày trước'
-    },
-    {
-      id: 3,
-      name: 'Mai Anh',
-      rating: 3,
-      comment: 'Đây là một khóa học rất tuyệt vời, tôi chưa từng thấy khóa học nào tốt như vậy trước đây.',
-      verified: false,
-      date: '1 ngày trước'
-    },
-    {
-      id: 4,
-      name: 'Ngọc Hằng',
-      rating: 2,
-      comment: 'Đây là lần đầu tiên tôi thấy có một khóa học phù hợp với bé nhỏ của tôi như vậy.',
-      verified: true,
-      date: '5 ngày trước'
-    }
-  ]
+function ProductDescription({
+  description,
+  detail,
+  guide,
+  id
+}: {
+  description: string
+  detail: string
+  guide: string
+  id: string
+}) {
+  const [selectedFilter, setSelectedFilter] = useState<string | null>(null)
+  const { data, isLoading } = useGetProductReviewsQuery({
+    id,
+    page_index: 1,
+    page_size: 20,
+    star: selectedFilter ? parseInt(selectedFilter) : 0
+  })
+  const productReviews = data?.payload.data.ratingInfos || []
+  const overallRating = data?.payload.data.stars.averageRating || 0
+  const ratingCounts = data?.payload.data.stars.ratings || {
+    1: 0,
+    2: 0,
+    3: 0,
+    4: 0,
+    5: 0
+  }
+
+  const totalReviews = data?.payload.data.stars.totalRating || 0
+
+  const handleFilterClick = (filter: string) => {
+    setSelectedFilter(filter === selectedFilter ? null : filter)
+  }
 
   return (
     <div className='mt-12 space-y-20'>
@@ -57,17 +57,18 @@ function ProductDescription({ description }: { description: string }) {
         </TabsContent>
         <TabsContent value='usage' className='mt-4'>
           <h3 className='text-lg font-semibold mb-2'>Hướng dẫn sử dụng:</h3>
-          <ol className='list-decimal list-inside space-y-2'>
+          {/* <ol className='list-decimal list-inside space-y-2'>
             <li>Đọc từng chương theo thứ tự để hiểu rõ các giai đoạn phát triển.</li>
             <li>Thảo luận nội dung sách cùng cha mẹ hoặc người lớn đáng tin cậy.</li>
             <li>Thực hành các bài tập và hoạt động được đề xuất trong sách.</li>
             <li>Sử dụng sách như một tài liệu tham khảo khi có thắc mắc.</li>
             <li>Chia sẻ kiến thức học được với bạn bè cùng lứa tuổi.</li>
-          </ol>
+          </ol> */}
+          <p>{guide}</p>
         </TabsContent>
         <TabsContent value='details' className='mt-4'>
           <h3 className='text-lg font-semibold mb-2'>Chi tiết sản phẩm:</h3>
-          <ul className='list-disc list-inside space-y-2'>
+          {/* <ul className='list-disc list-inside space-y-2'>
             <li>Tác giả: Nguyễn Văn A</li>
             <li>Nhà xuất bản: NXB Trẻ</li>
             <li>Năm xuất bản: 2023</li>
@@ -75,7 +76,8 @@ function ProductDescription({ description }: { description: string }) {
             <li>Kích thước: 14 x 20 cm</li>
             <li>Bìa: Bìa mềm</li>
             <li>Độ tuổi phù hợp: 10-15 tuổi</li>
-          </ul>
+          </ul> */}
+          <p>{detail}</p>
         </TabsContent>
       </Tabs>
 
@@ -87,7 +89,10 @@ function ProductDescription({ description }: { description: string }) {
               <div className='text-5xl font-bold'>{overallRating.toFixed(1)}</div>
               <div className='flex mt-2'>
                 {[1, 2, 3, 4, 5].map((star) => (
-                  <Star key={star} className='w-5 h-5 fill-yellow-400 text-yellow-400' />
+                  <Star
+                    key={star}
+                    className={`w-5 h-5 ${star <= Math.ceil(overallRating) ? 'fill-yellow-400 text-yellow-400' : 'fill-gray-400 text-gray-400'}`}
+                  />
                 ))}
               </div>
               <div className='text-sm text-gray-500 mt-1'>({totalReviews} đánh giá)</div>
@@ -107,36 +112,55 @@ function ProductDescription({ description }: { description: string }) {
               ))}
             </div>
           </div>
-          <div className='space-y-2'>
+          {/* <div className='space-y-2'>
             {['Mới nhất', 'Có hình ảnh', '5 sao', '4 sao', '3 sao', '2 sao', '1 sao'].map((filter) => (
               <Button key={filter} variant='outline' size='sm' className='mr-2 mb-2'>
+                {filter}
+              </Button>
+            ))}
+          </div> */}
+          <div className='space-y-2'>
+            {['5 sao', '4 sao', '3 sao', '2 sao', '1 sao'].map((filter) => (
+              <Button
+                key={filter}
+                variant='outline'
+                size='sm'
+                className={`mr-2 mb-2 ${selectedFilter === filter ? 'opacity-50' : ''}`}
+                onClick={() => handleFilterClick(filter)}
+              >
                 {filter}
               </Button>
             ))}
           </div>
         </div>
         <div className='mt-6 space-y-6'>
-          {reviews.map((review) => (
-            <Card key={review.id}>
-              <CardContent className='p-6'>
-                <div className='flex items-center mb-2'>
-                  <div className='w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 font-semibold mr-3'>
-                    {review.name.charAt(0)}
-                  </div>
-                  <div>
-                    <div className='font-semibold'>{review.name}</div>
-                    <div className='flex items-center mb-2'>
-                      {[1, 2, 3, 4, 5].map((star) => (
-                        <Star
-                          key={star}
-                          className={`w-4 h-4 ${star <= review.rating ? 'fill-yellow-400 text-yellow-400' : 'fill-gray-200 text-gray-200'}`}
-                        />
-                      ))}
+          {isLoading ? (
+            <div className='flex items-center justify-center'>
+              <Loading />
+            </div>
+          ) : productReviews.length === 0 ? (
+            <div className='text-center'>Không có đánh giá nào cho sản phẩm này</div>
+          ) : (
+            productReviews.map((review) => (
+              <Card key={review.productId}>
+                <CardContent className='p-6'>
+                  <div className='flex items-center mb-2'>
+                    <div className='w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 font-semibold mr-3'>
+                      {review.user.username.charAt(0)}
+                    </div>
+                    <div>
+                      <div className='font-semibold'>{review.user.username}</div>
+                      <div className='flex items-center mb-2'>
+                        {[1, 2, 3, 4, 5].map((star) => (
+                          <Star
+                            key={star}
+                            className={`w-4 h-4 ${star <= review.rating ? 'fill-yellow-400 text-yellow-400' : 'fill-gray-200 text-gray-200'}`}
+                          />
+                        ))}
+                      </div>
                     </div>
                   </div>
-                </div>
 
-                {review.verified && (
                   <div className='flex items-center text-green-600 text-sm mb-2'>
                     <svg className='w-4 h-4 mr-1' fill='currentColor' viewBox='0 0 20 20'>
                       <path
@@ -147,12 +171,13 @@ function ProductDescription({ description }: { description: string }) {
                     </svg>
                     Đã mua hàng
                   </div>
-                )}
-                <p className='text-gray-600 mb-2'>{review.comment}</p>
-                <div className='text-sm text-gray-500'>Đánh giá vào {review.date}</div>
-              </CardContent>
-            </Card>
-          ))}
+
+                  <p className='text-gray-600 mb-2'>{review.review}</p>
+                  <div className='text-sm text-gray-500'>Đánh giá vào {review.updatedAtFormatted}</div>
+                </CardContent>
+              </Card>
+            ))
+          )}
         </div>
       </div>
     </div>

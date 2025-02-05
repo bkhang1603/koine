@@ -1,6 +1,6 @@
 import { Sidebar } from '@/types/sidebar'
 import SidebarLayout from '@/components/layout/sidebar-layout'
-import { Book, BookMarked, Home } from 'lucide-react'
+import { AreaChart, Book, BookMarked, Settings } from 'lucide-react'
 
 export default function Layout({
   children
@@ -14,7 +14,7 @@ export default function Layout({
         {
           id: 'dashboard',
           href: '/content-creator',
-          icon: <Home className='h-5 w-5' />,
+          icon: <AreaChart className='h-5 w-5' />,
           label: 'Thống kê'
         }
       ]
@@ -33,6 +33,17 @@ export default function Layout({
           href: '/content-creator/course',
           icon: <BookMarked className='h-5 w-5' />,
           label: 'Khoá học'
+        }
+      ]
+    },
+    {
+      title: 'Cài đặt',
+      group: [
+        {
+          id: 'settings',
+          href: '/content-creator/settings',
+          icon: <Settings className='h-5 w-5' />,
+          label: 'Cài đặt'
         }
       ]
     }

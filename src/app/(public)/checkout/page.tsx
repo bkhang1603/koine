@@ -1,4 +1,4 @@
-import Checkout from '@/app/(public)/checkout/components/checkout'
+import Checkout from '@/components/public/parent/checkout/checkout'
 
 function CheckoutPage() {
   return <Checkout />

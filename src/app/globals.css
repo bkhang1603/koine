@@ -46,6 +46,9 @@
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 40% 98%;
 
+    --success: 145 67% 37%;
+    --success-foreground: 0 0% 100%;
+
     --border: 214.3 31.8% 91.4%;
     --input: 214.3 31.8% 91.4%;
     --ring: 222.2 84% 4.9%;
@@ -101,6 +104,9 @@
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 40% 98%;
 
+    --success: 145 67% 37%;
+    --success-foreground: 0 0% 100%;
+
     --border: 214.3 31.8% 91.4%;
     --input: 214.3 31.8% 91.4%;
     --ring: 222.2 84% 4.9%;
@@ -132,6 +138,9 @@
   }
   p {
     @apply break-words;
+  }
+  img {
+    @apply rounded-lg;
   }
   /* Data-type */
   /* [data-type='custom-column'] {
@@ -222,4 +231,13 @@
   padding-top: 2px;
   word-break: break-all;
   word-wrap: break-word;
+}
+
+.ProseMirror img {
+  border-radius: 0.375rem;
+}
+
+.ProseMirror-selectednode .mw-file-element {
+  outline: 2px dashed #aed1ff;
+  outline-offset: 2px;
 }

@@ -238,3 +238,55 @@ export const checkAndSetTokenToCookieByLoginGoogle = async ({
   //   role
   // }
 }
+
+export const changeTime = (createdAt: string) => {
+  // Tôi đang có data là 14:00:00-10/01/2024, tôi muốn chuyển thành số giờ trước so với thời gian hiện tại
+  // Ví dụ: 2 giờ trước
+  // const [time, date] = createdAt.split('-')
+  // const [hour, minute, second] = time.split(':').map(Number)
+  // const [day, month, year] = date.split('/').map(Number)
+  // const commentDate = new Date(year, month - 1, day, hour, minute, second)
+  // const currentDate = new Date()
+  // const diff = currentDate.getTime() - commentDate.getTime()
+
+  const commentDate = new Date(createdAt)
+  const currentDate = new Date()
+  const diff = currentDate.getTime() - commentDate.getTime()
+
+  if (diff < 0) {
+    return 'Vừa xong'
+  }
+
+  const seconds = Math.floor(diff / 1000)
+  const minutes = Math.floor(seconds / 60)
+  const hours = Math.floor(minutes / 60)
+  const days = Math.floor(hours / 24)
+  const months = Math.floor(days / 30)
+  const years = Math.floor(months / 12)
+
+  if (years) {
+    return `${years} năm trước`
+  }
+
+  if (months) {
+    return `${months} tháng trước`
+  }
+
+  if (days) {
+    return `${days} ngày trước`
+  }
+
+  if (hours) {
+    return `${hours} giờ trước`
+  }
+
+  if (minutes) {
+    return `${minutes} phút trước`
+  }
+
+  if (seconds) {
+    return `${seconds} giây trước`
+  }
+
+  return 'Vừa xong'
+}

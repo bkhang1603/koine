@@ -5,22 +5,21 @@ export const CourseData = z
   .object({
     id: z.string(),
     creatorId: z.string(),
-    editorId: z.string(),
     title: z.string(),
+    titleNoTone: z.string(),
+    slug: z.string(),
     description: z.string(),
-    price: z.number(),
     imageUrl: z.string(),
     imageBanner: z.string(),
-    totalOfStudent: z.number(),
-    aveRating: z.number(),
+    price: z.number(),
+    discount: z.number(),
     durations: z.number(),
+    durationsDisplay: z.string(),
+    aveRating: z.number(),
+    totalEnrollment: z.number(),
     creator: z.object({
       id: z.string(),
-      name: z.string()
-    }),
-    editor: z.object({
-      id: z.string(),
-      name: z.string()
+      username: z.string()
     }),
     categories: z.array(
       z.object({
@@ -28,21 +27,25 @@ export const CourseData = z
         name: z.string()
       })
     ),
-    lessons: z.array(
+    chapters: z.array(
       z.object({
         id: z.string(),
         title: z.string(),
         description: z.string(),
+        durations: z.number(),
+        durationsDisplay: z.string(),
         sequence: z.number(),
-        courseResources: z.array(
+        lessons: z.array(
           z.object({
             id: z.string(),
+            type: z.enum(TypeResourceValues),
             title: z.string(),
             description: z.string(),
+            durations: z.number(),
             content: z.string().nullable(),
-            type: z.enum(TypeResourceValues),
             videoUrl: z.string().nullable(),
-            sequence: z.number()
+            sequence: z.number(),
+            durationsDisplay: z.string()
           })
         )
       })
@@ -86,20 +89,13 @@ export const ReactDataRes = z.object({
 
 export const UpdateReactData = z
   .object({
-    blogId: z.string(),
+    identifier: z.string(),
     isReact: z.boolean()
   })
   .strict()
 
 export const UserCourseData = z.object({
-  id: z.string(),
-  courseId: z.string(),
-  course: z.object({
-    id: z.string(),
-    title: z.string(),
-    description: z.string(),
-    imageUrl: z.string()
-  })
+  id: z.string()
 })
 
 export const UserCoursesRes = z.object({
@@ -109,36 +105,115 @@ export const UserCoursesRes = z.object({
 })
 
 export const UserCourseProgressData = z.object({
-  id: z.string(),
-  title: z.string(),
-  courseResources: z.array(
+  status: z.string(),
+  chapters: z.array(
     z.object({
       id: z.string(),
       title: z.string(),
-      type: z.enum(TypeResourceValues),
-      status: z.string()
+      durations: z.number(),
+      durationsDisplay: z.string(),
+      sequence: z.number(),
+      status: z.string(),
+      lessons: z.array(
+        z.object({
+          id: z.string(),
+          type: z.enum(TypeResourceValues),
+          title: z.string(),
+          description: z.string(),
+          durations: z.number(),
+          durationsDisplay: z.string(),
+          sequence: z.number(),
+          status: z.string()
+        })
+      )
     })
-  )
+  ),
+  totalLessonsInCourse: z.number(),
+  totalCompletedLessonsInCourse: z.number(),
+  courseCompletionPercentage: z.number()
 })
 
 export const UserCourseProgressRes = z.object({
-  data: z.array(UserCourseProgressData),
+  data: UserCourseProgressData,
   message: z.string(),
   statusCode: z.number()
 })
 
-export const CourseResourceData = z.object({
+export const CategoryCourses = z.object({
   id: z.string(),
+  name: z.string(),
+  description: z.string(),
+  isDeleted: z.boolean(),
+  createdAt: z.string(),
+  updatedAt: z.string()
+})
+
+export const CategoryCoursesRes = z.object({
+  data: z.array(CategoryCourses),
+  message: z.string(),
+  statusCode: z.number()
+})
+
+export const ChaptersData = z
+  .object({
+    id: z.string(),
+    creatorId: z.string(),
+    courseId: z.string(),
+    title: z.string(),
+    description: z.string(),
+    durations: z.number(),
+    sequence: z.number(),
+    creator: z.object({
+      id: z.string(),
+      username: z.string()
+    })
+  })
+  .strict()
+
+export const ChaptersRes = z.object({
+  data: z.array(ChaptersData),
+  message: z.string(),
+  statusCode: z.number(),
+  pagination: z.object({
+    totalItem: z.number(),
+    pageSize: z.number(),
+    currentPage: z.number(),
+    maxPageSize: z.number(),
+    totalPage: z.number()
+  })
+})
+
+export const LessonsData = z.object({
+  id: z.string(),
+  chapterId: z.string(),
+  type: z.enum(TypeResourceValues),
   title: z.string(),
   description: z.string(),
   content: z.string().nullable(),
-  type: z.enum(TypeResourceValues),
   videoUrl: z.string().nullable(),
-  sequence: z.number()
+  durations: z.number(),
+  sequence: z.number(),
+  creator: z.object({
+    id: z.string(),
+    username: z.string()
+  })
 })
 
-export const CourseResourceRes = z.object({
-  data: CourseResourceData,
+export const LessonsRes = z.object({
+  data: z.array(LessonsData),
+  message: z.string(),
+  statusCode: z.number(),
+  pagination: z.object({
+    totalItem: z.number(),
+    pageSize: z.number(),
+    currentPage: z.number(),
+    maxPageSize: z.number(),
+    totalPage: z.number()
+  })
+})
+
+export const LessonRes = z.object({
+  data: LessonsData,
   message: z.string(),
   statusCode: z.number()
 })
@@ -155,4 +230,10 @@ export type UserCoursesResType = z.infer<typeof UserCoursesRes>
 
 export type UserCourseProgressResType = z.infer<typeof UserCourseProgressRes>
 
-export type CourseResourceResType = z.infer<typeof CourseResourceRes>
+export type CategoryCoursesResType = z.infer<typeof CategoryCoursesRes>
+
+export type ChaptersResType = z.infer<typeof ChaptersRes>
+
+export type LessonsResType = z.infer<typeof LessonsRes>
+
+export type LessonResType = z.infer<typeof LessonRes>

@@ -1,5 +1,5 @@
 import blogApiRequest from '@/apiRequests/blog'
-import BlogComments from '@/app/(public)/knowledge/components/blog-comments'
+import BlogComments from '@/components/public/parent/knowledge/blog-comments'
 import { BlogResType } from '@/schemaValidations/blog.schema'
 
 async function page({ params: { id } }: { params: { id: string } }) {
@@ -21,7 +21,7 @@ async function page({ params: { id } }: { params: { id: string } }) {
         {blog?.title}
       </h1>
 
-      <div className='mt-12 tiptap-editor' dangerouslySetInnerHTML={{ __html: blog?.content! }} />
+      {blog?.content && <div className='mt-12 tiptap-editor' dangerouslySetInnerHTML={{ __html: blog.content }} />}
 
       <BlogComments id={id} />
     </div>

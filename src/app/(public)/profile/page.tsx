@@ -1,96 +1,25 @@
 'use client'
 
 import React from 'react'
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
-import { Button } from '@/components/ui/button'
-import { Progress } from '@/components/ui/progress'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
-import { Heart, User, Award, BookOpen, Clock, CheckCircle, Phone, Mail, MapPin, Calendar, Trophy } from 'lucide-react'
-import Image from 'next/image'
-import { useAppStore } from '@/components/app-provider'
+import { Separator } from '@/components/ui/separator'
 
 export default function EnhancedCourseProfile() {
-  const user = useAppStore((state) => state.user)
-
-  const courses = [
-    {
-      id: 1,
-      name: 'Hiểu về cơ thể của mình',
-      progress: 100,
-      totalLessons: 10,
-      completedLessons: 10,
-      image: 'https://koine-bucket.s3.ap-southeast-2.amazonaws.com/image_97d6bb06-9a3c-47ff-8371-25cbd2487532_png_s3',
-      status: 'Hoàn thành',
-      estimatedTime: '5 giờ',
-      color: 'bg-pink-100 text-pink-800'
-    },
-    {
-      id: 2,
-      name: 'Tôn trọng ranh giới cá nhân',
-      progress: 80,
-      totalLessons: 8,
-      completedLessons: 6,
-      image: 'https://koine-bucket.s3.ap-southeast-2.amazonaws.com/image_2deb32f4-f42e-409c-b0cc-d71a5a78471c_png_s3',
-      status: 'Đang học',
-      estimatedTime: '4 giờ',
-      color: 'bg-purple-100 text-purple-800'
-    },
-    {
-      id: 3,
-      name: 'Cảm xúc và mối quan hệ',
-      progress: 50,
-      totalLessons: 12,
-      completedLessons: 6,
-      image: 'https://koine-bucket.s3.ap-southeast-2.amazonaws.com/image_97d6bb06-9a3c-47ff-8371-25cbd2487532_png_s3',
-      status: 'Đang học',
-      estimatedTime: '6 giờ',
-      color: 'bg-blue-100 text-blue-800'
-    },
-    {
-      id: 4,
-      name: 'An toàn trên mạng',
-      progress: 25,
-      totalLessons: 8,
-      completedLessons: 2,
-      image: 'https://koine-bucket.s3.ap-southeast-2.amazonaws.com/image_2deb32f4-f42e-409c-b0cc-d71a5a78471c_png_s3',
-      status: 'Mới bắt đầu',
-      estimatedTime: '4 giờ',
-      color: 'bg-green-100 text-green-800'
-    }
-  ]
-
-  const achievements = [
-    {
-      id: 1,
-      title: 'Nhà thám hiểm cơ thể',
-      description: 'Hoàn thành khóa học "Hiểu về cơ thể của mình"',
-      icon: Heart,
-      color: 'bg-pink-500',
-      progress: 100
-    },
-    {
-      id: 2,
-      title: 'Người bạn tôn trọng',
-      description: 'Đạt điểm tuyệt đối trong bài kiểm tra về ranh giới cá nhân',
-      icon: User,
-      color: 'bg-purple-500',
-      progress: 80
-    },
-    {
-      id: 3,
-      title: 'Chuyên gia cảm xúc',
-      description: 'Hoàn thành 50% khóa học về cảm xúc và mối quan hệ',
-      icon: Award,
-      color: 'bg-blue-500',
-      progress: 50
-    }
-  ]
-
   return (
     <main className='mb-56'>
+      <div className='hidden space-y-6 p-10 pb-16 md:block'>
+        <div className='space-y-0.5'>
+          <h2 className='text-2xl font-bold tracking-tight'>Settings</h2>
+          <p className='text-muted-foreground'>Manage your account settings and set e-mail preferences.</p>
+        </div>
+        <Separator className='my-6' />
+        <div className='flex flex-col space-y-8 lg:flex-row lg:space-x-12 lg:space-y-0'>
+          <aside className='-mx-4 lg:w-1/5'>{/* <SidebarNav items={sidebarNavItems} /> */}</aside>
+          {/* <div className='flex-1 lg:max-w-2xl'>{children}</div> */}
+        </div>
+      </div>
+
       {/* Header Section */}
-      <section className='p-8 flex items-center justify-between rounded-b-xl overflow-hidden border-b-2 border-gray-200 bg-gradient-to-br from-green-100 to-blue-100'>
+      {/* <section className='p-8 flex items-center justify-between rounded-b-xl overflow-hidden border-b-2 border-gray-200 bg-gradient-to-br from-green-100 to-blue-100'>
         <div className='flex items-center'>
           <Avatar className='h-24 w-24 rounded-full border-4 border-blue-200 transition-transform duration-300 hover:scale-110 cursor-pointer'>
             <AvatarImage src={user?.avatarUrl} alt={user?.username || user?.email} />
@@ -107,11 +36,10 @@ export default function EnhancedCourseProfile() {
         <Button variant='outline' className='flex items-center transition-colors duration-300 hover:bg-gray-100'>
           <User className='mr-2 h-4 w-4' /> Chỉnh sửa hồ sơ
         </Button>
-      </section>
+      </section> */}
 
       {/* Main Content */}
-      <div className='p-8'>
-        {/* Personal Information */}
+      {/* <div className='p-8'>
         <section className='mb-12'>
           <h2 className='text-2xl font-bold text-gray-900 mb-6'>Thông tin cá nhân</h2>
           <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
@@ -139,7 +67,6 @@ export default function EnhancedCourseProfile() {
           </div>
         </section>
 
-        {/* Course Progress Overview */}
         <section className='mb-12'>
           <h2 className='text-2xl font-bold text-gray-900 mb-6'>Tổng quan tiến độ học tập</h2>
           <div className='grid grid-cols-1 md:grid-cols-3 gap-6'>
@@ -176,7 +103,6 @@ export default function EnhancedCourseProfile() {
           </div>
         </section>
 
-        {/* Courses */}
         <section className='mb-12'>
           <h2 className='text-2xl font-bold text-gray-900 mb-6'>Khóa học của bạn</h2>
           <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
@@ -232,7 +158,6 @@ export default function EnhancedCourseProfile() {
           </div>
         </section>
 
-        {/* Achievements */}
         <section>
           <h2 className='text-2xl font-bold text-gray-900 mb-6'>Thành tựu</h2>
           <div className='grid grid-cols-1 md:grid-cols-3 gap-6'>
@@ -268,7 +193,7 @@ export default function EnhancedCourseProfile() {
             ))}
           </div>
         </section>
-      </div>
+      </div> */}
     </main>
   )
 }

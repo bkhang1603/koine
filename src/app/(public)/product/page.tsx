@@ -1,5 +1,5 @@
-import Filter from '@/app/(public)/product/components/filter'
-import List from '@/app/(public)/product/components/list'
+import Filter from '@/components/public/parent/product/filter'
+import List from '@/components/public/parent/product/list'
 import images from '@/assets/images'
 import { searchParams } from '@/types/query'
 import Image from 'next/image'
@@ -19,8 +19,10 @@ function ProductPage({ searchParams }: { searchParams?: searchParams }) {
         />
       </div>
 
-      <div className='grid grid-cols-4 gap-6 mt-8 container'>
-        <Filter />
+      <div className='grid grid-cols-3 md:grid-cols-4 gap-6 mt-8 container'>
+        <div className='md:col-span-1 hidden md:block'>
+          <Filter />
+        </div>
 
         <List searchParams={searchParams} />
       </div>
