@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useCallback, useEffect, useRef } from 'react'
+import { useState, useCallback, useEffect, useRef, useMemo } from 'react'
 import Artplayer from 'artplayer'
 import { ChevronDown, ArrowLeft, ArrowRight, ChevronLeft } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -12,7 +12,11 @@ import Image from 'next/image'
 import icons from '@/assets/icons'
 import Link from 'next/link'
 import configRoute from '@/config/route'
-import { useGetCourseProgressQuery, useGetLessonQuery } from '@/queries/useCourse'
+import { useGetCourseProgressQuery, useGetLessonQuery, useUpdateCourseProgressMutation } from '@/queries/useCourse'
+import { handleErrorApi } from '@/lib/utils'
+import { UserCourseProgressResType } from '@/schemaValidations/course.schema'
+
+type Lesson = UserCourseProgressResType['data']['chapters'][0]['lessons'][0]
 
 export default function CoursePage() {
   const { id } = useParams()
@@ -20,7 +24,7 @@ export default function CoursePage() {
   const router = useRouter()
 
   const { data: courseProgress } = useGetCourseProgressQuery({ id: id as string })
-  const courseProgressData = courseProgress?.payload?.data?.chapters ?? []
+  const courseProgressData = useMemo(() => courseProgress?.payload?.data?.chapters ?? [], [courseProgress])
   const progress = courseProgress?.payload.data.courseCompletionPercentage
   const totalLesson = courseProgress?.payload.data.totalLessonsInCourse
   const totalCompletedLesson = courseProgress?.payload.data.totalCompletedLessonsInCourse
@@ -32,6 +36,21 @@ export default function CoursePage() {
 
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const playerRef = useRef<HTMLDivElement>(null)
+
+  const updateCourseProgressMutation = useUpdateCourseProgressMutation()
+
+  const handleUpdate = useCallback(
+    async ({ lessonId, status }: { lessonId: string; status: Lesson['status'] }) => {
+      try {
+        if (status === 'NOTYET') {
+          await updateCourseProgressMutation.mutateAsync(lessonId)
+        }
+      } catch (error) {
+        handleErrorApi({ error })
+      }
+    },
+    [updateCourseProgressMutation]
+  )
 
   const toggleSidebar = useCallback(() => {
     setSidebarOpen((prev) => !prev)
@@ -72,12 +91,28 @@ export default function CoursePage() {
     }
   }, [lessonData?.type, lessonData?.videoUrl])
 
+  const navigateLesson = useCallback(
+    (direction: 'prev' | 'next') => {
+      const currentLessonIndex = courseProgressData
+        .flatMap((chapter) => chapter.lessons)
+        .findIndex((lesson) => lesson.id === rId)
+
+      const nextLessonIndex = direction === 'next' ? currentLessonIndex + 1 : currentLessonIndex - 1
+      const nextLessonId = courseProgressData.flatMap((chapter) => chapter.lessons)[nextLessonIndex]?.id
+
+      if (nextLessonId) {
+        router.replace(`?rId=${nextLessonId}`)
+      }
+    },
+    [courseProgressData, rId, router]
+  )
+
   return (
     <div className='flex flex-col h-screen bg-background'>
       {/* Header */}
       <header className='h-16 border-b flex items-center justify-between px-4'>
         <div className='flex items-center gap-2'>
-          <Button size={'icon'} variant={'ghost'} onClick={() => router.back()}>
+          <Button size={'icon'} variant={'ghost'} onClick={() => router.push(configRoute.home)}>
             <ChevronLeft className='h-5 w-5' />
           </Button>
 
@@ -96,8 +131,11 @@ export default function CoursePage() {
             variant='ghost'
             size='icon'
             onClick={() => {
-              // navigateResource('prev')
+              navigateLesson('prev')
             }}
+            disabled={
+              courseProgressData.flatMap((chapter) => chapter.lessons).findIndex((lesson) => lesson.id === rId) === 0
+            }
           >
             <ArrowLeft className='h-4 w-4' />
           </Button>
@@ -105,8 +143,13 @@ export default function CoursePage() {
             variant='ghost'
             size='icon'
             onClick={() => {
-              // navigateResource('next')
+              navigateLesson('next')
             }}
+            disabled={
+              lessonData?.status === 'NOTYET' ||
+              courseProgressData.flatMap((chapter) => chapter.lessons).findIndex((lesson) => lesson.id === rId) ===
+                courseProgressData.flatMap((chapter) => chapter.lessons).length - 1
+            }
           >
             <ArrowRight className='h-4 w-4' />
           </Button>
@@ -121,21 +164,60 @@ export default function CoursePage() {
         {/* Content area */}
         <div className='flex-1 overflow-hidden'>
           <ScrollArea className='h-[calc(100vh-4rem)] bg-gray-100'>
-            <div className='max-w-4xl mx-auto bg-white min-h-[calc(100vh-4rem)]'>
-              {(lessonData?.type === 'VIDEO' || lessonData?.type === 'BOTH') && (
-                <div className='aspect-video relative z-0'>
-                  <div ref={playerRef} className='w-full h-full'></div>
+            <div className='max-w-4xl mx-auto bg-white min-h-[calc(100vh-4rem)] flex justify-between items-end flex-col'>
+              <div className='w-full'>
+                {(lessonData?.type === 'VIDEO' || lessonData?.type === 'BOTH') && (
+                  <div className='aspect-video relative z-0'>
+                    <div ref={playerRef} className='w-full h-full'></div>
+                  </div>
+                )}
+                <div className='p-6'>
+                  <h2 className='text-2xl font-medium'>{lessonData?.title}</h2>
+                  <p className='text-gray-500'>{lessonData?.description}</p>
+
+                  {(lessonData?.type === 'DOCUMENT' || lessonData?.type === 'BOTH') && (
+                    <div className='mt-4'>{lessonData?.content}</div>
+                  )}
+                </div>
+              </div>
+
+              {lessonData && (
+                <div className='flex items-center justify-between p-6 w-full'>
+                  <Button
+                    variant='default'
+                    onClick={() => navigateLesson('prev')}
+                    disabled={
+                      courseProgressData
+                        .flatMap((chapter) => chapter.lessons)
+                        .findIndex((lesson) => lesson.id === rId) === 0
+                    }
+                  >
+                    Quay lại
+                  </Button>
+
+                  <Button
+                    variant='default'
+                    onClick={() => handleUpdate({ lessonId: lessonData?.id, status: lessonData?.status })}
+                    disabled={lessonData?.status === 'YET'}
+                  >
+                    Hoàn thành bài học
+                  </Button>
+
+                  <Button
+                    variant='default'
+                    onClick={() => navigateLesson('next')}
+                    disabled={
+                      lessonData?.status === 'NOTYET' ||
+                      courseProgressData
+                        .flatMap((chapter) => chapter.lessons)
+                        .findIndex((lesson) => lesson.id === rId) ===
+                        courseProgressData.flatMap((chapter) => chapter.lessons).length - 1
+                    }
+                  >
+                    Tiếp theo
+                  </Button>
                 </div>
               )}
-
-              <div className='p-6'>
-                <h2 className='text-2xl font-medium'>{lessonData?.title}</h2>
-                <p className='text-gray-500'>{lessonData?.description}</p>
-
-                {(lessonData?.type === 'DOCUMENT' || lessonData?.type === 'BOTH') && (
-                  <div className='mt-4'>{lessonData?.content}</div>
-                )}
-              </div>
             </div>
           </ScrollArea>
         </div>

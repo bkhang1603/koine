@@ -2,10 +2,10 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/
 import { Button } from '@/components/ui/button'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { handleErrorApi } from '@/lib/utils'
-import { useUpdateCourseProgressMutation } from '@/queries/useCourse'
 import { UserCourseProgressResType } from '@/schemaValidations/course.schema'
 import { Check, FileText, MonitorPlay } from 'lucide-react'
-import { useParams, useRouter, useSearchParams } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
+import { useCallback } from 'react'
 
 type Lesson = UserCourseProgressResType['data']['chapters'][0]['lessons'][0]
 type Chapter = UserCourseProgressResType['data']['chapters'][0]
@@ -17,29 +17,30 @@ function LearnSidebar({
   sidebarOpen: boolean
   courseProgressData: UserCourseProgressResType['data']['chapters']
 }) {
-  const { id } = useParams()
+  // const { id } = useParams()
   const search = useSearchParams()
   const rId = search.get('rId')
   const router = useRouter()
-
-  const updateCourseProgressMutation = useUpdateCourseProgressMutation()
 
   // Tìm resource NOTYET đầu tiên trong toàn bộ courseProgressData
   const firstNotYetChapterId = courseProgressData
     .flatMap((chapter) => chapter.lessons)
     .find((lesson) => lesson.status === 'NOTYET')?.id
 
-  const handleUpdate = async ({ lessonId, status }: { lessonId: string; status: string }) => {
-    try {
-      if (status === 'NOTYET') {
-        await updateCourseProgressMutation.mutateAsync(lessonId)
-      }
+  const firstLessonId = courseProgressData
+    .flatMap((chapter) => chapter.lessons)
+    .sort((a, b) => a.sequence - b.sequence)[0]?.id
 
-      router.push(`/learn/${id}?rId=${lessonId}`)
-    } catch (error) {
-      handleErrorApi({ error })
-    }
-  }
+  const handleUpdate = useCallback(
+    async ({ lessonId }: { lessonId: string }) => {
+      try {
+        router.replace(`?rId=${lessonId}`)
+      } catch (error) {
+        handleErrorApi({ error })
+      }
+    },
+    [router]
+  )
 
   const defaultLessonId = rId
     ? [courseProgressData?.find((lesson) => lesson.lessons.some((resource) => resource.id === rId))?.id || '']
@@ -56,12 +57,14 @@ function LearnSidebar({
               <AccordionTrigger className='px-4'>{chapter.title}</AccordionTrigger>
               <AccordionContent className='px-4'>
                 <ul>
-                  {chapter.lessons.map((lesson: Lesson, index: number) => (
+                  {chapter.lessons.map((lesson: Lesson) => (
                     <li key={lesson.id} className='flex items-center'>
                       <Button
-                        variant={rId === lesson.id || (!rId && index === 0) ? 'linkNoUnderline' : 'ghostBlur'}
+                        variant={
+                          rId === lesson.id || (!rId && lesson.id === firstLessonId) ? 'linkNoUnderline' : 'ghostBlur'
+                        }
                         className='w-full justify-start px-4 pr-8 py-2 h-12 text-sm font-normal'
-                        onClick={() => handleUpdate({ lessonId: lesson.id, status: lesson.status })}
+                        onClick={() => handleUpdate({ lessonId: lesson.id })}
                         disabled={lesson.status === 'NOTYET' && lesson.id !== firstNotYetChapterId}
                       >
                         <div className='flex items-center'>

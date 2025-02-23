@@ -1,112 +1,144 @@
-import icons from '@/assets/icons'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import Image from 'next/image'
-import React from 'react'
+'use client'
 
-const serviceData = [
+import { motion } from 'framer-motion'
+import { Card } from '@/components/ui/card'
+import Image from 'next/image'
+import icons from '@/assets/icons'
+import { cn } from '@/lib/utils'
+
+const services = [
   {
     icon: icons.user,
     title: 'Hướng dẫn 1-1',
-    description:
-      'Koine tạo cơ hội cho học viên kết nối trực tiếp với các chuyên gia hàng đầu trong lĩnh vực giáo dục giới tính xuyên suốt khóa học.'
+    description: 'Kết nối trực tiếp với các chuyên gia hàng đầu trong lĩnh vực giáo dục giới tính',
+    color: 'bg-[#FFF0F0]',
+    iconColor: 'bg-[#FF9898]',
+    position: 'lg:translate-y-12'
   },
   {
     icon: icons.clock,
     title: 'Sẵn sàng 24/7',
-    description:
-      'Với hệ thống học trực tuyến hoạt động 24/7, đội ngũ chuyên gia sẵn sàng hỗ trợ giải đáp các thắc mắc đồng hành cùng học viên.'
+    description: 'Hệ thống học trực tuyến và đội ngũ chuyên gia luôn sẵn sàng hỗ trợ mọi lúc',
+    color: 'bg-[#F0F7FF]',
+    iconColor: 'bg-[#98CAFF]',
+    position: 'lg:-translate-y-12'
   },
   {
     icon: icons.calendar,
-    title: 'Nhận tư vấn mọi lúc',
-    description:
-      'Mỗi học viên tại Koine đều có trải nghiệm học tập được cá nhân hóa, phù hợp với độ tuổi, sở thích và nhu cầu riêng. '
+    title: 'Lộ trình cá nhân hóa',
+    description: 'Trải nghiệm học tập được thiết kế riêng phù hợp với từng độ tuổi và nhu cầu',
+    color: 'bg-[#FFF0FA]',
+    iconColor: 'bg-[#FF98D6]',
+    position: 'lg:translate-y-12'
   },
   {
     icon: icons.dollar,
-    title: 'Giá cả phải chăng',
-    description: 'Tất cả chương trình giáo dục đặc biệt của chúng tôi các chuyên gia có bằng cấp về giáo dục đặc biệt'
+    title: 'Chi phí hợp lý',
+    description: 'Mức học phí phù hợp với chất lượng đào tạo từ các chuyên gia hàng đầu',
+    color: 'bg-[#F0FFF4]',
+    iconColor: 'bg-[#98FFB0]',
+    position: 'lg:-translate-y-12'
   }
 ]
 
-function Service() {
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.2
+    }
+  }
+}
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      duration: 0.5
+    }
+  }
+}
+
+export default function Service() {
   return (
-    <section className='bg-fifth'>
-      <div className='container pt-20 pb-28 flex flex-col justify-center items-center'>
-        <h3 className='font-semibold sm:text-lg'>Tại sao chọn chúng tôi</h3>
-        <h2
-          className='bg-gradient-to-r from-[#FF0059] via-[#FF597D] to-[#2945DE]
-          text-transparent bg-clip-text text-2xl md:text-3xl lg:text-5xl lg:h-14 font-bold mt-5 text-center'
+    <section className='overflow-hidden'>
+      <div className='container py-24'>
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          viewport={{ once: true }}
+          className='text-center max-w-2xl mx-auto'
         >
-          Các khóa học tạo nên sự khác biệt
-        </h2>
+          <span className='bg-primary/10 text-primary px-4 py-1.5 rounded-full text-sm font-medium'>
+            Tại sao chọn chúng tôi
+          </span>
+          <h2 className='text-3xl md:text-4xl lg:text-5xl font-bold mt-6'>
+            Trải nghiệm học tập
+            <span
+              className='bg-gradient-to-r from-[#FF0059] via-[#FF597D] to-[#2945DE] 
+              text-transparent bg-clip-text'
+            >
+              {' '}
+              tuyệt vời nhất
+            </span>
+          </h2>
+          <p className='mt-4 text-muted-foreground'>
+            Chúng tôi cung cấp môi trường học tập tốt nhất cho con bạn với đội ngũ chuyên gia hàng đầu
+          </p>
+        </motion.div>
 
-        <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-16'>
-          {serviceData.map((service, index) => (
-            <Card key={index} className='transition-shadow duration-300 hover:shadow-xl cursor-pointer'>
-              <CardHeader className='pt-4 pb-2 px-4 sm:pt-6 sm:pb-4 sm:px-6'>
-                <Image src={service.icon} alt='user' width={70} height={70} className='w-10 h-10 sm:w-16 sm:h-16' />
-              </CardHeader>
-              <CardContent className='pb-4 pt-2 px-4 sm:pb-6 sm:pt-4 sm:px-6'>
-                <CardTitle className='text-sm sm:text-base'>{service.title}</CardTitle>
-                <CardDescription className='mt-2 text-xs sm:text-base line-clamp-4'>
-                  {service.description}
-                </CardDescription>
-              </CardContent>
-            </Card>
+        <motion.div
+          variants={containerVariants}
+          initial='hidden'
+          whileInView='visible'
+          viewport={{ once: true }}
+          className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mt-16'
+        >
+          {services.map((service, index) => (
+            <motion.div
+              key={index}
+              variants={itemVariants}
+              className={cn('transition-all duration-500', service.position)}
+            >
+              <Card
+                className={cn(
+                  'group relative overflow-hidden border-none rounded-xl h-full transition-all duration-500',
+                  service.color,
+                  'hover:shadow-[0_8px_30px_rgb(0,0,0,0.12)]'
+                )}
+              >
+                <div className='p-6'>
+                  {/* Icon */}
+                  <div
+                    className={cn(
+                      'w-14 h-14 rounded-xl flex items-center justify-center mb-6',
+                      service.iconColor,
+                      'group-hover:scale-110 transition-transform duration-500'
+                    )}
+                  >
+                    <Image src={service.icon} alt={service.title} width={28} height={28} className='w-7 h-7' />
+                  </div>
+
+                  {/* Content */}
+                  <h3 className='text-xl font-semibold mb-2'>{service.title}</h3>
+                  <p className='text-muted-foreground text-sm leading-relaxed'>{service.description}</p>
+                </div>
+
+                {/* Decorative Corner */}
+                <div
+                  className='absolute top-0 right-0 w-24 h-24 bg-white/20 rounded-bl-[100px] 
+                  -translate-y-12 translate-x-12 group-hover:translate-y-0 group-hover:translate-x-0 
+                  transition-transform duration-500'
+                />
+              </Card>
+            </motion.div>
           ))}
-
-          {/* <Card className='transition-shadow duration-300 hover:shadow-xl cursor-pointer'>
-            <CardHeader className='pt-4 pb-2 px-4 sm:pt-6 sm:pb-4 sm:px-6'>
-              <Image src={icons.user} alt='user' width={70} height={70} className='w-10 h-10 sm:w-16 sm:h-16' />
-            </CardHeader>
-            <CardContent className='pb-4 pt-2 px-4 sm:pb-6 sm:pt-4 sm:px-6'>
-              <CardTitle className='text-sm sm:text-base'>Hướng dẫn 1-1</CardTitle>
-              <CardDescription className='mt-2 text-xs sm:text-base line-clamp-4'>
-                Tất cả chương trình giáo dục đặc biệt của chúng tôi các chuyên gia có bằng cấp về giáo dục đặc biệt
-              </CardDescription>
-            </CardContent>
-          </Card>
-
-          <Card className='transition-shadow duration-300 hover:shadow-xl cursor-pointer'>
-            <CardHeader className='pt-4 pb-2 px-4 sm:pt-6 sm:pb-4 sm:px-6'>
-              <Image src={icons.clock} alt='clock' width={70} height={70} className='w-10 h-10 sm:w-16 sm:h-16' />
-            </CardHeader>
-            <CardContent className='pb-4 pt-2 px-4 sm:pb-6 sm:pt-4 sm:px-6'>
-              <CardTitle className='text-sm sm:text-base'>Sẵn sàng 24/7</CardTitle>
-              <CardDescription className='mt-2 text-xs sm:text-base line-clamp-4'>
-                Tất cả chương trình giáo dục đặc biệt của chúng tôi các chuyên gia có bằng cấp về giáo dục đặc biệt
-              </CardDescription>
-            </CardContent>
-          </Card>
-
-          <Card className='transition-shadow duration-300 hover:shadow-xl cursor-pointer'>
-            <CardHeader className='pt-4 pb-2 px-4 sm:pt-6 sm:pb-4 sm:px-6'>
-              <Image src={icons.calendar} alt='calendar' width={70} height={70} className='w-10 h-10 sm:w-16 sm:h-16' />
-            </CardHeader>
-            <CardContent className='pb-4 pt-2 px-4 sm:pb-6 sm:pt-4 sm:px-6'>
-              <CardTitle className='text-sm sm:text-base'>Nhận tư vấn mọi lúc</CardTitle>
-              <CardDescription className='mt-2 text-xs sm:text-base line-clamp-4'>
-                Tất cả chương trình giáo dục đặc biệt của chúng tôi các chuyên gia có bằng cấp về giáo dục đặc biệt
-              </CardDescription>
-            </CardContent>
-          </Card>
-
-          <Card className='transition-shadow duration-300 hover:shadow-xl cursor-pointer'>
-            <CardHeader className='pt-4 pb-2 px-4 sm:pt-6 sm:pb-4 sm:px-6'>
-              <Image src={icons.dollar} alt='dollar' width={70} height={70} className='w-10 h-10 sm:w-16 sm:h-16' />
-            </CardHeader>
-            <CardContent className='pb-4 pt-2 px-4 sm:pb-6 sm:pt-4 sm:px-6'>
-              <CardTitle className='text-sm sm:text-base'>Giá cả phải chăng</CardTitle>
-              <CardDescription className='mt-2 text-xs sm:text-base line-clamp-4'>
-                Tất cả chương trình giáo dục đặc biệt của chúng tôi các chuyên gia có bằng cấp về giáo dục đặc biệt
-              </CardDescription>
-            </CardContent>
-          </Card> */}
-        </div>
+        </motion.div>
       </div>
     </section>
   )
 }
-
-export default Service

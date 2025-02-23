@@ -1,6 +1,7 @@
 'use client'
 
 import { useAppStore } from '@/components/app-provider'
+import Loading from '@/components/loading'
 import { Button } from '@/components/ui/button'
 import { Form, FormControl, FormField, FormItem } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
@@ -30,6 +31,10 @@ function AddToCartButton({ product }: { product: ProductResType['data'] }) {
 
   const onSubmit = async (data: AddCartDetailReqType) => {
     try {
+      if (addToCartMutation.isPending) {
+        return
+      }
+
       const value = {
         productId: product.id,
         courseId: null, // Add courseId property
@@ -122,9 +127,20 @@ function AddToCartButton({ product }: { product: ProductResType['data'] }) {
             </Button>
           )}
 
-          {role && (
+          {/* {role && (
             <Button type='submit' variant={'outlineSecondary'} className='w-full mb-6'>
               Thêm vào giỏ hàng
+            </Button>
+          )} */}
+
+          {role && (
+            <Button
+              type='submit'
+              variant={'outlineSecondary'}
+              className='w-full mb-6'
+              disabled={addToCartMutation.isPending}
+            >
+              {addToCartMutation.isPending ? <Loading color='bg-secondary' /> : 'Thêm vào giỏ hàng'}
             </Button>
           )}
 

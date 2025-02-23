@@ -1,22 +1,17 @@
 import z from 'zod'
 
-export const orderData = z
+export const orderBody = z
   .object({
-    id: z.string(),
-    userId: z.string(),
-    cartDetailIds: z.array(z.string()),
-    totalPrice: z.number(),
-    status: z.string(),
-    paymentMethod: z.string(),
-    shippingMethod: z.string(),
-    shippingAddress: z.string(),
-    createdAt: z.string(),
-    updatedAt: z.string()
+    arrayCartDetailIds: z.array(z.string()),
+    deliveryInfoId: z.string()
   })
   .strict()
 
-export const orderRes = z.object({
-  data: orderData,
-  message: z.string(),
-  statusCode: z.number()
+export const orderBodyRes = z.object({
+  data: z.string(),
+  message: z.string()
 })
+
+export type OrderBody = z.infer<typeof orderBody>
+
+export type OrderBodyResType = z.TypeOf<typeof orderBodyRes>

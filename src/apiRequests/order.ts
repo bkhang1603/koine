@@ -1,11 +1,9 @@
 import http from '@/lib/http'
+import { OrderBody, OrderBodyResType } from '@/schemaValidations/order.schema'
 
 const orderApiRequest = {
   getOrders: () => http.get('/orders'),
-  createOrderNow: ({ data }: { data: any }) => http.post('/orders', data),
-  createOrderByCart: ({ data }: { data: any }) => http.post('/orders/cart-detail-ids', data),
-  updateOrder: ({ id, data }: { id: string; data: any }) => http.put(`/orders/${id}`, data),
-  deleteOrder: ({ id }: { id: string }) => http.delete(`/orders/${id}`)
+  createOrder: (data: OrderBody) => http.post<OrderBodyResType>('/orders', data)
 }
 
 export default orderApiRequest

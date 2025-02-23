@@ -13,7 +13,11 @@ const configRoute = {
     profile: '/setting',
     myCourse: '/setting/my-course',
     order: '/setting/order',
-    password: '/setting/password'
+    password: '/setting/password',
+    address: '/setting/address',
+    payment: '/setting/payment',
+    notification: '/setting/notification',
+    security: '/setting/security'
   },
   profile: '/profile',
   contentCreator: {

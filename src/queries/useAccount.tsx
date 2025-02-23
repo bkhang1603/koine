@@ -36,3 +36,10 @@ export const useUpdateAccountProfileMutation = () => {
     }
   })
 }
+
+export const useGetAccountAddress = () => {
+  return useQuery({
+    queryKey: ['account-address'],
+    queryFn: accountApiRequest.getAccountAddress
+  })
+}

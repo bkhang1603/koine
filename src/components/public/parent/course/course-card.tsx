@@ -1,82 +1,66 @@
-import { Badge } from '@/components/ui/badge'
-import { Separator } from '@/components/ui/separator'
 import { CoursesResType } from '@/schemaValidations/course.schema'
-import { Clock, Rocket, Star, Users } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
 
 function CourseCard({ course }: { course: CoursesResType['data'][0] }) {
-  const discountedPrice = course.price - (course.price * course.discount) / 100
+  const discountedPrice = course.price - course.price * course.discount
 
   return (
-    <Link href={`/course/${course.slug}`} className='group'>
-      <article className='bg-white rounded-xl overflow-hidden shadow-lg transition-all duration-300 hover:shadow-2xl'>
-        <div className='relative overflow-hidden'>
+    <Link href={`/course/${course.slug}`}>
+      <article className='cursor-pointer group/course'>
+        {/* Image Container */}
+        <div className='w-full aspect-square rounded-lg overflow-hidden relative'>
           <Image
-            src={course.imageUrl || '/placeholder.svg'}
+            src={course.imageUrl || '/no-image.png'}
             alt={course.title}
-            width={600}
+            width={400}
             height={400}
-            className='w-full aspect-square object-cover transition-transform duration-300 group-hover:scale-110'
+            className='w-full h-full object-cover rounded-lg'
+            priority={true}
           />
-          <div className='absolute top-2 left-2 flex gap-2 flex-wrap'>
-            {course.categories.map((category) => (
-              <Badge key={category.id} className='bg-blue-500 text-white'>
-                {category.name}
-              </Badge>
-            ))}
+
+          {/* Discount Tag */}
+          {course.discount > 0 && (
+            <div
+              className='absolute -right-12 top-6 rotate-45 bg-gradient-to-r from-red-500 to-rose-500 
+                          text-white py-1 px-12 text-sm font-medium shadow-lg transform transition-transform'
+            >
+              {course.discount * 100}% OFF
+            </div>
+          )}
+
+          {/* Hover Overlay */}
+          <div
+            className='absolute w-full h-10 bg-black/50 opacity-0 -bottom-10 
+            group-hover/course:bottom-0 group-hover/course:opacity-100 
+            flex justify-center items-center transition-all duration-500'
+          >
+            <p className='text-white'>Xem thêm</p>
           </div>
-          <div className='absolute bottom-2 right-2 bg-black bg-opacity-70 text-white px-3 py-1 rounded-full text-sm font-semibold'>
+        </div>
+
+        {/* Content */}
+        <div className='p-2'>
+          {/* Categories */}
+          <p className='text-xs text-gray-500'>{course.categories.map((cat) => cat.name).join(' • ')}</p>
+
+          {/* Title */}
+          <h3 className='text-lg font-semibold line-clamp-1'>{course.title}</h3>
+
+          {/* Price */}
+          <div className='flex items-center gap-2 mt-2'>
             {course.price === 0 ? (
-              'Miễn phí'
+              <span className='text-base font-semibold text-primary'>Miễn phí</span>
             ) : (
               <>
-                {discountedPrice.toLocaleString()}đ
+                <span className='text-base font-semibold'>{discountedPrice.toLocaleString()}đ</span>
                 {course.discount > 0 && (
-                  <span className='ml-2 line-through text-gray-400'>{course.price.toLocaleString()}đ</span>
+                  <span className='text-sm text-gray-500 line-through'>{course.price.toLocaleString()}đ</span>
                 )}
               </>
             )}
           </div>
         </div>
-
-        <div className='p-4'>
-          <h3 className='text-lg font-bold mb-2 group-hover:text-primary transition-colors duration-300'>
-            {course.title}
-          </h3>
-          <p className='text-sm text-gray-600 mb-4 line-clamp-2'>{course.description}</p>
-
-          <div className='pb-4'>
-            <div className='flex items-center text-sm text-gray-600 gap-2'>
-              <Rocket className='w-4 h-4' />
-              <span>Sơ cấp</span>
-            </div>
-          </div>
-
-          <Separator className='mb-4' />
-
-          <div className='flex items-center justify-between text-sm text-gray-600 mb-2'>
-            <div className='flex items-center'>
-              <Star className='w-4 h-4 text-yellow-400 mr-1' />
-              <span className='font-medium'>{course.aveRating === 0 ? 5 : course.aveRating}</span>
-            </div>
-            <div className='flex items-center'>
-              <Clock className='w-4 h-4 mr-1' />
-              <span>{course.durationsDisplay}</span>
-            </div>
-            <div className='flex items-center'>
-              <Users className='w-4 h-4 mr-1' />
-              <span>{course.totalEnrollment.toLocaleString()}</span>
-            </div>
-          </div>
-        </div>
-        {/* <div className='px-4 pb-4 flex items-center justify-between text-sm'>
-          <div className='flex items-center text-primary'>
-            <Tag className='w-4 h-4 mr-1' />
-            <span>{course.creator.username}</span>
-          </div>
-          <span className='text-gray-500'>Cập nhật: {new Date(course.updatedAt).toLocaleDateString('vi-VN')}</span>
-        </div> */}
       </article>
     </Link>
   )

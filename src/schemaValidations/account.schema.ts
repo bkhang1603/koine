@@ -3,7 +3,7 @@ import z from 'zod'
 
 export const accountRes = z.object({
   data: z.object({
-    id: z.number(),
+    id: z.string(),
     email: z.string(),
     username: z.string(),
     role: z.enum(RoleValues),
@@ -20,7 +20,7 @@ export const accountRes = z.object({
 export const courseByAccountRes = z.object({
   data: z.array(
     z.object({
-      id: z.number(),
+      id: z.string(),
       course: z.object({
         id: z.number(),
         title: z.string(),
@@ -33,7 +33,7 @@ export const courseByAccountRes = z.object({
 })
 
 export const accountProfile = z.object({
-  id: z.number(),
+  id: z.string(),
   email: z.string(),
   username: z.string(),
   role: z.enum(RoleValues),
@@ -92,6 +92,25 @@ export const accountProfileBody = z
   .strict()
   .partial()
 
+export const accountAddress = z
+  .object({
+    isDeleted: z.boolean(),
+    createdAt: z.string(),
+    updatedAt: z.string(),
+    id: z.string(),
+    userId: z.string(),
+    name: z.string(),
+    phone: z.string(),
+    address: z.string(),
+    tag: z.string()
+  })
+  .strict()
+
+export const accountAddressRes = z.object({
+  data: z.array(accountAddress),
+  message: z.string()
+})
+
 export type AccountResType = z.TypeOf<typeof accountRes>
 
 export type CourseByAccountResType = z.TypeOf<typeof courseByAccountRes>
@@ -99,3 +118,5 @@ export type CourseByAccountResType = z.TypeOf<typeof courseByAccountRes>
 export type AccountProfileResType = z.TypeOf<typeof accountProfileRes>
 
 export type AccountProfileBodyType = z.TypeOf<typeof accountProfileBody>
+
+export type AccountAddressResType = z.TypeOf<typeof accountAddressRes>

@@ -1,7 +1,13 @@
+'use client'
+
+import { useAppStore } from '@/components/app-provider'
 import { Button } from '@/components/ui/button'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { ScrollArea } from '@/components/ui/scroll-area'
+import socket from '@/lib/socket'
 import { Bell } from 'lucide-react'
+
+import { useEffect } from 'react'
 
 type Notification = {
   id: number
@@ -32,6 +38,48 @@ const notifications: Notification[] = [
 ]
 
 function BellNotification() {
+  const user = useAppStore((state) => state.user)
+
+  useEffect(() => {
+    if (socket.connected) {
+      onConnect()
+    }
+
+    function onConnect() {
+      console.log('socket id', socket.id)
+    }
+
+    function onDisconnect() {
+      console.log('disconnected')
+    }
+
+    function getNotifications() {
+      console.log('get notifications')
+    }
+
+    function login() {
+      socket.emit('login', {
+        userId: user?.id
+      })
+    }
+
+    socket.on('connect', onConnect)
+
+    socket.on('login', login)
+    socket.on('notification', getNotifications)
+
+    socket.on('disconnect', onDisconnect)
+
+    return () => {
+      socket.off('connect', onConnect)
+
+      socket.off('login', login)
+      socket.off('notification', getNotifications)
+
+      socket.off('disconnect', onDisconnect)
+    }
+  }, [user])
+
   return (
     <Popover>
       <PopoverTrigger asChild>

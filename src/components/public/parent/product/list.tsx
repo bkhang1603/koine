@@ -47,14 +47,26 @@ async function List({ searchParams }: { searchParams: searchParams | undefined }
               <article className='cursor-pointer group/product'>
                 <div className='w-full aspect-square rounded-lg overflow-hidden relative'>
                   {item.images && item.images.length > 0 ? (
-                    <Image
-                      src={item.images[0].imageUrl === 'image' ? '/no-image.png' : item.images[0].imageUrl}
-                      alt={item.images[0].name}
-                      width={400}
-                      height={400}
-                      className='w-full h-full object-cover rounded-lg'
-                      priority={true}
-                    />
+                    <>
+                      <Image
+                        src={item.images[0].imageUrl === 'image' ? '/no-image.png' : item.images[0].imageUrl}
+                        alt={item.images[0].name}
+                        width={400}
+                        height={400}
+                        className='w-full h-full object-cover rounded-lg'
+                        priority={true}
+                      />
+
+                      {/* Discount Tag */}
+                      {item.discount > 0 && (
+                        <div
+                          className='absolute -right-12 top-6 rotate-45 bg-gradient-to-r from-red-500 to-rose-500 
+                          text-white py-1 px-12 text-sm font-medium shadow-lg transform transition-transform'
+                        >
+                          {item.discount * 100}% OFF
+                        </div>
+                      )}
+                    </>
                   ) : (
                     <div className='w-full aspect-square bg-gray-200 rounded-lg flex items-center justify-center'>
                       <p>No Image</p>
@@ -63,8 +75,8 @@ async function List({ searchParams }: { searchParams: searchParams | undefined }
 
                   <div
                     className='absolute w-full h-10 bg-black/50 opacity-0 -bottom-10
-                group-hover/product:bottom-0 group-hover/product:opacity-100
-                flex justify-center items-center transition-all duration-500'
+                    group-hover/product:bottom-0 group-hover/product:opacity-100
+                    flex justify-center items-center transition-all duration-500'
                   >
                     <p className='text-fourth'>Xem thêm</p>
                   </div>
@@ -77,7 +89,16 @@ async function List({ searchParams }: { searchParams: searchParams | undefined }
                   <h3 className='text-lg font-semibold line-clamp-1'>{item.name}</h3>
 
                   <div className='flex items-center gap-2 mt-2'>
-                    <span className='text-base font-semibold'>{item.price.toLocaleString()}đ</span>
+                    {item.discount > 0 ? (
+                      <>
+                        <span className='text-base font-semibold'>
+                          {(item.price - item.price * item.discount).toLocaleString()}đ
+                        </span>
+                        <span className='text-sm text-gray-500 line-through'>{item.price.toLocaleString()}đ</span>
+                      </>
+                    ) : (
+                      <span className='text-base font-semibold'>{item.price.toLocaleString()}đ</span>
+                    )}
                   </div>
                 </div>
               </article>

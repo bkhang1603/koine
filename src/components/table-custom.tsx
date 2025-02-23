@@ -1,6 +1,5 @@
 import PaginationTable from '@/components/pagination-table'
-import SearchTable from '@/components/search-table'
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card, CardContent, CardFooter } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 
@@ -33,33 +32,18 @@ export function TableCustom({
   data,
   headerColumn,
   bodyColumn,
-  title,
-  loading,
-  button,
   href,
-  searchShow = true
+  loading = false
 }: {
   data: dataListType
   headerColumn: headerColumnType[]
   bodyColumn: bodyColumnType[]
-  title: string
-  loading?: boolean
-  button?: JSX.Element
   href: string
-  searchShow?: boolean
+  loading?: boolean
 }) {
   return (
     <Card>
-      <CardHeader>
-        <CardTitle className='text-2xl mb-4'>{title}</CardTitle>
-        {(searchShow || button) && (
-          <div className='flex justify-between items-center'>
-            <SearchTable />
-            {button}
-          </div>
-        )}
-      </CardHeader>
-      <CardContent>
+      <CardContent className='p-6'>
         <Table>
           <TableHeader>
             <TableRow>
@@ -72,17 +56,9 @@ export function TableCustom({
           </TableHeader>
           <TableBody>
             {loading ? (
-              Array.from({ length: data.pagination.pageSize }, (_, i) => i).map((_, index) => (
-                <TableRow key={index}>
-                  <TableCell colSpan={headerColumn.length} className='text-center'>
-                    <Skeleton className='w-full h-[40px]' />
-                  </TableCell>
-                </TableRow>
-              ))
-            ) : data.data.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={headerColumn.length} className='text-center'>
-                  <p className='h-[40px] flex items-center justify-center text-gray-500 text-base'>Không có dữ liệu</p>
+                <TableCell colSpan={headerColumn.length}>
+                  <Skeleton className='w-full h-24' />
                 </TableCell>
               </TableRow>
             ) : (
@@ -107,7 +83,6 @@ export function TableCustom({
             ) : (
               <p>
                 Hiện <strong>{data.data.length}</strong> trên <strong>{data.pagination.totalItem}</strong> kết quả
-                {/* {title.toLowerCase()} */}
               </p>
             )}
           </div>

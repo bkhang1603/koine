@@ -1,6 +1,8 @@
+'use client'
+
 import { NavItem, SidebarNav } from '@/components/public/parent/setting/sidebar-nav'
 import { Separator } from '@/components/ui/separator'
-import { Album, CircleUserRound, NotepadText, TvMinimal } from 'lucide-react'
+import { Album, Archive, CircleUserRound, FolderKanban, NotepadText, TvMinimal } from 'lucide-react'
 
 const sidebarNavItems: NavItem[] = [
   {
@@ -21,24 +23,36 @@ const sidebarNavItems: NavItem[] = [
       },
       {
         title: 'Cài đặt thông báo',
-        href: '/setting/notification'
+        href: '/setting/notifications'
       },
       {
         title: 'Bảo mật',
-        href: '/setting/password'
+        href: '/setting/security'
       }
     ]
   },
   {
-    title: 'Quản lý tài khoản con',
-    icon: <TvMinimal className='h-5 w-5 mr-2' />,
-    href: '/setting/child-account'
+    title: 'Quản lý',
+    icon: <FolderKanban className='h-5 w-5 mr-2' />,
+    children: [
+      {
+        title: 'Khóa học của tôi',
+        icon: <Album className='h-5 w-5 mr-2' />,
+        href: '/setting/my-course'
+      },
+      {
+        title: 'Khóa học đã mua',
+        icon: <Archive className='h-5 w-5 mr-2' />,
+        href: '/setting/purchased-courses'
+      },
+      {
+        title: 'Quản lý tài khoản con',
+        icon: <TvMinimal className='h-5 w-5 mr-2' />,
+        href: '/setting/child-account'
+      }
+    ]
   },
-  {
-    title: 'Khóa học của tôi',
-    icon: <Album className='h-5 w-5 mr-2' />,
-    href: '/setting/my-course'
-  },
+
   {
     title: 'Đơn mua',
     icon: <NotepadText className='h-5 w-5 mr-2' />,
@@ -46,7 +60,7 @@ const sidebarNavItems: NavItem[] = [
   }
 ]
 
-function layout({ children }: { children: React.ReactNode }) {
+export default function SettingsLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className='container pt-32 pb-16'>
       <div className='space-y-0.5'>
@@ -63,5 +77,3 @@ function layout({ children }: { children: React.ReactNode }) {
     </div>
   )
 }
-
-export default layout

@@ -9,6 +9,23 @@ const nextConfig = {
         pathname: '*/**'
       }
     ]
+  },
+  async redirects() {
+    return [
+      {
+        source: '/payment/:path*',
+        destination: 'https://pay.payos.vn/:path*',
+        permanent: false
+      }
+    ]
+  },
+  async rewrites() {
+    return [
+      {
+        source: '/payment/:path*',
+        destination: 'https://pay.payos.vn/:path*'
+      }
+    ]
   }
 }
 

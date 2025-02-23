@@ -1,66 +1,102 @@
-import icons from '@/assets/icons'
-import images from '@/assets/images'
+'use client'
+
+import { motion } from 'framer-motion'
 import { Button } from '@/components/ui/button'
-import configRoute from '@/config/route'
-import { CircleArrowRight } from 'lucide-react'
+import { ArrowRight } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
+import icons from '@/assets/icons'
+import images from '@/assets/images'
 
-function Promo() {
+export default function Promo() {
   return (
-    <section className='bg-fourth py-10 sm:py-24'>
-      <div className='container grid grid-cols-1 lg:grid-cols-2 gap-4 relative'>
-        <div className='flex justify-center items-center'>
-          <Image
-            src={images.product}
-            alt='product'
-            width={500}
-            height={500}
-            priority
-            className='w-full max-h-[500px] object-cover rounded-[20px]'
-          />
-        </div>
-
-        <div className='flex items-center justify-between flex-col py-10 xl:py-16 gap-y-6'>
-          <div className='text-center'>
-            <h3 className='text-base sm:text-lg font-semibold text-gray-600'>Sản phẩm của Koine</h3>
-            <h2
-              className='bg-gradient-to-r from-[#FF0059] via-[#FF597D] to-[#2945DE]
-            text-transparent bg-clip-text text-2xl md:text-3xl lg:text-4xl font-bold mt-2 sm:mt-4 md:mt-6'
-            >
-              Hộp quà trưởng thành
+    <section className='py-24 overflow-hidden'>
+      <div className='container'>
+        <div className='grid lg:grid-cols-2 gap-12 lg:gap-24 items-center'>
+          {/* Content */}
+          <motion.div
+            initial={{ opacity: 0, x: -20 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.5 }}
+            viewport={{ once: true }}
+            className='relative'
+          >
+            <span className='bg-primary/10 text-primary px-4 py-1.5 rounded-full text-sm font-medium'>
+              Ưu đãi đặc biệt
+            </span>
+            <h2 className='text-3xl md:text-4xl lg:text-5xl font-bold mt-6 mb-6'>
+              Bắt đầu hành trình với
+              <span
+                className='bg-gradient-to-r from-[#FF0059] via-[#FF597D] to-[#2945DE] 
+                text-transparent bg-clip-text'
+              >
+                {' '}
+                khóa học miễn phí
+              </span>
             </h2>
-          </div>
+            <p className='text-muted-foreground mb-8 text-lg'>
+              Trải nghiệm ngay các khóa học chất lượng từ đội ngũ chuyên gia hàng đầu. Đăng ký ngay hôm nay để nhận ưu
+              đãi đặc biệt dành cho người mới bắt đầu.
+            </p>
 
-          <p
-            className='line-clamp-5 max-w-[500px] text-center
-          font-medium text-xs sm:text-base md:text-lg text-gray-700'
-          >
-            Đi đôi với các khoá học thiết thực, Koine chúng tôi còn đem đến cho các em bộ sản phẩm cần thiết phù hợp với
-            từng nhu cầu của cá nhân mỗi bé, nhằm hỗ trợ quá trình học hiệu quả và chính xác hơn.
-          </p>
+            <div className='flex flex-col sm:flex-row gap-4'>
+              <Button size='lg' asChild>
+                <Link href='/course' className='group'>
+                  Khám phá khóa học
+                  <ArrowRight className='w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform' />
+                </Link>
+              </Button>
+              <Button size='lg' variant='outline' asChild>
+                <Link href='/contact'>Tư vấn miễn phí</Link>
+              </Button>
+            </div>
+          </motion.div>
 
-          <Link
-            href={configRoute.product}
-            // className='w-full p-4 flex items-center justify-center gap-2 text-secondary hover:text-secondary/80'
+          {/* Image */}
+          <motion.div
+            initial={{ opacity: 0, x: 20 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.5 }}
+            viewport={{ once: true }}
+            className='relative'
           >
-            <Button variant={'secondary'} className='w-60 flex justify-center items-center gap-2 mt-6'>
-              <span className='text-base sm:text-lg'>Mua hàng</span>
-              <CircleArrowRight className='w-4 h-4 sm:h-5 sm:w-5' />
-            </Button>
-          </Link>
+            <div className='relative aspect-[4/3] rounded-2xl overflow-hidden'>
+              <Image src={images.product} alt='Promo' fill className='object-cover' />
+              {/* Overlay Gradient */}
+              <div className='absolute inset-0 bg-gradient-to-tr from-primary/20 to-transparent' />
+
+              {/* Floating Elements */}
+              <div className='absolute top-6 left-6 bg-white/90 backdrop-blur p-4 rounded-xl shadow-lg'>
+                <div className='flex items-center gap-3'>
+                  <div className='w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center'>
+                    <Image src={icons.user} alt='Users' width={20} height={20} />
+                  </div>
+                  <div>
+                    <div className='font-semibold'>Học viên mới</div>
+                    <div className='text-sm text-muted-foreground'>+100 tuần này</div>
+                  </div>
+                </div>
+              </div>
+
+              <div className='absolute bottom-6 right-6 bg-white/90 backdrop-blur p-4 rounded-xl shadow-lg'>
+                <div className='flex items-center gap-3'>
+                  <div className='w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center'>
+                    <Image src={icons.pinkStar} alt='Rating' width={20} height={20} />
+                  </div>
+                  <div>
+                    <div className='font-semibold'>Đánh giá</div>
+                    <div className='text-sm text-muted-foreground'>4.9/5 sao</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Decorative Elements */}
+            <div className='absolute -top-12 -right-12 w-24 h-24 bg-primary/5 rounded-full blur-2xl' />
+            <div className='absolute -bottom-12 -left-12 w-32 h-32 bg-secondary/5 rounded-full blur-2xl' />
+          </motion.div>
         </div>
-
-        <Image
-          src={icons.pinkStars}
-          alt='pink stars'
-          width={200}
-          height={200}
-          className='hidden lg:block absolute left-12 bottom-4 translate-x-[-50%] translate-y-[50%] h-32 w-auto'
-        />
       </div>
     </section>
   )
 }
-
-export default Promo

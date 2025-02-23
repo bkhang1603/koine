@@ -1,148 +1,152 @@
 'use client'
 
-import Link from 'next/link'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
+import { Textarea } from '@/components/ui/textarea'
+import { ArrowLeft, Upload, X } from 'lucide-react'
+import Link from 'next/link'
+import { blogCategories } from '@/app/(private)/content-creator/_mock/data'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { ArrowLeft } from 'lucide-react'
-import { useState } from 'react'
 import RichTextEditor from '@/components/rich-text-editor'
+import { useState, useRef, useEffect } from 'react'
+import Image from 'next/image'
 
-export default function EditBlogPost({ params }: { params: { id: string } }) {
-  const blogPosts = [
-    {
-      id: 1,
-      title: '10 Tips for Learning a New Language',
-      content: 'Learning a new language can be challenging, but with these tips...',
-      image: '/images/language-learning.jpg',
-      status: 'Published',
-      date: '2023-06-15',
-      category: 'Language Learning',
-      author: 'John Doe'
-    },
-    {
-      id: 2,
-      title: 'The Benefits of Bilingualism',
-      content: 'Being bilingual has numerous cognitive and social benefits...',
-      image: '/images/bilingualism.jpg',
-      status: 'Draft',
-      date: '2023-06-10',
-      category: 'Language Science',
-      author: 'Jane Smith'
-    },
-    {
-      id: 3,
-      title: 'Common Mistakes in English Grammar',
-      content: 'Even native speakers make these common grammar mistakes...',
-      image: '/images/english-grammar.jpg',
-      status: 'Published',
-      date: '2023-06-05',
-      category: 'Grammar',
-      author: 'Emily Brown'
-    },
-    {
-      id: 4,
-      title: 'How to Improve Your Listening Skills',
-      content: "Effective listening is crucial for language learning. Here's how to improve...",
-      image: '/images/listening-skills.jpg',
-      status: 'Draft',
-      date: '2023-06-01',
-      category: 'Language Skills',
-      author: 'Michael Wilson'
-    },
-    {
-      id: 5,
-      title: 'The Best Language Learning Apps',
-      content: 'These language learning apps are perfect for beginners and advanced learners...',
-      image: '/images/language-learning-apps.jpg',
-      status: 'Published',
-      date: '2023-05-25',
-      category: 'Language Learning',
-      author: 'Sarah Johnson'
+export default function EditBlogPage({ params }: { params: { id: string } }) {
+  const [title, setTitle] = useState('')
+  const [description, setDescription] = useState('')
+  const [content, setContent] = useState('')
+  const [category, setCategory] = useState('')
+  const [preview, setPreview] = useState<string | null>(null)
+  const fileInputRef = useRef<HTMLInputElement>(null)
+
+  // TODO: Fetch blog data using params.id
+  useEffect(() => {
+    // Giả lập data, sau này sẽ fetch từ API
+    setTitle('Làm sao để nói chuyện với con về giới tính?')
+    setDescription('Hướng dẫn chi tiết cho phụ huynh...')
+    setContent('<p>Nội dung chi tiết của bài viết...</p>')
+    setCategory('1')
+    setPreview('https://hoanghamobile.com/tin-tuc/wp-content/uploads/2024/04/anh-meo-ngau-42.jpg')
+  }, [])
+
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0]
+    if (file) {
+      const imageUrl = URL.createObjectURL(file)
+      setPreview(imageUrl)
     }
-  ]
-
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
-    console.log('Form submitted', post)
   }
 
-  const [post, setPost] = useState(blogPosts.find((post) => post.id === parseInt(params.id, 10)))
-
-  if (!post) {
-    return <div>Loading...</div>
+  const removeImage = () => {
+    setPreview(null)
+    if (fileInputRef.current) {
+      fileInputRef.current.value = ''
+    }
   }
 
   return (
-    <div className='max-w-5xl mx-auto space-y-6'>
-      <div className='flex justify-between items-center'>
-        <Button variant='outline' asChild>
-          <Link href={`/content-creator/blog/${post.id}`}>
-            <ArrowLeft className='mr-2 h-4 w-4' />
-            Back to Post
-          </Link>
-        </Button>
+    <div className='container max-w-4xl mx-auto px-4 py-6'>
+      {/* Back Button */}
+      <Button variant='ghost' asChild className='mb-6'>
+        <Link href={`/content-creator/blog/${params.id}`}>
+          <ArrowLeft className='w-4 h-4 mr-2' />
+          Quay lại
+        </Link>
+      </Button>
+
+      {/* Header */}
+      <div className='flex justify-between items-center mb-6'>
+        <div>
+          <h1 className='text-2xl font-bold'>Chỉnh sửa bài viết</h1>
+          <p className='text-sm text-muted-foreground mt-1'>Cập nhật nội dung bài viết của bạn</p>
+        </div>
+        <div className='flex items-center gap-4'>
+          <Button variant='outline'>Lưu nháp</Button>
+          <Button>Cập nhật</Button>
+        </div>
       </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Edit Blog Post</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleSubmit} className='space-y-4'>
+      <div className='grid gap-6'>
+        {/* Main Content */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Thông tin bài viết</CardTitle>
+          </CardHeader>
+          <CardContent className='space-y-6'>
             <div className='space-y-2'>
-              <Label htmlFor='title'>Title</Label>
-              <Input
-                id='title'
-                value={post.title}
-                onChange={(e) => setPost({ ...post, title: e.target.value })}
-                required
+              <label className='text-sm font-medium'>Tiêu đề</label>
+              <Input placeholder='Nhập tiêu đề bài viết' value={title} onChange={(e) => setTitle(e.target.value)} />
+            </div>
+
+            <div className='space-y-2'>
+              <label className='text-sm font-medium'>Mô tả ngắn</label>
+              <Textarea
+                placeholder='Nhập mô tả ngắn về bài viết'
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
               />
             </div>
 
             <div className='space-y-2'>
-              <Label htmlFor='category'>Category</Label>
-              <Select value={post.category} onValueChange={(value) => setPost({ ...post, category: value })}>
-                <SelectTrigger>
-                  <SelectValue placeholder='Select a category' />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value='Language Learning'>Language Learning</SelectItem>
-                  <SelectItem value='Grammar'>Grammar</SelectItem>
-                  <SelectItem value='Vocabulary'>Vocabulary</SelectItem>
-                  <SelectItem value='Culture'>Culture</SelectItem>
-                </SelectContent>
-              </Select>
+              <label className='text-sm font-medium'>Nội dung</label>
+              <RichTextEditor content={content} onChange={setContent} />
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Sidebar */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Cài đặt bài viết</CardTitle>
+          </CardHeader>
+          <CardContent className='space-y-6'>
+            <div className='space-y-2'>
+              <label className='text-sm font-medium'>Ảnh đại diện</label>
+              <div className='border-2 border-dashed rounded-lg p-4'>
+                {preview ? (
+                  <div className='relative aspect-video'>
+                    <Image src={preview} alt='Preview' fill className='object-cover rounded-md' />
+                    <Button variant='destructive' size='icon' className='absolute top-2 right-2' onClick={removeImage}>
+                      <X className='h-4 w-4' />
+                    </Button>
+                  </div>
+                ) : (
+                  <div className='text-center'>
+                    <input
+                      type='file'
+                      accept='image/*'
+                      onChange={handleFileChange}
+                      className='hidden'
+                      ref={fileInputRef}
+                    />
+                    <Button variant='outline' onClick={() => fileInputRef.current?.click()}>
+                      <Upload className='w-4 h-4 mr-2' />
+                      Tải ảnh lên
+                    </Button>
+                  </div>
+                )}
+              </div>
             </div>
 
             <div className='space-y-2'>
-              <Label>Content</Label>
-              {/* <TiptapEditor content={post.content} onChange={(content) => setPost({ ...post, content })} /> */}
-              <RichTextEditor content={post.content} onChange={(content: any) => setPost({ ...post, content })} />
-            </div>
-
-            <div className='space-y-2'>
-              <Label htmlFor='status'>Status</Label>
-              <Select
-                value={post.status}
-                onValueChange={(value: 'Published' | 'Draft') => setPost({ ...post, status: value })}
-              >
+              <label className='text-sm font-medium'>Danh mục</label>
+              <Select value={category} onValueChange={setCategory}>
                 <SelectTrigger>
-                  <SelectValue placeholder='Select a status' />
+                  <SelectValue placeholder='Chọn danh mục' />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value='Draft'>Draft</SelectItem>
-                  <SelectItem value='Published'>Published</SelectItem>
+                  {blogCategories.map((category) => (
+                    <SelectItem key={category.id} value={category.id}>
+                      {category.name}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>
-
-            <Button type='submit'>Update Post</Button>
-          </form>
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   )
 }

@@ -196,7 +196,8 @@ export const LessonsData = z.object({
   creator: z.object({
     id: z.string(),
     username: z.string()
-  })
+  }),
+  status: z.string()
 })
 
 export const LessonsRes = z.object({

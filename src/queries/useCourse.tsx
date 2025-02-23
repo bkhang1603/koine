@@ -56,8 +56,15 @@ export const useGetCategoryCoursesQuery = () => {
 }
 
 export const useActiveCourseMutation = () => {
+  const queryClient = useQueryClient()
+
   return useMutation({
-    mutationFn: courseApiRequest.activeCourse
+    mutationFn: courseApiRequest.activeCourse,
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ['userCourses']
+      })
+    }
   })
 }
 
@@ -77,7 +84,7 @@ export const useGetLessonsQuery = ({ id }: { id: string }) => {
 
 export const useGetLessonQuery = ({ id, enabled }: { id: string; enabled?: boolean }) => {
   return useQuery({
-    queryKey: ['lesson', id],
+    queryKey: ['courseProgress', id],
     queryFn: () => courseApiRequest.getLesson(id),
     enabled
   })

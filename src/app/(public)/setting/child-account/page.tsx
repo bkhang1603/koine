@@ -4,30 +4,23 @@ import { useState } from 'react'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
+import { Card, CardContent } from '@/components/ui/card'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
-import { useToast } from '@/components/ui/use-toast'
 import { Progress } from '@/components/ui/progress'
-import { Plus, User, BookOpen, BarChart, Eye, Search } from 'lucide-react'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { Search, Plus, Users, ChevronRight, BookOpen, BarChart2, Calendar } from 'lucide-react'
 import {
-  Pagination,
-  PaginationContent,
-  PaginationEllipsis,
-  PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious
-} from '@/components/ui/pagination'
-import { Separator } from '@/components/ui/separator'
-
-interface Course {
-  id: number
-  title: string
-  progress: number
-  lastAccessed: Date
-}
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger
+} from '@/components/ui/dialog'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { useToast } from '@/components/ui/use-toast'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { CardHeader, CardTitle } from '@/components/ui/card'
 
 interface SubAccount {
   id: string
@@ -36,288 +29,450 @@ interface SubAccount {
   avatar: string
   courses: Course[]
   lastLogin: Date
-  totalStudyTime: number // in minutes
+  totalStudyTime: number
+  recentActivities: Activity[]
 }
 
-export default function SubAccountsPage() {
-  const [subAccounts, setSubAccounts] = useState<SubAccount[]>([
-    {
-      id: '1',
-      name: 'Nguyễn Văn B',
-      email: 'nguyenvanb@example.com',
-      avatar: 'https://i.pravatar.cc/150?img=1',
-      courses: [
-        { id: 1, title: 'Kỹ năng giao tiếp hiệu quả', progress: 75, lastAccessed: new Date(2023, 5, 15) },
-        { id: 2, title: 'Quản lý thời gian và năng suất', progress: 30, lastAccessed: new Date(2023, 5, 20) }
-      ],
-      lastLogin: new Date(2023, 5, 21),
-      totalStudyTime: 720 // 12 hours
-    },
-    {
-      id: '2',
-      name: 'Trần Thị C',
-      email: 'tranthic@example.com',
-      avatar: 'https://i.pravatar.cc/150?img=2',
-      courses: [
-        { id: 3, title: 'Kỹ năng thuyết trình chuyên nghiệp', progress: 50, lastAccessed: new Date(2023, 5, 18) },
-        { id: 4, title: 'Tư duy phản biện', progress: 80, lastAccessed: new Date(2023, 5, 19) }
-      ],
-      lastLogin: new Date(2023, 5, 22),
-      totalStudyTime: 540 // 9 hours
-    },
-    {
-      id: '3',
-      name: 'Lê Hoàng D',
-      email: 'lehoangd@example.com',
-      avatar: 'https://i.pravatar.cc/150?img=3',
-      courses: [
-        { id: 5, title: 'Kỹ năng lãnh đạo', progress: 60, lastAccessed: new Date(2023, 5, 17) },
-        { id: 6, title: 'Quản lý dự án', progress: 40, lastAccessed: new Date(2023, 5, 21) },
-        { id: 7, title: 'Kỹ năng đàm phán', progress: 20, lastAccessed: new Date(2023, 5, 22) }
-      ],
-      lastLogin: new Date(2023, 5, 23),
-      totalStudyTime: 900 // 15 hours
-    }
-  ])
-  const [newSubAccountName, setNewSubAccountName] = useState('')
-  const [newSubAccountEmail, setNewSubAccountEmail] = useState('')
+interface Course {
+  id: number
+  title: string
+  progress: number
+  lastAccessed: Date
+}
+
+interface Activity {
+  id: number
+  type: 'course_progress' | 'course_completed' | 'quiz_completed'
+  description: string
+  date: Date
+}
+
+const MOCK_ACCOUNTS: SubAccount[] = [
+  {
+    id: '1',
+    name: 'Nguyễn Văn An',
+    email: 'nguyenvanan@gmail.com',
+    avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=1',
+    courses: [
+      { id: 1, title: 'Khóa học lập trình Python cơ bản', progress: 75, lastAccessed: new Date('2024-01-15') },
+      { id: 2, title: 'Khóa học tiếng Anh giao tiếp', progress: 45, lastAccessed: new Date('2024-01-20') }
+    ],
+    lastLogin: new Date('2024-01-21'),
+    totalStudyTime: 2160, // 36 hours
+    recentActivities: [
+      {
+        id: 1,
+        type: 'course_progress',
+        description: 'Hoàn thành bài học "Biến và kiểu dữ liệu"',
+        date: new Date('2024-01-21')
+      }
+    ]
+  },
+  {
+    id: '2',
+    name: 'Trần Thị Bình',
+    email: 'tranbinh@gmail.com',
+    avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=2',
+    courses: [
+      { id: 3, title: 'Khóa học Toán nâng cao', progress: 90, lastAccessed: new Date('2024-01-19') },
+      { id: 4, title: 'Khóa học Vật lý cơ bản', progress: 60, lastAccessed: new Date('2024-01-21') }
+    ],
+    lastLogin: new Date('2024-01-22'),
+    totalStudyTime: 1800, // 30 hours
+    recentActivities: [
+      {
+        id: 2,
+        type: 'quiz_completed',
+        description: 'Đạt điểm 9/10 trong bài kiểm tra Toán',
+        date: new Date('2024-01-22')
+      }
+    ]
+  },
+  {
+    id: '3',
+    name: 'Lê Hoàng Cường',
+    email: 'hoangcuong@gmail.com',
+    avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=3',
+    courses: [{ id: 5, title: 'Khóa học Hóa học', progress: 30, lastAccessed: new Date('2024-01-20') }],
+    lastLogin: new Date('2024-01-23'),
+    totalStudyTime: 900, // 15 hours
+    recentActivities: [
+      {
+        id: 3,
+        type: 'course_completed',
+        description: 'Bắt đầu khóa học Hóa học mới',
+        date: new Date('2024-01-23')
+      }
+    ]
+  }
+]
+
+export default function ChildAccountsPage() {
+  const [accounts, setAccounts] = useState<SubAccount[]>(MOCK_ACCOUNTS)
   const [searchQuery, setSearchQuery] = useState('')
-  const [sortBy, setSortBy] = useState('name')
+  const [newAccount, setNewAccount] = useState({ name: '', email: '' })
   const { toast } = useToast()
 
-  const handleCreateSubAccount = (e: React.FormEvent) => {
-    e.preventDefault()
-    if (!newSubAccountName || !newSubAccountEmail) {
+  const handleCreateAccount = () => {
+    if (!newAccount.name || !newAccount.email) {
       toast({
-        title: 'Lỗi',
-        description: 'Vui lòng điền đầy đủ thông tin tài khoản con.',
+        title: 'Thông tin không đầy đủ',
+        description: 'Vui lòng điền đầy đủ thông tin tài khoản.',
         variant: 'destructive'
       })
       return
     }
-
-    const newSubAccount: SubAccount = {
-      id: Date.now().toString(),
-      name: newSubAccountName,
-      email: newSubAccountEmail,
-      avatar: `https://i.pravatar.cc/150?img=${subAccounts.length + 1}`,
-      courses: [],
-      lastLogin: new Date(),
-      totalStudyTime: 0
-    }
-
-    setSubAccounts([...subAccounts, newSubAccount])
-    setNewSubAccountName('')
-    setNewSubAccountEmail('')
-
-    toast({
-      title: 'Thành công',
-      description: 'Tài khoản con đã được tạo.'
-    })
+    // Add new account logic
   }
 
-  const getTotalProgress = (account: SubAccount) => {
-    if (account.courses.length === 0) return 0
-    const totalProgress = account.courses.reduce((sum, course) => sum + course.progress, 0)
-    return Math.round(totalProgress / account.courses.length)
+  const getActivityTimeAgo = (date: Date) => {
+    const now = new Date()
+    const diffInHours = Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60))
+
+    if (diffInHours < 24) return `${diffInHours} giờ trước`
+    const diffInDays = Math.floor(diffInHours / 24)
+    if (diffInDays === 1) return 'Hôm qua'
+    if (diffInDays < 7) return `${diffInDays} ngày trước`
+    return date.toLocaleDateString('vi-VN')
   }
 
   const formatStudyTime = (minutes: number) => {
     const hours = Math.floor(minutes / 60)
     const mins = minutes % 60
-    return `${hours}h ${mins}m`
+    if (hours === 0) return `${mins}p`
+    if (mins === 0) return `${hours}g`
+    return `${hours}g ${mins}p`
   }
 
-  const filteredAndSortedAccounts = subAccounts
-    .filter(
-      (account) =>
-        account.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        account.email.toLowerCase().includes(searchQuery.toLowerCase())
-    )
-    .sort((a, b) => {
-      if (sortBy === 'name') return a.name.localeCompare(b.name)
-      if (sortBy === 'lastLogin') return b.lastLogin.getTime() - a.lastLogin.getTime()
-      if (sortBy === 'progress') return getTotalProgress(b) - getTotalProgress(a)
-      return 0
-    })
+  const getAverageProgress = (account: SubAccount) => {
+    if (!account.courses.length) return 0
+    return Math.round(account.courses.reduce((sum, course) => sum + course.progress, 0) / account.courses.length)
+  }
 
   return (
-    <div className='space-y-6'>
-      <div>
-        <h3 className='text-lg font-medium'>Quản lý tài khoản con</h3>
-        <p className='text-sm text-muted-foreground'>Xem và quản lý tài khoản con của bạn.</p>
-      </div>
-      <Separator />
+    <div className='container mx-auto p-6 max-w-7xl'>
+      {/* Header & Quick Stats */}
+      <div className='space-y-6'>
+        <div className='flex justify-between items-center'>
+          <div>
+            <h1 className='text-3xl font-bold'>Quản lý tài khoản con</h1>
+            <p className='text-gray-500 mt-1'>Theo dõi và quản lý việc học tập của con</p>
+          </div>
+          <Dialog>
+            <DialogTrigger asChild>
+              <Button size='lg'>
+                <Plus className='w-4 h-4 mr-2' /> Thêm tài khoản con
+              </Button>
+            </DialogTrigger>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Tạo tài khoản con mới</DialogTitle>
+                <DialogDescription>Điền thông tin để tạo tài khoản cho con của bạn</DialogDescription>
+              </DialogHeader>
+              <div className='space-y-4 py-4'>
+                <div className='space-y-2'>
+                  <label>Tên tài khoản</label>
+                  <Input
+                    placeholder='VD: Nguyễn Văn A'
+                    value={newAccount.name}
+                    onChange={(e) => setNewAccount({ ...newAccount, name: e.target.value })}
+                  />
+                </div>
+                <div className='space-y-2'>
+                  <label>Email</label>
+                  <Input
+                    type='email'
+                    placeholder='email@example.com'
+                    value={newAccount.email}
+                    onChange={(e) => setNewAccount({ ...newAccount, email: e.target.value })}
+                  />
+                </div>
+              </div>
+              <DialogFooter>
+                <Button variant='outline' onClick={() => setNewAccount({ name: '', email: '' })}>
+                  Hủy
+                </Button>
+                <Button onClick={handleCreateAccount}>Tạo tài khoản</Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
+        </div>
 
-      <div className='flex flex-col lg:flex-row gap-6'>
-        <div className='w-full lg:w-2/3 space-y-6'>
-          <Card className='bg-gradient-to-r from-blue-500 to-purple-500 text-white'>
-            <CardHeader>
-              <CardTitle className='text-2xl'>Tổng quan tài khoản con</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className='grid grid-cols-1 sm:grid-cols-3 gap-4'>
-                <div className='flex flex-col items-center p-4 bg-white/20 rounded-lg backdrop-blur-lg'>
-                  <User className='w-8 h-8 mb-2' />
-                  <span className='text-2xl font-bold'>{subAccounts.length}</span>
-                  <span className='text-sm'>Tài khoản con</span>
+        <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6'>
+          <Card className='bg-gradient-to-br from-primary/80 to-primary text-white'>
+            <CardContent className='pt-6'>
+              <div className='flex items-center gap-4'>
+                <div className='p-3 bg-white/20 rounded-xl'>
+                  <Users className='w-6 h-6' />
                 </div>
-                <div className='flex flex-col items-center p-4 bg-white/20 rounded-lg backdrop-blur-lg'>
-                  <BookOpen className='w-8 h-8 mb-2' />
-                  <span className='text-2xl font-bold'>
-                    {subAccounts.reduce((sum, account) => sum + account.courses.length, 0)}
-                  </span>
-                  <span className='text-sm'>Khóa học đã đăng ký</span>
-                </div>
-                <div className='flex flex-col items-center p-4 bg-white/20 rounded-lg backdrop-blur-lg'>
-                  <BarChart className='w-8 h-8 mb-2' />
-                  <span className='text-2xl font-bold'>
-                    {Math.round(
-                      subAccounts.reduce((sum, account) => sum + getTotalProgress(account), 0) / subAccounts.length
-                    )}
-                    %
-                  </span>
-                  <span className='text-sm'>Tiến độ trung bình</span>
+                <div>
+                  <p className='text-sm text-white/80'>Tổng tài khoản</p>
+                  <p className='text-2xl font-bold'>{accounts.length}</p>
                 </div>
               </div>
             </CardContent>
           </Card>
 
-          <div className='flex flex-col sm:flex-row justify-between items-center gap-4'>
-            <div className='w-full sm:w-auto flex-1 relative'>
-              <Input
-                placeholder='Tìm kiếm tài khoản con...'
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className='pl-10'
-              />
-              <Search className='absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400' />
-            </div>
-            <Select value={sortBy} onValueChange={setSortBy}>
-              <SelectTrigger className='w-[180px]'>
-                <SelectValue placeholder='Sắp xếp theo' />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value='name'>Tên</SelectItem>
-                <SelectItem value='lastLogin'>Đăng nhập gần đây</SelectItem>
-                <SelectItem value='progress'>Tiến độ</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
+          <Card className='bg-gradient-to-br from-orange-400 to-orange-500 text-white'>
+            <CardContent className='pt-6'>
+              <div className='flex items-center gap-4'>
+                <div className='p-3 bg-white/20 rounded-xl'>
+                  <BookOpen className='w-6 h-6' />
+                </div>
+                <div>
+                  <p className='text-sm text-white/80'>Tổng khóa học</p>
+                  <p className='text-2xl font-bold'>{accounts.reduce((sum, acc) => sum + acc.courses.length, 0)}</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
 
-          <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
-            {filteredAndSortedAccounts.map((account) => (
-              <Card key={account.id} className='flex flex-col hover:shadow-lg transition-shadow duration-300'>
-                <CardHeader className='pb-2'>
-                  <div className='flex items-center space-x-4'>
-                    <Avatar className='h-12 w-12'>
-                      <AvatarImage src={account.avatar} alt={account.name} />
-                      <AvatarFallback>{account.name.charAt(0)}</AvatarFallback>
-                    </Avatar>
-                    <div>
-                      <CardTitle>{account.name}</CardTitle>
-                      <CardDescription>{account.email}</CardDescription>
-                    </div>
-                  </div>
-                </CardHeader>
-                <CardContent className='flex-grow'>
-                  <div className='space-y-4'>
-                    <div className='flex justify-between items-center'>
-                      <span className='text-sm text-gray-500'>Số khóa học:</span>
-                      <span className='font-semibold'>{account.courses.length}</span>
-                    </div>
-                    <div className='space-y-1'>
-                      <div className='flex justify-between items-center'>
-                        <span className='text-sm text-gray-500'>Tiến độ trung bình:</span>
-                        <span className='font-semibold'>{getTotalProgress(account)}%</span>
-                      </div>
-                      <Progress value={getTotalProgress(account)} className='w-full' />
-                    </div>
-                    <div className='flex justify-between items-center'>
-                      <span className='text-sm text-gray-500'>Tổng thời gian học:</span>
-                      <span className='font-semibold'>{formatStudyTime(account.totalStudyTime)}</span>
-                    </div>
-                    <div className='flex justify-between items-center'>
-                      <span className='text-sm text-gray-500'>Đăng nhập gần nhất:</span>
-                      <span className='font-semibold'>{account.lastLogin.toLocaleDateString()}</span>
-                    </div>
-                  </div>
-                </CardContent>
-                <CardContent className='border-t pt-4'>
-                  <Link href={`/account/sub-account/${account.id}`} passHref>
-                    <Button variant='outline' className='w-full'>
-                      <Eye className='w-4 h-4 mr-2' />
-                      Xem chi tiết
-                    </Button>
+          <Card className='bg-gradient-to-br from-green-400 to-green-500 text-white'>
+            <CardContent className='pt-6'>
+              <div className='flex items-center gap-4'>
+                <div className='p-3 bg-white/20 rounded-xl'>
+                  <BarChart2 className='w-6 h-6' />
+                </div>
+                <div>
+                  <p className='text-sm text-white/80'>Tiến độ trung bình</p>
+                  <p className='text-2xl font-bold'>
+                    {Math.round(accounts.reduce((sum, acc) => sum + getAverageProgress(acc), 0) / accounts.length)}%
+                  </p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className='bg-gradient-to-br from-blue-400 to-blue-500 text-white'>
+            <CardContent className='pt-6'>
+              <div className='flex items-center gap-4'>
+                <div className='p-3 bg-white/20 rounded-xl'>
+                  <Calendar className='w-6 h-6' />
+                </div>
+                <div>
+                  <p className='text-sm text-white/80'>Tổng thời gian học</p>
+                  <p className='text-2xl font-bold'>
+                    {formatStudyTime(accounts.reduce((sum, acc) => sum + acc.totalStudyTime, 0))}
+                  </p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+
+      {/* Main Content */}
+      <div className='mt-8'>
+        <Tabs defaultValue='accounts' className='space-y-6'>
+          <TabsList>
+            <TabsTrigger value='accounts'>Tài khoản</TabsTrigger>
+            <TabsTrigger value='activities'>Hoạt động gần đây</TabsTrigger>
+            <TabsTrigger value='analytics'>Phân tích</TabsTrigger>
+          </TabsList>
+
+          <TabsContent value='accounts'>
+            <div className='space-y-6'>
+              {/* Search */}
+              <div className='relative'>
+                <Search className='absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4' />
+                <Input
+                  placeholder='Tìm kiếm tài khoản...'
+                  className='pl-10'
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                />
+              </div>
+
+              {/* Accounts Grid */}
+              <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'>
+                {accounts.map((account) => (
+                  <Link href={`/setting/child-account/${account.id}`} key={account.id}>
+                    <Card className='hover:shadow-lg transition-all cursor-pointer group'>
+                      <CardContent className='pt-6'>
+                        <div className='flex items-start justify-between mb-6'>
+                          <div className='flex items-center gap-3'>
+                            <Avatar className='h-12 w-12 border-2 border-primary/10'>
+                              <AvatarImage src={account.avatar} />
+                              <AvatarFallback>{account.name.charAt(0)}</AvatarFallback>
+                            </Avatar>
+                            <div>
+                              <h3 className='font-semibold group-hover:text-primary transition-colors'>
+                                {account.name}
+                              </h3>
+                              <p className='text-sm text-gray-500'>{account.email}</p>
+                            </div>
+                          </div>
+                          <ChevronRight className='w-5 h-5 text-gray-400 group-hover:text-primary transition-colors' />
+                        </div>
+
+                        <div className='space-y-4'>
+                          <div className='grid grid-cols-2 gap-4 text-sm'>
+                            <div>
+                              <p className='text-gray-500'>Khóa học</p>
+                              <p className='font-medium'>{account.courses.length} khóa học</p>
+                            </div>
+                            <div>
+                              <p className='text-gray-500'>Thời gian học</p>
+                              <p className='font-medium'>{formatStudyTime(account.totalStudyTime)}</p>
+                            </div>
+                          </div>
+
+                          <div className='space-y-2'>
+                            <div className='flex justify-between text-sm'>
+                              <span className='text-gray-500'>Tiến độ trung bình</span>
+                              <span className='font-medium'>{getAverageProgress(account)}%</span>
+                            </div>
+                            <Progress value={getAverageProgress(account)} className='h-2' />
+                          </div>
+
+                          <div className='pt-2 border-t'>
+                            <p className='text-xs text-gray-500'>
+                              Hoạt động cuối: {getActivityTimeAgo(account.lastLogin)}
+                            </p>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
                   </Link>
+                ))}
+              </div>
+            </div>
+          </TabsContent>
+
+          <TabsContent value='activities'>
+            <div className='space-y-6'>
+              {/* Activities Filter */}
+              <div className='flex items-center gap-4'>
+                <Select defaultValue='all'>
+                  <SelectTrigger className='w-[180px]'>
+                    <SelectValue placeholder='Loại hoạt động' />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value='all'>Tất cả hoạt động</SelectItem>
+                    <SelectItem value='course_progress'>Tiến độ học tập</SelectItem>
+                    <SelectItem value='quiz_completed'>Bài kiểm tra</SelectItem>
+                    <SelectItem value='course_completed'>Hoàn thành khóa học</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Activities Timeline */}
+              <div className='space-y-4'>
+                {accounts.map((account) =>
+                  account.recentActivities.map((activity) => (
+                    <Card key={activity.id}>
+                      <CardContent className='pt-6'>
+                        <div className='flex items-start gap-4'>
+                          <Avatar className='h-10 w-10'>
+                            <AvatarImage src={account.avatar} />
+                            <AvatarFallback>{account.name.charAt(0)}</AvatarFallback>
+                          </Avatar>
+                          <div className='flex-1'>
+                            <div className='flex items-center justify-between'>
+                              <p className='font-medium'>{account.name}</p>
+                              <time className='text-sm text-gray-500'>{getActivityTimeAgo(activity.date)}</time>
+                            </div>
+                            <p className='text-sm text-gray-600 mt-1'>{activity.description}</p>
+                            {activity.type === 'course_progress' && (
+                              <div className='mt-3'>
+                                <Progress value={75} className='h-2' />
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))
+                )}
+              </div>
+            </div>
+          </TabsContent>
+
+          <TabsContent value='analytics'>
+            <div className='space-y-8'>
+              {/* Overview Cards */}
+              <div className='grid grid-cols-1 md:grid-cols-3 gap-6'>
+                <Card>
+                  <CardHeader>
+                    <CardTitle className='text-lg font-medium'>Thời gian học trung bình</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className='text-3xl font-bold text-primary'>
+                      {formatStudyTime(accounts.reduce((sum, acc) => sum + acc.totalStudyTime, 0) / accounts.length)}
+                    </div>
+                    <p className='text-sm text-gray-500 mt-1'>Mỗi tài khoản / tuần</p>
+                  </CardContent>
+                </Card>
+
+                <Card>
+                  <CardHeader>
+                    <CardTitle className='text-lg font-medium'>Tỷ lệ hoàn thành</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className='text-3xl font-bold text-green-500'>85%</div>
+                    <p className='text-sm text-gray-500 mt-1'>Khóa học đã hoàn thành</p>
+                  </CardContent>
+                </Card>
+
+                <Card>
+                  <CardHeader>
+                    <CardTitle className='text-lg font-medium'>Điểm trung bình</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className='text-3xl font-bold text-orange-500'>8.5</div>
+                    <p className='text-sm text-gray-500 mt-1'>Trên thang điểm 10</p>
+                  </CardContent>
+                </Card>
+              </div>
+
+              {/* Performance Chart */}
+              <Card>
+                <CardHeader>
+                  <CardTitle>Phân tích hiệu suất học tập</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className='h-[300px] flex items-center justify-center text-gray-500'>
+                    {/* Replace with actual chart component */}
+                    <p>Biểu đồ thống kê hiệu suất học tập theo thời gian</p>
+                  </div>
                 </CardContent>
               </Card>
-            ))}
-          </div>
 
-          <Pagination>
-            <PaginationContent>
-              <PaginationItem>
-                <PaginationPrevious href='#' />
-              </PaginationItem>
-              <PaginationItem>
-                <PaginationLink href='#'>1</PaginationLink>
-              </PaginationItem>
-              <PaginationItem>
-                <PaginationLink href='#' isActive>
-                  2
-                </PaginationLink>
-              </PaginationItem>
-              <PaginationItem>
-                <PaginationLink href='#'>3</PaginationLink>
-              </PaginationItem>
-              <PaginationItem>
-                <PaginationEllipsis />
-              </PaginationItem>
-              <PaginationItem>
-                <PaginationNext href='#' />
-              </PaginationItem>
-            </PaginationContent>
-          </Pagination>
-        </div>
-
-        <div className='w-full lg:w-1/3'>
-          <div className='lg:sticky lg:top-4'>
-            <Card>
-              <CardHeader>
-                <CardTitle>Tạo tài khoản con</CardTitle>
-                <CardDescription>Thêm tài khoản con mới</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <form onSubmit={handleCreateSubAccount} className='space-y-4'>
-                  <div className='space-y-2'>
-                    <Label htmlFor='subAccountName'>Tên tài khoản con</Label>
-                    <Input
-                      id='subAccountName'
-                      value={newSubAccountName}
-                      onChange={(e) => setNewSubAccountName(e.target.value)}
-                      placeholder='Nhập tên tài khoản con'
-                    />
+              {/* Top Performers */}
+              <Card>
+                <CardHeader>
+                  <CardTitle>Top học viên xuất sắc</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className='space-y-4'>
+                    {accounts
+                      .sort((a, b) => getAverageProgress(b) - getAverageProgress(a))
+                      .slice(0, 3)
+                      .map((account, index) => (
+                        <div key={account.id} className='flex items-center gap-4'>
+                          <div className='w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center font-medium text-primary'>
+                            {index + 1}
+                          </div>
+                          <Avatar className='h-10 w-10'>
+                            <AvatarImage src={account.avatar} />
+                            <AvatarFallback>{account.name.charAt(0)}</AvatarFallback>
+                          </Avatar>
+                          <div className='flex-1'>
+                            <p className='font-medium'>{account.name}</p>
+                            <p className='text-sm text-gray-500'>{account.courses.length} khóa học</p>
+                          </div>
+                          <div className='text-right'>
+                            <p className='font-medium'>{getAverageProgress(account)}%</p>
+                            <p className='text-sm text-gray-500'>Tiến độ</p>
+                          </div>
+                        </div>
+                      ))}
                   </div>
-                  <div className='space-y-2'>
-                    <Label htmlFor='subAccountEmail'>Email tài khoản con</Label>
-                    <Input
-                      id='subAccountEmail'
-                      type='email'
-                      value={newSubAccountEmail}
-                      onChange={(e) => setNewSubAccountEmail(e.target.value)}
-                      placeholder='Nhập email tài khoản con'
-                    />
-                  </div>
-                  <Button type='submit' className='w-full'>
-                    <Plus className='w-4 h-4mr-2' />
-                    Tạo tài khoản con
-                  </Button>
-                </form>
-              </CardContent>
-            </Card>
-          </div>
-        </div>
+                </CardContent>
+              </Card>
+            </div>
+          </TabsContent>
+        </Tabs>
       </div>
     </div>
   )

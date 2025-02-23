@@ -1,136 +1,140 @@
-import icons from '@/assets/icons'
-import images from '@/assets/images'
-import { Button } from '@/components/ui/button'
-import configRoute from '@/config/route'
-import { cn } from '@/lib/utils'
-import { CircleArrowRight } from 'lucide-react'
-import Image from 'next/image'
-import Link from 'next/link'
+'use client'
 
-const sharingData = [
+import { motion } from 'framer-motion'
+import { Card } from '@/components/ui/card'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { Star } from 'lucide-react'
+import Image from 'next/image'
+import icons from '@/assets/icons'
+
+const testimonials = [
   {
-    id: 1,
-    image: images.teamVy,
-    name: 'Nguyễn Phương',
     content:
-      'Chỉ muốn chia sẻ một chút về khóa học giới tính Koine! Con mình đã có một trải nghiệm tuyệt vời, học hỏi được nhiều điều hay ho và bổ ích. Nội dung rất gần gũi và dễ hiểu. Cảm ơn Koine đã mang đến một khóa học thú vị như vậy! Hy vọng sẽ có nhiều điều thú vị trong tương lai nhé! 🌟❤️'
+      'Con tôi đã tiến bộ rõ rệt trong việc giao tiếp và thể hiện cảm xúc sau khi tham gia các khóa học. Đội ngũ giảng viên rất tận tâm và chuyên nghiệp.',
+    author: {
+      name: 'Nguyễn Thị Hương',
+      role: 'Phụ huynh học sinh lớp 7',
+      avatar: '/images/avatar1.jpg'
+    },
+    rating: 5
   },
   {
-    id: 2,
-    image: images.teamHuyen,
-    name: 'Minh Hằng',
     content:
-      'Wow, vừa kết thúc khóa học giới tính Koine và thật sự rất ấn tượng! Con mình đã học được nhiều điều bổ ích và thú vị. Nội dung dễ hiểu, gần gũi, giúp bé tự tin hơn khi nói về những vấn đề này.',
-    class: 'hidden sm:flex'
+      'Phương pháp giảng dạy rất phù hợp với lứa tuổi của con, giúp con dễ dàng tiếp thu và học hỏi. Môi trường học tập an toàn và thân thiện.',
+    author: {
+      name: 'Trần Văn Nam',
+      role: 'Phụ huynh học sinh lớp 5',
+      avatar: '/images/avatar2.jpg'
+    },
+    rating: 5
   },
   {
-    id: 3,
-    image: images.teamDao,
-    name: 'Mai Anh',
     content:
-      'Vừa xong khóa học giới tính Koine và mình thật sự rất hài lòng! Con mình không chỉ học được kiến thức mới mà còn trở nên tự tin hơn khi nói về giới tính. ',
-    class: 'hidden lg:flex'
-  },
-  {
-    id: 4,
-    image: images.teamKhoa,
-    name: 'Ngọc Hằng',
-    content:
-      'Vừa kết thúc khóa học giới tính Koine và có một vài điều muốn chia sẻ! Mặc dù con mình đã học được một số kiến thức bổ ích, nhưng mình cảm thấy một số phần nội dung có thể sâu hơn nữa. Hy vọng trong các khóa tới, chương trình sẽ được nâng cấp để phong phú hơn. Cảm ơn ban tổ chức đã tạo ra không gian an toàn cho các bạn trẻ! Mong chờ những cải thiện trong tương lai! 🌱😊',
-    class: 'hidden xl:flex'
+      'Tôi rất hài lòng với sự tiến bộ của con. Các bài học không chỉ giúp con hiểu về giới tính mà còn phát triển kỹ năng sống tốt hơn.',
+    author: {
+      name: 'Lê Thị Minh',
+      role: 'Phụ huynh học sinh lớp 6',
+      avatar: '/images/avatar3.jpg'
+    },
+    rating: 5
   }
 ]
 
-function Sharing() {
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.2
+    }
+  }
+}
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      duration: 0.5
+    }
+  }
+}
+
+export default function Sharing() {
   return (
-    <section className='bg-fifth'>
-      <div className='container text-center py-20'>
-        <h3 className='text-gray-600 font-medium'>Nhận xét của người dùng</h3>
-
-        <h2
-          className='bg-gradient-to-r from-[#FF0059] via-[#FF597D] to-[#2945DE]
-          text-transparent bg-clip-text text-2xl md:text-3xl lg:text-5xl lg:h-14 font-bold mt-4'
+    <section className='py-24 overflow-hidden'>
+      <div className='container'>
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          viewport={{ once: true }}
+          className='text-center max-w-2xl mx-auto mb-16'
         >
-          Chia sẻ sau khóa học
-        </h2>
-
-        <p className='text-gray-700'>Vùng đất kỉ niệm của Koine</p>
-
-        <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 pt-10 gap-10'>
-          {sharingData.map((item) => (
-            <article
-              key={item.id}
-              className={cn(
-                'bg-white w-60 sm:w-80 mx-auto flex justify-between items-center flex-col p-8 rounded-full relative',
-                item.class
-              )}
-            >
-              <Image
-                src={icons.quote}
-                alt='koine icon'
-                width={35}
-                height={35}
-                quality={100}
-                className='absolute top-5 left-5 w-9 h-auto'
-              />
-
-              <Image
-                src={item.image}
-                alt='koine image'
-                width={1000}
-                height={1000}
-                priority
-                className='rounded-full w-44 h-44 sm:w-60 sm:h-60 object-cover'
-              />
-              <div className='py-6'>
-                <h3>{item.name}</h3>
-                <p className='pt-2 px-3 text-sm text-gray-500 line-clamp-3'>{item.content}</p>
-              </div>
-
-              <Image
-                src={icons.quote}
-                alt='koine icon'
-                width={35}
-                height={35}
-                quality={100}
-                className='absolute bottom-5 right-5 rotate-180 w-9 h-auto'
-              />
-            </article>
-          ))}
-        </div>
-      </div>
-
-      <div className='container grid grid-cols-1 xl:grid-cols-5 mt-28'>
-        <div className='xl:col-span-2'>
-          <h2
-            className='bg-gradient-to-r from-[#FF0059] via-[#FF597D] to-[#2945DE]
-            text-transparent bg-clip-text text-3xl lg:text-5xl lg:leading-16 font-bold'
-          >
-            Tham gia cùng Koine
+          <span className='bg-primary/10 text-primary px-4 py-1.5 rounded-full text-sm font-medium'>
+            Chia sẻ từ phụ huynh
+          </span>
+          <h2 className='text-3xl md:text-4xl lg:text-5xl font-bold mt-6'>
+            Phụ huynh nói gì về
+            <span className='block mt-2 bg-gradient-to-r from-[#FF0059] via-[#FF597D] to-[#2945DE] text-transparent bg-clip-text h-14'>
+              chương trình học của chúng tôi
+            </span>
           </h2>
-          <p className='text-gray-700 mt-6 text-sm md:text-base'>
-            Cùng Koine, trẻ sẽ khám phá những kiến thức quý giá về cơ thể, cảm xúc và mối quan hệ, giúp em phát triển
-            toàn diện và tự tin hơn. Hãy sẵn sàng để mở ra những cánh cửa mới và xây dựng nền tảng vững chắc cho tương
-            lai của bé nhé!
+          <p className='mt-4 text-muted-foreground'>
+            Những phản hồi chân thực từ các phụ huynh đã tin tưởng và đồng hành cùng chúng tôi
           </p>
+        </motion.div>
 
-          <Button
-            asChild
-            variant={'secondary'}
-            className='gap-2 lg:text-xl mt-10 xl:mt-16 lg:h-12 lg:w-48 lg:rounded-xl'
-          >
-            <Link href={configRoute.course}>
-              Tham gia <CircleArrowRight className='h-5 w-5 lg:w-6 lg:h-6' />
-            </Link>
-          </Button>
-        </div>
+        <motion.div
+          variants={containerVariants}
+          initial='hidden'
+          whileInView='visible'
+          viewport={{ once: true }}
+          className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8'
+        >
+          {testimonials.map((testimonial, index) => (
+            <motion.div key={index} variants={itemVariants}>
+              <Card className='p-6 h-full group hover:shadow-lg transition-shadow duration-300 relative overflow-hidden'>
+                {/* Quote Icon */}
+                <div className='absolute -top-6 -right-6 w-24 h-24 bg-primary/5 rounded-full flex items-center justify-center'>
+                  <Image src={icons.quote} alt='Quote' width={24} height={24} className='text-primary/20' />
+                </div>
 
-        <div className='xl:col-span-3'>
-          <Image src={images.sharing} alt='koine image' width={1000} height={1000} priority />
-        </div>
+                {/* Rating */}
+                <div className='flex gap-1 mb-4'>
+                  {[...Array(testimonial.rating)].map((_, i) => (
+                    <Star key={i} className='w-5 h-5 fill-primary text-primary' />
+                  ))}
+                </div>
+
+                {/* Content */}
+                <blockquote className='text-lg text-muted-foreground mb-6 relative z-10'>
+                  &quot;{testimonial.content}&quot;
+                </blockquote>
+
+                {/* Author */}
+                <div className='flex items-center gap-4 mt-auto'>
+                  <Avatar className='h-12 w-12 border-2 border-primary/10'>
+                    <AvatarImage src={testimonial.author.avatar} alt={testimonial.author.name} />
+                    <AvatarFallback>{testimonial.author.name.charAt(0)}</AvatarFallback>
+                  </Avatar>
+                  <div>
+                    <div className='font-semibold'>{testimonial.author.name}</div>
+                    <div className='text-sm text-muted-foreground'>{testimonial.author.role}</div>
+                  </div>
+                </div>
+
+                {/* Decorative Corner */}
+                <div
+                  className='absolute top-0 right-0 w-24 h-24 bg-gradient-to-bl from-primary/5 to-transparent 
+                  rounded-bl-[100px] opacity-0 group-hover:opacity-100 transition-opacity duration-500'
+                />
+              </Card>
+            </motion.div>
+          ))}
+        </motion.div>
       </div>
     </section>
   )
 }
-
-export default Sharing

@@ -39,5 +39,4 @@ function CustomInput({ className, placeholder }: { className?: string; placehold
     </div>
   )
 }
-
 export default CustomInput
