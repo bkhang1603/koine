@@ -27,3 +27,15 @@ export const TypeResource = {
 } as const
 
 export const TypeResourceValues = [TypeResource.Video, TypeResource.Document, TypeResource.Both] as const
+
+export const DeliveryMethod = {
+  STANDARD: 'STANDARD',
+  EXPEDITED: 'EXPEDITED',
+  NONESHIP: 'NONESHIP'
+} as const
+
+export const DeliveryMethodValues = [
+  DeliveryMethod.STANDARD,
+  DeliveryMethod.EXPEDITED,
+  DeliveryMethod.NONESHIP
+] as const

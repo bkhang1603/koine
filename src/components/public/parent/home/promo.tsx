@@ -66,29 +66,90 @@ export default function Promo() {
               <div className='absolute inset-0 bg-gradient-to-tr from-primary/20 to-transparent' />
 
               {/* Floating Elements */}
-              <div className='absolute top-6 left-6 bg-white/90 backdrop-blur p-4 rounded-xl shadow-lg'>
-                <div className='flex items-center gap-3'>
-                  <div className='w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center'>
-                    <Image src={icons.user} alt='Users' width={20} height={20} />
-                  </div>
-                  <div>
-                    <div className='font-semibold'>Học viên mới</div>
-                    <div className='text-sm text-muted-foreground'>+100 tuần này</div>
+              <motion.div
+                initial={{ opacity: 0, x: -20 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.5 }}
+                className='absolute top-6 left-6'
+              >
+                <div
+                  className='bg-white/95 backdrop-blur-sm rounded-2xl shadow-lg
+                  border border-gray-100/20 p-4 hover:shadow-xl hover:scale-105
+                  transition-all duration-300'
+                >
+                  <div className='flex items-center gap-4'>
+                    <div className='relative'>
+                      <div
+                        className='w-12 h-12 rounded-xl bg-gradient-to-br from-primary/10 to-secondary/10 
+                        flex items-center justify-center'
+                      >
+                        <Image src={icons.user} alt='Users' width={24} height={24} />
+                      </div>
+                      {/* Animated Ring */}
+                      <div
+                        className='absolute -inset-1 rounded-xl border border-primary/20 
+                        animate-pulse-slow opacity-70'
+                      />
+                    </div>
+                    <div>
+                      <div className='flex items-baseline gap-2'>
+                        <div className='font-semibold text-gray-900'>Học viên mới</div>
+                        <div className='px-2 py-0.5 rounded-full bg-green-50 text-green-600 text-xs font-medium'>
+                          +100
+                        </div>
+                      </div>
+                      <div className='text-sm text-gray-500 mt-0.5'>Tuần này</div>
+                    </div>
                   </div>
                 </div>
-              </div>
+              </motion.div>
 
-              <div className='absolute bottom-6 right-6 bg-white/90 backdrop-blur p-4 rounded-xl shadow-lg'>
-                <div className='flex items-center gap-3'>
-                  <div className='w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center'>
-                    <Image src={icons.pinkStar} alt='Rating' width={20} height={20} />
-                  </div>
-                  <div>
-                    <div className='font-semibold'>Đánh giá</div>
-                    <div className='text-sm text-muted-foreground'>4.9/5 sao</div>
+              <motion.div
+                initial={{ opacity: 0, x: 20 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.5 }}
+                className='absolute bottom-6 right-6'
+              >
+                <div
+                  className='bg-white/95 backdrop-blur-sm rounded-2xl shadow-lg
+                  border border-gray-100/20 p-4 hover:shadow-xl hover:scale-105
+                  transition-all duration-300'
+                >
+                  <div className='flex items-center gap-4'>
+                    <div className='relative'>
+                      <div
+                        className='w-12 h-12 rounded-xl bg-gradient-to-br from-yellow-500/10 to-orange-500/10
+                        flex items-center justify-center group'
+                      >
+                        <Image
+                          src={icons.pinkStar}
+                          alt='Rating'
+                          width={24}
+                          height={24}
+                          className='group-hover:rotate-12 transition-transform duration-300'
+                        />
+                      </div>
+                      {/* Star Decoration */}
+                      <div className='absolute -top-1 -right-1'>
+                        <div className='w-3 h-3 bg-yellow-400 rounded-full animate-ping-slow opacity-70' />
+                      </div>
+                    </div>
+                    <div>
+                      <div className='font-semibold text-gray-900 mb-0.5'>Đánh giá</div>
+                      <div className='flex items-center gap-1.5'>
+                        <div className='flex'>
+                          {[...Array(5)].map((_, i) => (
+                            <svg key={i} className='w-4 h-4 text-yellow-400 fill-current' viewBox='0 0 20 20'>
+                              <path d='M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z' />
+                            </svg>
+                          ))}
+                        </div>
+                        <span className='text-sm font-medium text-gray-600'>4.9/5</span>
+                      </div>
+                    </div>
                   </div>
                 </div>
-              </div>
+              </motion.div>
             </div>
 
             {/* Decorative Elements */}

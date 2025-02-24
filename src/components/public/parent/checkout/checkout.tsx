@@ -2,8 +2,6 @@
 
 import { useState, useEffect, useMemo } from 'react'
 import Image from 'next/image'
-import { useRouter } from 'next/navigation'
-
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
@@ -16,6 +14,8 @@ import configRoute from '@/config/route'
 import { useGetAccountAddress } from '@/queries/useAccount'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { useCreateOrderMutation } from '@/queries/useOrder'
+import { DeliveryMethod } from '@/constants/type'
+import { useRouter } from 'next/navigation'
 
 export default function Checkout() {
   const checkoutData = useAppStore((state) => state.checkoutData)
@@ -25,10 +25,10 @@ export default function Checkout() {
 
   const addresses = useMemo(() => data?.payload.data ?? [], [data?.payload.data])
 
-  const [showQRModal, setShowQRModal] = useState(false)
   const [showAddressModal, setShowAddressModal] = useState(false)
-  const [qrCodeUrl, setQrCodeUrl] = useState('')
-  const [shippingMethod, setShippingMethod] = useState('standard')
+  const [shippingMethod, setShippingMethod] = useState<(typeof DeliveryMethod)[keyof typeof DeliveryMethod]>(
+    DeliveryMethod.STANDARD
+  )
   const [selectedAddressId, setSelectedAddressId] = useState('')
 
   // Set selectedAddressId after addresses are loaded
@@ -42,12 +42,6 @@ export default function Checkout() {
 
   const selectedAddress = addresses.find((addr) => addr.id === selectedAddressId)
 
-  const handleGenerateQRCode = () => {
-    if (!selectedAddressId) return
-    setQrCodeUrl('/placeholder.svg?height=200&width=200')
-    setShowQRModal(true)
-  }
-
   const handleCreateOrder = async () => {
     if (createOrderMutation.isPending) return
 
@@ -55,11 +49,16 @@ export default function Checkout() {
 
     const orderData = {
       arrayCartDetailIds: checkoutData?.cartDetails?.map((item) => item.id) ?? [],
-      deliveryInfoId: selectedAddressId
+      deliveryInfoId: selectedAddressId,
+      deliMethod: shippingMethod
     }
 
     try {
-      await createOrderMutation.mutateAsync(orderData)
+      const res = await createOrderMutation.mutateAsync(orderData)
+
+      if (res) {
+        router.push(res.payload.data)
+      }
     } catch (error) {
       console.log(error)
     }
@@ -118,13 +117,18 @@ export default function Checkout() {
           <Card className='mb-4'>
             <CardContent className='p-4'>
               <h2 className='font-medium mb-4'>Phương thức vận chuyển</h2>
-              <RadioGroup value={shippingMethod} onValueChange={setShippingMethod}>
+              <RadioGroup
+                value={shippingMethod}
+                onValueChange={(value: (typeof DeliveryMethod)[keyof typeof DeliveryMethod]) =>
+                  setShippingMethod(value)
+                }
+              >
                 <div className='flex items-center space-x-2 mb-2'>
-                  <RadioGroupItem value='standard' id='standard' />
+                  <RadioGroupItem value={DeliveryMethod.STANDARD} id='standard' />
                   <Label htmlFor='standard'>Giao hàng tiêu chuẩn</Label>
                 </div>
                 <div className='flex items-center space-x-2 mb-2'>
-                  <RadioGroupItem value='express' id='express' />
+                  <RadioGroupItem value={DeliveryMethod.EXPEDITED} id='express' />
                   <Label htmlFor='express'>Giao hàng hỏa tốc (Chỉ áp dụng cho TP.HCM)</Label>
                 </div>
               </RadioGroup>
@@ -136,12 +140,12 @@ export default function Checkout() {
               <h2 className='font-medium mb-4'>Phương thức thanh toán</h2>
               <RadioGroup defaultValue='qr'>
                 <div className='flex items-center space-x-2 mb-2'>
-                  <RadioGroupItem value='qr' id='qr' />
+                  <RadioGroupItem value={DeliveryMethod.STANDARD} id='qr' />
                   <Label htmlFor='qr'>Thanh toán qua mã QR</Label>
                 </div>
 
                 <div className='flex items-center space-x-2 mb-2'>
-                  <RadioGroupItem value='cod' id='cod' disabled />
+                  <RadioGroupItem value={DeliveryMethod.EXPEDITED} id='cod' disabled />
                   <Label htmlFor='cod' className='text-gray-400'>
                     Thanh toán khi nhận hàng (Hiện không hỗ trợ)
                   </Label>
@@ -207,7 +211,7 @@ export default function Checkout() {
                 </div>
                 <div className='flex justify-between text-sm'>
                   <span className='text-gray-600'>Phí vận chuyển</span>
-                  <span>{shippingMethod === 'express' ? '50,000đ' : '26,000đ'}</span>
+                  <span>{shippingMethod === DeliveryMethod.EXPEDITED ? '50,000đ' : '26,000đ'}</span>
                 </div>
                 <div className='flex justify-between text-sm text-green-600'>
                   <span>Giảm giá vận chuyển</span>
@@ -217,7 +221,7 @@ export default function Checkout() {
               <div className='flex justify-between font-medium'>
                 <span>Tổng tiền</span>
                 <span className='text-xl text-red-600'>
-                  {shippingMethod === 'express'
+                  {shippingMethod === DeliveryMethod.EXPEDITED
                     ? ((checkoutData?.totalAmount ?? 0) + 50000).toLocaleString()
                     : ((checkoutData?.totalAmount ?? 0) + 26000).toLocaleString()}
                   đ
@@ -300,18 +304,6 @@ export default function Checkout() {
             <Button variant='ghost' size='sm' onClick={() => setShowAddressModal(false)}>
               Đóng
             </Button>
-          </div>
-        </DialogContent>
-      </Dialog>
-
-      <Dialog open={showQRModal} onOpenChange={setShowQRModal}>
-        <DialogContent className='sm:max-w-[400px]'>
-          <DialogHeader>
-            <DialogTitle>Quét mã QR để thanh toán</DialogTitle>
-          </DialogHeader>
-          <div className='flex flex-col items-center space-y-4'>
-            {qrCodeUrl && <Image src={qrCodeUrl} alt='QR Code' width={200} height={200} />}
-            <p className='text-center'>Vui lòng quét mã QR để hoàn tất thanh toán</p>
           </div>
         </DialogContent>
       </Dialog>

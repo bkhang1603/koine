@@ -2,14 +2,26 @@
 
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Input } from '@/components/ui/input'
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
-import { Search, Filter, PlayCircle, Users2, ChevronDown, Clock, BookOpen, Gift, Sparkles } from 'lucide-react'
+import {
+  Search,
+  Filter,
+  PlayCircle,
+  Users2,
+  ChevronDown,
+  Clock,
+  BookOpen,
+  Gift,
+  Sparkles,
+  Calendar
+} from 'lucide-react'
 import Image from 'next/image'
 import { Progress } from '@/components/ui/progress'
+import { cn } from '@/lib/utils'
 
 interface PurchasedCourse {
   id: number
@@ -78,216 +90,284 @@ export default function PurchasedCoursesPage() {
 
   return (
     <div className='space-y-8'>
+      {/* Header */}
+      <div>
+        <h3 className='text-2xl font-semibold'>Khóa học đã mua</h3>
+        <p className='text-sm text-gray-500 mt-1'>Quản lý và kích hoạt các khóa học bạn đã mua</p>
+      </div>
+
       {/* Stats Overview */}
-      <div className='grid gap-4 md:grid-cols-3'>
-        <Card>
-          <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
-            <CardTitle className='text-sm font-medium'>Tổng khóa học</CardTitle>
-            <BookOpen className='h-4 w-4 text-muted-foreground' />
-          </CardHeader>
-          <CardContent>
-            <div className='text-2xl font-bold'>{courses.length}</div>
-            <p className='text-xs text-muted-foreground'>
-              {courses.filter((c) => c.status === 'activated').length} khóa học đã kích hoạt
-            </p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
-            <CardTitle className='text-sm font-medium'>Tổng giá trị</CardTitle>
-            <Sparkles className='h-4 w-4 text-muted-foreground' />
-          </CardHeader>
-          <CardContent>
-            <div className='text-2xl font-bold'>
-              {courses.reduce((sum, course) => sum + course.price, 0).toLocaleString('vi-VN')} VNĐ
+      <div className='grid grid-cols-1 md:grid-cols-3 gap-6'>
+        <Card className='relative overflow-hidden border-none shadow-md bg-gradient-to-br from-primary/5 to-primary/10'>
+          <CardContent className='pt-6'>
+            <div className='flex items-center gap-4'>
+              <div className='h-14 w-14 rounded-xl bg-primary/10 flex items-center justify-center'>
+                <BookOpen className='h-7 w-7 text-primary' />
+              </div>
+              <div className='relative z-10'>
+                <p className='text-sm text-gray-600 font-medium'>Tổng khóa học</p>
+                <div className='flex items-baseline gap-1 mt-1'>
+                  <span className='text-2xl font-bold text-gray-900'>{courses.length}</span>
+                  <span className='text-sm text-gray-500'>khóa học</span>
+                </div>
+              </div>
             </div>
-            <p className='text-xs text-muted-foreground'>Đã đầu tư cho việc học</p>
+            <div className='absolute right-4 bottom-4 opacity-10'>
+              <BookOpen className='h-16 w-16 text-primary' />
+            </div>
           </CardContent>
         </Card>
-        <Card>
-          <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
-            <CardTitle className='text-sm font-medium'>Thời lượng</CardTitle>
-            <Clock className='h-4 w-4 text-muted-foreground' />
-          </CardHeader>
-          <CardContent>
-            <div className='text-2xl font-bold'>15.5 giờ</div>
-            <p className='text-xs text-muted-foreground'>Tổng thời lượng học tập</p>
+
+        <Card className='relative overflow-hidden border-none shadow-md bg-gradient-to-br from-green-50 to-green-100/50'>
+          <CardContent className='pt-6'>
+            <div className='flex items-center gap-4'>
+              <div className='h-14 w-14 rounded-xl bg-green-100 flex items-center justify-center'>
+                <Sparkles className='h-7 w-7 text-green-600' />
+              </div>
+              <div className='relative z-10'>
+                <p className='text-sm text-gray-600 font-medium'>Tổng giá trị</p>
+                <div className='flex items-baseline gap-1 mt-1'>
+                  <span className='text-2xl font-bold text-gray-900'>
+                    {courses.reduce((sum, course) => sum + course.price, 0).toLocaleString('vi-VN')}
+                  </span>
+                  <span className='text-sm text-gray-500'>VNĐ</span>
+                </div>
+              </div>
+            </div>
+            <div className='absolute right-4 bottom-4 opacity-10'>
+              <Sparkles className='h-16 w-16 text-green-600' />
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className='relative overflow-hidden border-none shadow-md bg-gradient-to-br from-blue-50 to-blue-100/50'>
+          <CardContent className='pt-6'>
+            <div className='flex items-center gap-4'>
+              <div className='h-14 w-14 rounded-xl bg-blue-100 flex items-center justify-center'>
+                <Clock className='h-7 w-7 text-blue-600' />
+              </div>
+              <div className='relative z-10'>
+                <p className='text-sm text-gray-600 font-medium'>Thời lượng</p>
+                <div className='flex items-baseline gap-1 mt-1'>
+                  <span className='text-2xl font-bold text-gray-900'>15.5</span>
+                  <span className='text-sm text-gray-500'>giờ</span>
+                </div>
+              </div>
+            </div>
+            <div className='absolute right-4 bottom-4 opacity-10'>
+              <Clock className='h-16 w-16 text-blue-600' />
+            </div>
           </CardContent>
         </Card>
       </div>
 
       {/* Search and Filters */}
-      <div className='flex flex-col gap-4'>
-        <div className='flex items-center justify-between'>
-          <h2 className='text-2xl font-semibold tracking-tight'>Khóa học của bạn</h2>
-          <Tabs defaultValue='all' className='w-[400px]'>
-            <TabsList className='grid w-full grid-cols-3'>
-              <TabsTrigger value='all'>Tất cả</TabsTrigger>
-              <TabsTrigger value='activated'>Đã kích hoạt</TabsTrigger>
-              <TabsTrigger value='not_activated'>Chưa kích hoạt</TabsTrigger>
-            </TabsList>
-          </Tabs>
-        </div>
-        <div className='flex gap-4'>
-          <div className='relative flex-1'>
-            <Search className='absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground' />
-            <Input className='pl-9' placeholder='Tìm kiếm khóa học...' />
+      <Card className='border-none shadow-md'>
+        <CardContent className='p-6'>
+          <div className='flex flex-col sm:flex-row gap-4'>
+            <div className='flex-1 flex gap-4'>
+              <div className='relative flex-1 max-w-md'>
+                <Search className='absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400' />
+                <Input
+                  placeholder='Tìm kiếm khóa học...'
+                  className='pl-9 border-gray-200 focus:border-primary/30 focus:ring-primary/20'
+                />
+              </div>
+              <Button variant='outline' size='icon' className='border-gray-200 hover:bg-gray-100'>
+                <Filter className='h-4 w-4 text-gray-500' />
+              </Button>
+            </div>
+            <Tabs defaultValue='all' className='w-full sm:w-auto'>
+              <TabsList className='grid w-full sm:w-auto grid-cols-3 p-1 bg-gray-100/80'>
+                <TabsTrigger value='all' className='data-[state=active]:bg-white'>
+                  Tất cả
+                </TabsTrigger>
+                <TabsTrigger value='activated' className='data-[state=active]:bg-white'>
+                  Đã kích hoạt
+                </TabsTrigger>
+                <TabsTrigger value='not_activated' className='data-[state=active]:bg-white'>
+                  Chưa kích hoạt
+                </TabsTrigger>
+              </TabsList>
+            </Tabs>
           </div>
-          <Button variant='outline' size='icon'>
-            <Filter className='h-4 w-4' />
-          </Button>
-        </div>
-      </div>
+        </CardContent>
+      </Card>
 
-      {/* Course Grid - New Design */}
+      {/* Course Grid */}
       <div className='grid gap-6 md:grid-cols-2'>
         {courses.map((course) => (
-          <Card key={course.id} className='overflow-hidden hover:shadow-lg transition-shadow'>
+          <Card
+            key={course.id}
+            className={cn(
+              'group border-none shadow-md overflow-hidden transition-all duration-300',
+              'hover:shadow-xl hover:shadow-primary/10'
+            )}
+          >
             <CardContent className='p-0 flex flex-col h-full'>
               {/* Course Header */}
-              <div className='relative h-40 flex-shrink-0'>
-                <Image src={course.thumbnail} alt={course.title} fill className='object-cover' />
-                <div className='absolute inset-0 bg-gradient-to-t from-black/60 via-black/40 to-transparent' />
-                <div className='absolute inset-0 p-4 flex flex-col justify-between'>
+              <div className='relative h-48 flex-shrink-0'>
+                <Image
+                  src={course.thumbnail}
+                  alt={course.title}
+                  fill
+                  className='object-cover transition-transform duration-500 group-hover:scale-105'
+                />
+                <div className='absolute inset-0 bg-gradient-to-t from-black/80 via-black/50 to-transparent' />
+                <div className='absolute inset-0 p-6 flex flex-col justify-between'>
                   <div className='flex justify-between items-start'>
-                    <Badge variant='outline' className='bg-black/50 text-white border-none'>
+                    <Badge variant='outline' className='bg-black/50 text-white border-none backdrop-blur-sm'>
                       {course.category}
                     </Badge>
-                    <Badge variant={getStatusConfig(course.status).variant} className='shadow-sm'>
+                    <Badge variant={getStatusConfig(course.status).variant} className='shadow-sm backdrop-blur-sm'>
                       {getStatusConfig(course.status).label}
                     </Badge>
                   </div>
-                  <h3 className='text-lg font-semibold text-white line-clamp-2'>{course.title}</h3>
+                  <div>
+                    <h3 className='text-xl font-semibold text-white line-clamp-2 group-hover:text-primary/90 transition-colors'>
+                      {course.title}
+                    </h3>
+                    <p className='text-sm text-gray-200 mt-2 line-clamp-2'>
+                      Khóa học {course.totalLessons} bài • {course.duration}
+                    </p>
+                  </div>
                 </div>
               </div>
 
-              {/* Course Content Wrapper */}
-              <div className='flex-1 flex flex-col p-4'>
-                {/* Basic Info */}
-                <div className='grid grid-cols-2 gap-4 text-sm'>
+              {/* Course Content */}
+              <div className='flex-1 flex flex-col p-6 bg-gradient-to-b from-gray-50 to-white'>
+                {/* Info Grid */}
+                <div className='grid grid-cols-2 gap-6 p-4 bg-white rounded-xl border border-gray-100'>
                   <div className='space-y-1'>
-                    <p className='text-muted-foreground'>Thời lượng</p>
-                    <p className='font-medium flex items-center gap-1'>
-                      <Clock className='w-4 h-4' />
-                      {course.duration}
+                    <p className='text-xs font-medium text-gray-500 uppercase tracking-wider'>Ngày mua</p>
+                    <p className='font-medium text-gray-700 flex items-center gap-2'>
+                      <Clock className='w-4 h-4 text-gray-400' />
+                      {course.purchaseDate}
                     </p>
                   </div>
                   <div className='space-y-1'>
-                    <p className='text-muted-foreground'>Số bài học</p>
-                    <p className='font-medium flex items-center gap-1'>
-                      <BookOpen className='w-4 h-4' />
-                      {course.totalLessons} bài
+                    <p className='text-xs font-medium text-gray-500 uppercase tracking-wider'>Thời hạn</p>
+                    <p className='font-medium text-gray-700 flex items-center gap-2'>
+                      <Calendar className='w-4 h-4 text-gray-400' />
+                      {course.validUntil || 'Vĩnh viễn'}
                     </p>
-                  </div>
-                  <div className='space-y-1'>
-                    <p className='text-muted-foreground'>Ngày mua</p>
-                    <p className='font-medium'>{course.purchaseDate}</p>
-                  </div>
-                  <div className='space-y-1'>
-                    <p className='text-muted-foreground'>Thời hạn</p>
-                    <p className='font-medium'>{course.validUntil || 'Vĩnh viễn'}</p>
                   </div>
                 </div>
 
-                {/* Status Specific Content */}
-                <div className='flex-1 py-4'>
+                {/* Status Content */}
+                <div className='flex-1 py-6'>
                   {course.status === 'activated' ? (
-                    <div className='space-y-3'>
-                      <div className='flex items-center gap-3'>
-                        <div className='w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center'>
-                          <Users2 className='w-4 h-4 text-primary' />
+                    <div className='space-y-4'>
+                      <div className='flex items-center gap-4 p-3 rounded-lg bg-primary/5 border border-primary/10'>
+                        <div className='h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center'>
+                          <Users2 className='w-5 h-5 text-primary' />
                         </div>
                         <div>
-                          <p className='text-sm text-muted-foreground'>Đã kích hoạt cho</p>
-                          <p className='font-medium'>{course.activatedFor}</p>
+                          <p className='text-sm font-medium text-gray-900'>{course.activatedFor}</p>
+                          <p className='text-sm text-gray-500'>Đã kích hoạt khóa học</p>
                         </div>
                       </div>
-                      <div className='space-y-1.5'>
-                        <div className='flex justify-between text-sm'>
-                          <span className='text-muted-foreground'>Tiến độ học tập</span>
-                          <span className='font-medium'>45%</span>
+                      {course.activationType === 'self' && (
+                        <div className='space-y-2'>
+                          <div className='flex justify-between text-sm'>
+                            <span className='font-medium text-gray-900'>Tiến độ học tập</span>
+                            <span className='text-primary font-semibold'>45%</span>
+                          </div>
+                          <Progress value={45} className='h-2 bg-primary/10' />
                         </div>
-                        <Progress value={45} className='h-1.5' />
-                      </div>
+                      )}
                     </div>
                   ) : course.status === 'expired' ? (
-                    <div className='space-y-3'>
+                    <div className='p-4 rounded-lg bg-red-50 border border-red-100 space-y-3'>
                       <div className='flex items-center gap-3'>
-                        <div className='w-8 h-8 rounded-full bg-destructive/10 flex items-center justify-center'>
-                          <Clock className='w-4 h-4 text-destructive' />
+                        <div className='h-10 w-10 rounded-full bg-red-100 flex items-center justify-center'>
+                          <Clock className='w-5 h-5 text-red-600' />
                         </div>
                         <div>
-                          <p className='text-sm text-muted-foreground'>Trạng thái</p>
-                          <p className='font-medium text-destructive'>Khóa học đã hết hạn</p>
+                          <p className='font-medium text-red-900'>Khóa học đã hết hạn</p>
+                          <p className='text-sm text-red-600'>Hết hạn vào ngày {course.validUntil}</p>
                         </div>
-                      </div>
-                      <div className='flex items-center gap-2 text-sm text-muted-foreground'>
-                        <Clock className='w-4 h-4' />
-                        <span>Hết hạn vào ngày {course.validUntil}</span>
                       </div>
                     </div>
                   ) : (
-                    <div className='space-y-3'>
+                    <div className='p-4 rounded-lg bg-blue-50 border border-blue-100 space-y-3'>
                       <div className='flex items-center gap-3'>
-                        <div className='w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center'>
-                          <Gift className='w-4 h-4 text-primary' />
+                        <div className='h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center'>
+                          <Gift className='w-5 h-5 text-blue-600' />
                         </div>
                         <div>
-                          <p className='text-sm text-muted-foreground'>Trạng thái</p>
-                          <p className='font-medium'>Chưa kích hoạt</p>
+                          <p className='font-medium text-blue-900'>Chưa kích hoạt</p>
+                          <p className='text-sm text-blue-600'>Có thể kích hoạt cho bản thân hoặc tài khoản con</p>
                         </div>
-                      </div>
-                      <div className='flex items-center gap-2 text-sm text-muted-foreground pt-2'>
-                        <Users2 className='w-4 h-4' />
-                        <span>Có thể kích hoạt cho bản thân hoặc tài khoản con</span>
                       </div>
                     </div>
                   )}
                 </div>
 
-                {/* Actions - Will always stay at bottom */}
-                <div className='flex items-center gap-2 pt-2 border-t mt-auto'>
+                {/* Actions */}
+                <div className='pt-4 border-t border-dashed'>
                   {course.status === 'not_activated' ? (
-                    <>
-                      <Button className='flex-1' variant='default'>
+                    <div className='flex gap-2'>
+                      <Button
+                        className='flex-1 bg-gradient-to-r from-primary to-primary/90 hover:from-primary/90 hover:to-primary
+                          shadow-lg shadow-primary/25 hover:shadow-xl hover:shadow-primary/20'
+                      >
                         <Gift className='w-4 h-4 mr-2' />
                         Kích hoạt cho bản thân
                       </Button>
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                          <Button variant='outline' size='icon'>
+                          <Button
+                            variant='outline'
+                            size='icon'
+                            className='border-gray-200 hover:border-primary/30 hover:bg-primary/5'
+                          >
                             <Users2 className='w-4 h-4' />
                           </Button>
                         </DropdownMenuTrigger>
-                        <DropdownMenuContent align='end' className='w-48'>
-                          <DropdownMenuItem disabled className='text-muted-foreground font-medium'>
+                        <DropdownMenuContent align='end' className='w-56'>
+                          <DropdownMenuItem disabled className='text-gray-500 font-medium'>
                             Kích hoạt cho con
                           </DropdownMenuItem>
                           {mockChildAccounts.map((child) => (
-                            <DropdownMenuItem key={child.id}>
+                            <DropdownMenuItem
+                              key={child.id}
+                              className='flex items-center gap-2 cursor-pointer hover:bg-primary/5'
+                            >
+                              <div className='h-6 w-6 rounded-full bg-primary/10 flex items-center justify-center'>
+                                <Users2 className='w-3 h-3 text-primary' />
+                              </div>
                               {child.name} ({child.age} tuổi)
                             </DropdownMenuItem>
                           ))}
                         </DropdownMenuContent>
                       </DropdownMenu>
-                    </>
+                    </div>
                   ) : course.status === 'activated' ? (
                     course.activationType === 'self' ? (
-                      <Button className='flex-1' variant='default'>
+                      <Button
+                        className='w-full bg-gradient-to-r from-primary to-primary/90 hover:from-primary/90 hover:to-primary
+                          shadow-lg shadow-primary/25 hover:shadow-xl hover:shadow-primary/20'
+                      >
                         <PlayCircle className='w-4 h-4 mr-2' />
                         Vào học ngay
                       </Button>
                     ) : (
-                      <div className='flex-1 flex items-center justify-between px-4 py-2 bg-muted rounded-md'>
-                        <div className='flex items-center gap-2 text-sm text-muted-foreground'>
+                      <div className='flex items-center justify-between px-4 py-3 bg-gray-50 rounded-lg border border-gray-100'>
+                        <div className='flex items-center gap-2 text-sm text-gray-600'>
                           <Users2 className='w-4 h-4' />
                           Đã kích hoạt cho {course.activatedFor}
                         </div>
-                        <Badge variant='outline'>Không thể truy cập</Badge>
+                        <Badge variant='outline' className='bg-white border-gray-200'>
+                          Không thể truy cập
+                        </Badge>
                       </div>
                     )
                   ) : (
-                    <Button className='flex-1' variant='default'>
+                    <Button
+                      className='w-full bg-gradient-to-r from-primary to-primary/90 hover:from-primary/90 hover:to-primary
+                        shadow-lg shadow-primary/25 hover:shadow-xl hover:shadow-primary/20'
+                    >
                       <Sparkles className='w-4 h-4 mr-2' />
                       Gia hạn khóa học
                     </Button>

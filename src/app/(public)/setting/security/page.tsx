@@ -10,75 +10,78 @@ import { KeyRound, Smartphone, Shield, History } from 'lucide-react'
 
 export default function SecurityPage() {
   return (
-    <div className='space-y-6'>
+    <div className='max-w-4xl mx-auto space-y-8'>
+      {/* Header */}
       <div>
-        <h3 className='text-lg font-medium'>Bảo mật</h3>
-        <p className='text-sm text-muted-foreground'>Bảo vệ tài khoản của bạn</p>
+        <h3 className='text-2xl font-semibold'>Bảo mật tài khoản</h3>
+        <p className='text-sm text-gray-500 mt-1'>Thiết lập các tùy chọn bảo mật để bảo vệ tài khoản của bạn</p>
       </div>
-      <Separator />
 
-      <div className='grid gap-4'>
-        <Card>
-          <CardHeader>
-            <CardTitle className='flex items-center gap-2'>
-              <KeyRound className='w-5 h-5' />
-              Mật khẩu
+      <div className='space-y-6'>
+        {/* Password Section */}
+        <Card className='border-none shadow-md'>
+          <CardHeader className='pb-6 border-b'>
+            <CardTitle className='flex items-center gap-2 text-lg font-medium'>
+              <KeyRound className='w-5 h-5 text-primary' />
+              Thay đổi mật khẩu
             </CardTitle>
           </CardHeader>
-          <CardContent className='space-y-6'>
-            <div className='grid gap-4'>
-              <div className='grid gap-2'>
-                <Label>Mật khẩu hiện tại</Label>
-                <Input type='password' />
+          <CardContent className='pt-6'>
+            <div className='max-w-xl space-y-4'>
+              <div>
+                <Label className='text-sm text-gray-600 mb-1.5 block'>Mật khẩu hiện tại</Label>
+                <Input type='password' className='h-10 border-gray-200' />
               </div>
-              <div className='grid gap-2'>
-                <Label>Mật khẩu mới</Label>
-                <Input type='password' />
+              <div>
+                <Label className='text-sm text-gray-600 mb-1.5 block'>Mật khẩu mới</Label>
+                <Input type='password' className='h-10 border-gray-200' />
               </div>
-              <div className='grid gap-2'>
-                <Label>Xác nhận mật khẩu mới</Label>
-                <Input type='password' />
+              <div>
+                <Label className='text-sm text-gray-600 mb-1.5 block'>Xác nhận mật khẩu mới</Label>
+                <Input type='password' className='h-10 border-gray-200' />
               </div>
+              <Button className='mt-2 bg-primary/5 text-primary hover:bg-primary/10'>Đổi mật khẩu</Button>
             </div>
-            <Button>Đổi mật khẩu</Button>
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader>
-            <CardTitle className='flex items-center gap-2'>
-              <Smartphone className='w-5 h-5' />
-              Xác thực 2 lớp
+        {/* 2FA Section */}
+        <Card className='border-none shadow-md'>
+          <CardHeader className='pb-6 border-b'>
+            <CardTitle className='flex items-center gap-2 text-lg font-medium'>
+              <Smartphone className='w-5 h-5 text-primary' />
+              Xác thực hai yếu tố
             </CardTitle>
           </CardHeader>
-          <CardContent className='space-y-4'>
+          <CardContent className='pt-6 space-y-6'>
             <div className='flex items-center justify-between'>
-              <div className='space-y-0.5'>
-                <Label className='text-base'>Bảo mật 2 lớp</Label>
-                <p className='text-sm text-muted-foreground'>Bảo vệ tài khoản bằng xác thực 2 lớp</p>
+              <div>
+                <Label className='font-medium block mb-0.5'>Bảo mật hai lớp</Label>
+                <p className='text-sm text-gray-500'>Thêm một lớp bảo mật cho tài khoản của bạn</p>
               </div>
               <Switch />
             </div>
             <Separator />
             <div className='flex items-center justify-between'>
-              <div className='space-y-0.5'>
-                <Label className='text-base'>Thông báo đăng nhập</Label>
-                <p className='text-sm text-muted-foreground'>Nhận thông báo khi có đăng nhập mới</p>
+              <div>
+                <Label className='font-medium block mb-0.5'>Thông báo đăng nhập</Label>
+                <p className='text-sm text-gray-500'>Nhận email thông báo khi có đăng nhập mới</p>
               </div>
               <Switch defaultChecked />
             </div>
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader>
-            <CardTitle className='flex items-center gap-2'>
-              <History className='w-5 h-5' />
+        {/* Login History */}
+        <Card className='border-none shadow-md'>
+          <CardHeader className='pb-6 border-b'>
+            <CardTitle className='flex items-center gap-2 text-lg font-medium'>
+              <History className='w-5 h-5 text-primary' />
               Lịch sử đăng nhập
             </CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className='space-y-4'>
+          <CardContent className='pt-6'>
+            <div className='space-y-6'>
               {[
                 {
                   device: 'Chrome trên Windows',
@@ -93,20 +96,20 @@ export default function SecurityPage() {
                 }
               ].map((session, i) => (
                 <div key={i} className='flex items-center justify-between'>
-                  <div className='space-y-1'>
-                    <p className='font-medium flex items-center gap-2'>
-                      {session.device}
+                  <div>
+                    <div className='flex items-center gap-2 mb-0.5'>
+                      <span className='font-medium'>{session.device}</span>
                       {session.current && (
-                        <span className='text-xs bg-green-500/10 text-green-500 px-2 py-0.5 rounded-full'>
+                        <span className='text-xs bg-primary/5 text-primary px-2 py-0.5 rounded-full font-medium'>
                           Hiện tại
                         </span>
                       )}
-                    </p>
-                    <p className='text-sm text-muted-foreground'>{session.location}</p>
-                    <p className='text-xs text-muted-foreground'>{session.time}</p>
+                    </div>
+                    <p className='text-sm text-gray-500'>{session.location}</p>
+                    <p className='text-xs text-gray-400 mt-0.5'>{session.time}</p>
                   </div>
                   {!session.current && (
-                    <Button variant='outline' size='sm'>
+                    <Button variant='outline' size='sm' className='h-9'>
                       Đăng xuất
                     </Button>
                   )}
@@ -118,4 +121,4 @@ export default function SecurityPage() {
       </div>
     </div>
   )
-} 
+}

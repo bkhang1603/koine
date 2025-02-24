@@ -1,9 +1,11 @@
+import { DeliveryMethodValues } from '@/constants/type'
 import z from 'zod'
 
 export const orderBody = z
   .object({
     arrayCartDetailIds: z.array(z.string()),
-    deliveryInfoId: z.string()
+    deliveryInfoId: z.string(),
+    deliMethod: z.enum(DeliveryMethodValues)
   })
   .strict()
 

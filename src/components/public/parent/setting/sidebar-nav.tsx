@@ -2,76 +2,96 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { useState } from 'react'
-import { ChevronDown, ChevronRight } from 'lucide-react'
-
+import { ChevronDown } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import { buttonVariants } from '@/components/ui/button'
+import { useState } from 'react'
 
 export interface NavItem {
+  title: string
   href?: string
-  title?: string
   icon?: React.ReactNode
-  children?: NavItem[]
+  children?: Omit<NavItem, 'children'>[]
 }
 
-interface SidebarNavProps extends React.HTMLAttributes<HTMLElement> {
+interface SidebarNavProps {
   items: NavItem[]
 }
 
-export function SidebarNav({ className, items, ...props }: SidebarNavProps) {
+export function SidebarNav({ items }: SidebarNavProps) {
   const pathname = usePathname()
+  const [openSections, setOpenSections] = useState<string[]>(['Hồ sơ', 'Quản lý'])
+
+  const toggleSection = (title: string) => {
+    setOpenSections((prev) =>
+      prev.includes(title) ? prev.filter((t) => t !== title) : [...prev, title]
+    )
+  }
 
   return (
-    <nav className={cn('flex flex-col space-y-1', className)} {...props}>
-      {items.map((item, index) => (
-        <NavItem key={item.href || `item-${index}`} item={item} pathname={pathname} />
-      ))}
-    </nav>
-  )
-}
+    <nav className='flex flex-col space-y-1'>
+      {items.map((item) => {
+        if (item.children) {
+          const isOpen = openSections.includes(item.title)
+          const isActive = item.children.some((child) => child.href === pathname)
 
-function NavItem({ item, pathname }: { item: NavItem; pathname: string }) {
-  const [isOpen, setIsOpen] = useState(false)
-  const isActive = item.href && pathname === item.href
-  const hasChildren = item.children && item.children.length > 0
-
-  const content = (
-    <div
-      className={cn(
-        buttonVariants({ variant: 'ghost' }),
-        isActive ? 'bg-muted hover:bg-muted' : 'hover:bg-transparent hover:underline',
-        'justify-between w-full text-sm select-none',
-        item.title ? '' : 'pointer-events-none'
-      )}
-      onClick={() => {
-        if (hasChildren) {
-          setIsOpen(!isOpen)
+          return (
+            <div key={item.title} className='space-y-1'>
+              <button
+                onClick={() => toggleSection(item.title)}
+                className={cn(
+                  'w-full flex items-center justify-between px-3 py-2 text-sm font-medium rounded-lg transition-colors',
+                  isActive
+                    ? 'bg-primary/5 text-primary hover:bg-primary/10'
+                    : 'hover:bg-gray-100 text-gray-700'
+                )}
+              >
+                <div className='flex items-center gap-3'>
+                  {item.icon}
+                  <span>{item.title}</span>
+                </div>
+                <ChevronDown
+                  className={cn('h-4 w-4 transition-transform', isOpen && 'rotate-180')}
+                />
+              </button>
+              {isOpen && (
+                <div className='ml-4 pl-4 border-l border-gray-100 space-y-1'>
+                  {item.children.map((child) => (
+                    <Link
+                      key={child.href}
+                      href={child.href!}
+                      className={cn(
+                        'flex items-center gap-3 px-3 py-2 text-sm rounded-lg transition-colors',
+                        pathname === child.href
+                          ? 'bg-primary/5 text-primary hover:bg-primary/10 font-medium'
+                          : 'text-gray-600 hover:bg-gray-100'
+                      )}
+                    >
+                      {child.icon}
+                      {child.title}
+                    </Link>
+                  ))}
+                </div>
+              )}
+            </div>
+          )
         }
-      }}
-    >
-      <span className='flex items-center'>
-        {item.icon && <span>{item.icon}</span>}
-        {item.title || 'Untitled'}
-      </span>
-      {hasChildren && (
-        <span className='ml-auto'>
-          {isOpen ? <ChevronDown className='h-4 w-4' /> : <ChevronRight className='h-4 w-4' />}
-        </span>
-      )}
-    </div>
-  )
 
-  return (
-    <div>
-      {item.href && item.title ? <Link href={item.href}>{content}</Link> : content}
-      {hasChildren && isOpen && (
-        <div className='ml-4 mt-1 flex flex-col space-y-1'>
-          {item.children?.map((child, index) => (
-            <NavItem key={child.href || `child-${index}`} item={child} pathname={pathname} />
-          ))}
-        </div>
-      )}
-    </div>
+        return (
+          <Link
+            key={item.href}
+            href={item.href!}
+            className={cn(
+              'flex items-center gap-3 px-3 py-2 text-sm font-medium rounded-lg transition-colors',
+              pathname === item.href
+                ? 'bg-primary/5 text-primary hover:bg-primary/10'
+                : 'hover:bg-gray-100 text-gray-700'
+            )}
+          >
+            {item.icon}
+            {item.title}
+          </Link>
+        )
+      })}
+    </nav>
   )
 }

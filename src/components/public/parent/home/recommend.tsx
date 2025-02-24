@@ -1,202 +1,188 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { Card } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { ArrowRight, Star, Sparkles } from 'lucide-react'
+import { ArrowRight, BookOpen, Clock, Users } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
 import images from '@/assets/images'
-import icons from '@/assets/icons'
 
 const courses = [
   {
     id: 1,
-    title: 'Khóa học về Sức khỏe Sinh lý',
-    description: 'Hiểu về những thay đổi của cơ thể trong giai đoạn dậy thì',
+    title: 'Giới tính và Sự phát triển',
+    description: 'Khám phá sự phát triển cơ thể và tâm lý theo độ tuổi',
     image: images.course1,
-    lessons: 12,
-    duration: '6 tuần',
-    level: 'Cơ bản'
+    duration: '8 tuần',
+    students: '250+',
+    lessons: '24 bài học'
   },
   {
     id: 2,
-    title: 'Kỹ năng Quản lý Cảm xúc',
-    description: 'Phát triển khả năng kiểm soát và thấu hiểu cảm xúc bản thân',
+    title: 'An toàn và Ranh giới',
+    description: 'Kỹ năng tự bảo vệ và nhận biết ranh giới cá nhân',
     image: images.course2,
-    lessons: 10,
-    duration: '5 tuần',
-    level: 'Trung bình'
+    duration: '6 tuần',
+    students: '180+',
+    lessons: '18 bài học'
   },
   {
     id: 3,
-    title: 'Giao tiếp Hiệu quả',
-    description: 'Rèn luyện kỹ năng giao tiếp và xây dựng mối quan hệ tốt đẹp',
+    title: 'Mối quan hệ Lành mạnh',
+    description: 'Xây dựng các mối quan hệ tích cực và tôn trọng',
     image: images.course3,
-    lessons: 8,
-    duration: '4 tuần',
-    level: 'Nâng cao'
+    duration: '7 tuần',
+    students: '200+',
+    lessons: '21 bài học'
   }
 ]
 
-const containerVariants = {
-  hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: {
-      staggerChildren: 0.2
-    }
-  }
-}
-
-const itemVariants = {
-  hidden: { opacity: 0, y: 20 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: {
-      duration: 0.5
-    }
-  }
-}
-
 export default function Recommend() {
   return (
-    <section className='relative py-24 overflow-hidden'>
-      {/* Background Decoration */}
-      <div className='absolute inset-0'>
-        {/* Wave Pattern */}
-        <div className='absolute inset-0 opacity-[0.15]'>
-          <svg width='100%' height='100%' className='absolute inset-0'>
-            <pattern id='recommendGrid' width='60' height='60' patternUnits='userSpaceOnUse'>
-              <path
-                d='M 60 0 L 0 0 0 60'
-                fill='none'
-                stroke='currentColor'
-                strokeWidth='1'
-                className='text-primary/40'
-              />
-            </pattern>
-            <rect width='100%' height='100%' fill='url(#recommendGrid)' />
-          </svg>
-        </div>
+    <section className='py-20 relative overflow-hidden'>
+      <div className='container'>
+        {/* Section Header */}
+        <div className='relative max-w-3xl mx-auto mb-20'>
+          {/* Decorative Elements */}
+          <div className='absolute -top-8 left-0 w-20 h-20 bg-primary/5 rounded-full blur-2xl' />
+          <div className='absolute -top-4 left-20 w-12 h-12 bg-secondary/5 rounded-full blur-xl' />
 
-        {/* Floating Elements */}
-        <div className='absolute inset-0'>
-          {/* Circles */}
-          <div className='absolute top-[10%] left-[25%] w-40 h-40 border-[12px] border-primary/20 rounded-full animate-float-slow' />
-          <div className='absolute bottom-[15%] right-[20%] w-28 h-28 border-[8px] border-secondary/20 rounded-full animate-float-slow delay-500' />
-          <div className='absolute top-[60%] left-[10%] w-20 h-20 border-[6px] border-primary/15 rounded-full animate-float-slow delay-700' />
+          <div className='relative text-center'>
+            {/* Subtitle */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5 }}
+              className='inline-block mb-4'
+            >
+              <span className='px-4 py-2 rounded-full bg-primary/5 text-primary font-medium text-sm'>
+                Chương trình học
+              </span>
+            </motion.div>
 
-          {/* Squares */}
-          <div className='absolute top-[30%] right-[15%] w-24 h-24 border-[8px] border-primary/20 rotate-[30deg] animate-float-slow delay-200' />
-          <div className='absolute bottom-[40%] left-[30%] w-32 h-32 border-[10px] border-secondary/20 rotate-[60deg] animate-float-slow delay-300' />
-          <div className='absolute top-[45%] right-[25%] w-16 h-16 border-[6px] border-secondary/15 -rotate-12 animate-float-slow delay-600' />
-        </div>
+            {/* Title */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.1 }}
+              className='relative'
+            >
+              <h2 className='text-4xl font-bold mb-6 leading-tight'>
+                Khóa học tiêu biểu
+                <span className='block text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary'>
+                  được thiết kế cho con bạn
+                </span>
+              </h2>
+            </motion.div>
 
-        {/* Animated Lines */}
-        <div className='absolute inset-0'>
-          {[...Array(4)].map((_, i) => (
-            <div
-              key={i}
-              className='absolute h-[1px] w-full'
-              style={{
-                background: `linear-gradient(90deg, transparent, ${
-                  i % 2 ? 'rgba(var(--primary), 0.15)' : 'rgba(var(--secondary), 0.15)'
-                }, transparent)`,
-                top: `${25 + i * 18}%`,
-                transform: `rotate(${-20 + i * 12}deg) translateY(${i * 25}px)`,
-                animation: 'moveLeftRight 18s linear infinite',
-                animationDelay: `${i * 1.5}s`
-              }}
+            {/* Description */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.2 }}
+              className='relative'
+            >
+              <p className='text-muted-foreground text-lg max-w-2xl mx-auto leading-relaxed'>
+                Được xây dựng bởi các chuyên gia hàng đầu, mỗi khóa học là một hành trình
+                <span className='text-primary font-medium'> khám phá và phát triển </span>
+                phù hợp với từng độ tuổi của trẻ
+              </p>
+            </motion.div>
+
+            {/* Decorative Line */}
+            <motion.div
+              initial={{ scaleX: 0 }}
+              whileInView={{ scaleX: 1 }}
+              transition={{ duration: 0.8, delay: 0.3 }}
+              className='absolute left-1/2 bottom-0 w-20 h-1 -translate-x-1/2
+                bg-gradient-to-r from-transparent via-primary/30 to-transparent'
             />
-          ))}
+          </div>
         </div>
 
-        {/* Gradient Circles - Adjusted Positions */}
-        <div className='absolute -top-1/4 -left-1/4 w-2/3 h-2/3'>
-          <div className='w-full h-full bg-gradient-to-br from-primary/15 via-primary/5 to-transparent rounded-full blur-3xl' />
-        </div>
-        <div className='absolute -bottom-1/4 -right-1/4 w-2/3 h-2/3'>
-          <div className='w-full h-full bg-gradient-to-tl from-secondary/15 via-secondary/5 to-transparent rounded-full blur-3xl' />
-        </div>
-
-        {/* Overlay - Adjusted Opacity */}
-        <div className='absolute inset-0 bg-gradient-to-b from-white/60 via-transparent to-white/60' />
-      </div>
-
-      {/* Content Container */}
-      <div className='container relative'>
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-          viewport={{ once: true }}
-          className='text-center mb-16'
-        >
-          <h2 className='text-3xl md:text-4xl lg:text-5xl font-bold'>Khóa học nổi bật</h2>
-          <p className='mt-4 text-muted-foreground max-w-2xl mx-auto'>
-            Khám phá các khóa học được thiết kế đặc biệt để hỗ trợ sự phát triển toàn diện của trẻ
-          </p>
-        </motion.div>
-
-        <motion.div
-          variants={containerVariants}
-          initial='hidden'
-          whileInView='visible'
-          viewport={{ once: true }}
-          className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8'
-        >
-          {courses.map((course) => (
-            <motion.div key={course.id} variants={itemVariants}>
-              <Card className='overflow-hidden group hover:shadow-lg transition-shadow duration-300'>
+        {/* Course Cards */}
+        <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8'>
+          {courses.map((course, index) => (
+            <motion.div
+              key={course.id}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: index * 0.1 }}
+            >
+              <div className='group bg-white rounded-2xl border border-gray-100/50 overflow-hidden hover:shadow-xl hover:shadow-primary/5 transition-all duration-300'>
+                {/* Course Image */}
                 <div className='relative h-48 overflow-hidden'>
                   <Image
                     src={course.image}
                     alt={course.title}
                     fill
-                    className='object-cover group-hover:scale-110 transition-transform duration-300'
+                    className='object-cover group-hover:scale-110 transition-transform duration-500'
                   />
-                  <div className='absolute inset-0 bg-gradient-to-t from-black/60 to-transparent' />
-                  <div className='absolute bottom-4 left-4 right-4 text-white'>
-                    <div className='flex items-center gap-2 text-sm'>
-                      <span>{course.lessons} bài học</span>
-                      <span>•</span>
+                  <div className='absolute inset-0 bg-gradient-to-t from-black/20 to-transparent' />
+                </div>
+
+                {/* Course Content */}
+                <div className='p-6'>
+                  <h3 className='text-xl font-semibold mb-2 group-hover:text-primary transition-colors'>
+                    {course.title}
+                  </h3>
+                  <p className='text-muted-foreground text-sm mb-4'>{course.description}</p>
+
+                  {/* Course Meta */}
+                  <div className='grid grid-cols-3 gap-4 py-4 border-y border-gray-100'>
+                    <div className='flex items-center gap-2 text-sm text-gray-600'>
+                      <Clock className='w-4 h-4 text-primary/60' />
                       <span>{course.duration}</span>
-                      <span>•</span>
-                      <span>{course.level}</span>
+                    </div>
+                    <div className='flex items-center gap-2 text-sm text-gray-600'>
+                      <Users className='w-4 h-4 text-primary/60' />
+                      <span>{course.students}</span>
+                    </div>
+                    <div className='flex items-center gap-2 text-sm text-gray-600'>
+                      <BookOpen className='w-4 h-4 text-primary/60' />
+                      <span>{course.lessons}</span>
                     </div>
                   </div>
+
+                  {/* Action Button */}
+                  <div className='mt-6'>
+                    <Button
+                      asChild
+                      variant='outline'
+                      className='w-full rounded-xl border-primary/20 hover:bg-primary/5 group/btn'
+                    >
+                      <Link href={`/course/${course.id}`}>
+                        Xem chi tiết
+                        <ArrowRight className='w-4 h-4 ml-2 group-hover/btn:translate-x-1 transition-transform' />
+                      </Link>
+                    </Button>
+                  </div>
                 </div>
-                <div className='p-6'>
-                  <h3 className='text-xl font-semibold mb-2 line-clamp-1'>{course.title}</h3>
-                  <p className='text-muted-foreground line-clamp-2 mb-4'>{course.description}</p>
-                  <Button variant='outline' className='w-full group/btn' asChild>
-                    <Link href={`/course`}>
-                      Xem chi tiết
-                      <ArrowRight className='w-4 h-4 ml-2 group-hover/btn:translate-x-1 transition-transform' />
-                    </Link>
-                  </Button>
-                </div>
-              </Card>
+              </div>
             </motion.div>
           ))}
-        </motion.div>
+        </div>
 
+        {/* View All Button */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.4 }}
-          viewport={{ once: true }}
+          transition={{ duration: 0.6, delay: 0.3 }}
           className='text-center mt-12'
         >
-          <Button size='lg' asChild>
+          <Button asChild size='lg' className='rounded-full px-8 group'>
             <Link href='/course'>
               Xem tất cả khóa học
-              <ArrowRight className='w-4 h-4 ml-2' />
+              <ArrowRight className='w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform' />
             </Link>
           </Button>
         </motion.div>
+      </div>
+
+      {/* Background Decorations */}
+      <div className='absolute top-0 left-0 w-full h-full pointer-events-none'>
+        <div className='absolute top-20 left-0 w-72 h-72 bg-primary/5 rounded-full blur-3xl' />
+        <div className='absolute bottom-20 right-0 w-96 h-96 bg-secondary/5 rounded-full blur-3xl' />
       </div>
     </section>
   )

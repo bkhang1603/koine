@@ -1,66 +1,109 @@
+'use client'
+
 import images from '@/assets/images'
 import Image from 'next/image'
+import { motion } from 'framer-motion'
 
 const viewData = [
   {
     id: 1,
     image: images.about1,
-    className: 'row-span-4 col-span-4'
+    title: 'Khởi Đầu Hành Trình',
+    description: 'Những bước đi đầu tiên của Koine trên con đường mang giáo dục giới tính đến gần hơn với mọi người',
+    position: 'center'
   },
   {
     id: 2,
     image: images.about2,
-    className: 'row-span-2 col-span-3'
+    title: 'Gặp Gỡ & Giao Lưu',
+    description: 'Kết nối và chia sẻ với cộng đồng, lan tỏa những giá trị tích cực',
+    position: 'left'
   },
   {
     id: 3,
     image: images.about3,
-    className: 'row-span-2 col-span-3'
-  },
-  {
-    id: 4,
-    image: images.about4,
-    className: 'row-span-1 col-span-2'
-  },
-  {
-    id: 5,
-    image: images.about6,
-    className: 'row-span-3 col-span-5'
-  },
-  {
-    id: 6,
-    image: images.about5,
-    className: 'row-span-1 col-span-3'
+    title: 'Không Gian Sáng Tạo',
+    description: 'Môi trường làm việc năng động, nơi những ý tưởng được ươm mầm và phát triển',
+    position: 'right'
   }
 ]
 
 function View() {
   return (
-    <section>
-      <div className='container mt-44'>
-        <h2
-          className='bg-gradient-to-r from-[#FF0059] via-[#FF597D] to-[#2945DE]
-          text-transparent bg-clip-text text-xl md:text-2xl
-          lg:text-4xl font-bold text-center lg:leading-16'
+    <section className='py-10 relative overflow-hidden'>
+      <div className='container'>
+        {/* <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          className='text-center mb-20'
         >
-          Những hình ảnh hoạt động của Koine
-        </h2>
-        <p className='text-center'>Những chặng đường và các hoạt động mà Koine đã trải qua.</p>
-      </div>
+          <h2 className='text-4xl md:text-5xl font-bold mb-6'>
+            Hành Trình <span className='text-primary'>Phát Triển</span>
+          </h2>
+          <p className='text-gray-600 text-lg max-w-2xl mx-auto'>
+            Những khoảnh khắc đáng nhớ trong chặng đường xây dựng Koine
+          </p>
+        </motion.div> */}
 
-      <div className='container grid grid-rows-4 grid-cols-12 grid-flow-col gap-4 h-[300px] lg:h-[600px] mt-20'>
-        {viewData.map((data, index) => (
-          <div key={index} className={data.className}>
-            <Image
-              src={data.image}
-              alt='Image 1'
-              width={500}
-              height={500}
-              quality={100}
-              className='w-full h-full object-cover rounded-xl'
-            />
-          </div>
-        ))}
+        <div className='space-y-32'>
+          {viewData.map((item) => (
+            <motion.div
+              key={item.id}
+              initial={{ opacity: 0, y: 40 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: '-100px' }}
+              transition={{ duration: 0.7 }}
+            >
+              <div
+                className={`flex flex-col ${
+                  item.position === 'left'
+                    ? 'md:flex-row'
+                    : item.position === 'right'
+                      ? 'md:flex-row-reverse'
+                      : 'items-center'
+                } gap-8 md:gap-12`}
+              >
+                {/* Image */}
+                <div className='flex-1'>
+                  <div
+                    className='relative aspect-[4/3] md:aspect-[16/9] rounded-[2rem] 
+                    overflow-hidden group'
+                  >
+                    <Image
+                      src={item.image}
+                      alt={item.title}
+                      fill
+                      className='object-cover transition-transform duration-700
+                        group-hover:scale-105'
+                    />
+                    {/* Gradient Overlay */}
+                    <div
+                      className='absolute inset-0 bg-gradient-to-tr 
+                      from-black/40 to-transparent opacity-0 
+                      group-hover:opacity-100 transition-opacity duration-500'
+                    />
+                  </div>
+                </div>
+
+                {/* Content */}
+                <div className={`flex-1 ${item.position === 'center' ? 'text-center max-w-2xl mx-auto' : ''}`}>
+                  <div className='space-y-6'>
+                    <motion.div
+                      initial={{ width: 0 }}
+                      whileInView={{ width: '3rem' }}
+                      viewport={{ once: true }}
+                      transition={{ duration: 0.5, delay: 0.2 }}
+                      className='h-1 bg-gradient-to-r from-primary to-secondary rounded-full'
+                    />
+                    <h3 className='text-2xl md:text-3xl font-bold text-gray-900'>{item.title}</h3>
+                    <p className='text-gray-600 text-lg leading-relaxed'>{item.description}</p>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          ))}
+        </div>
       </div>
     </section>
   )

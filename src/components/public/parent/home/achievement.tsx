@@ -3,8 +3,6 @@
 import { motion } from 'framer-motion'
 import { Card } from '@/components/ui/card'
 import { Users, BookOpen, Award, Star } from 'lucide-react'
-import Image from 'next/image'
-import icons from '@/assets/icons'
 
 const achievements = [
   {
@@ -125,22 +123,6 @@ export default function Achievement() {
             </motion.div>
           ))}
         </motion.div>
-
-        {/* Decorative Elements */}
-        <Image
-          src={icons.pinkStar}
-          alt='Decoration'
-          width={40}
-          height={40}
-          className='absolute bottom-10 -right-10 animate-pulse'
-        />
-        <Image
-          src={icons.blueStar}
-          alt='Decoration'
-          width={60}
-          height={60}
-          className='absolute top-5 -left-10 animate-pulse'
-        />
       </div>
     </section>
   )

@@ -67,12 +67,8 @@ export default function Information() {
           </motion.div>
         </motion.div>
 
-        {/* Decorative Elements */}
-        <div className='absolute top-1/2 left-10 w-72 h-72 bg-primary/5 rounded-full blur-3xl opacity-50' />
-        <div className='absolute top-1/2 right-10 w-72 h-72 bg-secondary/5 rounded-full blur-3xl opacity-50' />
-
         {/* Decorative Stars - Repositioned */}
-        <div className='absolute -left-20 top-1/3 animate-pulse'>
+        <div className='absolute left-0 top-1/3 animate-pulse'>
           <Star className='w-8 h-8 text-primary/40' />
         </div>
         <div className='absolute left-1/4 bottom-10 animate-pulse delay-300'>
@@ -81,7 +77,7 @@ export default function Information() {
         <div className='absolute right-1/4 top-10 animate-pulse delay-150'>
           <Star className='w-5 h-5 text-primary/40' />
         </div>
-        <div className='absolute -right-16 bottom-1/3 animate-pulse delay-500'>
+        <div className='absolute right-0 bottom-1/3 animate-pulse delay-500'>
           <Star className='w-7 h-7 text-secondary/40' />
         </div>
       </div>

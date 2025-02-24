@@ -21,10 +21,11 @@ export const useEnrollCourseMutation = () => {
   })
 }
 
-export const useGetUserCoursesQuery = () => {
+export const useGetUserCoursesQuery = ({ enabled }: { enabled?: boolean }) => {
   return useQuery({
     queryKey: ['userCourses'],
-    queryFn: courseApiRequest.getUserCourses
+    queryFn: courseApiRequest.getUserCourses,
+    enabled
   })
 }
 

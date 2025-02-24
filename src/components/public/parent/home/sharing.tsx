@@ -109,7 +109,7 @@ export default function Sharing() {
                 </div>
 
                 {/* Content */}
-                <blockquote className='text-lg text-muted-foreground mb-6 relative z-10'>
+                <blockquote className='text-lg text-muted-foreground mb-6 relative line-clamp-3'>
                   &quot;{testimonial.content}&quot;
                 </blockquote>
 

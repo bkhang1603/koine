@@ -74,22 +74,7 @@ const itemVariants = {
 
 export default function Feature() {
   return (
-    <section className='relative py-24 overflow-hidden'>
-      {/* Background Decoration */}
-      <div className='absolute inset-0'>
-        <div className='absolute top-0 left-1/4 w-96 h-96 bg-primary/5 rounded-full blur-[100px]' />
-        <div className='absolute bottom-0 right-1/4 w-96 h-96 bg-secondary/5 rounded-full blur-[100px]' />
-
-        {/* Dotted Pattern */}
-        <div
-          className='absolute inset-0'
-          style={{
-            backgroundImage: 'radial-gradient(circle at 2px 2px, rgba(0,0,0,0.05) 2px, transparent 0)',
-            backgroundSize: '40px 40px'
-          }}
-        />
-      </div>
-
+    <section className='py-24 overflow-hidden'>
       <div className='container relative'>
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -143,7 +128,7 @@ export default function Feature() {
 
                 {/* Decorative Corner */}
                 <div
-                  className='absolute top-0 right-0 w-24 h-24 bg-white/20 rounded-bl-[100px] 
+                  className='absolute top-0 right-0 w-24 h-24 bg-white/70 rounded-bl-[100px] 
                   -translate-y-12 translate-x-12 group-hover:translate-y-0 group-hover:translate-x-0 
                   transition-transform duration-500'
                 />
@@ -151,22 +136,6 @@ export default function Feature() {
             </motion.div>
           ))}
         </motion.div>
-
-        {/* Decorative Elements */}
-        <Image
-          src={icons.pinkStar}
-          alt='Decoration'
-          width={40}
-          height={40}
-          className='absolute top-20 left-0 animate-pulse'
-        />
-        <Image
-          src={icons.blueStar}
-          alt='Decoration'
-          width={60}
-          height={60}
-          className='absolute bottom-20 right-0 animate-pulse'
-        />
       </div>
     </section>
   )

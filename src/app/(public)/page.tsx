@@ -7,20 +7,23 @@ import Promo from '@/components/public/parent/home/promo'
 import Recommend from '@/components/public/parent/home/recommend'
 import Service from '@/components/public/parent/home/service'
 import Sharing from '@/components/public/parent/home/sharing'
+import BackgroundDecoration from '@/components/public/parent/home/background-decoration'
 
-function Home() {
+export default function HomePage() {
   return (
     <>
-      <Hero />
-      <Feature />
-      <Recommend />
-      <Service />
-      <Blog />
-      <Promo />
-      <Achievement />
-      <Sharing />
-      <Information />
+      <BackgroundDecoration />
+      <main>
+        <Hero />
+        <Feature />
+        <Recommend />
+        <Service />
+        <Blog />
+        <Promo />
+        <Achievement />
+        <Sharing />
+        <Information />
+      </main>
     </>
   )
 }
-export default Home

@@ -7,7 +7,7 @@ import { ArrowRight } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { Badge } from '@/components/ui/badge'
-import icons from '@/assets/icons'
+import images from '@/assets/images'
 
 const blogs = [
   {
@@ -15,7 +15,7 @@ const blogs = [
     title: 'Làm thế nào để nói chuyện với con về giới tính?',
     excerpt:
       'Hướng dẫn cha mẹ cách tiếp cận và trò chuyện với con về các vấn đề nhạy cảm một cách tự nhiên và hiệu quả',
-    image: '/images/blog1.jpg',
+    image: images.course4,
     category: 'Tâm lý',
     readingTime: '5 phút đọc'
   },
@@ -23,7 +23,7 @@ const blogs = [
     id: 2,
     title: 'Những thay đổi tâm sinh lý ở tuổi dậy thì',
     excerpt: 'Tìm hiểu về những thay đổi phổ biến về tâm sinh lý ở trẻ trong giai đoạn dậy thì và cách hỗ trợ con',
-    image: '/images/blog2.jpg',
+    image: images.course5,
     category: 'Sức khỏe',
     readingTime: '7 phút đọc'
   },
@@ -31,7 +31,7 @@ const blogs = [
     id: 3,
     title: 'Xây dựng lòng tự tin cho con trong giai đoạn dậy thì',
     excerpt: 'Các phương pháp và hoạt động giúp trẻ phát triển sự tự tin và hình ảnh tích cực về bản thân',
-    image: '/images/blog3.jpg',
+    image: images.course6,
     category: 'Kỹ năng sống',
     readingTime: '6 phút đọc'
   }
@@ -61,66 +61,6 @@ const itemVariants = {
 export default function Blog() {
   return (
     <section className='relative py-24 overflow-hidden'>
-      {/* Background Decoration */}
-      <div className='absolute inset-0'>
-        {/* Wave Pattern */}
-        <div className='absolute inset-0 opacity-[0.15]'>
-          <svg width='100%' height='100%' className='absolute inset-0'>
-            <pattern id='smallGrid' width='60' height='60' patternUnits='userSpaceOnUse'>
-              <path
-                d='M 60 0 L 0 0 0 60'
-                fill='none'
-                stroke='currentColor'
-                strokeWidth='1'
-                className='text-primary/40'
-              />
-            </pattern>
-            <rect width='100%' height='100%' fill='url(#smallGrid)' />
-          </svg>
-        </div>
-
-        {/* Gradient Circles */}
-        <div className='absolute top-0 -left-1/4 w-1/2 h-1/2'>
-          <div className='w-full h-full bg-gradient-to-br from-primary/20 via-primary/5 to-transparent rounded-full blur-3xl' />
-        </div>
-        <div className='absolute bottom-0 -right-1/4 w-1/2 h-1/2'>
-          <div className='w-full h-full bg-gradient-to-tl from-secondary/20 via-secondary/5 to-transparent rounded-full blur-3xl' />
-        </div>
-
-        {/* Floating Elements */}
-        <div className='absolute inset-0'>
-          {/* Circles */}
-          <div className='absolute top-1/4 left-[15%] w-32 h-32 border-8 border-primary/20 rounded-full animate-float-slow' />
-          <div className='absolute bottom-1/4 right-[15%] w-24 h-24 border-8 border-secondary/20 rounded-full animate-float-slow delay-300' />
-
-          {/* Squares */}
-          <div className='absolute top-[40%] right-[10%] w-16 h-16 border-4 border-primary/20 rotate-45 animate-float-slow delay-150' />
-          <div className='absolute bottom-[35%] left-[10%] w-20 h-20 border-4 border-secondary/20 rotate-12 animate-float-slow delay-500' />
-        </div>
-
-        {/* Animated Lines */}
-        <div className='absolute inset-0'>
-          {[...Array(3)].map((_, i) => (
-            <div
-              key={i}
-              className='absolute h-[1px] w-full'
-              style={{
-                background: `linear-gradient(90deg, transparent, ${
-                  i % 2 ? 'rgba(var(--primary), 0.2)' : 'rgba(var(--secondary), 0.2)'
-                }, transparent)`,
-                top: `${30 + i * 20}%`,
-                transform: `rotate(${-15 + i * 15}deg) translateY(${i * 30}px)`,
-                animation: 'moveLeftRight 15s linear infinite',
-                animationDelay: `${i * 2}s`
-              }}
-            />
-          ))}
-        </div>
-
-        {/* Overlay */}
-        <div className='absolute inset-0 bg-gradient-to-b from-white/50 via-transparent to-white/50' />
-      </div>
-
       <div className='container relative'>
         <motion.div
           initial={{ opacity: 0, y: 20 }}
