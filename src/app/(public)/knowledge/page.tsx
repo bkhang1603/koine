@@ -123,7 +123,7 @@ async function KnowledgePage() {
                     {/* Author */}
                     <div className='flex items-center gap-3 mt-6 pt-6 border-t border-gray-100'>
                       <div className='relative w-8 h-8 rounded-full overflow-hidden'>
-                        <Avatar>
+                        <Avatar className='w-full h-full'>
                           <AvatarImage src={blog.creatorInfo.avatarUrl} />
                           <AvatarFallback>{blog.creatorInfo.firstName.charAt(0)}</AvatarFallback>
                         </Avatar>

@@ -78,7 +78,7 @@ export default function Sharing() {
           </span>
           <h2 className='text-3xl md:text-4xl lg:text-5xl font-bold mt-6'>
             Phụ huynh nói gì về
-            <span className='block mt-2 bg-gradient-to-r from-[#FF0059] via-[#FF597D] to-[#2945DE] text-transparent bg-clip-text h-14'>
+            <span className='block mt-2 bg-gradient-to-r from-[#FF0059] via-[#FF597D] to-[#2945DE] text-transparent bg-clip-text leading-[1.4] pb-1'>
               chương trình học của chúng tôi
             </span>
           </h2>

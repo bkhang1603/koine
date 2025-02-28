@@ -26,7 +26,7 @@ async function BlogDetailPage({ params: { id } }: { params: { id: string } }) {
           {/* Author & Date */}
           <div className='flex items-center gap-4 mb-8'>
             <div className='relative w-14 h-14 rounded-full overflow-hidden border-4 border-white shadow-md'>
-              <Avatar>
+              <Avatar className='w-full h-full'>
                 <AvatarImage src={blog.creatorInfo.avatarUrl} />
                 <AvatarFallback>{blog.creatorInfo.firstName.charAt(0)}</AvatarFallback>
               </Avatar>
