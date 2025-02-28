@@ -72,4 +72,4 @@ export function TicketStats({ stats }: TicketStatsProps) {
       </Card>
     </div>
   )
-} 
+}

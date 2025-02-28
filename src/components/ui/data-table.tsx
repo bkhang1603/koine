@@ -8,7 +8,6 @@ import {
   useReactTable,
   Row,
   Cell,
-  Header,
   HeaderGroup
 } from '@tanstack/react-table'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'

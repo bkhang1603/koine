@@ -3,7 +3,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Progress } from '@/components/ui/progress'
-import { BookOpen, Star, Plus, MessageSquare, Eye, Clock, FileText, Users } from 'lucide-react'
+import { BookOpen, Star, MessageSquare, Eye, Clock, FileText, Users } from 'lucide-react'
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
 
 const quickStats = [

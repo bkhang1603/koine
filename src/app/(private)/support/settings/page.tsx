@@ -9,7 +9,6 @@ import { Switch } from '@/components/ui/switch'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Textarea } from '@/components/ui/textarea'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { mockData } from '../_data/mock'
 
 export default function SettingsPage() {
   return (
@@ -174,21 +173,18 @@ export default function SettingsPage() {
               <div className='space-y-4'>
                 <div className='space-y-2'>
                   <Label>Chào mừng</Label>
-                  <Textarea 
+                  <Textarea
                     placeholder='Nhập nội dung mẫu...'
                     defaultValue='Xin chào {user_name}, cảm ơn bạn đã liên hệ với chúng tôi...'
                   />
                 </div>
                 <div className='space-y-2'>
                   <Label>Đang xử lý</Label>
-                  <Textarea 
-                    placeholder='Nhập nội dung mẫu...'
-                    defaultValue='Chúng tôi đang xử lý yêu cầu của bạn...'
-                  />
+                  <Textarea placeholder='Nhập nội dung mẫu...' defaultValue='Chúng tôi đang xử lý yêu cầu của bạn...' />
                 </div>
                 <div className='space-y-2'>
                   <Label>Kết thúc</Label>
-                  <Textarea 
+                  <Textarea
                     placeholder='Nhập nội dung mẫu...'
                     defaultValue='Cảm ơn bạn đã sử dụng dịch vụ của chúng tôi...'
                   />
@@ -205,4 +201,4 @@ export default function SettingsPage() {
       </div>
     </div>
   )
-} 
+}

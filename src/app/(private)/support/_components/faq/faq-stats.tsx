@@ -70,4 +70,4 @@ export function FAQStats({ stats }: FAQStatsProps) {
       </Card>
     </div>
   )
-} 
+}

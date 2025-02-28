@@ -18,6 +18,7 @@ interface PromotionFormProps {
     endDate: string
     status: string
   }
+  // eslint-disable-next-line no-unused-vars
   onSubmit: (data: any) => void
   isEdit?: boolean
 }

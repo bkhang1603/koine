@@ -23,24 +23,7 @@ interface RefundItemProps {
   }
 }
 
-const statusMap = {
-  pending: { label: 'Chờ duyệt', variant: 'secondary' },
-  approved: { label: 'Đã duyệt', variant: 'success' },
-  rejected: { label: 'Từ chối', variant: 'destructive' }
-} as const
-
-export function RefundItem({
-  id,
-  type,
-  item,
-  amount,
-  reason,
-  status,
-  condition,
-  progress,
-  createdAt,
-  user
-}: RefundItemProps) {
+export function RefundItem({ id, type, item, amount, reason, condition, progress, createdAt, user }: RefundItemProps) {
   return (
     <div className='p-4 flex gap-4 hover:bg-muted/50 transition-colors'>
       <Avatar>
@@ -52,13 +35,9 @@ export function RefundItem({
           <div>
             <div className='flex items-center gap-2'>
               <h4 className='font-medium'>{item}</h4>
-              <Badge variant={statusMap[status].variant}>{statusMap[status].label}</Badge>
+              {/* <Badge variant={statusMap[status].variant}>{statusMap[status].label}</Badge> */}
               <Badge variant='outline'>
-                {type === 'course' ? (
-                  <BookOpen className='w-3 h-3 mr-1' />
-                ) : (
-                  <Package className='w-3 h-3 mr-1' />
-                )}
+                {type === 'course' ? <BookOpen className='w-3 h-3 mr-1' /> : <Package className='w-3 h-3 mr-1' />}
                 {type === 'course' ? 'Khóa học' : 'Sản phẩm'}
               </Badge>
             </div>
@@ -79,15 +58,11 @@ export function RefundItem({
           <span>•</span>
           <span>{user.email}</span>
           <span>•</span>
-          {type === 'course' ? (
-            <span>Tiến độ: {progress}</span>
-          ) : (
-            <span>Tình trạng: {condition}</span>
-          )}
+          {type === 'course' ? <span>Tiến độ: {progress}</span> : <span>Tình trạng: {condition}</span>}
           <span>•</span>
           <time>{formatDistanceToNow(new Date(createdAt), { addSuffix: true, locale: vi })}</time>
         </div>
       </div>
     </div>
   )
-} 
+}

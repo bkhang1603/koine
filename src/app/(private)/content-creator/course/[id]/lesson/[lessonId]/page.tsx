@@ -30,7 +30,7 @@ interface Question {
   }[]
 }
 
-export default function LessonEditorPage({ params }: LessonEditorPageProps) {
+export default function LessonEditorPage({}: LessonEditorPageProps) {
   const router = useRouter()
   const [lesson, setLesson] = useState<Lesson>({
     id: '',
@@ -51,7 +51,7 @@ export default function LessonEditorPage({ params }: LessonEditorPageProps) {
   })
   const [previewUrl, setPreviewUrl] = useState<string>('')
   const [questions, setQuestions] = useState<Question[]>([])
-  const [showQuestionForm, setShowQuestionForm] = useState(false)
+  const [, setShowQuestionForm] = useState(false)
 
   const handleChange = (field: keyof Lesson, value: any) => {
     setLesson((prev) => ({

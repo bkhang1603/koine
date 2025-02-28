@@ -5,20 +5,8 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Input } from '@/components/ui/input'
-import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
-import {
-  Search,
-  Filter,
-  PlayCircle,
-  Users2,
-  ChevronDown,
-  Clock,
-  BookOpen,
-  Gift,
-  Sparkles,
-  Calendar
-} from 'lucide-react'
+import { Search, Filter, PlayCircle, Users2, Clock, BookOpen, Gift, Sparkles, Calendar } from 'lucide-react'
 import Image from 'next/image'
 import { Progress } from '@/components/ui/progress'
 import { cn } from '@/lib/utils'
@@ -164,32 +152,17 @@ export default function PurchasedCoursesPage() {
       {/* Search and Filters */}
       <Card className='border-none shadow-md'>
         <CardContent className='p-6'>
-          <div className='flex flex-col sm:flex-row gap-4'>
-            <div className='flex-1 flex gap-4'>
-              <div className='relative flex-1 max-w-md'>
-                <Search className='absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400' />
-                <Input
-                  placeholder='Tìm kiếm khóa học...'
-                  className='pl-9 border-gray-200 focus:border-primary/30 focus:ring-primary/20'
-                />
-              </div>
-              <Button variant='outline' size='icon' className='border-gray-200 hover:bg-gray-100'>
-                <Filter className='h-4 w-4 text-gray-500' />
-              </Button>
+          <div className='flex-1 flex justify-between gap-4'>
+            <div className='relative flex-1'>
+              <Search className='absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400' />
+              <Input
+                placeholder='Tìm kiếm khóa học...'
+                className='pl-9 border-gray-200 focus:border-primary/30 focus:ring-primary/20'
+              />
             </div>
-            <Tabs defaultValue='all' className='w-full sm:w-auto'>
-              <TabsList className='grid w-full sm:w-auto grid-cols-3 p-1 bg-gray-100/80'>
-                <TabsTrigger value='all' className='data-[state=active]:bg-white'>
-                  Tất cả
-                </TabsTrigger>
-                <TabsTrigger value='activated' className='data-[state=active]:bg-white'>
-                  Đã kích hoạt
-                </TabsTrigger>
-                <TabsTrigger value='not_activated' className='data-[state=active]:bg-white'>
-                  Chưa kích hoạt
-                </TabsTrigger>
-              </TabsList>
-            </Tabs>
+            <Button variant='outline' size='icon' className='border-gray-200 hover:bg-gray-100'>
+              <Filter className='h-4 w-4 text-gray-500' />
+            </Button>
           </div>
         </CardContent>
       </Card>

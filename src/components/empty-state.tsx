@@ -5,9 +5,9 @@ interface EmptyStateProps {
   description?: string
 }
 
-export function EmptyState({ 
-  title = 'Không tìm thấy dữ liệu', 
-  description = 'Thử thay đổi bộ lọc hoặc từ khóa tìm kiếm khác.' 
+export function EmptyState({
+  title = 'Không tìm thấy dữ liệu',
+  description = 'Thử thay đổi bộ lọc hoặc từ khóa tìm kiếm khác.'
 }: EmptyStateProps) {
   return (
     <div className='flex flex-col items-center justify-center py-12 border rounded-lg bg-muted/10'>
@@ -16,4 +16,4 @@ export function EmptyState({
       <p className='text-sm text-muted-foreground mt-1'>{description}</p>
     </div>
   )
-} 
+}

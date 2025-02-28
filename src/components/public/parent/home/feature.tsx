@@ -3,8 +3,6 @@
 import { motion } from 'framer-motion'
 import { Card } from '@/components/ui/card'
 import { Brain, Heart, Target, Users, Sparkles, Trophy } from 'lucide-react'
-import Image from 'next/image'
-import icons from '@/assets/icons'
 
 const features = [
   {

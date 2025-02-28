@@ -17,5 +17,5 @@ export default function EditPromotionPage({ params }: { params: { id: string } }
     router.push('/salesman/promotions')
   }
 
-  return <PromotionForm initialData={promotion} onSubmit={handleSubmit} isEdit />
-} 
+  return <PromotionForm onSubmit={handleSubmit} isEdit />
+}

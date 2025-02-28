@@ -20,19 +20,13 @@ interface TicketItemProps {
   }
 }
 
-const statusMap = {
-  pending: { label: 'Chờ xử lý', variant: 'secondary' },
-  processing: { label: 'Đang xử lý', variant: 'default' },
-  resolved: { label: 'Đã giải quyết', variant: 'success' }
-} as const
-
 const priorityMap = {
   high: { label: 'Cao', variant: 'destructive' },
   medium: { label: 'Trung bình', variant: 'default' },
   low: { label: 'Thấp', variant: 'outline' }
 } as const
 
-export function TicketItem({ id, title, description, status, priority, category, createdAt, user }: TicketItemProps) {
+export function TicketItem({ id, title, description, priority, category, createdAt, user }: TicketItemProps) {
   return (
     <div className='p-4 flex gap-4 hover:bg-muted/50 transition-colors'>
       <Avatar>
@@ -44,7 +38,7 @@ export function TicketItem({ id, title, description, status, priority, category,
           <div>
             <div className='flex items-center gap-2'>
               <h4 className='font-medium'>{title}</h4>
-              <Badge variant={statusMap[status].variant}>{statusMap[status].label}</Badge>
+              {/* <Badge variant={statusMap[status].variant}>{statusMap[status].label}</Badge> */}
               <Badge variant={priorityMap[priority].variant}>{priorityMap[priority].label}</Badge>
             </div>
             <p className='text-sm text-muted-foreground mt-1 line-clamp-2'>{description}</p>
@@ -68,4 +62,4 @@ export function TicketItem({ id, title, description, status, priority, category,
       </div>
     </div>
   )
-} 
+}

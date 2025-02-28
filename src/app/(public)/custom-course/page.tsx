@@ -12,15 +12,9 @@ import Image from 'next/image'
 import { ChapterPickerDialog } from '@/components/public/custom-course/chapter-picker-dialog'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Separator } from '@/components/ui/separator'
+import { CoursesResType } from '@/schemaValidations/course.schema'
 
-interface Chapter {
-  id: string
-  name: string
-  description: string
-  lessons: number
-  courseId: string
-  courseName: string
-}
+type Chapter = CoursesResType['data'][0]['chapters'][0]
 
 export default function CustomCoursePage() {
   const [image, setImage] = useState('')
@@ -32,12 +26,15 @@ export default function CustomCoursePage() {
   }
 
   const handleSelectChapters = (selectedChapters: Chapter[]) => {
-    setChapters(prev => [...prev, ...selectedChapters])
+    setChapters((prev) => [...prev, ...selectedChapters])
   }
 
   const totalChapters = chapters.length
-  const totalLessons = chapters.reduce((sum, chapter) => sum + chapter.lessons.length, 0)
-  const coursesUsed = [...new Set(chapters.map(chapter => chapter.courseName))]
+  const totalLessons = chapters.reduce(
+    (sum, chapter) => sum + chapter.lessons.reduce((lessonSum, lesson) => lessonSum + lesson.durations, 0),
+    0
+  )
+  const coursesUsed = Array.from(new Set(chapters.map((chapter) => chapter.title)))
 
   return (
     <main className='container py-8 space-y-6'>
@@ -65,12 +62,7 @@ export default function CustomCoursePage() {
                 <div className='mt-2'>
                   {image ? (
                     <div className='relative w-40 h-40 rounded-lg overflow-hidden'>
-                      <Image 
-                        src={image}
-                        alt='Course image'
-                        fill
-                        className='object-cover'
-                      />
+                      <Image src={image} alt='Course image' fill className='object-cover' />
                       <Button
                         variant='destructive'
                         size='icon'
@@ -81,8 +73,8 @@ export default function CustomCoursePage() {
                       </Button>
                     </div>
                   ) : (
-                    <Button 
-                      variant='outline' 
+                    <Button
+                      variant='outline'
                       className='w-40 h-40'
                       onClick={() => setImage('https://picsum.photos/400')} // Tạm thời dùng ảnh mẫu
                     >
@@ -90,9 +82,7 @@ export default function CustomCoursePage() {
                     </Button>
                   )}
                 </div>
-                <p className='text-xs text-muted-foreground mt-2'>
-                  Tải lên ảnh đại diện cho khóa học của bạn
-                </p>
+                <p className='text-xs text-muted-foreground mt-2'>Tải lên ảnh đại diện cho khóa học của bạn</p>
               </div>
               <div>
                 <label className='text-sm font-medium'>Tên khóa học</label>
@@ -100,11 +90,7 @@ export default function CustomCoursePage() {
               </div>
               <div>
                 <label className='text-sm font-medium'>Mô tả</label>
-                <Textarea 
-                  className='mt-2' 
-                  placeholder='Mô tả ngắn về mục tiêu và nội dung khóa học...'
-                  rows={4}
-                />
+                <Textarea className='mt-2' placeholder='Mô tả ngắn về mục tiêu và nội dung khóa học...' rows={4} />
               </div>
             </CardContent>
           </Card>
@@ -155,9 +141,7 @@ export default function CustomCoursePage() {
                     </div>
                   ))}
                   {coursesUsed.length === 0 && (
-                    <div className='text-muted-foreground italic'>
-                      Chưa có khóa học nào được chọn
-                    </div>
+                    <div className='text-muted-foreground italic'>Chưa có khóa học nào được chọn</div>
                   )}
                 </div>
               </ScrollArea>
@@ -173,17 +157,13 @@ export default function CustomCoursePage() {
                     <div key={chapter.id} className='flex gap-2'>
                       <span className='text-muted-foreground min-w-[20px]'>{index + 1}.</span>
                       <div>
-                        <div>{chapter.name}</div>
-                        <div className='text-muted-foreground text-xs'>
-                          {chapter.lessons.length} bài học
-                        </div>
+                        <div>{chapter.title}</div>
+                        <div className='text-muted-foreground text-xs'>{chapter.lessons.length} bài học</div>
                       </div>
                     </div>
                   ))}
                   {chapters.length === 0 && (
-                    <div className='text-muted-foreground italic'>
-                      Chưa có chương nào được thêm vào
-                    </div>
+                    <div className='text-muted-foreground italic'>Chưa có chương nào được thêm vào</div>
                   )}
                 </div>
               </ScrollArea>
@@ -197,11 +177,11 @@ export default function CustomCoursePage() {
         </Card>
       </div>
 
-      <ChapterPickerDialog 
+      <ChapterPickerDialog
         open={openChapterPicker}
         onOpenChange={setOpenChapterPicker}
         onSelect={handleSelectChapters}
       />
     </main>
   )
-} 
+}

@@ -2,7 +2,19 @@
 
 import { NavItem, SidebarNav } from '@/components/public/parent/setting/sidebar-nav'
 import { Separator } from '@/components/ui/separator'
-import { Album, Archive, CircleUserRound, FolderKanban, NotepadText, TvMinimal } from 'lucide-react'
+import {
+  Album,
+  Archive,
+  CircleUserRound,
+  FolderKanban,
+  NotepadText,
+  TvMinimal,
+  MapPin,
+  KeyRound,
+  Receipt,
+  RefreshCcw,
+  BellRing
+} from 'lucide-react'
 
 const sidebarNavItems: NavItem[] = [
   {
@@ -11,18 +23,22 @@ const sidebarNavItems: NavItem[] = [
     children: [
       {
         title: 'Thông tin cá nhân',
+        icon: <CircleUserRound className='h-4 w-4' />,
         href: '/setting'
       },
       {
         title: 'Địa chỉ',
+        icon: <MapPin className='h-4 w-4' />,
         href: '/setting/address'
       },
       {
-        title: 'Cài đặt thông báo',
+        title: 'Thông báo',
+        icon: <BellRing className='h-4 w-4' />,
         href: '/setting/notifications'
       },
       {
         title: 'Bảo mật',
+        icon: <KeyRound className='h-4 w-4' />,
         href: '/setting/security'
       }
     ]
@@ -51,7 +67,18 @@ const sidebarNavItems: NavItem[] = [
   {
     title: 'Đơn mua',
     icon: <NotepadText className='h-5 w-5' />,
-    href: '/setting/order'
+    children: [
+      {
+        title: 'Danh sách đơn hàng',
+        icon: <Receipt className='h-4 w-4' />,
+        href: '/setting/order'
+      },
+      {
+        title: 'Hoàn tiền & Đổi trả',
+        icon: <RefreshCcw className='h-4 w-4' />,
+        href: '/setting/refund'
+      }
+    ]
   }
 ]
 
@@ -69,7 +96,7 @@ export default function SettingsLayout({ children }: { children: React.ReactNode
             <SidebarNav items={sidebarNavItems} />
           </div>
         </aside>
-        <div className='flex-1 lg:max-w-3xl'>{children}</div>
+        <div className='flex-1'>{children}</div>
       </div>
     </div>
   )

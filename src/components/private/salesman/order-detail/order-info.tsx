@@ -66,4 +66,4 @@ export function OrderInfo({ order }: { order: Order }) {
       )}
     </div>
   )
-} 
+}

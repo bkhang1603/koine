@@ -1,7 +1,10 @@
 import { Badge } from '@/components/ui/badge'
 import type { CourseStatus } from '@/app/(private)/salesman/_mock/data'
 
-const statusConfig: Record<CourseStatus, { label: string; variant: 'default' | 'secondary' | 'destructive' | 'outline' }> = {
+const statusConfig: Record<
+  CourseStatus,
+  { label: string; variant: 'default' | 'secondary' | 'destructive' | 'outline' }
+> = {
   draft: {
     label: 'Đang tạo nội dung',
     variant: 'secondary'
@@ -30,9 +33,5 @@ const statusConfig: Record<CourseStatus, { label: string; variant: 'default' | '
 
 export function CourseStatusBadge({ status }: { status: CourseStatus }) {
   const config = statusConfig[status]
-  return (
-    <Badge variant={config.variant}>
-      {config.label}
-    </Badge>
-  )
-} 
+  return <Badge variant={config.variant}>{config.label}</Badge>
+}

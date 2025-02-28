@@ -12,4 +12,4 @@ export default function NewPromotionPage() {
   }
 
   return <PromotionForm onSubmit={handleSubmit} />
-} 
+}

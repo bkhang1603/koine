@@ -30,7 +30,7 @@ export default function Footer() {
   return (
     <footer className='relative'>
       {/* Footer Image */}
-      <Image src={images.footer} alt='footer' width={3000} height={3000} priority className='w-full' />
+      <Image src={images.footer} alt='footer' width={3000} height={3000} priority className='w-full hidden md:block' />
 
       {/* Main Footer */}
       <div className='bg-fourth -mt-2 relative'>

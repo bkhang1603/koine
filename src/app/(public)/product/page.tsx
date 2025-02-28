@@ -3,11 +3,15 @@ import List from '@/components/public/parent/product/list'
 import images from '@/assets/images'
 import { searchParams } from '@/types/query'
 import Image from 'next/image'
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet'
+import { Button } from '@/components/ui/button'
+import { SlidersHorizontal } from 'lucide-react'
+import MobileFilter from '@/components/public/parent/product/mobile-filter'
 
 function ProductPage({ searchParams }: { searchParams?: searchParams }) {
   return (
     <main className='pb-28'>
-      <div className='h-[30vh] w-full'>
+      <div className='h-[15vh] md:h-[20vh] lg:h-[30vh] w-full'>
         <Image
           src={images.banner}
           alt='Banner'
@@ -19,15 +23,35 @@ function ProductPage({ searchParams }: { searchParams?: searchParams }) {
         />
       </div>
 
-      <div className='grid grid-cols-3 md:grid-cols-4 gap-6 mt-8 container'>
-        <div className='md:col-span-1 hidden md:block'>
-          <Filter />
+      <div className='container mt-8'>
+        <div className='flex md:hidden justify-end mb-4'>
+          <Sheet>
+            <SheetTrigger asChild>
+              <Button variant='outline' size='sm' className='gap-2'>
+                <SlidersHorizontal className='w-4 h-4' />
+                Bộ lọc
+              </Button>
+            </SheetTrigger>
+            <SheetContent side='left' className='w-[300px] p-0'>
+              <SheetHeader className='p-4 border-b'>
+                <SheetTitle>Bộ lọc sản phẩm</SheetTitle>
+              </SheetHeader>
+              <MobileFilter />
+            </SheetContent>
+          </Sheet>
         </div>
 
-        <List searchParams={searchParams} />
+        <div className='grid grid-cols-1 md:grid-cols-4 gap-6'>
+          <div className='hidden md:block'>
+            <Filter />
+          </div>
+          <div className='col-span-1 md:col-span-3'>
+            <List searchParams={searchParams} />
+          </div>
+        </div>
       </div>
 
-      <section className='container pt-60'>
+      <section className='container pt-20 md:pt-60'>
         <Image
           src={images.productPoster}
           alt='Product poster'

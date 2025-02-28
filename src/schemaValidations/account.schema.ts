@@ -102,7 +102,8 @@ export const accountAddress = z
     name: z.string(),
     phone: z.string(),
     address: z.string(),
-    tag: z.string()
+    tag: z.string(),
+    isDefault: z.boolean()
   })
   .strict()
 
@@ -110,6 +111,21 @@ export const accountAddressRes = z.object({
   data: z.array(accountAddress),
   message: z.string()
 })
+
+export const accountOneAddressRes = z.object({
+  data: accountAddress,
+  message: z.string()
+})
+
+export const accountAddressBody = z
+  .object({
+    name: z.string().min(1, 'Vui lòng nhập tên người nhận'),
+    phone: z.string().min(10, 'Số điện thoại không hợp lệ').max(11, 'Số điện thoại không hợp lệ'),
+    address: z.string().min(1, 'Vui lòng nhập địa chỉ'),
+    tag: z.string().min(1, 'Vui lòng nhập tag'),
+    isDefault: z.boolean().default(false)
+  })
+  .strict()
 
 export type AccountResType = z.TypeOf<typeof accountRes>
 
@@ -120,3 +136,7 @@ export type AccountProfileResType = z.TypeOf<typeof accountProfileRes>
 export type AccountProfileBodyType = z.TypeOf<typeof accountProfileBody>
 
 export type AccountAddressResType = z.TypeOf<typeof accountAddressRes>
+
+export type AccountOneAddressResType = z.TypeOf<typeof accountOneAddressRes>
+
+export type AccountAddressBodyType = z.TypeOf<typeof accountAddressBody>

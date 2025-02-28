@@ -105,13 +105,6 @@ export default function BackgroundDecoration() {
         </motion.div>
       </div>
 
-      {/* Light Beams */}
-      <div className='absolute inset-0 opacity-30'>
-        <div className='absolute top-0 left-1/4 w-px h-[20vh] bg-gradient-to-b from-transparent via-primary/20 to-transparent' />
-        <div className='absolute top-0 right-1/3 w-px h-[25vh] bg-gradient-to-b from-transparent via-secondary/20 to-transparent' />
-        <div className='absolute bottom-0 left-1/3 w-px h-[15vh] bg-gradient-to-t from-transparent via-primary/20 to-transparent' />
-      </div>
-
       {/* Subtle Grid */}
       <div className='absolute inset-0 bg-[linear-gradient(rgba(255,255,255,.05)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,.05)_1px,transparent_1px)] bg-[size:100px_100px] opacity-20' />
     </div>

@@ -85,4 +85,4 @@ export function CustomerSidebar({ customer }: { customer: Customer }) {
       </Card>
     </div>
   )
-} 
+}

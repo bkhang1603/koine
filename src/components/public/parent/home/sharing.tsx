@@ -6,6 +6,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Star } from 'lucide-react'
 import Image from 'next/image'
 import icons from '@/assets/icons'
+import images from '@/assets/images'
 
 const testimonials = [
   {
@@ -14,7 +15,7 @@ const testimonials = [
     author: {
       name: 'Nguyễn Thị Hương',
       role: 'Phụ huynh học sinh lớp 7',
-      avatar: '/images/avatar1.jpg'
+      avatar: images.teamDao
     },
     rating: 5
   },
@@ -24,7 +25,7 @@ const testimonials = [
     author: {
       name: 'Trần Văn Nam',
       role: 'Phụ huynh học sinh lớp 5',
-      avatar: '/images/avatar2.jpg'
+      avatar: images.teamHuyen
     },
     rating: 5
   },
@@ -34,7 +35,7 @@ const testimonials = [
     author: {
       name: 'Lê Thị Minh',
       role: 'Phụ huynh học sinh lớp 6',
-      avatar: '/images/avatar3.jpg'
+      avatar: images.teamKhang
     },
     rating: 5
   }
@@ -116,7 +117,11 @@ export default function Sharing() {
                 {/* Author */}
                 <div className='flex items-center gap-4 mt-auto'>
                   <Avatar className='h-12 w-12 border-2 border-primary/10'>
-                    <AvatarImage src={testimonial.author.avatar} alt={testimonial.author.name} />
+                    <AvatarImage
+                      src={testimonial.author.avatar.src}
+                      alt={testimonial.author.name}
+                      className='object-cover'
+                    />
                     <AvatarFallback>{testimonial.author.name.charAt(0)}</AvatarFallback>
                   </Avatar>
                   <div>

@@ -11,6 +11,7 @@ interface CourseBasicInfoProps {
   categories: string[]
   level: string
   ageGroup: string
+  // eslint-disable-next-line no-unused-vars
   onFieldChange: (field: 'title' | 'description' | 'categories' | 'level' | 'ageGroup', value: any) => void
 }
 

@@ -96,4 +96,4 @@ export function PriceInfoCard({ price, originalPrice, discount, type }: PriceInf
       </CardContent>
     </Card>
   )
-} 
+}

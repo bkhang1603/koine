@@ -1,3 +1,5 @@
+import { CoursesResType } from '@/schemaValidations/course.schema'
+
 export type ComboProduct = {
   id: string
   productId: string
@@ -106,104 +108,68 @@ export interface Course {
   reviewNote?: string
 }
 
-export const mockCourses: Course[] = [
+export const mockCourses: CoursesResType['data'] = [
   {
     id: 'CRS001',
-    name: 'IELTS 7.0 - Luyện Thi Tổng Quát',
-    category: 'language',
-    price: '3.000.000đ',
-    originalPrice: '3.500.000đ',
-    students: 250,
-    discount: '15%',
-    status: 'published',
-    image: 'https://picsum.photos/seed/course1/200/200',
+    title: 'IELTS 7.0 - Luyện Thi Tổng Quát',
+    categories: [
+      {
+        id: 'CAT001',
+        name: 'IELTS'
+      }
+    ],
+    price: 3000000,
+    totalEnrollment: 250,
+    discount: 15,
+    imageUrl: 'https://picsum.photos/seed/course1/200/200',
     description: 'Khóa học IELTS tổng quát giúp học viên đạt band điểm 7.0+',
-    duration: '24 buổi',
-    level: 'Trung cấp',
-    lessons: 24,
-    materials: 12,
-    rating: 4.8,
-    totalRatings: 180,
-    enrollments: 45,
-    completionRate: 85,
-    createdBy: 'creator-1',
-    createdAt: new Date('2024-01-15'),
-    updatedBy: 'editor-1',
-    updatedAt: new Date('2024-03-01'),
-    publishedAt: new Date('2024-01-20')
-  },
-  {
-    id: 'CRS002',
-    name: 'IELTS Speaking - Giao Tiếp Nâng Cao',
-    category: 'language',
-    price: '2.000.000đ',
-    originalPrice: '2.500.000đ',
-    students: 0,
-    discount: '20%',
-    status: 'pending_price',
-    image: 'https://picsum.photos/seed/course2/200/200',
-    description: 'Khóa học chuyên sâu về IELTS Speaking',
-    duration: '16 buổi',
-    level: 'Nâng cao',
-    lessons: 16,
-    materials: 8,
-    rating: 0,
-    totalRatings: 0,
-    enrollments: 0,
-    completionRate: 0,
-    createdBy: 'creator-2',
-    createdAt: new Date('2024-02-01'),
-    updatedBy: 'editor-1',
-    updatedAt: new Date('2024-03-10')
-  },
-  {
-    id: 'CRS003',
-    name: 'IELTS Listening - Luyện Nghe',
-    category: 'language',
-    price: '1.800.000đ',
-    originalPrice: '2.000.000đ',
-    students: 0,
-    discount: '10%',
-    status: 'draft',
-    image: 'https://picsum.photos/seed/course3/200/200',
-    description: 'Khóa học chuyên sâu về IELTS Listening',
-    duration: '12 buổi',
-    level: 'Cơ bản',
-    lessons: 12,
-    materials: 6,
-    rating: 0,
-    totalRatings: 0,
-    enrollments: 0,
-    completionRate: 0,
-    createdBy: 'creator-1',
-    createdAt: new Date('2024-02-15'),
-    updatedBy: 'editor-2',
-    updatedAt: new Date('2024-03-05')
-  },
-  {
-    id: 'CRS004',
-    name: 'IELTS Writing - Luyện Viết',
-    category: 'language',
-    price: '2.500.000đ',
-    originalPrice: '3.000.000đ',
-    students: 180,
-    discount: '17%',
-    status: 'published',
-    image: 'https://picsum.photos/seed/course4/200/200',
-    description: 'Khóa học chuyên sâu về IELTS Writing',
-    duration: '20 buổi',
-    level: 'Nâng cao',
-    lessons: 20,
-    materials: 10,
-    rating: 4.6,
-    totalRatings: 150,
-    enrollments: 35,
-    completionRate: 88,
-    createdBy: 'creator-2',
-    createdAt: new Date('2024-01-01'),
-    updatedBy: 'editor-1',
-    updatedAt: new Date('2024-02-15'),
-    publishedAt: new Date('2024-01-10')
+    durations: 100,
+    createdAt: '2024-01-01',
+    updatedAt: '2024-02-15',
+    creatorId: '',
+    titleNoTone: '',
+    slug: '',
+    imageBanner: '',
+    durationsDisplay: '',
+    aveRating: 0,
+    creator: {
+      id: 'USR001',
+      username: 'Nguyễn Văn A'
+    },
+    chapters: [
+      {
+        id: 'CHP001',
+        title: 'Chương 1: Ngữ Pháp',
+        lessons: [
+          {
+            id: 'LSN001',
+            title: 'Bài 1: Câu điều kiện loại 1',
+            durations: 15,
+            type: 'VIDEO',
+            description: '',
+            durationsDisplay: '',
+            sequence: 0,
+            content: null,
+            videoUrl: null
+          },
+          {
+            id: 'LSN002',
+            title: 'Bài 2: Câu điều kiện loại 2',
+            durations: 20,
+            type: 'VIDEO',
+            description: '',
+            durationsDisplay: '',
+            sequence: 0,
+            content: null,
+            videoUrl: null
+          }
+        ],
+        description: '',
+        durations: 0,
+        durationsDisplay: '',
+        sequence: 0
+      }
+    ]
   }
 ]
 

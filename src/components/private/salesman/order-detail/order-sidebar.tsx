@@ -94,4 +94,4 @@ export function OrderSidebar({ order }: { order: Order }) {
       </Card>
     </div>
   )
-} 
+}

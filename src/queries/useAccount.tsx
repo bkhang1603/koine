@@ -43,3 +43,42 @@ export const useGetAccountAddress = () => {
     queryFn: accountApiRequest.getAccountAddress
   })
 }
+
+export const useAddAccountAddressMutation = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: accountApiRequest.addAccountAddress,
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ['account-address']
+      })
+    }
+  })
+}
+
+export const useUpdateAccountAddressMutation = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: accountApiRequest.updateAccountAddress,
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ['account-address']
+      })
+    }
+  })
+}
+
+export const useDeleteAccountAddressMutation = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: accountApiRequest.deleteAccountAddress,
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ['account-address']
+      })
+    }
+  })
+}

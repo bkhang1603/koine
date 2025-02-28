@@ -12,10 +12,9 @@ export default function EditCoursePage({ params }: { params: { id: string } }) {
     return <div>Không tìm thấy khóa học</div>
   }
 
-  const handleSubmit = (data: any) => {
-    console.log('Update course:', data)
+  const handleSubmit = () => {
     router.push('/salesman/courses')
   }
 
-  return <CourseForm initialData={course} onSubmit={handleSubmit} isEdit />
+  return <CourseForm onSubmit={handleSubmit} isEdit />
 }

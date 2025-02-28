@@ -18,12 +18,12 @@ const dropMenuItems = [
   {
     title: 'Cài đặt',
     icon: <Settings />,
-    href: configRoute.setting.password
+    href: configRoute.setting.security
   },
   {
     title: 'Trợ giúp',
     icon: <MessageCircleQuestion />,
-    href: configRoute.setting.profile
+    href: configRoute.help
   },
   {
     title: 'Đăng xuất',
@@ -97,7 +97,7 @@ function AvatarNotification() {
           </Link>
           <Separator />
           <Button asChild variant={'custom'} className='w-full'>
-            <Link href={configRoute.parent.dashboard}>Xem các tài khoản quản lý</Link>
+            <Link href={configRoute.setting.profile}>Xem các tài khoản quản lý</Link>
           </Button>
         </div>
 

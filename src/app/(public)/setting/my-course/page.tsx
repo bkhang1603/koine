@@ -5,11 +5,10 @@ import Image from 'next/image'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Progress } from '@/components/ui/progress'
-import { Clock, Search, BarChart2, PlayCircle, BookOpen, GraduationCap, Trophy } from 'lucide-react'
+import { Clock, Search, PlayCircle, BookOpen, GraduationCap, Trophy } from 'lucide-react'
 import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Card, CardContent } from '@/components/ui/card'
-import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { cn } from '@/lib/utils'
 
 interface Course {
@@ -144,39 +143,24 @@ export default function MyCoursesPage() {
       {/* Filters */}
       <Card className='border-none shadow-md'>
         <CardContent className='p-6'>
-          <div className='flex flex-col sm:flex-row gap-4'>
-            <div className='flex-1 flex gap-4'>
-              <div className='relative flex-1 max-w-md'>
-                <Search className='absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400' />
-                <Input
-                  placeholder='Tìm khóa học...'
-                  className='pl-9 border-gray-200 focus:border-primary/30 focus:ring-primary/20'
-                />
-              </div>
-              <Select defaultValue='all'>
-                <SelectTrigger className='w-[180px] border-gray-200'>
-                  <SelectValue placeholder='Danh mục' />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value='all'>Tất cả danh mục</SelectItem>
-                  <SelectItem value='soft-skills'>Kỹ năng mềm</SelectItem>
-                  <SelectItem value='technical'>Kỹ thuật</SelectItem>
-                </SelectContent>
-              </Select>
+          <div className='flex-1 flex justify-between gap-4'>
+            <div className='relative flex-1'>
+              <Search className='absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400' />
+              <Input
+                placeholder='Tìm khóa học...'
+                className='pl-9 border-gray-200 focus:border-primary/30 focus:ring-primary/20'
+              />
             </div>
-            <Tabs defaultValue='all' className='w-full sm:w-auto'>
-              <TabsList className='grid w-full sm:w-auto grid-cols-3 p-1 bg-gray-100/80'>
-                <TabsTrigger value='all' className='data-[state=active]:bg-white'>
-                  Tất cả
-                </TabsTrigger>
-                <TabsTrigger value='in-progress' className='data-[state=active]:bg-white'>
-                  Đang học
-                </TabsTrigger>
-                <TabsTrigger value='completed' className='data-[state=active]:bg-white'>
-                  Đã xong
-                </TabsTrigger>
-              </TabsList>
-            </Tabs>
+            <Select defaultValue='all'>
+              <SelectTrigger className='w-[180px] border-gray-200'>
+                <SelectValue placeholder='Danh mục' />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value='all'>Tất cả danh mục</SelectItem>
+                <SelectItem value='soft-skills'>Kỹ năng mềm</SelectItem>
+                <SelectItem value='technical'>Kỹ thuật</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
         </CardContent>
       </Card>

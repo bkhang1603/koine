@@ -2,7 +2,7 @@
 
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 import { Button } from '@/components/ui/button'
-import { Edit, MoreHorizontal, Tags, Trash, Eye } from 'lucide-react'
+import { Edit, MoreHorizontal, Trash, Eye } from 'lucide-react'
 
 interface MoreOptionsProps {
   type: 'product' | 'course' | 'promotion' | 'order' | 'customer'
@@ -11,7 +11,7 @@ interface MoreOptionsProps {
   onDelete?: () => void
 }
 
-export function MoreOptions({ type, onView, onEdit, onDelete }: MoreOptionsProps) {
+export function MoreOptions({ onView, onEdit, onDelete }: MoreOptionsProps) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>

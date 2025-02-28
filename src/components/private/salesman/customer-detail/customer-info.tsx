@@ -79,4 +79,4 @@ export function CustomerInfo({ customer }: { customer: Customer }) {
       </Card>
     </div>
   )
-} 
+}

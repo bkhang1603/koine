@@ -46,4 +46,4 @@ export function FAQItem({ question, answer, category, views, helpful, onEdit, on
       </CardContent>
     </Card>
   )
-} 
+}

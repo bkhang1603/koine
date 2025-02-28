@@ -17,7 +17,7 @@ interface CategoryTableProps {
   statusFilter: string
 }
 
-export function CategoryTable({ data, searchQuery, statusFilter }: CategoryTableProps) {
+export function CategoryTable({ data, statusFilter }: CategoryTableProps) {
   const filteredData = data.filter((category) => {
     if (statusFilter !== 'all' && category.status !== statusFilter) {
       return false

@@ -71,11 +71,11 @@ export default function EditOrderPage({ params }: { params: { id: string } }) {
             <CardContent className='space-y-4'>
               <div>
                 <div className='text-sm text-muted-foreground'>Khách hàng</div>
-                <div className='font-medium'>{order.customer}</div>
+                <div className='font-medium'>Haha</div>
               </div>
               <div>
                 <div className='text-sm text-muted-foreground'>Sản phẩm</div>
-                <div className='font-medium'>{order.items}</div>
+                <div className='font-medium'>Haha</div>
               </div>
               <div>
                 <div className='text-sm text-muted-foreground'>Tổng tiền</div>
@@ -96,4 +96,4 @@ export default function EditOrderPage({ params }: { params: { id: string } }) {
       </form>
     </div>
   )
-} 
+}

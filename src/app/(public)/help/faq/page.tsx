@@ -4,18 +4,7 @@ import { useState } from 'react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion'
-import {
-  Search,
-  HelpCircle,
-  Lightbulb,
-  CreditCard,
-  Wrench,
-  MessagesSquare,
-  Users2,
-  Clock,
-  BookOpen,
-  ChevronRight
-} from 'lucide-react'
+import { Search, HelpCircle, Lightbulb, CreditCard, Wrench, MessagesSquare, ChevronRight } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 
@@ -137,81 +126,12 @@ export default function FAQPage() {
     }
   }
 
-  const stats = [
-    {
-      title: 'Câu hỏi thường gặp',
-      value: '200+',
-      description: 'Câu hỏi đã được giải đáp',
-      icon: <HelpCircle className='h-5 w-5' />,
-      trend: '+12 câu hỏi mới',
-      trendUp: true,
-      color: 'from-blue-500/20 to-blue-600/20'
-    },
-    {
-      title: 'Thời gian phản hồi',
-      value: '< 30p',
-      description: 'Thời gian phản hồi trung bình',
-      icon: <Clock className='h-5 w-5' />,
-      trend: 'Nhanh hơn 25%',
-      trendUp: true,
-      color: 'from-green-500/20 to-green-600/20'
-    },
-    {
-      title: 'Người dùng hài lòng',
-      value: '98%',
-      description: 'Tỷ lệ hài lòng với câu trả lời',
-      icon: <Users2 className='h-5 w-5' />,
-      trend: '+2.1% so với tháng trước',
-      trendUp: true,
-      color: 'from-purple-500/20 to-purple-600/20'
-    },
-    {
-      title: 'Chủ đề hỗ trợ',
-      value: '12+',
-      description: 'Danh mục câu hỏi',
-      icon: <BookOpen className='h-5 w-5' />,
-      trend: '4 chủ đề mới',
-      trendUp: true,
-      color: 'from-orange-500/20 to-orange-600/20'
-    }
-  ]
-
   return (
     <div className='min-h-screen bg-dot-pattern'>
       {/* Hero Section with new design */}
       <div className='relative bg-gradient-to-b from-background/80 to-background border-b backdrop-blur-sm'>
         <div className='absolute inset-0 bg-grid-pattern opacity-10' />
         <div className='container relative pt-32 pb-20'>
-          {/* Stats Grid */}
-          <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-16'>
-            {stats.map((stat, index) => (
-              <Card
-                key={index}
-                className='relative overflow-hidden border-none bg-gradient-to-br from-background to-background/80 hover:shadow-lg transition-all duration-300'
-              >
-                <div className={`absolute inset-0 bg-gradient-to-br ${stat.color} opacity-10`} />
-                <div className='absolute -right-6 -top-6 w-24 h-24 rounded-full bg-gradient-to-br from-foreground/5 to-foreground/10' />
-                <CardContent className='relative p-6'>
-                  <div className='flex items-center justify-between mb-4'>
-                    <div className='p-2 rounded-lg bg-gradient-to-br from-background to-background/80 shadow-sm'>
-                      {stat.icon}
-                    </div>
-                    <div className='flex items-center text-xs font-medium text-green-600 dark:text-green-400'>
-                      {stat.trendUp ? '↑' : '↓'} {stat.trend}
-                    </div>
-                  </div>
-                  <div className='space-y-1'>
-                    <h3 className='font-semibold text-muted-foreground'>{stat.title}</h3>
-                    <div className='flex items-baseline gap-2'>
-                      <span className='text-3xl font-bold tracking-tight'>{stat.value}</span>
-                    </div>
-                    <p className='text-sm text-muted-foreground'>{stat.description}</p>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-
           <div className='text-center space-y-8 mb-16'>
             <div className='space-y-4'>
               <h1 className='text-5xl font-bold tracking-tight bg-gradient-to-r from-primary/80 to-primary bg-clip-text text-transparent h-14'>

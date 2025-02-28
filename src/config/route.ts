@@ -13,7 +13,6 @@ const configRoute = {
     profile: '/setting',
     myCourse: '/setting/my-course',
     order: '/setting/order',
-    password: '/setting/password',
     address: '/setting/address',
     payment: '/setting/payment',
     notification: '/setting/notification',
@@ -29,11 +28,7 @@ const configRoute = {
     addCourse: '/content-creator/course/add',
     editCourse: '/content-creator/course/edit'
   },
-  parent: {
-    dashboard: '/parent',
-    child: '/parent/child',
-    bookmark: '/parent/bookmark'
-  },
+  help: '/help/faq',
   learn: '/learn',
   kid: {
     dashboard: '/kid',

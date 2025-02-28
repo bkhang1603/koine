@@ -6,6 +6,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import blogApiRequest from '@/apiRequests/blog'
 import { BlogsResType } from '@/schemaValidations/blog.schema'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 
 const categories = [
   { id: 'all', name: 'Tất cả', featured: true },
@@ -122,12 +123,10 @@ async function KnowledgePage() {
                     {/* Author */}
                     <div className='flex items-center gap-3 mt-6 pt-6 border-t border-gray-100'>
                       <div className='relative w-8 h-8 rounded-full overflow-hidden'>
-                        <Image
-                          src={blog.creatorInfo.avatarUrl || images.blogBanner}
-                          alt={blog.creatorInfo.firstName}
-                          fill
-                          className='object-cover'
-                        />
+                        <Avatar>
+                          <AvatarImage src={blog.creatorInfo.avatarUrl} />
+                          <AvatarFallback>{blog.creatorInfo.firstName.charAt(0)}</AvatarFallback>
+                        </Avatar>
                       </div>
                       <span className='text-sm font-medium text-gray-700'>{blog.creatorInfo.firstName}</span>
                     </div>

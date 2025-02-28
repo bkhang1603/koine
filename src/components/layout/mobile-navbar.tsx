@@ -4,7 +4,7 @@ import { Book, Building2, Home, LibraryBig, PackageSearch, Phone } from 'lucide-
 import Link from 'next/link'
 import configRoute from '@/config/route'
 import { usePathname } from 'next/navigation'
-import { Button } from '@/components/ui/button'
+import { cn } from '@/lib/utils'
 
 function MobileNavbar() {
   const pathname = usePathname()
@@ -19,24 +19,46 @@ function MobileNavbar() {
   ]
 
   return (
-    <nav className='flex flex-col justify-between h-[91%]'>
-      <ul className='flex flex-col space-y-4 text-primary font-medium text-lg'>
+    <nav className='flex flex-col justify-between h-full'>
+      {/* Menu Items */}
+      <div className='space-y-1'>
         {menuItems.map((item, index) => {
+          const isActive = pathname === item.href
           return (
             <Link key={index} href={item.href}>
-              <li
-                className={`flex items-center gap-3 cursor-pointer ${pathname === item.href ? 'text-secondary' : ''}`}
+              <div
+                className={cn(
+                  'flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors',
+                  'hover:bg-primary/5 active:bg-primary/10',
+                  isActive ? 'bg-primary/10 text-primary font-medium' : 'text-gray-600 hover:text-primary'
+                )}
               >
-                <item.icon />
-                {item.name}
-              </li>
+                <item.icon className={cn('w-5 h-5', isActive ? 'text-primary' : 'text-gray-500')} />
+                <span className='text-sm font-medium'>{item.name}</span>
+
+                {/* Active Indicator */}
+                {isActive && <div className='ml-auto w-1.5 h-1.5 rounded-full bg-primary' />}
+              </div>
             </Link>
           )
         })}
-      </ul>
-      <Button asChild className='text-base'>
-        <Link href={configRoute.login}>Đăng nhập vào Koine</Link>
-      </Button>
+      </div>
+
+      {/* Divider */}
+      <div className='my-4 border-t border-gray-100' />
+
+      {/* Additional Links */}
+      <div className='space-y-2 text-sm text-gray-600'>
+        <Link href='/help' className='block hover:text-primary'>
+          Trung tâm hỗ trợ
+        </Link>
+        <Link href='/terms' className='block hover:text-primary'>
+          Điều khoản sử dụng
+        </Link>
+        <Link href='/privacy' className='block hover:text-primary'>
+          Chính sách bảo mật
+        </Link>
+      </div>
     </nav>
   )
 }

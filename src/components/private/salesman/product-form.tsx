@@ -8,11 +8,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Switch } from '@/components/ui/switch'
 import { Label } from '@/components/ui/label'
 import { mockProducts, type ComboProduct } from '@/app/(private)/salesman/_mock/data'
-import { Badge } from '@/components/ui/badge'
-import { ArrowLeft, X, ImagePlus, Upload } from 'lucide-react'
+import { ArrowLeft, X, ImagePlus } from 'lucide-react'
 import Link from 'next/link'
 import { Textarea } from '@/components/ui/textarea'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import Image from 'next/image'
 
 interface ProductFormProps {
   initialData?: {
@@ -27,6 +26,7 @@ interface ProductFormProps {
     comboProducts?: ComboProduct[]
     images?: string[]
   }
+  // eslint-disable-next-line no-unused-vars
   onSubmit: (data: any) => void
   isEdit?: boolean
 }
@@ -96,7 +96,13 @@ export function ProductForm({ initialData, onSubmit, isEdit }: ProductFormProps)
                 <div className='grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4'>
                   {images.map((image, index) => (
                     <div key={index} className='relative aspect-square rounded-lg overflow-hidden group border'>
-                      <img src={image} alt={`Product ${index + 1}`} className='w-full h-full object-cover' />
+                      <Image
+                        src={image}
+                        alt={`Product ${index + 1}`}
+                        width={80}
+                        height={80}
+                        className='w-full h-full object-cover'
+                      />
                       <div className='absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center'>
                         <Button
                           variant='ghost'
@@ -161,9 +167,11 @@ export function ProductForm({ initialData, onSubmit, isEdit }: ProductFormProps)
                         <div key={item.id} className='flex gap-4 bg-muted/50 p-3 rounded-lg'>
                           {/* Product Image */}
                           <div className='w-20 h-20 rounded-md border overflow-hidden flex-shrink-0'>
-                            <img
-                              src={product?.images?.[0] || '/placeholder-product.png'}
-                              alt={product?.name}
+                            <Image
+                              src={product?.image?.[0] || '/placeholder-product.png'}
+                              alt={product?.name || 'Product Image'}
+                              width={80}
+                              height={80}
                               className='w-full h-full object-cover'
                             />
                           </div>

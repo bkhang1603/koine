@@ -9,9 +9,8 @@ import { ArrowLeft } from 'lucide-react'
 import Link from 'next/link'
 
 export default function CoursePricingPage({ params }: { params: { id: string } }) {
-  const course = mockCourses.find(c => c.id === params.id)
+  const course = mockCourses.find((c) => c.id === params.id)
   const [price, setPrice] = useState(course?.price || '')
-  const [originalPrice, setOriginalPrice] = useState(course?.originalPrice || '')
   const [discount, setDiscount] = useState(course?.discount || '')
 
   if (!course) {
@@ -33,9 +32,7 @@ export default function CoursePricingPage({ params }: { params: { id: string } }
         </Button>
         <div>
           <h1 className='text-2xl font-bold'>Thiết lập giá khóa học</h1>
-          <p className='text-sm text-muted-foreground'>
-            Thiết lập giá bán và chương trình giảm giá cho khóa học
-          </p>
+          <p className='text-sm text-muted-foreground'>Thiết lập giá bán và chương trình giảm giá cho khóa học</p>
         </div>
       </div>
 
@@ -46,36 +43,16 @@ export default function CoursePricingPage({ params }: { params: { id: string } }
           </CardHeader>
           <CardContent className='space-y-4'>
             <div className='space-y-2'>
-              <label className='text-sm font-medium'>Giá gốc</label>
-              <Input
-                value={originalPrice}
-                onChange={(e) => setOriginalPrice(e.target.value)}
-                placeholder='Nhập giá gốc...'
-              />
-            </div>
-            <div className='space-y-2'>
               <label className='text-sm font-medium'>Giá bán</label>
-              <Input
-                value={price}
-                onChange={(e) => setPrice(e.target.value)}
-                placeholder='Nhập giá bán...'
-              />
+              <Input value={price} onChange={(e) => setPrice(e.target.value)} placeholder='Nhập giá bán...' />
             </div>
             <div className='space-y-2'>
               <label className='text-sm font-medium'>Giảm giá (%)</label>
-              <Input
-                value={discount}
-                onChange={(e) => setDiscount(e.target.value)}
-                type='number'
-                min={0}
-                max={100}
-              />
+              <Input value={discount} onChange={(e) => setDiscount(e.target.value)} type='number' min={0} max={100} />
             </div>
 
             <div className='pt-4 space-x-2'>
-              <Button onClick={handleSubmit}>
-                Gửi duyệt
-              </Button>
+              <Button onClick={handleSubmit}>Gửi duyệt</Button>
               <Button variant='outline' asChild>
                 <Link href={`/salesman/courses/${params.id}`}>Hủy</Link>
               </Button>
@@ -85,4 +62,4 @@ export default function CoursePricingPage({ params }: { params: { id: string } }
       </div>
     </div>
   )
-} 
+}

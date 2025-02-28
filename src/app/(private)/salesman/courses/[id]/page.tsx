@@ -4,14 +4,14 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { mockCourses } from '../../_mock/data'
 import { Badge } from '@/components/ui/badge'
-import { ArrowLeft, Edit, Tags, Users, Clock, BookOpen, Star, BarChart, GraduationCap, Trophy } from 'lucide-react'
+import { ArrowLeft, Edit, Tags, Users, Clock, Star, Trophy } from 'lucide-react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { Separator } from '@/components/ui/separator'
 import { PriceInfoCard } from '@/components/private/salesman/price-info-card'
 
 export default function CourseDetailPage({ params }: { params: { id: string } }) {
-  const course = mockCourses.find(c => c.id === params.id)
+  const course = mockCourses.find((c) => c.id === params.id)
 
   if (!course) {
     return <div>Không tìm thấy khóa học</div>
@@ -55,25 +55,20 @@ export default function CourseDetailPage({ params }: { params: { id: string } })
           <CardContent className='space-y-6'>
             <div className='flex gap-6'>
               <div className='relative w-40 h-40 rounded-lg overflow-hidden'>
-                <Image 
-                  src={course.image} 
-                  alt={course.name}
-                  fill
-                  className='object-cover'
-                />
+                <Image src={course.imageUrl} alt={course.title} fill className='object-cover' />
               </div>
               <div className='flex-1 space-y-4'>
                 <div>
                   <div className='text-sm text-muted-foreground'>Tên khóa học</div>
-                  <div className='text-lg font-medium'>{course.name}</div>
+                  <div className='text-lg font-medium'>{course.title}</div>
                 </div>
                 <div className='flex gap-2'>
                   <Badge variant='outline'>
-                    {course.category === 'language' ? 'Ngoại ngữ' : 'Kỹ năng'}
+                    {course.categories.some((category) => category.id === 'language') ? 'Ngoại ngữ' : 'Kỹ năng'}
                   </Badge>
-                  <Badge variant={course.status === 'active' ? 'default' : 'secondary'}>
+                  {/* <Badge variant={course.status === 'active' ? 'default' : 'secondary'}>
                     {course.status === 'active' ? 'Đang mở' : 'Tạm dừng'}
-                  </Badge>
+                  </Badge> */}
                 </div>
               </div>
             </div>
@@ -87,21 +82,21 @@ export default function CourseDetailPage({ params }: { params: { id: string } })
                   <Users className='w-4 h-4' />
                   <span>Học viên</span>
                 </div>
-                <div className='text-2xl font-bold'>{course.students}</div>
+                <div className='text-2xl font-bold'>{course.totalEnrollment}</div>
               </div>
               <div className='p-4 bg-muted/50 rounded-lg space-y-1'>
                 <div className='flex items-center gap-2 text-muted-foreground'>
                   <Trophy className='w-4 h-4' />
                   <span>Tỷ lệ hoàn thành</span>
                 </div>
-                <div className='text-2xl font-bold'>{course.completionRate}%</div>
+                <div className='text-2xl font-bold'>100%</div>
               </div>
               <div className='p-4 bg-muted/50 rounded-lg space-y-1'>
                 <div className='flex items-center gap-2 text-muted-foreground'>
                   <Star className='w-4 h-4' />
                   <span>Đánh giá</span>
                 </div>
-                <div className='text-2xl font-bold'>{course.rating.toFixed(1)}</div>
+                <div className='text-2xl font-bold'>{course.aveRating}</div>
               </div>
             </div>
 
@@ -124,15 +119,15 @@ export default function CourseDetailPage({ params }: { params: { id: string } })
                   </div>
                   <div className='flex justify-between py-2 border-b'>
                     <span className='text-muted-foreground'>Giảng viên</span>
-                    <span className='font-medium'>{course.instructor}</span>
+                    <span className='font-medium'>Haha</span>
                   </div>
                   <div className='flex justify-between py-2 border-b'>
                     <span className='text-muted-foreground'>Thời lượng</span>
-                    <span className='font-medium'>{course.duration}</span>
+                    <span className='font-medium'>{course.durations}</span>
                   </div>
                   <div className='flex justify-between py-2 border-b'>
                     <span className='text-muted-foreground'>Trình độ</span>
-                    <span className='font-medium'>{course.level}</span>
+                    <span className='font-medium'>Cơ bản</span>
                   </div>
                 </div>
               </div>
@@ -183,9 +178,9 @@ export default function CourseDetailPage({ params }: { params: { id: string } })
         <div className='space-y-6'>
           {/* Thông tin giá */}
           <PriceInfoCard
-            price={course.price}
-            originalPrice={course.originalPrice}
-            discount={course.discount}
+            price={course.price.toString()}
+            originalPrice={course.price.toString()}
+            discount={course.discount.toString()}
             type='course'
           />
 
@@ -198,21 +193,21 @@ export default function CourseDetailPage({ params }: { params: { id: string } })
               <div className='flex items-center justify-between'>
                 <div className='text-sm text-muted-foreground'>Đánh giá trung bình</div>
                 <div className='flex items-center gap-1'>
-                  <span className='font-medium'>{course.rating.toFixed(1)}</span>
+                  <span className='font-medium'>{course.aveRating}</span>
                   <Star className='w-4 h-4 fill-yellow-400 text-yellow-400' />
                 </div>
               </div>
               <div className='flex items-center justify-between'>
                 <div className='text-sm text-muted-foreground'>Lượt đánh giá</div>
-                <div className='font-medium'>{course.totalRatings}</div>
+                <div className='font-medium'>100</div>
               </div>
               <div className='flex items-center justify-between'>
                 <div className='text-sm text-muted-foreground'>Đăng ký trong tháng</div>
-                <div className='font-medium'>{course.enrollments}</div>
+                <div className='font-medium'>100</div>
               </div>
               <div className='flex items-center justify-between'>
                 <div className='text-sm text-muted-foreground'>Tỷ lệ hoàn thành</div>
-                <div className='font-medium'>{course.completionRate}%</div>
+                <div className='font-medium'>100%</div>
               </div>
             </CardContent>
           </Card>
@@ -239,4 +234,4 @@ export default function CourseDetailPage({ params }: { params: { id: string } })
       </div>
     </div>
   )
-} 
+}

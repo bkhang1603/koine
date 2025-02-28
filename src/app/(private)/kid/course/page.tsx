@@ -2,8 +2,6 @@
 
 import { Button } from '@/components/ui/button'
 import Image from 'next/image'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { Progress } from '@/components/ui/progress'
 import { Card } from '@/components/ui/card'
 import Link from 'next/link'
 

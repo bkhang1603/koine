@@ -73,4 +73,4 @@ export default function SalesmanLayout({
   ]
 
   return <SidebarLayout sidebarData={sidebarData}>{children}</SidebarLayout>
-} 
+}

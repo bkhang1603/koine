@@ -3,6 +3,7 @@ import { cn } from '@/lib/utils'
 import { MessageSquare, RefreshCcw, Star, AlertCircle, CheckCircle } from 'lucide-react'
 import { formatDistanceToNow } from 'date-fns'
 import { vi } from 'date-fns/locale'
+import Link from 'next/link'
 
 type NotificationType = 'ticket' | 'refund' | 'review' | 'alert' | 'success'
 
@@ -58,4 +59,4 @@ export function NotificationItem({ type, title, message, createdAt, isRead, link
       </div>
     </div>
   )
-} 
+}

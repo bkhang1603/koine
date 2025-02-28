@@ -4,14 +4,14 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { mockProducts } from '../../_mock/data'
 import { Badge } from '@/components/ui/badge'
-import { ArrowLeft, Edit, Tags, Package, DollarSign, ShoppingCart, Truck, Clock, Star } from 'lucide-react'
+import { ArrowLeft, Edit, Tags, Package, ShoppingCart, Truck, Clock, Star } from 'lucide-react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { Separator } from '@/components/ui/separator'
 import { PriceInfoCard } from '@/components/private/salesman/price-info-card'
 
 export default function ProductDetailPage({ params }: { params: { id: string } }) {
-  const product = mockProducts.find(p => p.id === params.id)
+  const product = mockProducts.find((p) => p.id === params.id)
 
   if (!product) {
     return <div>Không tìm thấy sản phẩm</div>
@@ -55,12 +55,7 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
           <CardContent className='space-y-6'>
             <div className='flex gap-6'>
               <div className='relative w-40 h-40 rounded-lg overflow-hidden'>
-                <Image 
-                  src={product.image} 
-                  alt={product.name}
-                  fill
-                  className='object-cover'
-                />
+                <Image src={product.image} alt={product.name} fill className='object-cover' />
               </div>
               <div className='flex-1 space-y-4'>
                 <div>
@@ -108,7 +103,9 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
               <h3 className='font-medium mb-3'>Mô tả chi tiết</h3>
               <div className='prose max-w-none'>
                 <p className='text-muted-foreground'>
-                  Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+                  Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et
+                  dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut
+                  aliquip ex ea commodo consequat.
                 </p>
               </div>
             </div>
@@ -237,4 +234,4 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
       </div>
     </div>
   )
-} 
+}

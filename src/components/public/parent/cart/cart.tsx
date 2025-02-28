@@ -2,8 +2,11 @@
 
 import { useState, useEffect, useCallback, useMemo, useRef } from 'react'
 import Image from 'next/image'
-import { Minus, Plus, Trash2, ChevronRight, ShoppingCart } from 'lucide-react'
-
+import { Minus, Plus, Trash2, ChevronRight, ShoppingCart, MapPin } from 'lucide-react'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { ScrollArea } from '@/components/ui/scroll-area'
+import Link from 'next/link'
+import configRoute from '@/config/route'
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Card, CardContent } from '@/components/ui/card'
@@ -27,10 +30,12 @@ import {
 } from '@/components/ui/alert-dialog'
 import { useAppStore } from '@/components/app-provider'
 import { useRouter } from 'next/navigation'
-import Link from 'next/link'
-import configRoute from '@/config/route'
+import { useGetAccountAddress } from '@/queries/useAccount'
 
 export default function Cart() {
+  const pickAddress = useAppStore((state) => state.pickAddress)
+  const setPickAddress = useAppStore((state) => state.setPickAddress)
+
   const { data } = useCartDetailQuery()
   const updateMutation = useCartDetailUpdateMutation()
   const deleteMutation = useCartDetailDeleteMutation()
@@ -42,6 +47,10 @@ export default function Cart() {
 
   const router = useRouter()
 
+  const { data: addressData } = useGetAccountAddress()
+  const addresses = useMemo(() => addressData?.payload.data ?? [], [addressData?.payload.data])
+  const [showAddressModal, setShowAddressModal] = useState(false)
+
   useEffect(() => {
     if (data) {
       const inStockItems = data.payload.data.cartDetails
@@ -50,6 +59,13 @@ export default function Cart() {
       setSelectedItems(new Set(inStockItems))
     }
   }, [data])
+
+  useEffect(() => {
+    if (addresses.length > 0 && !pickAddress) {
+      const defaultAddress = addresses.find((addr) => addr.isDefault) || addresses[0]
+      setPickAddress(defaultAddress)
+    }
+  }, [addresses, pickAddress, setPickAddress])
 
   const toggleSelectAll = useCallback(() => {
     if (!data) return
@@ -83,7 +99,8 @@ export default function Cart() {
   }, [data, selectedItems])
 
   const handleQuantityChange = (id: string, value: number) => {
-    const newQuantity = (quantities[id] ?? cartDetails.find((item) => item.id === id)?.quantity) + value
+    const newQuantity =
+      (quantities[id] ?? data?.payload.data.cartDetails.find((item) => item.id === id)?.quantity) + value
 
     if (newQuantity >= 1) {
       setQuantities((prev) => ({
@@ -363,15 +380,49 @@ export default function Cart() {
         <div className='lg:col-span-1'>
           <Card className='mb-4'>
             <CardContent className='p-4'>
-              <h2 className='font-semibold mb-2'>Giao tới</h2>
-              <p className='font-medium'>bảo khang 0934600600</p>
-              <p className='text-sm text-gray-600'>
-                <span className='text-green-500 font-medium'>Nhà</span> 66 nguyễn ngọc phương (sảnh A), Phường 19, Quận
-                Bình Thạnh, Hồ Chí Minh
-              </p>
-              <Button variant='link' className='p-0 h-auto text-blue-600'>
-                Thay đổi
-              </Button>
+              <div className='flex items-center justify-between mb-2'>
+                <h2 className='font-semibold'>Giao tới</h2>
+                <Button variant='link' className='p-0 h-auto text-blue-600' onClick={() => setShowAddressModal(true)}>
+                  Thay đổi
+                </Button>
+              </div>
+
+              {addresses.length === 0 ? (
+                <div className='space-y-3 mt-4'>
+                  <div className='flex items-center gap-2'>
+                    <MapPin className='w-6 h-6 text-yellow-500' />
+                    <p className='text-gray-500 text-sm'>Chưa có địa chỉ giao hàng</p>
+                  </div>
+
+                  <Button variant='outline' className='w-full' asChild>
+                    <Link href={configRoute.setting.address}>
+                      <Plus className='w-4 h-4 mr-2' />
+                      Thêm địa chỉ giao hàng
+                    </Link>
+                  </Button>
+                </div>
+              ) : pickAddress ? (
+                <div>
+                  <div className='flex items-center gap-2'>
+                    <span className='font-medium'>{pickAddress.name}</span>
+                    <span className='text-muted-foreground'>|</span>
+                    <span>{pickAddress.phone}</span>
+                    {pickAddress.isDefault && (
+                      <>
+                        <span className='text-muted-foreground'>|</span>
+                        <span className='text-xs bg-primary/10 text-primary px-2 py-1 rounded-full font-medium'>
+                          Mặc định
+                        </span>
+                      </>
+                    )}
+                  </div>
+                  <div className='text-muted-foreground'>
+                    <p className='text-green-500 font-medium text-sm'>{pickAddress.tag}</p>
+
+                    <p className='text-sm'>{pickAddress.address}</p>
+                  </div>
+                </div>
+              ) : null}
             </CardContent>
           </Card>
           {/* <Card className='mb-4'>
@@ -416,6 +467,77 @@ export default function Cart() {
           </Card>
         </div>
       </div>
+
+      <Dialog open={showAddressModal} onOpenChange={setShowAddressModal}>
+        <DialogContent className='sm:max-w-[600px]'>
+          <DialogHeader>
+            <DialogTitle className='text-xl font-semibold'>Địa chỉ giao hàng</DialogTitle>
+            <p className='text-sm text-muted-foreground mt-1'>Chọn địa chỉ bạn muốn giao hàng đến</p>
+          </DialogHeader>
+
+          <div className='relative'>
+            <ScrollArea className='max-h-[400px]'>
+              <div className='space-y-4'>
+                {addresses.map((address) => (
+                  <div
+                    key={address.id}
+                    onClick={() => {
+                      setPickAddress(address)
+                      setShowAddressModal(false)
+                    }}
+                    className={`p-4 rounded-lg border-2 cursor-pointer group transition-all
+                      ${
+                        pickAddress?.id === address.id
+                          ? 'border-primary shadow-sm bg-primary/5'
+                          : 'hover:border-primary/50 hover:shadow-sm'
+                      }`}
+                  >
+                    <div className='flex items-center gap-3'>
+                      <MapPin
+                        className={`w-6 h-6 ${pickAddress?.id === address.id ? 'text-primary' : 'text-muted-foreground'}`}
+                      />
+                      <div className='flex-1 min-w-0'>
+                        <div className='flex items-center gap-2'>
+                          <span className='text-xs bg-green-100 text-green-600 px-2 py-1 rounded-full font-medium'>
+                            {address.tag}
+                          </span>
+                          <span className='text-muted-foreground'>|</span>
+                          <span>{address.name}</span>
+                          <span className='text-muted-foreground'>|</span>
+                          <span>{address.phone}</span>
+                        </div>
+                      </div>
+                      {address.isDefault && (
+                        <span className='text-xs bg-primary/10 text-primary px-2 py-1 rounded-full font-medium'>
+                          Mặc định
+                        </span>
+                      )}
+                    </div>
+                    <div>
+                      <p className='text-sm text-muted-foreground mt-1.5'>{address.address}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </ScrollArea>
+          </div>
+
+          <div className='flex items-center justify-between pt-4 mt-4 border-t'>
+            <Link
+              href={configRoute.setting.address}
+              className='text-sm text-muted-foreground hover:text-primary transition-colors'
+            >
+              <Button variant='outline' size='sm'>
+                <Plus className='w-4 h-4 mr-2' />
+                Thêm địa chỉ mới
+              </Button>
+            </Link>
+            <Button variant='ghost' size='sm' onClick={() => setShowAddressModal(false)}>
+              Đóng
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

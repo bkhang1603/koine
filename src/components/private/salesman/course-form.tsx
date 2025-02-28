@@ -9,7 +9,6 @@ import { ArrowLeft, Upload, X } from 'lucide-react'
 import Link from 'next/link'
 import { useState, useRef } from 'react'
 import Image from 'next/image'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Separator } from '@/components/ui/separator'
 
 interface CourseFormProps {
@@ -25,6 +24,7 @@ interface CourseFormProps {
     duration: string
     level: string
   }
+  // eslint-disable-next-line no-unused-vars
   onSubmit: (data: any) => void
   isEdit?: boolean
 }
@@ -91,12 +91,8 @@ export function CourseForm({ initialData, onSubmit, isEdit }: CourseFormProps) {
                       )}
                     </div>
                     <div className='space-y-2'>
-                      <Button onClick={() => fileInputRef.current?.click()}>
-                        Tải ảnh lên
-                      </Button>
-                      <p className='text-sm text-muted-foreground'>
-                        Khuyến nghị kích thước 800x600px, tối đa 2MB
-                      </p>
+                      <Button onClick={() => fileInputRef.current?.click()}>Tải ảnh lên</Button>
+                      <p className='text-sm text-muted-foreground'>Khuyến nghị kích thước 800x600px, tối đa 2MB</p>
                     </div>
                     <input
                       type='file'
@@ -169,8 +165,8 @@ export function CourseForm({ initialData, onSubmit, isEdit }: CourseFormProps) {
               {/* Mô tả */}
               <div className='space-y-2'>
                 <label className='text-sm font-medium'>Mô tả khóa học</label>
-                <Textarea 
-                  defaultValue={initialData?.description} 
+                <Textarea
+                  defaultValue={initialData?.description}
                   className='min-h-[120px]'
                   placeholder='Nhập mô tả chi tiết về khóa học...'
                 />
@@ -232,4 +228,4 @@ export function CourseForm({ initialData, onSubmit, isEdit }: CourseFormProps) {
       </form>
     </div>
   )
-} 
+}

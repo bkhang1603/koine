@@ -6,14 +6,11 @@ import { Calendar as CalendarIcon } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { Calendar } from '@/components/ui/calendar'
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from '@/components/ui/popover'
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 
 interface DatePickerProps {
   value?: Date
+  // eslint-disable-next-line no-unused-vars
   onChange?: (date: Date | undefined) => void
 }
 
@@ -25,10 +22,7 @@ export function DatePicker({ value, onChange }: DatePickerProps) {
       <PopoverTrigger asChild>
         <Button
           variant={'outline'}
-          className={cn(
-            'w-full justify-start text-left font-normal',
-            !date && 'text-muted-foreground'
-          )}
+          className={cn('w-full justify-start text-left font-normal', !date && 'text-muted-foreground')}
         >
           <CalendarIcon className='mr-2 h-4 w-4' />
           {date ? format(date, 'PPP') : <span>Chọn ngày</span>}
@@ -47,4 +41,4 @@ export function DatePicker({ value, onChange }: DatePickerProps) {
       </PopoverContent>
     </Popover>
   )
-} 
+}

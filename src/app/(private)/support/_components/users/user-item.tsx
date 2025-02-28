@@ -24,30 +24,13 @@ interface UserItemProps {
   }
 }
 
-const statusMap = {
-  active: { label: 'Đang hoạt động', variant: 'success' },
-  inactive: { label: 'Không hoạt động', variant: 'secondary' },
-  blocked: { label: 'Đã khóa', variant: 'destructive' }
-} as const
-
 const roleMap = {
   parent: { label: 'Phụ huynh', variant: 'default' },
   student: { label: 'Học sinh', variant: 'outline' },
   teacher: { label: 'Giáo viên', variant: 'secondary' }
 } as const
 
-export function UserItem({
-  id,
-  name,
-  email,
-  phone,
-  avatar,
-  status,
-  role,
-  joinDate,
-  lastActive,
-  stats
-}: UserItemProps) {
+export function UserItem({ id, name, email, phone, avatar, role, joinDate, lastActive, stats }: UserItemProps) {
   return (
     <div className='p-4 flex gap-4 hover:bg-muted/50 transition-colors'>
       <Avatar className='h-12 w-12'>
@@ -59,7 +42,7 @@ export function UserItem({
           <div>
             <div className='flex items-center gap-2'>
               <h4 className='font-medium'>{name}</h4>
-              <Badge variant={statusMap[status].variant}>{statusMap[status].label}</Badge>
+              {/* <Badge variant={statusMap[status].variant}>{statusMap[status].label}</Badge> */}
               <Badge variant={roleMap[role].variant}>{roleMap[role].label}</Badge>
             </div>
             <div className='flex gap-4 mt-1 text-sm text-muted-foreground'>
@@ -102,4 +85,4 @@ export function UserItem({
       </div>
     </div>
   )
-} 
+}

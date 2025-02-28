@@ -6,10 +6,10 @@ import { courses } from '../_mock/data'
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { CourseCard } from '../../../../components/private/content-creator/course/course-card'
-import { CourseFilters } from '../../../../components/private/content-creator/course/course-filters'
-import { EmptyCourses } from '../../../../components/private/content-creator/course/empty-courses'
-import { DeleteCourseDialog } from '../../../../components/private/content-creator/course/delete-course-dialog'
+import { CourseFilters } from '@/components/private/content-creator/course/course-filters'
+import { EmptyCourses } from '@/components/private/content-creator/course/empty-courses'
+import { DeleteCourseDialog } from '@/components/private/content-creator/course/delete-course-dialog'
+import { CourseCard } from '@/components/private/content-creator/course/course-card'
 
 export default function CoursesPage() {
   const [selectedCategory, setSelectedCategory] = useState<string>('all')

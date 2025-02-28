@@ -55,9 +55,7 @@ export default function ReportsPage() {
             <TrendingUp className='h-4 w-4 text-muted-foreground' />
           </CardHeader>
           <CardContent>
-            <div className='text-2xl font-bold'>
-              {Math.round((ticketStats.resolved / ticketStats.total) * 100)}%
-            </div>
+            <div className='text-2xl font-bold'>{Math.round((ticketStats.resolved / ticketStats.total) * 100)}%</div>
             <p className='text-xs text-muted-foreground'>+5% so với tháng trước</p>
           </CardContent>
         </Card>
@@ -153,4 +151,4 @@ export default function ReportsPage() {
       </Tabs>
     </div>
   )
-} 
+}

@@ -14,7 +14,7 @@ import { Course, Lesson } from '../../types'
 export default function EditCoursePage({ params }: { params: { id: string } }) {
   const router = useRouter()
   const [course, setCourse] = useState<Course | null>(null)
-  const [selectedLesson, setSelectedLesson] = useState<{ chapterId: string; lesson: Lesson } | null>(null)
+  const [, setSelectedLesson] = useState<{ chapterId: string; lesson: Lesson } | null>(null)
 
   useEffect(() => {
     const courseData = courses.find((c) => c.id === params.id)

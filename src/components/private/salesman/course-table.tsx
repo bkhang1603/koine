@@ -3,7 +3,6 @@
 import { useState, useEffect, useMemo } from 'react'
 import { TableCustom } from '@/components/table-custom'
 import { Badge } from '@/components/ui/badge'
-import { mockCourses } from '@/app/(private)/salesman/_mock/data'
 import { MoreOptions } from './more-options'
 import { useRouter } from 'next/navigation'
 import Image from 'next/image'
@@ -20,11 +19,10 @@ interface CourseTableProps {
 
 export function CourseTable({ search, category, priceRange }: CourseTableProps) {
   const router = useRouter()
-  const [data, setData] = useState<Course[]>([])
+  const [data] = useState<Course[]>([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    setData(mockCourses)
     setLoading(false)
   }, [])
 

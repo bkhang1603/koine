@@ -22,9 +22,7 @@ export function SidebarNav({ items }: SidebarNavProps) {
   const [openSections, setOpenSections] = useState<string[]>(['Hồ sơ', 'Quản lý'])
 
   const toggleSection = (title: string) => {
-    setOpenSections((prev) =>
-      prev.includes(title) ? prev.filter((t) => t !== title) : [...prev, title]
-    )
+    setOpenSections((prev) => (prev.includes(title) ? prev.filter((t) => t !== title) : [...prev, title]))
   }
 
   return (
@@ -40,18 +38,14 @@ export function SidebarNav({ items }: SidebarNavProps) {
                 onClick={() => toggleSection(item.title)}
                 className={cn(
                   'w-full flex items-center justify-between px-3 py-2 text-sm font-medium rounded-lg transition-colors',
-                  isActive
-                    ? 'bg-primary/5 text-primary hover:bg-primary/10'
-                    : 'hover:bg-gray-100 text-gray-700'
+                  isActive ? 'bg-primary/5 text-primary hover:bg-primary/10' : 'hover:bg-gray-100 text-gray-700'
                 )}
               >
                 <div className='flex items-center gap-3'>
                   {item.icon}
                   <span>{item.title}</span>
                 </div>
-                <ChevronDown
-                  className={cn('h-4 w-4 transition-transform', isOpen && 'rotate-180')}
-                />
+                <ChevronDown className={cn('h-4 w-4 transition-transform', isOpen && 'rotate-180')} />
               </button>
               {isOpen && (
                 <div className='ml-4 pl-4 border-l border-gray-100 space-y-1'>

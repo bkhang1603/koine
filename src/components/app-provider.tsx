@@ -15,7 +15,7 @@ import { RoleType } from '@/types/jwt.types'
 import type { Socket } from 'socket.io-client'
 import { create } from 'zustand'
 import RefreshToken from '@/components/refresh-token'
-import { AccountResType } from '@/schemaValidations/account.schema'
+import { AccountOneAddressResType, AccountResType } from '@/schemaValidations/account.schema'
 import { CartDetailResType } from '@/schemaValidations/cart-detail.schema'
 
 // Default
@@ -53,6 +53,8 @@ type AppStoreType = {
   setUser: (user?: AccountResType['data'] | undefined) => void
   checkoutData: CartDetailResType['data'] | undefined
   setCheckoutData: (data?: CartDetailResType['data'] | undefined) => void
+  pickAddress: AccountOneAddressResType['data'] | undefined
+  setPickAddress: (address?: AccountOneAddressResType['data'] | undefined) => void
 }
 
 export const useAppStore = create<AppStoreType>((set) => ({
@@ -86,7 +88,9 @@ export const useAppStore = create<AppStoreType>((set) => ({
     } else {
       removeCheckoutDataFromLocalStorage()
     }
-  }
+  },
+  pickAddress: undefined,
+  setPickAddress: (address?: AccountOneAddressResType['data'] | undefined) => set({ pickAddress: address })
 }))
 
 // export const useAppContext = () => {

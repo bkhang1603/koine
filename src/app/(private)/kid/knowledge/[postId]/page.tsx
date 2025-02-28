@@ -6,13 +6,6 @@ import Image from 'next/image'
 import Link from 'next/link'
 
 // Add these types at the top of the file
-type ContentBlock = {
-  type: 'paragraph' | 'image' | 'subtitle' | 'funFact'
-  content?: string
-  url?: string
-  caption?: string
-  title?: string
-}
 
 const postDetail = {
   id: 1,

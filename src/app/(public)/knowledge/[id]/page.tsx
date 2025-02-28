@@ -1,8 +1,8 @@
 import blogApiRequest from '@/apiRequests/blog'
 import BlogComments from '@/components/public/parent/knowledge/blog-comments'
 import { BlogResType } from '@/schemaValidations/blog.schema'
-import Image from 'next/image'
-import { CalendarDays, MessageCircle, ThumbsUp, Share2 } from 'lucide-react'
+import { CalendarDays } from 'lucide-react'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 
 async function BlogDetailPage({ params: { id } }: { params: { id: string } }) {
   let blog: BlogResType['data'] | null = null
@@ -26,7 +26,10 @@ async function BlogDetailPage({ params: { id } }: { params: { id: string } }) {
           {/* Author & Date */}
           <div className='flex items-center gap-4 mb-8'>
             <div className='relative w-14 h-14 rounded-full overflow-hidden border-4 border-white shadow-md'>
-              <Image src={blog.creatorInfo.avatarUrl} alt={blog.creatorInfo.firstName} fill className='object-cover' />
+              <Avatar>
+                <AvatarImage src={blog.creatorInfo.avatarUrl} />
+                <AvatarFallback>{blog.creatorInfo.firstName.charAt(0)}</AvatarFallback>
+              </Avatar>
             </div>
             <div>
               <div className='font-semibold text-gray-900'>{blog.creatorInfo.firstName}</div>

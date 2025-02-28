@@ -11,6 +11,7 @@ import {
 
 interface DeleteBlogDialogProps {
   open: boolean
+  // eslint-disable-next-line no-unused-vars
   onOpenChange: (open: boolean) => void
   onConfirm: () => void
 }

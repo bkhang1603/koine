@@ -5,9 +5,9 @@ interface EmptyStateProps {
   description?: string
 }
 
-export function EmptyState({ 
-  title = 'Không có dữ liệu', 
-  description = 'Chưa có dữ liệu nào được tạo hoặc không tìm thấy kết quả phù hợp.' 
+export function EmptyState({
+  title = 'Không có dữ liệu',
+  description = 'Chưa có dữ liệu nào được tạo hoặc không tìm thấy kết quả phù hợp.'
 }: EmptyStateProps) {
   return (
     <div className='flex flex-col items-center justify-center h-[200px] text-center p-4'>
@@ -16,4 +16,4 @@ export function EmptyState({
       <p className='text-sm text-muted-foreground'>{description}</p>
     </div>
   )
-} 
+}

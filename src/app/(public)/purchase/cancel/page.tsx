@@ -32,7 +32,7 @@ function CancelPurchasePage() {
       orderCode,
       isCancel
     })
-  }, [code, id, status, orderCode, router])
+  }, [code, id, status, orderCode, router, isCancel])
 
   return (
     <div className='min-h-[100vh] flex items-center justify-center py-32'>

@@ -6,197 +6,300 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card, CardContent } from '@/components/ui/card'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-  DialogFooter
-} from '@/components/ui/dialog'
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog'
+import { Badge } from '@/components/ui/badge'
 import { useToast } from '@/components/ui/use-toast'
-import { cn } from '@/lib/utils'
-import { Search, Plus, BookOpen, Users2, Clock, ChevronRight, Star } from 'lucide-react'
+import { Users2, GraduationCap, Clock, Search, Plus, X, ChevronRight } from 'lucide-react'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 
 interface ChildAccount {
   id: string
-  name: string
+  username: string
   avatar: string
-  age: number
-  grade: string
-  totalCourses: number
-  learningTime: number // in minutes
   lastActive: string
-  level: number
-  points: number
-  activeCourses: {
-    id: string
-    name: string
-    thumbnail: string
-    progress: number
-  }[]
+  activeCourses: number
+  completedCourses: number
+  totalStudyTime: number
 }
 
-const MOCK_ACCOUNTS: ChildAccount[] = [
-  {
-    id: '1',
-    name: 'Nguyễn Minh An',
-    avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=1',
-    age: 10,
-    grade: 'Lớp 5',
-    totalCourses: 5,
-    learningTime: 1850,
-    lastActive: '2024-03-15T08:30:00Z',
-    level: 5,
-    points: 850,
-    activeCourses: [
-      {
-        id: 'course-1',
-        name: 'Toán tư duy nâng cao',
-        thumbnail: '/course-1.jpg',
-        progress: 75
-      },
-      {
-        id: 'course-2',
-        name: 'Tiếng Anh giao tiếp',
-        thumbnail: '/course-2.jpg',
-        progress: 45
-      }
-    ]
-  }
-]
+// Thêm interface cho filters
+interface Filters {
+  search: string
+  status: 'all' | 'active' | 'inactive'
+  sort: 'recent' | 'name' | 'courses'
+}
 
 export default function ChildAccountPage() {
-  const [accounts] = useState<ChildAccount[]>(MOCK_ACCOUNTS)
-  const [searchQuery, setSearchQuery] = useState('')
   const [showAddDialog, setShowAddDialog] = useState(false)
+  const [filters, setFilters] = useState<Filters>({
+    search: '',
+    status: 'all',
+    sort: 'recent'
+  })
+  const { toast } = useToast()
+
+  // Mock data
+  const childAccounts: ChildAccount[] = [
+    {
+      id: '1',
+      username: 'anna2024',
+      avatar: '/avatars/01.png',
+      lastActive: '5 phút trước',
+      activeCourses: 2,
+      completedCourses: 3,
+      totalStudyTime: 45 // hours
+    }
+    // Thêm mock data...
+  ]
 
   return (
-    <div className='max-w-7xl mx-auto'>
-      {/* Header Section */}
-      <div className='flex items-center justify-between mb-8'>
-        <div>
-          <h3 className='text-2xl font-semibold'>Tài khoản con</h3>
-          <p className='text-sm text-gray-500 mt-1'>Quản lý việc học tập của con</p>
-        </div>
-        <Button onClick={() => setShowAddDialog(true)} className='gap-2'>
-          <Plus className='h-4 w-4' />
-          Thêm tài khoản
-        </Button>
+    <div className='space-y-8'>
+      {/* Header */}
+      <div>
+        <h3 className='text-2xl font-semibold'>Tài khoản con</h3>
+        <p className='text-sm text-gray-500 mt-1'>Quản lý và theo dõi tiến độ học tập của con</p>
       </div>
 
-      {/* Quick Stats */}
-      <div className='flex items-center gap-6 p-6 mb-8 bg-gray-50 rounded-xl'>
-        <div className='flex items-center gap-3'>
-          <div className='h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center'>
-            <Users2 className='h-5 w-5 text-primary' />
-          </div>
-          <div>
-            <p className='text-sm text-gray-500'>Tổng tài khoản</p>
-            <p className='text-xl font-semibold'>{accounts.length}</p>
-          </div>
-        </div>
-        <div className='w-px h-10 bg-gray-200' />
-        <div className='flex items-center gap-3'>
-          <div className='h-10 w-10 rounded-full bg-orange-100 flex items-center justify-center'>
-            <BookOpen className='h-5 w-5 text-orange-600' />
-          </div>
-          <div>
-            <p className='text-sm text-gray-500'>Khóa học</p>
-            <p className='text-xl font-semibold'>{accounts.reduce((sum, acc) => sum + acc.totalCourses, 0)}</p>
-          </div>
-        </div>
-        <div className='w-px h-10 bg-gray-200' />
-        <div className='flex items-center gap-3'>
-          <div className='h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center'>
-            <Clock className='h-5 w-5 text-blue-600' />
-          </div>
-          <div>
-            <p className='text-sm text-gray-500'>Thời gian học</p>
-            <p className='text-xl font-semibold'>
-              {Math.round(accounts.reduce((sum, acc) => sum + acc.learningTime, 0) / 60)}h
-            </p>
-          </div>
-        </div>
+      {/* Stats Cards */}
+      <div className='grid grid-cols-1 md:grid-cols-3 gap-6'>
+        <Card className='relative overflow-hidden border-none shadow-md bg-gradient-to-br from-primary/5 to-primary/10'>
+          <CardContent className='pt-6'>
+            <div className='flex items-center gap-4'>
+              <div className='h-14 w-14 rounded-xl bg-primary/10 flex items-center justify-center'>
+                <Users2 className='h-7 w-7 text-primary' />
+              </div>
+              <div className='relative z-10'>
+                <p className='text-sm text-gray-600 font-medium'>Tổng số tài khoản</p>
+                <div className='flex items-baseline gap-1 mt-1'>
+                  <span className='text-2xl font-bold text-gray-900'>{childAccounts.length}</span>
+                  <span className='text-sm text-gray-500'>tài khoản</span>
+                </div>
+              </div>
+            </div>
+            <div className='absolute right-4 bottom-4 opacity-10'>
+              <Users2 className='h-16 w-16 text-primary' />
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className='relative overflow-hidden border-none shadow-md bg-gradient-to-br from-green-50 to-green-100/50'>
+          <CardContent className='pt-6'>
+            <div className='flex items-center gap-4'>
+              <div className='h-14 w-14 rounded-xl bg-green-100 flex items-center justify-center'>
+                <GraduationCap className='h-7 w-7 text-green-600' />
+              </div>
+              <div className='relative z-10'>
+                <p className='text-sm text-gray-600 font-medium'>Khóa học đang học</p>
+                <div className='flex items-baseline gap-1 mt-1'>
+                  <span className='text-2xl font-bold text-gray-900'>
+                    {childAccounts.reduce((sum, account) => sum + account.activeCourses, 0)}
+                  </span>
+                  <span className='text-sm text-gray-500'>khóa học</span>
+                </div>
+              </div>
+            </div>
+            <div className='absolute right-4 bottom-4 opacity-10'>
+              <GraduationCap className='h-16 w-16 text-green-600' />
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className='relative overflow-hidden border-none shadow-md bg-gradient-to-br from-blue-50 to-blue-100/50'>
+          <CardContent className='pt-6'>
+            <div className='flex items-center gap-4'>
+              <div className='h-14 w-14 rounded-xl bg-blue-100 flex items-center justify-center'>
+                <Clock className='h-7 w-7 text-blue-600' />
+              </div>
+              <div className='relative z-10'>
+                <p className='text-sm text-gray-600 font-medium'>Tổng thời gian học</p>
+                <div className='flex items-baseline gap-1 mt-1'>
+                  <span className='text-2xl font-bold text-gray-900'>
+                    {childAccounts.reduce((sum, account) => sum + account.totalStudyTime, 0)}
+                  </span>
+                  <span className='text-sm text-gray-500'>giờ</span>
+                </div>
+              </div>
+            </div>
+            <div className='absolute right-4 bottom-4 opacity-10'>
+              <Clock className='h-16 w-16 text-blue-600' />
+            </div>
+          </CardContent>
+        </Card>
       </div>
 
-      {/* Search Bar */}
-      <div className='relative max-w-md mb-8'>
-        <Search className='absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400' />
-        <Input
-          placeholder='Tìm kiếm tài khoản...'
-          className='pl-9'
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-        />
+      {/* Search and Filters */}
+      <div className='flex flex-col gap-6'>
+        <Card className='border-none shadow-md'>
+          <CardContent className='p-6'>
+            <div className='flex flex-col lg:flex-row gap-4'>
+              {/* Search */}
+              <div className='relative flex-1'>
+                <Search className='absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400' />
+                <Input
+                  placeholder='Tìm kiếm theo tên tài khoản...'
+                  value={filters.search}
+                  onChange={(e) => setFilters((prev) => ({ ...prev, search: e.target.value }))}
+                  className='pl-9 border-gray-200 focus:border-primary/30 focus:ring-primary/20 w-full'
+                />
+              </div>
+
+              {/* Filters */}
+              <div className='flex flex-col sm:flex-row gap-4 lg:w-auto'>
+                <Select
+                  value={filters.status}
+                  onValueChange={(value: Filters['status']) => setFilters((prev) => ({ ...prev, status: value }))}
+                >
+                  <SelectTrigger className='w-full sm:w-[180px] border-gray-200'>
+                    <SelectValue placeholder='Trạng thái' />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value='all'>Tất cả trạng thái</SelectItem>
+                    <SelectItem value='active'>Đang hoạt động</SelectItem>
+                    <SelectItem value='inactive'>Không hoạt động</SelectItem>
+                  </SelectContent>
+                </Select>
+
+                <Button
+                  onClick={() => setShowAddDialog(true)}
+                  className='bg-gradient-to-r from-primary to-primary/90 hover:from-primary/90 hover:to-primary
+                    shadow-lg shadow-primary/25 hover:shadow-xl hover:shadow-primary/20 w-full sm:w-auto'
+                >
+                  <Plus className='w-4 h-4 mr-2' />
+                  Thêm tài khoản con
+                </Button>
+              </div>
+            </div>
+
+            {/* Active Filters */}
+            {(filters.search || filters.status !== 'all' || filters.sort !== 'recent') && (
+              <div className='flex flex-wrap gap-2 mt-4 pt-4 border-t border-gray-100'>
+                {filters.search && (
+                  <Badge variant='secondary' className='gap-1'>
+                    Tìm kiếm: {filters.search}
+                    <X
+                      className='w-3 h-3 cursor-pointer'
+                      onClick={() => setFilters((prev) => ({ ...prev, search: '' }))}
+                    />
+                  </Badge>
+                )}
+                {filters.status !== 'all' && (
+                  <Badge variant='secondary' className='gap-1'>
+                    {filters.status === 'active' ? 'Đang hoạt động' : 'Không hoạt động'}
+                    <X
+                      className='w-3 h-3 cursor-pointer'
+                      onClick={() => setFilters((prev) => ({ ...prev, status: 'all' }))}
+                    />
+                  </Badge>
+                )}
+                {filters.sort !== 'recent' && (
+                  <Badge variant='secondary' className='gap-1'>
+                    Sắp xếp: {filters.sort === 'name' ? 'Theo tên' : 'Số khóa học'}
+                    <X
+                      className='w-3 h-3 cursor-pointer'
+                      onClick={() => setFilters((prev) => ({ ...prev, sort: 'recent' }))}
+                    />
+                  </Badge>
+                )}
+                <Button
+                  variant='ghost'
+                  size='sm'
+                  onClick={() => setFilters({ search: '', status: 'all', sort: 'recent' })}
+                  className='text-sm text-gray-500 hover:text-gray-700'
+                >
+                  Xóa bộ lọc
+                </Button>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* Results Count */}
+        <div className='flex items-center justify-between px-2'>
+          <p className='text-sm text-gray-500'>
+            Hiển thị <span className='font-medium text-gray-900'>{childAccounts.length}</span> tài khoản
+          </p>
+          <p className='text-sm text-gray-500'>
+            Cập nhật lần cuối: <span className='font-medium text-gray-900'>2 phút trước</span>
+          </p>
+        </div>
       </div>
 
       {/* Account List */}
-      <div className='space-y-4'>
-        {accounts.map((account) => (
-          <Link href={`/setting/child-account/${account.id}`} key={account.id}>
-            <Card className='overflow-hidden hover:shadow-lg transition-shadow duration-300'>
+      <div className='grid gap-6 md:grid-cols-2 lg:grid-cols-3'>
+        {childAccounts.map((account) => (
+          <Link key={account.id} href={`/setting/child-account/${account.id}`}>
+            <Card
+              className='group border-none shadow-md hover:shadow-xl hover:-translate-y-0.5 
+              transition-all duration-300 bg-white'
+            >
               <CardContent className='p-0'>
-                <div className='flex'>
-                  {/* Left Section */}
-                  <div className='w-64 bg-gray-50 p-6 flex flex-col items-center text-center border-r'>
-                    <Avatar className='h-20 w-20 mb-4'>
-                      <AvatarImage src={account.avatar} />
-                      <AvatarFallback>{account.name.charAt(0)}</AvatarFallback>
+                {/* Card Header with Avatar */}
+                <div className='p-6 pb-4 border-b border-gray-100'>
+                  <div className='flex items-center gap-3'>
+                    <Avatar className='h-10 w-10 ring-2 ring-primary/10'>
+                      <AvatarImage src={account.avatar} alt={account.username} />
+                      <AvatarFallback className='bg-primary/5 text-primary'>
+                        {account.username[0].toUpperCase()}
+                      </AvatarFallback>
                     </Avatar>
-                    <h4 className='font-medium'>{account.name}</h4>
-                    <p className='text-sm text-gray-500 mb-4'>
-                      {account.age} tuổi • {account.grade}
-                    </p>
-                    <div className='flex items-center gap-1 text-yellow-500'>
-                      <Star className='h-4 w-4 fill-current' />
-                      <span className='text-sm font-medium'>Level {account.level}</span>
+                    <div className='flex-1 min-w-0'>
+                      <h3 className='font-medium text-gray-900 truncate group-hover:text-primary transition-colors'>
+                        {account.username}
+                      </h3>
+                      <p className='text-sm text-gray-500 flex items-center gap-1.5'>
+                        <Clock className='w-3.5 h-3.5' />
+                        {account.lastActive}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Card Content */}
+                <div className='p-6 space-y-6'>
+                  {/* Course Progress */}
+                  <div className='space-y-2'>
+                    <div className='flex items-center justify-between text-sm'>
+                      <span className='text-gray-600'>Khóa học đang học</span>
+                      <Badge variant='secondary' className='bg-primary/5 text-primary border-none font-medium'>
+                        {account.activeCourses} khóa học
+                      </Badge>
+                    </div>
+                    <div className='h-2 bg-gray-100 rounded-full overflow-hidden'>
+                      <div
+                        className='h-full bg-gradient-to-r from-primary to-primary/80 transition-all 
+                        group-hover:from-primary/80 group-hover:to-primary'
+                        style={{
+                          width: `${(account.activeCourses / (account.activeCourses + account.completedCourses)) * 100}%`
+                        }}
+                      />
+                    </div>
+                    <div className='flex items-center justify-between text-xs text-gray-500'>
+                      <span>Đang học</span>
+                      <span>{account.completedCourses} khóa học đã hoàn thành</span>
                     </div>
                   </div>
 
-                  {/* Right Section */}
-                  <div className='flex-1 p-6'>
-                    <div className='flex items-center justify-between mb-6'>
-                      <div className='space-y-1'>
-                        <p className='text-sm text-gray-500'>Đang học</p>
-                        <p className='font-medium'>{account.activeCourses.length} khóa học</p>
-                      </div>
-                      <div className='space-y-1'>
-                        <p className='text-sm text-gray-500'>Điểm tích lũy</p>
-                        <p className='font-medium'>{account.points} điểm</p>
-                      </div>
-                      <div className='space-y-1'>
-                        <p className='text-sm text-gray-500'>Thời gian học</p>
-                        <p className='font-medium'>{Math.round(account.learningTime / 60)}h</p>
-                      </div>
-                      <Button variant='ghost' size='sm' className='text-primary'>
-                        Chi tiết
-                        <ChevronRight className='h-4 w-4 ml-1' />
-                      </Button>
+                  {/* Learning Stats */}
+                  <div className='grid grid-cols-2 gap-3 text-center'>
+                    <div className='p-3 rounded-xl bg-gray-50'>
+                      <p className='text-2xl font-semibold text-primary'>{account.totalStudyTime}</p>
+                      <p className='text-xs text-gray-500 mt-1'>Giờ học</p>
                     </div>
-
-                    {account.activeCourses.length > 0 && (
-                      <div>
-                        <p className='text-sm font-medium mb-3'>Khóa học gần đây</p>
-                        <div className='space-y-3'>
-                          {account.activeCourses.map((course) => (
-                            <div
-                              key={course.id}
-                              className='flex items-center justify-between p-3 bg-gray-50 rounded-lg'
-                            >
-                              <div>
-                                <p className='font-medium'>{course.name}</p>
-                                <p className='text-sm text-gray-500'>Hoàn thành: {course.progress}%</p>
-                              </div>
-                              <Button variant='ghost' size='sm' className='h-8'>
-                                Xem chi tiết
-                              </Button>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    )}
+                    <div className='p-3 rounded-xl bg-gray-50'>
+                      <p className='text-2xl font-semibold text-green-600'>{account.completedCourses}</p>
+                      <p className='text-xs text-gray-500 mt-1'>Đã hoàn thành</p>
+                    </div>
                   </div>
+
+                  {/* Action Button */}
+                  <Button
+                    variant='ghost'
+                    className='w-full bg-gray-50 hover:bg-primary/5 hover:text-primary border-none
+                    transition-colors group/btn flex items-center justify-between'
+                  >
+                    <span>Xem chi tiết tài khoản</span>
+                    <ChevronRight className='w-4 h-4 group-hover/btn:translate-x-0.5 transition-transform' />
+                  </Button>
                 </div>
               </CardContent>
             </Card>
@@ -208,28 +311,38 @@ export default function ChildAccountPage() {
       <Dialog open={showAddDialog} onOpenChange={setShowAddDialog}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Thêm tài khoản con</DialogTitle>
-            <DialogDescription>Điền thông tin để tạo tài khoản mới cho con của bạn</DialogDescription>
+            <DialogTitle>Thêm tài khoản con mới</DialogTitle>
           </DialogHeader>
           <div className='space-y-4 py-4'>
             <div className='space-y-2'>
-              <label className='text-sm font-medium'>Tên tài khoản</label>
-              <Input placeholder='VD: Nguyễn Văn A' />
+              <label className='text-sm font-medium'>Tên đăng nhập</label>
+              <Input placeholder='Nhập tên đăng nhập' className='border-gray-200' />
             </div>
             <div className='space-y-2'>
-              <label className='text-sm font-medium'>Tuổi</label>
-              <Input type='number' placeholder='VD: 10' />
+              <label className='text-sm font-medium'>Mật khẩu</label>
+              <Input type='password' placeholder='Nhập mật khẩu' className='border-gray-200' />
             </div>
             <div className='space-y-2'>
-              <label className='text-sm font-medium'>Lớp</label>
-              <Input placeholder='VD: Lớp 5' />
+              <label className='text-sm font-medium'>Xác nhận mật khẩu</label>
+              <Input type='password' placeholder='Nhập lại mật khẩu' className='border-gray-200' />
             </div>
           </div>
           <DialogFooter>
             <Button variant='outline' onClick={() => setShowAddDialog(false)}>
               Hủy
             </Button>
-            <Button>Tạo tài khoản</Button>
+            <Button
+              onClick={() => {
+                toast({
+                  title: 'Thành công',
+                  description: 'Đã tạo tài khoản con mới'
+                })
+                setShowAddDialog(false)
+              }}
+              className='bg-gradient-to-r from-primary to-primary/90'
+            >
+              Tạo tài khoản
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

@@ -8,7 +8,7 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import { Label } from '@/components/ui/label'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { useAppStore } from '@/components/app-provider'
-import { ChevronRight, MapPin, Plus, ShoppingCart } from 'lucide-react'
+import { ChevronRight, MapPin, Plus, ShoppingCart, ArrowLeft } from 'lucide-react'
 import Link from 'next/link'
 import configRoute from '@/config/route'
 import { useGetAccountAddress } from '@/queries/useAccount'
@@ -19,6 +19,9 @@ import { useRouter } from 'next/navigation'
 
 export default function Checkout() {
   const checkoutData = useAppStore((state) => state.checkoutData)
+  const pickAddress = useAppStore((state) => state.pickAddress)
+  const setPickAddress = useAppStore((state) => state.setPickAddress)
+
   const { data } = useGetAccountAddress()
   const createOrderMutation = useCreateOrderMutation()
   const router = useRouter()
@@ -29,27 +32,24 @@ export default function Checkout() {
   const [shippingMethod, setShippingMethod] = useState<(typeof DeliveryMethod)[keyof typeof DeliveryMethod]>(
     DeliveryMethod.STANDARD
   )
-  const [selectedAddressId, setSelectedAddressId] = useState('')
 
   // Set selectedAddressId after addresses are loaded
   useEffect(() => {
-    if (addresses.length > 0 && !selectedAddressId) {
+    if (addresses.length > 0 && !pickAddress) {
       // Find default address or use first address
-      const defaultAddress = addresses.find((addr) => addr.tag === 'HOME') || addresses[0]
-      setSelectedAddressId(defaultAddress.id)
+      const defaultAddress = addresses.find((addr) => addr.isDefault) || addresses[0]
+      setPickAddress(defaultAddress)
     }
-  }, [addresses, selectedAddressId])
-
-  const selectedAddress = addresses.find((addr) => addr.id === selectedAddressId)
+  }, [addresses, pickAddress, setPickAddress])
 
   const handleCreateOrder = async () => {
     if (createOrderMutation.isPending) return
 
-    if (!selectedAddressId) return
+    if (!pickAddress) return
 
     const orderData = {
       arrayCartDetailIds: checkoutData?.cartDetails?.map((item) => item.id) ?? [],
-      deliveryInfoId: selectedAddressId,
+      deliveryInfoId: pickAddress.id,
       deliMethod: shippingMethod
     }
 
@@ -66,7 +66,12 @@ export default function Checkout() {
 
   return (
     <div className='pt-4 pb-40'>
-      <h1 className='text-2xl font-bold mb-4'>THANH TOÁN</h1>
+      <div className='flex items-center gap-4 mb-6'>
+        <Button variant='ghost' size='icon' onClick={() => router.back()} className='hover:bg-primary/5'>
+          <ArrowLeft className='h-5 w-5' />
+        </Button>
+        <h1 className='text-2xl font-bold'>THANH TOÁN</h1>
+      </div>
       <div className='grid grid-cols-1 lg:grid-cols-4 gap-4'>
         <div className='lg:col-span-3'>
           <Card className='mb-4 p-4'>
@@ -140,12 +145,12 @@ export default function Checkout() {
               <h2 className='font-medium mb-4'>Phương thức thanh toán</h2>
               <RadioGroup defaultValue='qr'>
                 <div className='flex items-center space-x-2 mb-2'>
-                  <RadioGroupItem value={DeliveryMethod.STANDARD} id='qr' />
+                  <RadioGroupItem value='qr' id='qr' />
                   <Label htmlFor='qr'>Thanh toán qua mã QR</Label>
                 </div>
 
                 <div className='flex items-center space-x-2 mb-2'>
-                  <RadioGroupItem value={DeliveryMethod.EXPEDITED} id='cod' disabled />
+                  <RadioGroupItem value='cod' id='cod' disabled />
                   <Label htmlFor='cod' className='text-gray-400'>
                     Thanh toán khi nhận hàng (Hiện không hỗ trợ)
                   </Label>
@@ -185,16 +190,24 @@ export default function Checkout() {
                     </Link>
                   </Button>
                 </div>
-              ) : selectedAddress ? (
+              ) : pickAddress ? (
                 <div>
                   <div className='flex items-center gap-2'>
-                    <span className='font-medium'>{selectedAddress.name}</span>
+                    <span className='font-medium'>{pickAddress.name}</span>
                     <span className='text-muted-foreground'>|</span>
-                    <span>{selectedAddress.phone}</span>
+                    <span>{pickAddress.phone}</span>
+                    {pickAddress.isDefault && (
+                      <>
+                        <span className='text-muted-foreground'>|</span>
+                        <span className='text-xs bg-primary/10 text-primary px-2 py-1 rounded-full font-medium'>
+                          Mặc định
+                        </span>
+                      </>
+                    )}
                   </div>
                   <div className='text-muted-foreground'>
-                    <p className='text-green-500 font-medium text-sm'>{selectedAddress.tag}</p>
-                    <p className='text-sm'>{selectedAddress.address}</p>
+                    <p className='text-green-500 font-medium text-sm'>{pickAddress.tag}</p>
+                    <p className='text-sm'>{pickAddress.address}</p>
                   </div>
                 </div>
               ) : null}
@@ -229,8 +242,8 @@ export default function Checkout() {
               </div>
               <p className='text-right text-xs text-gray-500 mt-1'>(Đã bao gồm VAT nếu có)</p>
 
-              <Button className='w-full mt-4 font-medium' onClick={handleCreateOrder} disabled={!selectedAddressId}>
-                {!selectedAddressId ? 'Vui lòng thêm địa chỉ giao hàng' : 'Đặt hàng'}
+              <Button className='w-full mt-4 font-medium' onClick={handleCreateOrder} disabled={!pickAddress}>
+                {!pickAddress ? 'Vui lòng thêm địa chỉ giao hàng' : 'Đặt hàng'}
               </Button>
             </CardContent>
           </Card>
@@ -251,19 +264,19 @@ export default function Checkout() {
                   <div
                     key={address.id}
                     onClick={() => {
-                      setSelectedAddressId(address.id)
+                      setPickAddress(address)
                       setShowAddressModal(false)
                     }}
                     className={`p-4 rounded-lg border-2 cursor-pointer group transition-all
                       ${
-                        selectedAddressId === address.id
+                        pickAddress?.id === address.id
                           ? 'border-primary shadow-sm bg-primary/5'
                           : 'hover:border-primary/50 hover:shadow-sm'
                       }`}
                   >
                     <div className='flex items-center gap-3'>
                       <MapPin
-                        className={`w-6 h-6 ${selectedAddressId === address.id ? 'text-primary' : 'text-muted-foreground'}`}
+                        className={`w-6 h-6 ${pickAddress?.id === address.id ? 'text-primary' : 'text-muted-foreground'}`}
                       />
                       <div className='flex-1 min-w-0'>
                         <div className='flex items-center gap-2'>
@@ -276,8 +289,8 @@ export default function Checkout() {
                           <span>{address.phone}</span>
                         </div>
                       </div>
-                      {address.tag === 'HOME' && (
-                        <span className='text-xs bg-blue-100 text-blue-600 px-2 py-1 rounded-full font-medium'>
+                      {address.isDefault && (
+                        <span className='text-xs bg-primary/10 text-primary px-2 py-1 rounded-full font-medium'>
                           Mặc định
                         </span>
                       )}
