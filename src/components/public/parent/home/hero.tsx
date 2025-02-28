@@ -134,39 +134,42 @@ export default function Hero() {
                         animate={{ width: 320, opacity: 1 }}
                         exit={{ width: 0, opacity: 0 }}
                         transition={{ duration: 0.3, ease: 'easeOut' }}
-                        className='absolute left-0 top-1/2 -translate-y-1/2
+                      >
+                        <div
+                          className='absolute left-0 top-1/2 -translate-y-1/2
                         bg-white/80 backdrop-blur-sm rounded-2xl overflow-hidden
                         border border-primary/10 shadow-lg shadow-primary/5'
-                      >
-                        <div className='relative w-[320px]'>
-                          <div className='p-5'>
-                            {/* Title with Decorative Line */}
-                            <div className='flex items-center gap-3 mb-3'>
-                              <div
-                                className='flex-shrink-0 w-8 h-8 rounded-full bg-primary/10 
-                                flex items-center justify-center text-primary'
-                              >
-                                {features[activeFeature].icon}
+                        >
+                          <div className='relative w-[320px]'>
+                            <div className='p-5'>
+                              {/* Title with Decorative Line */}
+                              <div className='flex items-center gap-3 mb-3'>
+                                <div
+                                  className='flex-shrink-0 w-8 h-8 rounded-full bg-primary/10 
+                                  flex items-center justify-center text-primary'
+                                >
+                                  {features[activeFeature].icon}
+                                </div>
+                                <div className='flex-grow h-[2px] bg-gradient-to-r from-primary/20 to-transparent' />
                               </div>
-                              <div className='flex-grow h-[2px] bg-gradient-to-r from-primary/20 to-transparent' />
-                            </div>
 
-                            {/* Content */}
-                            <div>
-                              <h3 className='text-base font-semibold text-gray-900 mb-2'>
-                                {features[activeFeature].title}
-                              </h3>
-                              <p className='text-sm text-gray-600 leading-relaxed line-clamp-1'>
-                                {features[activeFeature].description}
-                              </p>
-                            </div>
+                              {/* Content */}
+                              <div>
+                                <h3 className='text-base font-semibold text-gray-900 mb-2'>
+                                  {features[activeFeature].title}
+                                </h3>
+                                <p className='text-sm text-gray-600 leading-relaxed line-clamp-1'>
+                                  {features[activeFeature].description}
+                                </p>
+                              </div>
 
-                            {/* Bottom Decoration */}
-                            <div
-                              className='absolute bottom-0 right-0 w-32 h-32 
-                              bg-gradient-to-tl from-primary/5 to-transparent 
-                              rounded-tl-full -z-10'
-                            />
+                              {/* Bottom Decoration */}
+                              <div
+                                className='absolute bottom-0 right-0 w-32 h-32 
+                                bg-gradient-to-tl from-primary/5 to-transparent 
+                                rounded-tl-full -z-10'
+                              />
+                            </div>
                           </div>
                         </div>
                       </motion.div>
@@ -183,73 +186,87 @@ export default function Hero() {
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.6 }}
-              className='relative'
             >
-              <div className='relative aspect-[4/3] rounded-[2rem] overflow-hidden transform hover:scale-[1.02] transition-transform duration-500'>
-                <Image src={images.heroImage} alt='Hero' fill className='object-cover' priority />
-                <div className='absolute inset-0 bg-gradient-to-tr from-black/20 via-black/5 to-transparent' />
-              </div>
+              <div className='relative'>
+                <div className='relative aspect-[4/3] rounded-[2rem] overflow-hidden transform hover:scale-[1.02] transition-transform duration-500'>
+                  <Image
+                    src={images.heroImage}
+                    alt='Hero'
+                    width={1000}
+                    height={1000}
+                    className='object-cover'
+                    priority
+                  />
+                  <div className='absolute inset-0 bg-gradient-to-tr from-black/20 via-black/5 to-transparent' />
+                </div>
 
-              {/* Floating Elements */}
-              <div className='absolute -bottom-8 -right-8 flex gap-4'>
-                {/* Stats Card */}
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.3, duration: 0.6 }}
-                  className='bg-white rounded-2xl shadow-xl p-4 border border-gray-100/50
-                    backdrop-blur-sm relative overflow-hidden'
-                >
-                  <div className='flex items-center gap-4 relative z-10'>
+                {/* Floating Elements */}
+                <div className='absolute -bottom-8 -right-8 flex gap-4'>
+                  {/* Stats Card */}
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.3, duration: 0.6 }}
+                  >
                     <div
-                      className='w-12 h-12 rounded-xl bg-gradient-to-br from-primary/10 to-secondary/10 
-                      flex items-center justify-center group cursor-pointer
-                      transition-transform duration-300 hover:scale-110'
+                      className='bg-white rounded-2xl shadow-xl p-4 border border-gray-100/50
+                      backdrop-blur-sm relative overflow-hidden'
                     >
-                      <Sparkles
-                        className='w-6 h-6 text-primary transform transition-transform 
-                        duration-300 group-hover:rotate-12'
+                      <div className='flex items-center gap-4 relative z-10'>
+                        <div
+                          className='w-12 h-12 rounded-xl bg-gradient-to-br from-primary/10 to-secondary/10 
+                          flex items-center justify-center group cursor-pointer
+                          transition-transform duration-300 hover:scale-110'
+                        >
+                          <Sparkles
+                            className='w-6 h-6 text-primary transform transition-transform 
+                            duration-300 group-hover:rotate-12'
+                          />
+                        </div>
+                        <div>
+                          <div className='flex items-baseline gap-1'>
+                            <div
+                              className='font-bold text-xl bg-gradient-to-r from-primary to-secondary 
+                              bg-clip-text text-transparent'
+                            >
+                              1000+
+                            </div>
+                            <div className='text-xs font-medium text-gray-400'>học viên</div>
+                          </div>
+                          <div className='text-sm text-gray-600 font-medium'>đang tin tưởng sử dụng</div>
+                        </div>
+                      </div>
+                      {/* Decorative Elements */}
+                      <div
+                        className='absolute top-0 right-0 w-24 h-24 bg-gradient-to-b 
+                        from-primary/5 to-transparent rounded-full blur-xl'
+                      />
+                      <div
+                        className='absolute bottom-0 left-0 w-20 h-20 bg-gradient-to-t 
+                        from-secondary/5 to-transparent rounded-full blur-xl'
                       />
                     </div>
-                    <div>
-                      <div className='flex items-baseline gap-1'>
-                        <div
-                          className='font-bold text-xl bg-gradient-to-r from-primary to-secondary 
-                          bg-clip-text text-transparent'
-                        >
-                          1000+
-                        </div>
-                        <div className='text-xs font-medium text-gray-400'>học viên</div>
-                      </div>
-                      <div className='text-sm text-gray-600 font-medium'>đang tin tưởng sử dụng</div>
-                    </div>
-                  </div>
-                  {/* Decorative Elements */}
-                  <div
-                    className='absolute top-0 right-0 w-24 h-24 bg-gradient-to-b 
-                    from-primary/5 to-transparent rounded-full blur-xl'
-                  />
-                  <div
-                    className='absolute bottom-0 left-0 w-20 h-20 bg-gradient-to-t 
-                    from-secondary/5 to-transparent rounded-full blur-xl'
-                  />
-                </motion.div>
+                  </motion.div>
 
-                {/* Rating Card */}
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.4, duration: 0.6 }}
-                  className='bg-white/90 backdrop-blur-sm rounded-2xl shadow-lg p-3
+                  {/* Rating Card */}
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.4, duration: 0.6 }}
+                  >
+                    <div
+                      className='bg-white/90 backdrop-blur-sm rounded-2xl shadow-lg p-3
                     border border-gray-100/50 self-start'
-                >
-                  <div className='flex gap-0.5'>
-                    {[...Array(5)].map((_, i) => (
-                      <Star key={i} className='w-4 h-4 fill-yellow-400 text-yellow-400' />
-                    ))}
-                  </div>
-                  <div className='text-xs font-medium text-gray-500 mt-1'>Đánh giá trung bình</div>
-                </motion.div>
+                    >
+                      <div className='flex gap-0.5'>
+                        {[...Array(5)].map((_, i) => (
+                          <Star key={i} className='w-4 h-4 fill-yellow-400 text-yellow-400' />
+                        ))}
+                      </div>
+                      <div className='text-xs font-medium text-gray-500 mt-1'>Đánh giá trung bình</div>
+                    </div>
+                  </motion.div>
+                </div>
               </div>
             </motion.div>
           </div>

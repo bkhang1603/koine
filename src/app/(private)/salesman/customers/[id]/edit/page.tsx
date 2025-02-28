@@ -8,8 +8,11 @@ import Link from 'next/link'
 import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { useRouter } from 'next/navigation'
+import { Params } from '@/types/query'
+import { use } from 'react'
 
-export default function EditCustomerPage({ params }: { params: { id: string } }) {
+export default function EditCustomerPage(props: { params: Params }) {
+  const params = use(props.params)
   const router = useRouter()
   const customer = mockCustomers.find((c) => c.id === params.id)
 

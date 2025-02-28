@@ -27,15 +27,9 @@ const courseApiRequest = {
     keyword?: string | string[] | undefined
   }) =>
     http.get<CoursesResType>(
-      `/courses?page_index=${page_index}&page_size=${page_size}&keyword=${keyword}&category=${category}&range=${range}&sort=${sort}`,
-      {
-        cache: 'no-cache'
-      }
+      `/courses?page_index=${page_index}&page_size=${page_size}&keyword=${keyword}&category=${category}&range=${range}&sort=${sort}`
     ),
-  getCourse: (id: string) =>
-    http.get<CourseResType>(`/courses/${id}`, {
-      cache: 'no-cache'
-    }),
+  getCourse: (id: string) => http.get<CourseResType>(`/courses/${id}`),
   addCourse: (data: any) => http.post('/courses', data),
   updateCourse: (data: any) => http.put('/courses', data),
   deleteCourse: (id: string) => http.delete(`/courses/${id}`),

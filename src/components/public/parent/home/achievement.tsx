@@ -69,59 +69,56 @@ export default function Achievement() {
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
           viewport={{ once: true }}
-          className='text-center max-w-2xl mx-auto mb-16'
         >
-          <span className='bg-primary/10 text-primary px-4 py-1.5 rounded-full text-sm font-medium'>
-            Con số ấn tượng
-          </span>
-          <h2 className='text-3xl md:text-4xl lg:text-5xl font-bold mt-6'>
-            Thành tựu của chúng tôi
-            <span className='block mt-2 bg-gradient-to-r from-[#FF0059] via-[#FF597D] to-[#2945DE] text-transparent bg-clip-text h-14'>
-              trong hành trình giáo dục
+          <div className='text-center max-w-2xl mx-auto mb-16'>
+            <span className='bg-primary/10 text-primary px-4 py-1.5 rounded-full text-sm font-medium'>
+              Con số ấn tượng
             </span>
-          </h2>
-          <p className='mt-4 text-muted-foreground'>
-            Những con số biết nói thể hiện sự tin tưởng và hiệu quả của phương pháp giáo dục của chúng tôi
-          </p>
+            <h2 className='text-3xl md:text-4xl lg:text-5xl font-bold mt-6'>
+              Thành tựu của chúng tôi
+              <span className='block mt-2 bg-gradient-to-r from-[#FF0059] via-[#FF597D] to-[#2945DE] text-transparent bg-clip-text h-14'>
+                trong hành trình giáo dục
+              </span>
+            </h2>
+            <p className='mt-4 text-muted-foreground'>
+              Những con số biết nói thể hiện sự tin tưởng và hiệu quả của phương pháp giáo dục của chúng tôi
+            </p>
+          </div>
         </motion.div>
 
-        <motion.div
-          variants={containerVariants}
-          initial='hidden'
-          whileInView='visible'
-          viewport={{ once: true }}
-          className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8'
-        >
-          {achievements.map((item, index) => (
-            <motion.div key={index} variants={itemVariants}>
-              <Card
-                className={`group p-6 border-none transition-all duration-500 ${item.color} 
-                hover:shadow-[0_8px_30px_rgb(0,0,0,0.12)] overflow-hidden relative h-full`}
-              >
-                {/* Icon Container */}
-                <div
-                  className={`w-14 h-14 rounded-2xl flex items-center justify-center mb-6
-                  bg-white/80 backdrop-blur group-hover:scale-110 transition-all duration-500 ${item.iconColor}`}
+        <motion.div variants={containerVariants} initial='hidden' whileInView='visible' viewport={{ once: true }}>
+         <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8'>
+            {achievements.map((item, index) => (
+              <motion.div key={index} variants={itemVariants}>
+                <Card
+                  className={`group p-6 border-none transition-all duration-500 ${item.color} 
+                  hover:shadow-[0_8px_30px_rgb(0,0,0,0.12)] overflow-hidden relative h-full`}
                 >
-                  {item.icon}
-                </div>
-
-                {/* Content */}
-                <div className='relative z-0'>
-                  <h3 className='text-4xl font-bold mb-1'>{item.title}</h3>
-                  <p className='text-lg font-semibold mb-2'>{item.label}</p>
-                  <p className='text-muted-foreground text-sm'>{item.description}</p>
-                </div>
-
-                {/* Decorative Corner */}
-                <div
-                  className='absolute top-0 right-0 w-24 h-24 bg-white/20 rounded-bl-[100px] 
-                  -translate-y-12 translate-x-12 group-hover:translate-y-0 group-hover:translate-x-0 
-                  transition-transform duration-500'
-                />
-              </Card>
-            </motion.div>
-          ))}
+                  {/* Icon Container */}
+                  <div
+                    className={`w-14 h-14 rounded-2xl flex items-center justify-center mb-6
+                    bg-white/80 backdrop-blur group-hover:scale-110 transition-all duration-500 ${item.iconColor}`}
+                  >
+                    {item.icon}
+                  </div>
+  
+                  {/* Content */}
+                  <div className='relative z-0'>
+                    <h3 className='text-4xl font-bold mb-1'>{item.title}</h3>
+                    <p className='text-lg font-semibold mb-2'>{item.label}</p>
+                    <p className='text-muted-foreground text-sm'>{item.description}</p>
+                  </div>
+  
+                  {/* Decorative Corner */}
+                  <div
+                    className='absolute top-0 right-0 w-24 h-24 bg-white/20 rounded-bl-[100px] 
+                    -translate-y-12 translate-x-12 group-hover:translate-y-0 group-hover:translate-x-0 
+                    transition-transform duration-500'
+                  />
+                </Card>
+              </motion.div>
+            ))}
+         </div>
         </motion.div>
       </div>
     </section>

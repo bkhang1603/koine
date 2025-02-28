@@ -71,73 +71,70 @@ export default function Sharing() {
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
           viewport={{ once: true }}
-          className='text-center max-w-2xl mx-auto mb-16'
         >
-          <span className='bg-primary/10 text-primary px-4 py-1.5 rounded-full text-sm font-medium'>
-            Chia sẻ từ phụ huynh
-          </span>
-          <h2 className='text-3xl md:text-4xl lg:text-5xl font-bold mt-6'>
-            Phụ huynh nói gì về
-            <span className='block mt-2 bg-gradient-to-r from-[#FF0059] via-[#FF597D] to-[#2945DE] text-transparent bg-clip-text h-14'>
-              chương trình học của chúng tôi
+          <div className='text-center max-w-2xl mx-auto mb-16'>
+            <span className='bg-primary/10 text-primary px-4 py-1.5 rounded-full text-sm font-medium'>
+              Chia sẻ từ phụ huynh
             </span>
-          </h2>
-          <p className='mt-4 text-muted-foreground'>
-            Những phản hồi chân thực từ các phụ huynh đã tin tưởng và đồng hành cùng chúng tôi
-          </p>
+            <h2 className='text-3xl md:text-4xl lg:text-5xl font-bold mt-6'>
+              Phụ huynh nói gì về
+              <span className='block mt-2 bg-gradient-to-r from-[#FF0059] via-[#FF597D] to-[#2945DE] text-transparent bg-clip-text h-14'>
+                chương trình học của chúng tôi
+              </span>
+            </h2>
+            <p className='mt-4 text-muted-foreground'>
+              Những phản hồi chân thực từ các phụ huynh đã tin tưởng và đồng hành cùng chúng tôi
+            </p>
+          </div>
         </motion.div>
 
-        <motion.div
-          variants={containerVariants}
-          initial='hidden'
-          whileInView='visible'
-          viewport={{ once: true }}
-          className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8'
-        >
-          {testimonials.map((testimonial, index) => (
-            <motion.div key={index} variants={itemVariants}>
-              <Card className='p-6 h-full group hover:shadow-lg transition-shadow duration-300 relative overflow-hidden'>
-                {/* Quote Icon */}
-                <div className='absolute -top-6 -right-6 w-24 h-24 bg-primary/5 rounded-full flex items-center justify-center'>
-                  <Image src={icons.quote} alt='Quote' width={24} height={24} className='text-primary/20' />
-                </div>
-
-                {/* Rating */}
-                <div className='flex gap-1 mb-4'>
-                  {[...Array(testimonial.rating)].map((_, i) => (
-                    <Star key={i} className='w-5 h-5 fill-primary text-primary' />
-                  ))}
-                </div>
-
-                {/* Content */}
-                <blockquote className='text-lg text-muted-foreground mb-6 relative line-clamp-3'>
-                  &quot;{testimonial.content}&quot;
-                </blockquote>
-
-                {/* Author */}
-                <div className='flex items-center gap-4 mt-auto'>
-                  <Avatar className='h-12 w-12 border-2 border-primary/10'>
-                    <AvatarImage
-                      src={testimonial.author.avatar.src}
-                      alt={testimonial.author.name}
-                      className='object-cover'
-                    />
-                    <AvatarFallback>{testimonial.author.name.charAt(0)}</AvatarFallback>
-                  </Avatar>
-                  <div>
-                    <div className='font-semibold'>{testimonial.author.name}</div>
-                    <div className='text-sm text-muted-foreground'>{testimonial.author.role}</div>
+        <motion.div variants={containerVariants} initial='hidden' whileInView='visible' viewport={{ once: true }}>
+          <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8'>
+            {testimonials.map((testimonial, index) => (
+              <motion.div key={index} variants={itemVariants}>
+                <Card className='p-6 h-full group hover:shadow-lg transition-shadow duration-300 relative overflow-hidden'>
+                  {/* Quote Icon */}
+                  <div className='absolute -top-6 -right-6 w-24 h-24 bg-primary/5 rounded-full flex items-center justify-center'>
+                    <Image src={icons.quote} alt='Quote' width={24} height={24} className='text-primary/20' />
                   </div>
-                </div>
 
-                {/* Decorative Corner */}
-                <div
-                  className='absolute top-0 right-0 w-24 h-24 bg-gradient-to-bl from-primary/5 to-transparent 
-                  rounded-bl-[100px] opacity-0 group-hover:opacity-100 transition-opacity duration-500'
-                />
-              </Card>
-            </motion.div>
-          ))}
+                  {/* Rating */}
+                  <div className='flex gap-1 mb-4'>
+                    {[...Array(testimonial.rating)].map((_, i) => (
+                      <Star key={i} className='w-5 h-5 fill-primary text-primary' />
+                    ))}
+                  </div>
+
+                  {/* Content */}
+                  <blockquote className='text-lg text-muted-foreground mb-6 relative line-clamp-3'>
+                    &quot;{testimonial.content}&quot;
+                  </blockquote>
+
+                  {/* Author */}
+                  <div className='flex items-center gap-4 mt-auto'>
+                    <Avatar className='h-12 w-12 border-2 border-primary/10'>
+                      <AvatarImage
+                        src={testimonial.author.avatar.src}
+                        alt={testimonial.author.name}
+                        className='object-cover'
+                      />
+                      <AvatarFallback>{testimonial.author.name.charAt(0)}</AvatarFallback>
+                    </Avatar>
+                    <div>
+                      <div className='font-semibold'>{testimonial.author.name}</div>
+                      <div className='text-sm text-muted-foreground'>{testimonial.author.role}</div>
+                    </div>
+                  </div>
+
+                  {/* Decorative Corner */}
+                  <div
+                    className='absolute top-0 right-0 w-24 h-24 bg-gradient-to-bl from-primary/5 to-transparent 
+                    rounded-bl-[100px] opacity-0 group-hover:opacity-100 transition-opacity duration-500'
+                  />
+                </Card>
+              </motion.div>
+            ))}
+          </div>
         </motion.div>
       </div>
     </section>

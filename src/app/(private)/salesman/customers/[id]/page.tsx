@@ -4,8 +4,11 @@ import { CustomerInfo } from '@/components/private/salesman/customer-detail/cust
 import { CustomerSidebar } from '@/components/private/salesman/customer-detail/customer-sidebar'
 import { mockCustomers } from '@/app/(private)/salesman/_mock/data'
 import { notFound } from 'next/navigation'
+import { Params } from '@/types/query'
+import { use } from 'react'
 
-export default function CustomerDetailPage({ params }: { params: { id: string } }) {
+export default function CustomerDetailPage(props: { params: Params }) {
+  const params = use(props.params)
   const customer = mockCustomers.find((c) => c.id === params.id)
 
   if (!customer) {

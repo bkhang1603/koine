@@ -7,8 +7,11 @@ import { Input } from '@/components/ui/input'
 import { mockCourses } from '../../../_mock/data'
 import { ArrowLeft } from 'lucide-react'
 import Link from 'next/link'
+import { Params } from '@/types/query'
+import { use } from 'react'
 
-export default function CoursePricingPage({ params }: { params: { id: string } }) {
+export default function CoursePricingPage(props: { params: Params }) {
+  const params = use(props.params)
   const course = mockCourses.find((c) => c.id === params.id)
   const [price, setPrice] = useState(course?.price || '')
   const [discount, setDiscount] = useState(course?.discount || '')

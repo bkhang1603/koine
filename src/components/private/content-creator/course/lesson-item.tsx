@@ -60,70 +60,71 @@ export function LessonItem({ lesson, chapterIndex, lessonIndex, handleLessonChan
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -10 }}
       transition={{ duration: 0.2 }}
-      className={`space-y-2 p-4 rounded-md shadow-sm border`}
     >
-      <div className='flex items-center mb-2'>
-        <div className='flex items-center space-x-2 flex-grow'>
-          {getLessonTypeIcon(lesson.type)}
-          <Input
-            placeholder='Lesson Title'
-            value={lesson.title}
-            onChange={(e) => handleLessonChange(chapterIndex, lessonIndex, 'title', e.target.value)}
-            className='w-[300px]'
-          />
-          <Select
-            value={lesson.type}
-            onValueChange={(value) =>
-              handleLessonChange(chapterIndex, lessonIndex, 'type', value as 'text' | 'video' | 'quiz')
-            }
-          >
-            <SelectTrigger className='w-[110px]'>
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value='text'>Text</SelectItem>
-              <SelectItem value='video'>Video</SelectItem>
-              <SelectItem value='quiz'>Quiz</SelectItem>
-            </SelectContent>
-          </Select>
+      <div className='space-y-2 p-4 rounded-md shadow-sm border'>
+        <div className='flex items-center mb-2'>
+          <div className='flex items-center space-x-2 flex-grow'>
+            {getLessonTypeIcon(lesson.type)}
+            <Input
+              placeholder='Lesson Title'
+              value={lesson.title}
+              onChange={(e) => handleLessonChange(chapterIndex, lessonIndex, 'title', e.target.value)}
+              className='w-[300px]'
+            />
+            <Select
+              value={lesson.type}
+              onValueChange={(value) =>
+                handleLessonChange(chapterIndex, lessonIndex, 'type', value as 'text' | 'video' | 'quiz')
+              }
+            >
+              <SelectTrigger className='w-[110px]'>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value='text'>Text</SelectItem>
+                <SelectItem value='video'>Video</SelectItem>
+                <SelectItem value='quiz'>Quiz</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button variant='ghost' size='icon' onClick={() => removeLesson(chapterIndex, lessonIndex)}>
+                  <X className='h-4 w-4' />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Remove lesson</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
         </div>
-        <TooltipProvider>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button variant='ghost' size='icon' onClick={() => removeLesson(chapterIndex, lessonIndex)}>
-                <X className='h-4 w-4' />
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent>
-              <p>Remove lesson</p>
-            </TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
+        {lesson.type === 'text' && (
+          <TextLessonContent
+            lesson={lesson}
+            chapterIndex={chapterIndex}
+            lessonIndex={lessonIndex}
+            handleLessonChange={handleLessonChange}
+          />
+        )}
+        {lesson.type === 'video' && (
+          <VideoLessonContent
+            lesson={lesson}
+            chapterIndex={chapterIndex}
+            lessonIndex={lessonIndex}
+            handleLessonChange={handleLessonChange}
+          />
+        )}
+        {lesson.type === 'quiz' && (
+          <QuizLessonContent
+            lesson={lesson}
+            chapterIndex={chapterIndex}
+            lessonIndex={lessonIndex}
+            handleLessonChange={handleLessonChange}
+          />
+        )}
       </div>
-      {lesson.type === 'text' && (
-        <TextLessonContent
-          lesson={lesson}
-          chapterIndex={chapterIndex}
-          lessonIndex={lessonIndex}
-          handleLessonChange={handleLessonChange}
-        />
-      )}
-      {lesson.type === 'video' && (
-        <VideoLessonContent
-          lesson={lesson}
-          chapterIndex={chapterIndex}
-          lessonIndex={lessonIndex}
-          handleLessonChange={handleLessonChange}
-        />
-      )}
-      {lesson.type === 'quiz' && (
-        <QuizLessonContent
-          lesson={lesson}
-          chapterIndex={chapterIndex}
-          lessonIndex={lessonIndex}
-          handleLessonChange={handleLessonChange}
-        />
-      )}
     </motion.div>
   )
 }

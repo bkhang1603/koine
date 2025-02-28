@@ -19,9 +19,12 @@ export default function BackgroundDecoration() {
           repeat: Infinity,
           ease: 'easeInOut'
         }}
-        className='absolute top-[10%] right-[15%] w-[30rem] h-[30rem] 
+      >
+        <div
+          className='absolute top-[10%] right-[15%] w-[30rem] h-[30rem] 
         bg-gradient-to-br from-primary/5 to-secondary/5 rounded-full blur-3xl'
-      />
+        />
+      </motion.div>
       <motion.div
         animate={{
           scale: [1, 1.1, 1],
@@ -35,9 +38,12 @@ export default function BackgroundDecoration() {
           ease: 'easeInOut',
           delay: 1
         }}
-        className='absolute bottom-[20%] left-[10%] w-[25rem] h-[25rem] 
+      >
+        <div
+          className='absolute bottom-[20%] left-[10%] w-[25rem] h-[25rem] 
         bg-gradient-to-tr from-secondary/5 to-primary/5 rounded-full blur-3xl'
-      />
+        />
+      </motion.div>
 
       {/* Floating Stars */}
       <div className='absolute inset-0'>
@@ -52,9 +58,10 @@ export default function BackgroundDecoration() {
             repeat: Infinity,
             ease: 'easeInOut'
           }}
-          className='absolute top-[20%] left-[15%]'
         >
-          <Star className='w-8 h-8 text-primary/20' fill='currentColor' />
+          <div className='absolute top-[20%] left-[15%]'>
+            <Star className='w-8 h-8 text-primary/20' fill='currentColor' />
+          </div>
         </motion.div>
         <motion.div
           animate={{
@@ -67,9 +74,10 @@ export default function BackgroundDecoration() {
             ease: 'easeInOut',
             delay: 1
           }}
-          className='absolute bottom-32 right-[10%]'
         >
-          <Star className='w-10 h-10 text-secondary/20' fill='currentColor' />
+          <div className='absolute bottom-32 right-[10%]'>
+            <Star className='w-10 h-10 text-secondary/20' fill='currentColor' />
+          </div>
         </motion.div>
 
         {/* Medium Stars */}
@@ -83,9 +91,10 @@ export default function BackgroundDecoration() {
             repeat: Infinity,
             ease: 'easeInOut'
           }}
-          className='absolute top-1/3 right-[25%]'
         >
-          <Star className='w-6 h-6 text-primary/15' fill='currentColor' />
+          <div className='absolute top-1/3 right-[25%]'>
+            <Star className='w-6 h-6 text-primary/15' fill='currentColor' />
+          </div>
         </motion.div>
 
         {/* Small Stars */}
@@ -99,9 +108,10 @@ export default function BackgroundDecoration() {
             repeat: Infinity,
             ease: 'easeInOut'
           }}
-          className='absolute top-1/2 left-[40%]'
         >
-          <Star className='w-4 h-4 text-primary/10' fill='currentColor' />
+          <div className='absolute top-1/2 left-[40%]'>
+            <Star className='w-4 h-4 text-primary/10' fill='currentColor' />
+          </div>
         </motion.div>
       </div>
 

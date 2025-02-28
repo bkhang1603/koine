@@ -21,6 +21,8 @@ import {
 } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
+import { Params } from '@/types/query'
+import { use } from 'react'
 
 interface OrderItem {
   id: string
@@ -65,7 +67,9 @@ const statusTextMap = {
   cancelled: 'Đã hủy'
 }
 
-export default function OrderDetailPage({ params }: { params: { id: string } }) {
+export default function OrderDetailPage(props: { params: Params }) {
+  const params = use(props.params)
+
   // Mock data - thay thế bằng API call thực tế
   const order: Order = {
     id: 'ORD-001',

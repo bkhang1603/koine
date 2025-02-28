@@ -9,8 +9,11 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { Separator } from '@/components/ui/separator'
 import { PriceInfoCard } from '@/components/private/salesman/price-info-card'
+import { Params } from '@/types/query'
+import { use } from 'react'
 
-export default function ProductDetailPage({ params }: { params: { id: string } }) {
+export default function ProductDetailPage(props: { params: Params }) {
+  const params = use(props.params)
   const product = mockProducts.find((p) => p.id === params.id)
 
   if (!product) {

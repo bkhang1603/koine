@@ -9,10 +9,13 @@ import Link from 'next/link'
 import { blogCategories } from '@/app/(private)/content-creator/_mock/data'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import RichTextEditor from '@/components/rich-text-editor'
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef, useEffect, use } from 'react'
 import Image from 'next/image'
+import { Params } from '@/types/query'
 
-export default function EditBlogPage({ params }: { params: { id: string } }) {
+export default function EditBlogPage(props: { params: Params }) {
+  const params = use(props.params)
+
   const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
   const [content, setContent] = useState('')

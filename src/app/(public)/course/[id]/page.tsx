@@ -6,6 +6,7 @@ import Image from 'next/image'
 import { Card } from '@/components/ui/card'
 import EnrollButton from './components/enroll-button'
 import CourseButton from './components/course-button'
+import { Params } from '@/types/query'
 
 const formatDuration = (minutes: number) => {
   const hours = Math.floor(minutes / 60)
@@ -28,8 +29,9 @@ const getLessonIcon = (type: string) => {
   }
 }
 
-export default async function CourseDetail({ params: { id } }: { params: { id: string } }) {
+export default async function CourseDetail(props: { params: Params }) {
   let courseData: CourseResType['data'] | null = null
+  const { id } = await props.params
 
   try {
     const { payload } = await courseApiRequest.getCourse(id)

@@ -67,80 +67,77 @@ export default function Blog() {
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
           viewport={{ once: true }}
-          className='text-center max-w-2xl mx-auto mb-16'
         >
-          <span
-            className='inline-flex items-center justify-center px-4 py-1.5 rounded-full
-            text-sm font-medium bg-primary/10 text-primary mb-4'
-          >
-            Blog & Tin tức
-          </span>
-          <h2 className='text-3xl md:text-4xl lg:text-5xl font-bold'>
-            Kiến thức bổ ích từ
+          <div className='text-center max-w-2xl mx-auto mb-16'>
             <span
-              className='bg-gradient-to-r from-[#FF0059] via-[#FF597D] to-[#2945DE] 
-              text-transparent bg-clip-text'
+              className='inline-flex items-center justify-center px-4 py-1.5 rounded-full
+              text-sm font-medium bg-primary/10 text-primary mb-4'
             >
-              {' '}
-              chuyên gia
+              Blog & Tin tức
             </span>
-          </h2>
-          <p className='mt-4 text-muted-foreground'>
-            Cập nhật những bài viết mới nhất về giáo dục giới tính và phát triển kỹ năng sống cho trẻ
-          </p>
+            <h2 className='text-3xl md:text-4xl lg:text-5xl font-bold'>
+              Kiến thức bổ ích từ
+              <span
+                className='bg-gradient-to-r from-[#FF0059] via-[#FF597D] to-[#2945DE] 
+                text-transparent bg-clip-text'
+              >
+                {' '}
+                chuyên gia
+              </span>
+            </h2>
+            <p className='mt-4 text-muted-foreground'>
+              Cập nhật những bài viết mới nhất về giáo dục giới tính và phát triển kỹ năng sống cho trẻ
+            </p>
+          </div>
         </motion.div>
 
-        <motion.div
-          variants={containerVariants}
-          initial='hidden'
-          whileInView='visible'
-          viewport={{ once: true }}
-          className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8'
-        >
-          {blogs.map((blog) => (
-            <motion.div key={blog.id} variants={itemVariants}>
-              <Link href={`/knowledge`} className='group block'>
-                <Card
-                  className='overflow-hidden border-none bg-white hover:shadow-[0_8px_30px_rgb(0,0,0,0.12)] 
-                  transition-all duration-500 relative'
-                >
-                  {/* Card Shine Effect */}
-                  <div
-                    className='absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500
-                    pointer-events-none bg-gradient-to-r from-transparent via-white/10 to-transparent 
-                    -translate-x-full group-hover:translate-x-full transform transition-transform duration-1000'
-                  />
-
-                  <div className='relative h-56 overflow-hidden'>
-                    <Image
-                      src={blog.image}
-                      alt={blog.title}
-                      fill
-                      className='object-cover group-hover:scale-110 transition-transform duration-500'
+        <motion.div variants={containerVariants} initial='hidden' whileInView='visible' viewport={{ once: true }}>
+          <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8'>
+            {blogs.map((blog) => (
+              <motion.div key={blog.id} variants={itemVariants}>
+                <Link href={`/knowledge`} className='group block'>
+                  <Card
+                    className='overflow-hidden border-none bg-white hover:shadow-[0_8px_30px_rgb(0,0,0,0.12)] 
+                    transition-all duration-500 relative'
+                  >
+                    {/* Card Shine Effect */}
+                    <div
+                      className='absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500
+                      pointer-events-none bg-gradient-to-r from-transparent via-white/10 to-transparent 
+                      -translate-x-full group-hover:translate-x-full transform'
                     />
-                    <div className='absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent' />
 
-                    {/* Category & Reading Time */}
-                    <div className='absolute bottom-4 left-4 right-4 flex items-center justify-between text-white'>
-                      <Badge className='bg-white/20 hover:bg-white/30 text-white border-none'>{blog.category}</Badge>
-                      <span className='text-sm'>{blog.readingTime}</span>
-                    </div>
-                  </div>
+                    <div className='relative h-56 overflow-hidden'>
+                      <Image
+                        src={blog.image}
+                        alt={blog.title}
+                        fill
+                        className='object-cover group-hover:scale-110 transition-transform duration-500'
+                      />
+                      <div className='absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent' />
 
-                  <div className='p-6'>
-                    <h3 className='text-xl font-semibold group-hover:text-primary transition-colors line-clamp-1 mb-3'>
-                      {blog.title}
-                    </h3>
-                    <p className='text-muted-foreground text-sm line-clamp-2 mb-4'>{blog.excerpt}</p>
-                    <div className='flex items-center text-primary font-medium text-sm'>
-                      Đọc thêm
-                      <ArrowRight className='w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform' />
+                      {/* Category & Reading Time */}
+                      <div className='absolute bottom-4 left-4 right-4 flex items-center justify-between text-white'>
+                        <Badge className='bg-white/20 hover:bg-white/30 text-white border-none'>{blog.category}</Badge>
+                        <span className='text-sm'>{blog.readingTime}</span>
+                      </div>
                     </div>
-                  </div>
-                </Card>
-              </Link>
-            </motion.div>
-          ))}
+
+                    <div className='p-6'>
+                      <h3 className='text-xl font-semibold group-hover:text-primary transition-colors line-clamp-1 mb-3'>
+                        {blog.title}
+                      </h3>
+                      <p className='text-muted-foreground text-sm line-clamp-2 mb-4'>{blog.excerpt}</p>
+                      <div className='flex items-center text-primary font-medium text-sm'>
+                        Đọc thêm
+                        <ArrowRight className='w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform' />
+                      </div>
+                    </div>
+                  </Card>
+                </Link>
+              </motion.div>
+            ))}
+          </div>
         </motion.div>
 
         <motion.div
@@ -148,14 +145,15 @@ export default function Blog() {
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.4 }}
           viewport={{ once: true }}
-          className='text-center mt-12'
         >
-          <Button size='lg' className='bg-white hover:bg-white/90 text-primary' asChild>
-            <Link href='/knowledge' className='group'>
-              Xem tất cả bài viết
-              <ArrowRight className='w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform' />
-            </Link>
-          </Button>
+          <div className='text-center mt-12'>
+            <Button size='lg' className='bg-white hover:bg-white/90 text-primary' asChild>
+              <Link href='/knowledge' className='group'>
+                Xem tất cả bài viết
+                <ArrowRight className='w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform' />
+              </Link>
+            </Button>
+          </div>
         </motion.div>
       </div>
     </section>

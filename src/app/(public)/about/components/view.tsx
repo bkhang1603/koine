@@ -94,8 +94,9 @@ function View() {
                       whileInView={{ width: '3rem' }}
                       viewport={{ once: true }}
                       transition={{ duration: 0.5, delay: 0.2 }}
-                      className='h-1 bg-gradient-to-r from-primary to-secondary rounded-full'
-                    />
+                    >
+                      <div className='h-1 bg-gradient-to-r from-primary to-secondary rounded-full' />
+                    </motion.div>
                     <h3 className='text-2xl md:text-3xl font-bold text-gray-900'>{item.title}</h3>
                     <p className='text-gray-600 text-lg leading-relaxed'>{item.description}</p>
                   </div>

@@ -8,8 +8,12 @@ import { courses } from '../../_mock/data'
 import Link from 'next/link'
 import Image from 'next/image'
 import { cn } from '@/lib/utils'
+import { Params } from '@/types/query'
+import { use } from 'react'
 
-export default function CourseDetailPage({ params }: { params: { id: string } }) {
+export default function CourseDetailPage(props: { params: Params }) {
+  const params = use(props.params)
+
   const course = courses.find((c) => c.id === params.id)
 
   if (!course) return null

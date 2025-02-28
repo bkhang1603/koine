@@ -24,8 +24,8 @@ function Header() {
           <Image
             src={icons.logo}
             alt='Koine'
-            width={1000}
-            height={1000}
+            width={500}
+            height={500}
             quality={100}
             className='w-[70px] md:w-[100px] object-contain cursor-pointer'
           />

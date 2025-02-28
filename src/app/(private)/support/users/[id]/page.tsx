@@ -13,14 +13,11 @@ import { formatDistanceToNow } from 'date-fns'
 import { vi } from 'date-fns/locale'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { cn } from '@/lib/utils'
+import { Params } from '@/types/query'
+import { use } from 'react'
 
-interface UserDetailPageProps {
-  params: {
-    id: string
-  }
-}
-
-export default function UserDetailPage({ params }: UserDetailPageProps) {
+export default function UserDetailPage(props: { params: Params }) {
+  const params = use(props.params)
   const user = getUser(params.id)
 
   if (!user) {

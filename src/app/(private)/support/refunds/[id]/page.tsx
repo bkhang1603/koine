@@ -9,14 +9,11 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Separator } from '@/components/ui/separator'
 import Link from 'next/link'
 import { getRefund, getUser } from '../../_data/mock'
+import { Params } from '@/types/query'
+import { use } from 'react'
 
-interface RefundDetailPageProps {
-  params: {
-    id: string
-  }
-}
-
-export default function RefundDetailPage({ params }: RefundDetailPageProps) {
+export default function RefundDetailPage(props: { params: Params }) {
+  const params = use(props.params)
   const refund = getRefund(params.id)
   const user = refund ? getUser(refund.userId) : null
 

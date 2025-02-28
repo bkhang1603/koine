@@ -5,8 +5,10 @@ import productApiRequest from '@/apiRequests/product'
 import { ProductResType } from '@/schemaValidations/product.schema'
 import AddToCartButton from '@/app/(public)/product/[id]/components/add-to-cart-button'
 import ProductDescription from '@/app/(public)/product/[id]/components/product-description'
+import { Params } from '@/types/query'
 
-export default async function ProductDetail({ params: { id } }: { params: { id: string } }) {
+export default async function ProductDetail(props: { params: Params }) {
+  const { id } = await props.params
   let product: ProductResType['data'] | null = null
   let overallRating = 0
 

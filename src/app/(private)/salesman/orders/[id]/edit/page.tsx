@@ -8,8 +8,11 @@ import Link from 'next/link'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Textarea } from '@/components/ui/textarea'
 import { useRouter } from 'next/navigation'
+import { Params } from '@/types/query'
+import { use } from 'react'
 
-export default function EditOrderPage({ params }: { params: { id: string } }) {
+export default function EditOrderPage(props: { params: Params }) {
+  const params = use(props.params)
   const router = useRouter()
   const order = mockOrders.find((o) => o.id === params.id)
 

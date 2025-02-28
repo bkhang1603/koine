@@ -39,7 +39,7 @@ export default function Footer() {
             {/* Brand */}
             <div className='col-span-2 md:col-span-1'>
               <Link href='/' className='block mb-2'>
-                <Image src={icons.logo} alt='Logo' width={100} height={40} />
+                <Image src={icons.logo} alt='Logo' width={100} height={40} quality={100} />
               </Link>
               <p className='text-muted-foreground text-sm mb-6'>
                 Nền tảng giáo dục giới tính toàn diện đầu tiên tại Việt Nam, giúp trẻ phát triển một cách tự nhiên và

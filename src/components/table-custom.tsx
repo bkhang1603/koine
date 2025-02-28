@@ -2,6 +2,7 @@ import PaginationTable from '@/components/pagination-table'
 import { Card, CardContent, CardFooter } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
+import { JSX } from 'react'
 
 type headerColumnType = {
   id: number

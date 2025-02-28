@@ -11,14 +11,8 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Label } from '@/components/ui/label'
-import { useState } from 'react'
-
-interface LessonEditorPageProps {
-  params: {
-    id: string
-    lessonId: string
-  }
-}
+import { use, useState } from 'react'
+import { Params } from '@/types/query'
 
 interface Question {
   id: string
@@ -30,7 +24,10 @@ interface Question {
   }[]
 }
 
-export default function LessonEditorPage({}: LessonEditorPageProps) {
+export default function LessonEditorPage(props: { params: Params }) {
+  // eslint-disable-next-line no-unused-vars
+  const params = use(props.params)
+
   const router = useRouter()
   const [lesson, setLesson] = useState<Lesson>({
     id: '',

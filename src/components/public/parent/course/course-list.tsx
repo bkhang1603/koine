@@ -4,9 +4,8 @@ import { CourseMobileFilter } from '@/components/public/parent/course/course-mob
 import CustomInput from '@/components/public/parent/home/custom-input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { CoursesResType } from '@/schemaValidations/course.schema'
-import { searchParams } from '@/types/query'
 
-async function CourseList({ searchParams }: { searchParams?: searchParams }) {
+async function CourseList({ searchParams }: { searchParams: { [key: string]: string | string[] | undefined } }) {
   let courseData: CoursesResType['data'] = []
   const page_index = isNaN(Number(searchParams?.page_index)) ? 1 : Number(searchParams?.page_index)
   const keyword = searchParams?.search ?? ''

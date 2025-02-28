@@ -7,6 +7,8 @@ import { ArrowLeft } from 'lucide-react'
 import Link from 'next/link'
 import { OrderInfo } from '@/components/private/salesman/order-detail/order-info'
 import { OrderSidebar } from '@/components/private/salesman/order-detail/order-sidebar'
+import { Params } from '@/types/query'
+import { use } from 'react'
 
 const orderStatusConfig = {
   pending: { label: 'Chờ xử lý', color: 'text-yellow-600' },
@@ -15,7 +17,8 @@ const orderStatusConfig = {
   cancelled: { label: 'Đã hủy', color: 'text-red-600' }
 } as const
 
-export default function OrderDetailPage({ params }: { params: { id: string } }) {
+export default function OrderDetailPage(props: { params: Params }) {
+  const params = use(props.params)
   const order = mockOrders.find((o) => o.id === params.id)
 
   if (!order) {

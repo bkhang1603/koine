@@ -53,18 +53,19 @@ function ContactPage() {
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.5, delay: index * 0.1 }}
-                    className='flex items-start gap-4'
                   >
-                    <div
-                      className='flex-shrink-0 w-12 h-12 rounded-xl bg-primary/5 
-                      flex items-center justify-center text-primary'
-                    >
-                      {item.icon}
-                    </div>
-                    <div>
-                      <h3 className='font-medium text-gray-900 mb-1'>{item.title}</h3>
-                      <p className='text-primary font-medium mb-1'>{item.content}</p>
-                      <p className='text-sm text-gray-500'>{item.description}</p>
+                    <div className='flex items-start space-x-4'>
+                      <div
+                        className='flex-shrink-0 w-12 h-12 rounded-xl bg-primary/5 
+                        flex items-center justify-center text-primary'
+                      >
+                        {item.icon}
+                      </div>
+                      <div>
+                        <h3 className='font-medium text-gray-900 mb-1'>{item.title}</h3>
+                        <p className='text-primary font-medium mb-1'>{item.content}</p>
+                        <p className='text-sm text-gray-500'>{item.description}</p>
+                      </div>
                     </div>
                   </motion.div>
                 ))}
@@ -72,39 +73,36 @@ function ContactPage() {
             </motion.div>
 
             {/* Form */}
-            <motion.div
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.5 }}
-              className='relative'
-            >
-              <div
-                className='bg-white rounded-[2rem] p-8 md:p-12 shadow-[0_8px_30px_rgb(0,0,0,0.12)]
-                border border-gray-100'
-              >
-                <div className='mb-8'>
-                  <h2 className='text-2xl font-bold mb-2'>Gửi tin nhắn cho chúng tôi</h2>
-                  <p className='text-gray-600'>Chúng tôi sẽ phản hồi trong thời gian sớm nhất</p>
+            <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.5 }}>
+              <div className='relative'>
+                <div
+                  className='bg-white rounded-[2rem] p-8 md:p-12 shadow-[0_8px_30px_rgb(0,0,0,0.12)]
+                  border border-gray-100'
+                >
+                  <div className='mb-8'>
+                    <h2 className='text-2xl font-bold mb-2'>Gửi tin nhắn cho chúng tôi</h2>
+                    <p className='text-gray-600'>Chúng tôi sẽ phản hồi trong thời gian sớm nhất</p>
+                  </div>
+
+                  <ContactForm />
                 </div>
 
-                <ContactForm />
+                {/* Decorative Elements */}
+                <Image
+                  src={icons.purpleCurly}
+                  width={150}
+                  height={150}
+                  alt='Decoration'
+                  className='absolute -top-12 -left-12 -z-10 opacity-50'
+                />
+                <Image
+                  src={icons.blueCurly}
+                  width={100}
+                  height={100}
+                  alt='Decoration'
+                  className='absolute -bottom-8 -right-8 -z-10 opacity-50'
+                />
               </div>
-
-              {/* Decorative Elements */}
-              <Image
-                src={icons.purpleCurly}
-                width={150}
-                height={150}
-                alt='Decoration'
-                className='absolute -top-12 -left-12 -z-10 opacity-50'
-              />
-              <Image
-                src={icons.blueCurly}
-                width={100}
-                height={100}
-                alt='Decoration'
-                className='absolute -bottom-8 -right-8 -z-10 opacity-50'
-              />
             </motion.div>
           </div>
         </div>

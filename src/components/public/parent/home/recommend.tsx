@@ -53,11 +53,12 @@ export default function Recommend() {
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5 }}
-              className='inline-block mb-4'
             >
-              <span className='px-4 py-2 rounded-full bg-primary/5 text-primary font-medium text-sm'>
-                Chương trình học
-              </span>
+              <div className='inline-block mb-4'>
+                <span className='px-4 py-2 rounded-full bg-primary/5 text-primary font-medium text-sm'>
+                  Chương trình học
+                </span>
+              </div>
             </motion.div>
 
             {/* Title */}
@@ -65,14 +66,15 @@ export default function Recommend() {
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.1 }}
-              className='relative'
             >
-              <h2 className='text-4xl font-bold mb-6 leading-tight'>
-                Khóa học tiêu biểu
-                <span className='block text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary'>
-                  được thiết kế cho con bạn
-                </span>
-              </h2>
+              <div className='relative'>
+                <h2 className='text-4xl font-bold mb-6 leading-tight'>
+                  Khóa học tiêu biểu
+                  <span className='block text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary'>
+                    được thiết kế cho con bạn
+                  </span>
+                </h2>
+              </div>
             </motion.div>
 
             {/* Description */}
@@ -80,23 +82,23 @@ export default function Recommend() {
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.2 }}
-              className='relative'
             >
-              <p className='text-muted-foreground text-lg max-w-2xl mx-auto leading-relaxed'>
-                Được xây dựng bởi các chuyên gia hàng đầu, mỗi khóa học là một hành trình
-                <span className='text-primary font-medium'> khám phá và phát triển </span>
-                phù hợp với từng độ tuổi của trẻ
-              </p>
+              <div className='relative'>
+                <p className='text-muted-foreground text-lg max-w-2xl mx-auto leading-relaxed'>
+                  Được xây dựng bởi các chuyên gia hàng đầu, mỗi khóa học là một hành trình
+                  <span className='text-primary font-medium'> khám phá và phát triển </span>
+                  phù hợp với từng độ tuổi của trẻ
+                </p>
+              </div>
             </motion.div>
 
             {/* Decorative Line */}
-            <motion.div
-              initial={{ scaleX: 0 }}
-              whileInView={{ scaleX: 1 }}
-              transition={{ duration: 0.8, delay: 0.3 }}
-              className='absolute left-1/2 bottom-0 w-20 h-1 -translate-x-1/2
+            <motion.div initial={{ scaleX: 0 }} whileInView={{ scaleX: 1 }} transition={{ duration: 0.8, delay: 0.3 }}>
+              <div
+                className='absolute left-1/2 bottom-0 w-20 h-1 -translate-x-1/2
                 bg-gradient-to-r from-transparent via-primary/30 to-transparent'
-            />
+              />
+            </motion.div>
           </div>
         </div>
 
@@ -168,14 +170,15 @@ export default function Recommend() {
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.3 }}
-          className='text-center mt-12'
         >
-          <Button asChild size='lg' className='rounded-full px-8 group'>
-            <Link href='/course'>
-              Xem tất cả khóa học
-              <ArrowRight className='w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform' />
-            </Link>
-          </Button>
+          <div className='text-center mt-12'>
+            <Button asChild size='lg' className='rounded-full px-8 group'>
+              <Link href='/course'>
+                Xem tất cả khóa học
+                <ArrowRight className='w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform' />
+              </Link>
+            </Button>
+          </div>
         </motion.div>
       </div>
 

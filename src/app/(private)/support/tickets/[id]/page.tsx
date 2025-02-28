@@ -9,14 +9,11 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Separator } from '@/components/ui/separator'
 import Link from 'next/link'
 import { getTicket, getUser } from '../../_data/mock'
+import { Params } from '@/types/query'
+import { use } from 'react'
 
-interface TicketDetailPageProps {
-  params: {
-    id: string
-  }
-}
-
-export default function TicketDetailPage({ params }: TicketDetailPageProps) {
+export default function TicketDetailPage(props: { params: Params }) {
+  const params = use(props.params)
   const ticket = getTicket(params.id)
   const user = ticket ? getUser(ticket.userId) : null
 

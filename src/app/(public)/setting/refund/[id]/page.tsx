@@ -6,6 +6,8 @@ import { Badge } from '@/components/ui/badge'
 import { Separator } from '@/components/ui/separator'
 import { ArrowLeft, Calendar, RefreshCcw, Receipt, User, CheckCircle2, XCircle, CircleDot } from 'lucide-react'
 import Link from 'next/link'
+import { use } from 'react'
+import { Params } from '@/types/query'
 
 interface RefundItem {
   id: string
@@ -49,7 +51,9 @@ const statusTextMap = {
   rejected: 'Đã từ chối'
 }
 
-export default function RefundDetailPage({ params }: { params: { id: string } }) {
+export default function RefundDetailPage(props: { params: Params }) {
+  const params = use(props.params)
+
   // Mock data - thay thế bằng API call thực tế
   const refund: RefundItem = {
     id: 'REF-001',

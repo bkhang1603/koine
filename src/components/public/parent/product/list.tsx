@@ -3,11 +3,16 @@ import CustomInput from '@/components/public/parent/home/custom-input'
 import ProductSort from '@/components/public/parent/product/sort'
 import configRoute from '@/config/route'
 import { ProductsResType } from '@/schemaValidations/product.schema'
-import { searchParams } from '@/types/query'
 import Image from 'next/image'
 import Link from 'next/link'
 
-async function List({ searchParams }: { searchParams: searchParams | undefined }) {
+async function List({
+  searchParams
+}: {
+  searchParams: {
+    [key: string]: string | string[] | undefined
+  }
+}) {
   let products: ProductsResType['data'] = []
   const page_index = isNaN(Number(searchParams?.page_index)) ? 1 : Number(searchParams?.page_index)
   const search = searchParams?.search ?? ''

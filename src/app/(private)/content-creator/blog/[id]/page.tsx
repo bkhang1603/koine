@@ -6,8 +6,12 @@ import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { ArrowLeft, Calendar, User } from 'lucide-react'
 import Image from 'next/image'
+import { Params } from '@/types/query'
+import { use } from 'react'
 
-export default function BlogPostDetail({ params }: { params: { id: string } }) {
+export default function BlogPostDetail(props: { params: Params }) {
+  const params = use(props.params)
+
   const blogPosts = [
     {
       id: 1,

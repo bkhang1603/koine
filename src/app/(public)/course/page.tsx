@@ -2,13 +2,15 @@ import CourseList from '@/components/public/parent/course/course-list'
 import images from '@/assets/images'
 import Image from 'next/image'
 import CourseFilter from '@/components/public/parent/course/course-filter'
-import { searchParams } from '@/types/query'
+import { SearchParams } from '@/types/query'
 import { Card } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
 import { Plus, Sparkles } from 'lucide-react'
 
-function CoursePage({ searchParams }: { searchParams?: searchParams }) {
+async function CoursePage(props: { searchParams: SearchParams }) {
+  const searchParams = await props.searchParams
+
   return (
     <main>
       <Image

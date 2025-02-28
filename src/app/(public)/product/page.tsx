@@ -1,14 +1,16 @@
 import Filter from '@/components/public/parent/product/filter'
 import List from '@/components/public/parent/product/list'
 import images from '@/assets/images'
-import { searchParams } from '@/types/query'
 import Image from 'next/image'
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet'
 import { Button } from '@/components/ui/button'
 import { SlidersHorizontal } from 'lucide-react'
 import MobileFilter from '@/components/public/parent/product/mobile-filter'
+import { SearchParams } from '@/types/query'
 
-function ProductPage({ searchParams }: { searchParams?: searchParams }) {
+async function ProductPage(props: { searchParams: SearchParams }) {
+  const searchParams = await props.searchParams
+
   return (
     <main className='pb-28'>
       <div className='h-[15vh] md:h-[20vh] lg:h-[30vh] w-full'>

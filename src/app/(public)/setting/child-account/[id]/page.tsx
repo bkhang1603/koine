@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { use, useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
@@ -20,6 +20,7 @@ import {
   DialogHeader,
   DialogTitle
 } from '@/components/ui/dialog'
+import { Params } from '@/types/query'
 
 interface ActivatedCourse {
   id: number
@@ -44,11 +45,12 @@ interface LearningActivity {
   score?: number
 }
 
-export default function ChildAccountDetailPage({ params }: { params: { id: string } }) {
+export default function ChildAccountDetailPage(props: { params: Params }) {
   const { toast } = useToast()
   const [showReportDialog, setShowReportDialog] = useState(false)
   const [reportReason, setReportReason] = useState('')
   const [hideAllCourses, setHideAllCourses] = useState(false)
+  const params = use(props.params)
 
   // State cho danh sách khóa học
   const [activatedCourses, setActivatedCourses] = useState<ActivatedCourse[]>([
