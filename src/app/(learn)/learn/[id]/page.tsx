@@ -13,7 +13,6 @@ import {
   FileText,
   MonitorPlay,
   Loader2,
-  User,
   Smile
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -28,8 +27,6 @@ import { UserCourseProgressResType } from '@/schemaValidations/course.schema'
 import { cn } from '@/lib/utils'
 import { Badge } from '@/components/ui/badge'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
-import Image from 'next/image'
-import icons from '@/assets/icons'
 
 type Lesson = UserCourseProgressResType['data']['chapters'][0]['lessons'][0]
 

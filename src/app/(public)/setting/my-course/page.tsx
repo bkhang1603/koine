@@ -1,6 +1,5 @@
 'use client'
 
-import { useState } from 'react'
 import Image from 'next/image'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -13,25 +12,9 @@ import { cn } from '@/lib/utils'
 import { useCourseByAccount } from '@/queries/useAccount'
 import Link from 'next/link'
 
-interface Course {
-  id: number
-  title: string
-  description: string
-  progress: number
-  totalLessons: number
-  completedLessons: number
-  duration: string
-  status: 'in-progress' | 'not-started' | 'completed'
-  image: string
-  lastAccessed?: string
-  category: string
-  nextLesson: string
-}
-
 export default function MyCoursesPage() {
   const { data } = useCourseByAccount()
   const courses = data?.payload.data || []
-  console.log(data)
 
   // const [courses] = useState<Course[]>([
   //   {
