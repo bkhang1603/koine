@@ -92,7 +92,7 @@ export default function PurchasedCoursesPage() {
               <div className='h-14 w-14 rounded-xl bg-primary/10 flex items-center justify-center'>
                 <BookOpen className='h-7 w-7 text-primary' />
               </div>
-              <div className='relative z-10'>
+              <div className='relative'>
                 <p className='text-sm text-gray-600 font-medium'>Tổng khóa học</p>
                 <div className='flex items-baseline gap-1 mt-1'>
                   <span className='text-2xl font-bold text-gray-900'>{courses.length}</span>
@@ -112,7 +112,7 @@ export default function PurchasedCoursesPage() {
               <div className='h-14 w-14 rounded-xl bg-green-100 flex items-center justify-center'>
                 <Sparkles className='h-7 w-7 text-green-600' />
               </div>
-              <div className='relative z-10'>
+              <div className='relative'>
                 <p className='text-sm text-gray-600 font-medium'>Tổng giá trị</p>
                 <div className='flex items-baseline gap-1 mt-1'>
                   <span className='text-2xl font-bold text-gray-900'>
@@ -134,7 +134,7 @@ export default function PurchasedCoursesPage() {
               <div className='h-14 w-14 rounded-xl bg-blue-100 flex items-center justify-center'>
                 <Clock className='h-7 w-7 text-blue-600' />
               </div>
-              <div className='relative z-10'>
+              <div className='relative'>
                 <p className='text-sm text-gray-600 font-medium'>Thời lượng</p>
                 <div className='flex items-baseline gap-1 mt-1'>
                   <span className='text-2xl font-bold text-gray-900'>15.5</span>

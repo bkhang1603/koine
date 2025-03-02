@@ -17,72 +17,28 @@ import {
   PaginationNext,
   PaginationPrevious
 } from '@/components/ui/pagination'
-
-interface OrderItem {
-  id: string
-  name: string
-  price: string
-  quantity: number
-  image: string
-}
-
-interface Order {
-  id: string
-  date: string
-  total: string
-  status: 'pending' | 'processing' | 'completed' | 'cancelled'
-  courses: OrderItem[]
-  products: OrderItem[]
-  paymentMethod: string
-}
+import { useGetAccountOrders } from '@/queries/useAccount'
 
 const statusColorMap = {
-  pending: 'bg-yellow-100 text-yellow-800',
-  processing: 'bg-blue-100 text-blue-800',
-  completed: 'bg-green-100 text-green-800',
-  cancelled: 'bg-red-100 text-red-800'
-}
+  PENDING: 'bg-yellow-100 text-yellow-800',
+  PROCESSING: 'bg-blue-100 text-blue-800',
+  COMPLETED: 'bg-green-100 text-green-800',
+  CANCELLED: 'bg-red-100 text-red-800'
+} as const
 
 const statusTextMap = {
-  pending: 'Chờ xử lý',
-  processing: 'Đang xử lý',
-  completed: 'Hoàn thành',
-  cancelled: 'Đã hủy'
-}
-
-// Mock data
-const orders: Order[] = [
-  {
-    id: 'ORD-001',
-    date: '15/03/2024',
-    total: '1,200,000đ',
-    status: 'completed',
-    courses: [
-      {
-        id: 'COURSE-1',
-        name: 'Kỹ năng giao tiếp cho trẻ 6-8 tuổi',
-        price: '800,000đ',
-        quantity: 1,
-        image: '/courses/communication.jpg'
-      }
-    ],
-    products: [
-      {
-        id: 'PROD-1',
-        name: 'Sách hướng dẫn giới tính lứa tuổi thiếu niên',
-        price: '400,000đ',
-        quantity: 1,
-        image: '/products/book.jpg'
-      }
-    ],
-    paymentMethod: 'Thẻ tín dụng'
-  }
-  // Thêm các đơn hàng khác...
-]
+  PENDING: 'Chờ xử lý',
+  PROCESSING: 'Đang xử lý',
+  COMPLETED: 'Hoàn thành',
+  CANCELLED: 'Đã hủy'
+} as const
 
 export default function OrderPage() {
   const [search, setSearch] = useState('')
   const [status, setStatus] = useState('all')
+  const { data } = useGetAccountOrders()
+  const orders = data?.payload.data || []
+  console.log(data)
 
   return (
     <div className='container max-w-7xl mx-auto py-6 space-y-8'>
@@ -117,32 +73,37 @@ export default function OrderPage() {
         </Select>
       </div>
 
-      {/* Orders List */}
-      <div className='space-y-4'>
+      {/* Order List */}
+      <div className='grid gap-6'>
         {orders.map((order) => (
-          <Card key={order.id} className='overflow-hidden hover:border-primary/50 transition-colors'>
+          <Card key={order.id}>
             <Link href={`/setting/order/${order.id}`}>
               <CardContent className='p-6'>
-                <div className='flex flex-col gap-6'>
+                <div className='space-y-6'>
                   {/* Order Header */}
-                  <div className='flex items-center justify-between'>
+                  <div className='flex justify-between items-start'>
                     <div className='space-y-1'>
                       <div className='flex items-center gap-2'>
                         <h3 className='font-medium'>Đơn hàng #{order.id}</h3>
-                        <Badge className={statusColorMap[order.status]}>{statusTextMap[order.status]}</Badge>
+                        <Badge className={statusColorMap[order.status as keyof typeof statusColorMap]}>
+                          {statusTextMap[order.status as keyof typeof statusTextMap]}
+                        </Badge>
                       </div>
                       <div className='flex items-center gap-4 text-sm text-muted-foreground'>
                         <div className='flex items-center gap-1'>
                           <Calendar className='h-4 w-4' />
-                          {order.date}
+                          {order.orderDate}
                         </div>
                         <div className='flex items-center gap-1'>
                           <CreditCard className='h-4 w-4' />
-                          {order.paymentMethod}
+                          Thanh toán chuyển khoản
                         </div>
                       </div>
                     </div>
-                    <ArrowRight className='h-5 w-5 text-muted-foreground' />
+                    <div className='flex items-center gap-1 text-primary hover:underline'>
+                      <span className='text-sm'>Xem chi tiết</span>
+                      <ArrowRight className='h-4 w-4' />
+                    </div>
                   </div>
 
                   <Separator />
@@ -150,43 +111,51 @@ export default function OrderPage() {
                   {/* Order Items */}
                   <div className='grid gap-4'>
                     {/* Courses */}
-                    {order.courses.length > 0 && (
+                    {order.orderDetails.filter((detail) => !!detail.courseId).length > 0 && (
                       <div className='space-y-3'>
                         <div className='flex items-center gap-2 text-sm font-medium text-muted-foreground'>
                           <BookOpen className='h-4 w-4' />
-                          <span>Khóa học ({order.courses.length})</span>
+                          <span>Khóa học ({order.orderDetails.filter((detail) => !!detail.courseId).length})</span>
                         </div>
                         <div className='grid gap-3'>
-                          {order.courses.map((course) => (
-                            <div key={course.id} className='flex items-center gap-3'>
-                              <div className='w-12 h-12 rounded-lg bg-muted' />
-                              <div>
-                                <div className='font-medium'>{course.name}</div>
-                                <div className='text-sm text-primary'>{course.price}</div>
+                          {order.orderDetails
+                            .filter((detail) => !!detail.courseId)
+                            .map((detail) => (
+                              <div key={detail.id} className='flex items-center gap-3'>
+                                <div className='w-12 h-12 rounded-lg bg-muted' />
+                                <div>
+                                  <div className='font-medium'>Khóa học ID: {detail.courseId}</div>
+                                  <div className='text-sm text-muted-foreground'>
+                                    {detail.totalPrice.toLocaleString()}đ
+                                  </div>
+                                </div>
                               </div>
-                            </div>
-                          ))}
+                            ))}
                         </div>
                       </div>
                     )}
 
                     {/* Products */}
-                    {order.products.length > 0 && (
+                    {order.orderDetails.filter((detail) => !!detail.productId).length > 0 && (
                       <div className='space-y-3'>
                         <div className='flex items-center gap-2 text-sm font-medium text-muted-foreground'>
                           <Package className='h-4 w-4' />
-                          <span>Sản phẩm ({order.products.length})</span>
+                          <span>Sản phẩm ({order.orderDetails.filter((detail) => !!detail.productId).length})</span>
                         </div>
                         <div className='grid gap-3'>
-                          {order.products.map((product) => (
-                            <div key={product.id} className='flex items-center gap-3'>
-                              <div className='w-12 h-12 rounded-lg bg-muted' />
-                              <div>
-                                <div className='font-medium'>{product.name}</div>
-                                <div className='text-sm text-primary'>{product.price}</div>
+                          {order.orderDetails
+                            .filter((detail) => !!detail.productId)
+                            .map((detail) => (
+                              <div key={detail.id} className='flex items-center gap-3'>
+                                <div className='w-12 h-12 rounded-lg bg-muted' />
+                                <div>
+                                  <div className='font-medium'>Sản phẩm ID: {detail.productId}</div>
+                                  <div className='text-sm text-muted-foreground'>
+                                    {detail.totalPrice.toLocaleString()}đ
+                                  </div>
+                                </div>
                               </div>
-                            </div>
-                          ))}
+                            ))}
                         </div>
                       </div>
                     )}
@@ -197,7 +166,7 @@ export default function OrderPage() {
                   {/* Order Footer */}
                   <div className='flex items-center justify-between'>
                     <div className='text-sm text-muted-foreground'>Tổng tiền</div>
-                    <div className='text-lg font-bold text-primary'>{order.total}</div>
+                    <div className='text-lg font-bold text-primary'>{order.totalAmount.toLocaleString()}đ</div>
                   </div>
                 </div>
               </CardContent>

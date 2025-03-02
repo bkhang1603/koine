@@ -19,7 +19,7 @@ interface SidebarNavProps {
 
 export function SidebarNav({ items }: SidebarNavProps) {
   const pathname = usePathname()
-  const [openSections, setOpenSections] = useState<string[]>(['Hồ sơ', 'Quản lý'])
+  const [openSections, setOpenSections] = useState<string[]>(['Hồ sơ', 'Quản lý', 'Đơn mua'])
 
   const toggleSection = (title: string) => {
     setOpenSections((prev) => (prev.includes(title) ? prev.filter((t) => t !== title) : [...prev, title]))

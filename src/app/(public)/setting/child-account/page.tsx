@@ -68,7 +68,7 @@ export default function ChildAccountPage() {
               <div className='h-14 w-14 rounded-xl bg-primary/10 flex items-center justify-center'>
                 <Users2 className='h-7 w-7 text-primary' />
               </div>
-              <div className='relative z-10'>
+              <div className='relative'>
                 <p className='text-sm text-gray-600 font-medium'>Tổng số tài khoản</p>
                 <div className='flex items-baseline gap-1 mt-1'>
                   <span className='text-2xl font-bold text-gray-900'>{childAccounts.length}</span>
@@ -88,7 +88,7 @@ export default function ChildAccountPage() {
               <div className='h-14 w-14 rounded-xl bg-green-100 flex items-center justify-center'>
                 <GraduationCap className='h-7 w-7 text-green-600' />
               </div>
-              <div className='relative z-10'>
+              <div className='relative'>
                 <p className='text-sm text-gray-600 font-medium'>Khóa học đang học</p>
                 <div className='flex items-baseline gap-1 mt-1'>
                   <span className='text-2xl font-bold text-gray-900'>
@@ -110,7 +110,7 @@ export default function ChildAccountPage() {
               <div className='h-14 w-14 rounded-xl bg-blue-100 flex items-center justify-center'>
                 <Clock className='h-7 w-7 text-blue-600' />
               </div>
-              <div className='relative z-10'>
+              <div className='relative'>
                 <p className='text-sm text-gray-600 font-medium'>Tổng thời gian học</p>
                 <div className='flex items-baseline gap-1 mt-1'>
                   <span className='text-2xl font-bold text-gray-900'>

@@ -17,18 +17,26 @@ export const accountRes = z.object({
   message: z.string()
 })
 
-export const courseByAccountRes = z.object({
-  data: z.array(
+export const courseByAccount = z.object({
+  id: z.string(),
+  title: z.string(),
+  description: z.string(),
+  durationDisplay: z.string(),
+  categories: z.array(
     z.object({
       id: z.string(),
-      course: z.object({
-        id: z.number(),
-        title: z.string(),
-        imageUrl: z.string(),
-        description: z.string()
-      })
+      name: z.string()
     })
   ),
+  completionRate: z.number(),
+  author: z.string(),
+  imageUrl: z.string(),
+  createdAtFormatted: z.string(),
+  updatedAtFormatted: z.string()
+})
+
+export const courseByAccountRes = z.object({
+  data: z.array(courseByAccount),
   message: z.string()
 })
 
@@ -127,6 +135,54 @@ export const accountAddressBody = z
   })
   .strict()
 
+export const accountOrder = z
+  .object({
+    id: z.string(),
+    userId: z.string(),
+    totalAmount: z.number(),
+    orderDate: z.string(),
+    status: z.string(),
+    isDeleted: z.boolean(),
+    deletedNote: z.string().nullable(),
+    orderDetails: z.array(
+      z.object({
+        id: z.string(),
+        orderId: z.string(),
+        productId: z.string(),
+        courseId: z.string(),
+        comboId: z.string(),
+        quantity: z.number(),
+        unitPrice: z.number(),
+        discount: z.number(),
+        totalPrice: z.number(),
+        isDeleted: z.boolean(),
+        createdAt: z.string(),
+        updatedAt: z.string()
+      })
+    ),
+    deliveryInfo: z.object({
+      name: z.string(),
+      phone: z.string(),
+      address: z.string(),
+      status: z.string()
+    }),
+    createdAt: z.string(),
+    updatedAt: z.string()
+  })
+  .strict()
+
+export const accountOrderRes = z.object({
+  data: z.array(accountOrder),
+  message: z.string(),
+  pagination: z.object({
+    pageSize: z.number(),
+    totalItem: z.number(),
+    currentPage: z.number(),
+    totalPage: z.number(),
+    maxPageSize: z.number()
+  })
+})
+
 export type AccountResType = z.TypeOf<typeof accountRes>
 
 export type CourseByAccountResType = z.TypeOf<typeof courseByAccountRes>
@@ -140,3 +196,5 @@ export type AccountAddressResType = z.TypeOf<typeof accountAddressRes>
 export type AccountOneAddressResType = z.TypeOf<typeof accountOneAddressRes>
 
 export type AccountAddressBodyType = z.TypeOf<typeof accountAddressBody>
+
+export type AccountOrderResType = z.TypeOf<typeof accountOrderRes>

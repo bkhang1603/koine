@@ -9,11 +9,10 @@ export const useAccountProfile = ({ enabled }: { enabled?: boolean }) => {
   })
 }
 
-export const useCourseByAccount = ({ enabled }: { enabled?: boolean }) => {
+export const useCourseByAccount = () => {
   return useQuery({
     queryKey: ['course-by-account'],
-    queryFn: accountApiRequest.getCourseAccount,
-    enabled
+    queryFn: accountApiRequest.getAccountCourse
   })
 }
 
@@ -80,5 +79,12 @@ export const useDeleteAccountAddressMutation = () => {
         queryKey: ['account-address']
       })
     }
+  })
+}
+
+export const useGetAccountOrders = () => {
+  return useQuery({
+    queryKey: ['account-orders'],
+    queryFn: accountApiRequest.getAccountOrders
   })
 }

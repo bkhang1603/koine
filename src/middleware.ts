@@ -5,7 +5,14 @@ const maintenanceMode = false
 // const privatePaths = ['/content-creator', '/content-creator/blog']
 
 const publicPaths = ['/', '/course', '/knowledge', '/about', '/contact', '/help/faq']
-const privatePaths = ['/setting', '/setting/:path*']
+const privatePaths = [
+  '/setting',
+  '/setting/:path*',
+  '/learn',
+  '/learn/:path*',
+  '/content-creator',
+  '/content-creator/:path*'
+]
 const unAuthPaths = ['/login', '/register']
 
 // This function can be marked `async` if using `await` inside
@@ -70,6 +77,8 @@ export const config = {
     '/setting',
     '/setting/:path*',
     '/content-creator',
-    '/content-creator/:path*'
+    '/content-creator/:path*',
+    '/learn',
+    '/learn/:path*'
   ]
 }
