@@ -1,10 +1,10 @@
 import { Star, Heart, Share2 } from 'lucide-react'
 import BreadCrumbCustom from '@/components/breadcrumb-custom'
-import ProductImage from '@/app/(public)/product/[id]/components/product-image'
+import ProductImage from '@/components/public/parent/product/product-image'
 import productApiRequest from '@/apiRequests/product'
 import { ProductResType } from '@/schemaValidations/product.schema'
-import AddToCartButton from '@/app/(public)/product/[id]/components/add-to-cart-button'
-import ProductDescription from '@/app/(public)/product/[id]/components/product-description'
+import AddToCartButton from '@/components/public/parent/product/add-to-cart-button'
+import ProductDescription from '@/components/public/parent/product/product-description'
 
 export default async function ProductDetail({ params: { id } }: { params: { id: string } }) {
   let product: ProductResType['data'] | null = null

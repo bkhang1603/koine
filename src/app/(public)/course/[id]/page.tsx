@@ -4,8 +4,8 @@ import { CourseResType } from '@/schemaValidations/course.schema'
 import { FileText, Video, MonitorPlay, Clock, Users2, BarChart, PlayCircle } from 'lucide-react'
 import Image from 'next/image'
 import { Card } from '@/components/ui/card'
-import EnrollButton from './components/enroll-button'
-import CourseButton from './components/course-button'
+import EnrollButton from '../../../../components/public/parent/course/enroll-button'
+import CourseButton from '../../../../components/public/parent/course/course-button'
 
 const formatDuration = (minutes: number) => {
   const hours = Math.floor(minutes / 60)
