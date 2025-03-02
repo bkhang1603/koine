@@ -41,8 +41,10 @@ function BellNotification() {
   const user = useAppStore((state) => state.user)
 
   useEffect(() => {
-    if (socket.connected) {
-      onConnect()
+    if (user) {
+      if (socket.connected) {
+        onConnect()
+      }
     }
 
     function onConnect() {

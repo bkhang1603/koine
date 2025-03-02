@@ -3,6 +3,7 @@ const configRoute = {
   about: '/about',
   contact: '/contact',
   course: '/course',
+  learn: '/learn',
   knowledge: '/knowledge',
   service: '/service',
   product: '/product',
@@ -29,7 +30,6 @@ const configRoute = {
     editCourse: '/content-creator/course/edit'
   },
   help: '/help/faq',
-  learn: '/learn',
   kid: {
     dashboard: '/kid',
     course: '/kid/course',

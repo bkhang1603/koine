@@ -61,24 +61,26 @@ async function KnowledgePage() {
           </div>
 
           {/* Categories */}
-          <ScrollArea className='w-full bg-white rounded-2xl shadow-sm border border-gray-100/80'>
-            <div className='flex items-center gap-2 p-4'>
-              {categories.map((category) => (
-                <button
-                  key={category.id}
-                  className={`px-6 py-2.5 rounded-xl text-sm font-medium transition-colors
-                    ${
-                      category.featured
-                        ? 'bg-primary text-white hover:bg-primary/90'
-                        : 'bg-gray-50 text-gray-700 hover:bg-gray-100'
-                    }`}
-                >
-                  {category.name}
-                </button>
-              ))}
-            </div>
-            <ScrollBar orientation='horizontal' />
-          </ScrollArea>
+          <div className='relative mb-8'>
+            <ScrollArea className='w-full bg-white rounded-xl shadow-sm border border-gray-100/80 py-1'>
+              <div className='flex items-center gap-2 p-3 sm:p-4'>
+                {categories.map((category) => (
+                  <button
+                    key={category.id}
+                    className={`whitespace-nowrap px-4 sm:px-6 py-2 sm:py-2.5 rounded-lg sm:rounded-xl text-xs sm:text-sm font-medium transition-colors
+            ${
+              category.featured
+                ? 'bg-primary text-white hover:bg-primary/90'
+                : 'bg-gray-50 text-gray-700 hover:bg-gray-100'
+            }`}
+                  >
+                    {category.name}
+                  </button>
+                ))}
+              </div>
+              <ScrollBar orientation='horizontal' className='h-2' />
+            </ScrollArea>
+          </div>
 
           {/* Blog Grid */}
           <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mt-12'>

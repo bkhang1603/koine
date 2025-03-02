@@ -1,6 +1,5 @@
 import courseApiRequest from '@/apiRequests/course'
 import CourseCard from '@/components/public/parent/course/course-card'
-import { CourseMobileFilter } from '@/components/public/parent/course/course-mobile-filter'
 import CustomInput from '@/components/public/parent/home/custom-input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { CoursesResType } from '@/schemaValidations/course.schema'
@@ -39,7 +38,7 @@ async function CourseList({ searchParams }: { searchParams?: searchParams }) {
       <div className='flex flex-col md:flex-row justify-between items-start md:items-center gap-4'>
         <CustomInput className='w-full md:max-w-[400px] h-9' placeholder='Tìm kiếm sản phẩm...' />
 
-        <div className='flex items-center gap-2 w-full md:w-auto'>
+        <div className='hidden sm:flex items-center gap-2 w-full md:w-auto'>
           <Select>
             <SelectTrigger className='w-[150px] focus:ring-0'>
               <SelectValue placeholder='Sắp xếp theo' />
@@ -50,17 +49,13 @@ async function CourseList({ searchParams }: { searchParams?: searchParams }) {
               <SelectItem value='most-popular'>Phổ biến nhất</SelectItem>
             </SelectContent>
           </Select>
-
-          <div className='md:hidden'>
-            <CourseMobileFilter />
-          </div>
         </div>
       </div>
 
       {courseData.length === 0 && <p className='text-center mt-6'>Không tìm thấy khóa học nào</p>}
 
       {courseData.length > 0 && (
-        <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 mt-6'>
+        <div className='grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 mt-6'>
           {courseData.map((course) => (
             // <Link href={`/course/${course.slug}`} passHref key={course.id}>
             //   <article

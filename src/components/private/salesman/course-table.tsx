@@ -8,7 +8,7 @@ import { useRouter } from 'next/navigation'
 import Image from 'next/image'
 import { Star, Users } from 'lucide-react'
 import type { Course } from '@/app/(private)/salesman/_mock/data'
-import { CourseStatusBadge } from '@/components/private/course-status-badge'
+import { CourseStatusBadge } from '@/components/course-status-badge'
 import { EmptyState } from '@/components/empty-state'
 
 interface CourseTableProps {

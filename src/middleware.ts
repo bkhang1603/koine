@@ -3,9 +3,9 @@ import type { NextRequest } from 'next/server'
 
 const maintenanceMode = false
 // const privatePaths = ['/content-creator', '/content-creator/blog']
-const privatePaths = ['/haha']
 
-const publicPaths = ['/', '/course', '/knowledge', '/about', '/contact']
+const publicPaths = ['/', '/course', '/knowledge', '/about', '/contact', '/help/faq']
+const privatePaths = ['/setting', '/setting/:path*']
 const unAuthPaths = ['/login', '/register']
 
 // This function can be marked `async` if using `await` inside
@@ -58,5 +58,18 @@ export function middleware(request: NextRequest) {
 
 // See "Matching Paths" below to learn more
 export const config = {
-  matcher: ['/', '/login', '/register', '/course', '/about', '/knowledge', '/content-creator', '/content-creator/blog']
+  matcher: [
+    '/',
+    '/login',
+    '/register',
+    '/course',
+    '/about',
+    '/knowledge',
+    '/contact',
+    '/help/faq',
+    '/setting',
+    '/setting/:path*',
+    '/content-creator',
+    '/content-creator/:path*'
+  ]
 }

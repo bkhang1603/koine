@@ -112,8 +112,8 @@ function BlogComments({ id }: { id: string }) {
 
   return (
     <section>
-      <div className='flex justify-between items-center border-t-2 border-b-2 py-2 mt-8'>
-        <div className='flex justify-start items-center gap-4'>
+      <div className='flex justify-center sm:justify-between items-center border-t-2 border-b-2 py-2 mt-8'>
+        <div className='hidden sm:flex justify-start items-center gap-4'>
           <div className='flex items-center gap-2 cursor-pointer text-secondary hover:underline' onClick={handleReact}>
             {isReacted ? <Heart className='w-6 h-6 fill-secondary' /> : <Heart className='w-6 h-6' />}
             {totalReacts !== 0 && <span className='text-lg'>{totalReacts}</span>}

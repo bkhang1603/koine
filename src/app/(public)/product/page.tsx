@@ -32,7 +32,7 @@ function ProductPage({ searchParams }: { searchParams?: searchParams }) {
                 Bộ lọc
               </Button>
             </SheetTrigger>
-            <SheetContent side='left' className='w-[300px] p-0'>
+            <SheetContent side='left' className='w-[300px] p-0 pb-16'>
               <SheetHeader className='p-4 border-b'>
                 <SheetTitle>Bộ lọc sản phẩm</SheetTitle>
               </SheetHeader>

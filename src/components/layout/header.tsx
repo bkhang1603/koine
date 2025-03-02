@@ -60,7 +60,7 @@ function Header() {
           <SheetContent side='right' className='p-0'>
             <SheetHeader className='p-4 border-b'>
               <SheetTitle className='flex justify-between items-center'>
-                <Image src={icons.logo} alt='Logo' width={70} height={70} className='object-contain' />
+                <Image src={icons.logo} alt='Logo' width={70} height={70} className='object-contain h-10 w-auto' />
                 {role && (
                   <div className='flex items-center gap-3'>
                     <CartNotification />

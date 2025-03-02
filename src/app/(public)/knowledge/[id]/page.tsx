@@ -1,8 +1,9 @@
 import blogApiRequest from '@/apiRequests/blog'
 import BlogComments from '@/components/public/parent/knowledge/blog-comments'
 import { BlogResType } from '@/schemaValidations/blog.schema'
-import { CalendarDays } from 'lucide-react'
+import { BookOpen, CalendarDays, ChevronRight } from 'lucide-react'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import Link from 'next/link'
 
 async function BlogDetailPage({ params: { id } }: { params: { id: string } }) {
   let blog: BlogResType['data'] | null = null
@@ -20,9 +21,23 @@ async function BlogDetailPage({ params: { id } }: { params: { id: string } }) {
 
   return (
     <main>
+      {/* Breadcrumb Navigation */}
+      <nav className='py-3 sm:py-4'>
+        <div className='container max-w-4xl'>
+          <div className='flex items-center text-sm text-muted-foreground'>
+            <Link href='/knowledge' className='flex items-center hover:text-primary transition-colors'>
+              <BookOpen className='w-3.5 h-3.5 mr-1' />
+              <span>Kiến thức</span>
+            </Link>
+            <ChevronRight className='w-3.5 h-3.5 mx-2' />
+            <span className='truncate max-w-[180px] sm:max-w-xs text-gray-600 font-medium'>{blog.title}</span>
+          </div>
+        </div>
+      </nav>
+
       {/* Blog Header */}
       <header className='relative bg-gradient-to-b from-gray-50/50'>
-        <div className='container max-w-4xl pt-20 pb-12'>
+        <div className='container max-w-4xl pt-10 pb-12'>
           {/* Author & Date */}
           <div className='flex items-center gap-4 mb-8'>
             <div className='relative w-14 h-14 rounded-full overflow-hidden border-4 border-white shadow-md'>

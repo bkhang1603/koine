@@ -49,7 +49,7 @@ export default function Information() {
                 </Button>
               </div>
 
-              <div className='mt-6 flex items-center justify-center gap-8 text-sm text-muted-foreground'>
+              <div className='mt-6 flex flex-col sm:flex-row items-center justify-center gap-8 text-sm text-muted-foreground'>
                 <div className='flex items-center gap-2'>
                   <CheckCircle2 className='w-4 h-4 text-primary' />
                   <span>Cập nhật hàng tuần</span>
