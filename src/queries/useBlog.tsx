@@ -62,10 +62,11 @@ export const useBlogCommentCreateMutation = () => {
   })
 }
 
-export const useBlogReactQuery = ({ id }: { id: string }) => {
+export const useBlogReactQuery = ({ id, enabled }: { id: string; enabled?: boolean }) => {
   return useQuery({
     queryKey: ['reactBlog', id],
-    queryFn: () => blogApiRequest.getReactComment(id)
+    queryFn: () => blogApiRequest.getReactComment(id),
+    enabled
   })
 }
 

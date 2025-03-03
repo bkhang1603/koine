@@ -45,13 +45,49 @@ export default function LoginForm({ className }: { className?: string }) {
       const result = await loginMutation.mutateAsync(values)
 
       setRole(result.payload.data.account.role)
+
+      // Kiểm tra xem có redirect parameter từ URL không (khi bị chuyển hướng từ middleware)
+      const redirect = searchParams.get('redirect')
+
+      // Điều hướng dựa trên role
+      if (redirect) {
+        // Nếu có redirect parameter, ưu tiên chuyển về trang đó
+        router.push(redirect)
+      } else {
+        // Nếu không có redirect, điều hướng theo role
+        switch (result.payload.data.account.role) {
+          case 'ADMIN':
+            router.push('/admin')
+            break
+          case 'MANAGER':
+            router.push('/manager')
+            break
+          case 'ACCOUNTING':
+            router.push('/salesman')
+            break
+          case 'SUPPORTER':
+            router.push('/supporter')
+            break
+          case 'CONTENT-CREATOR':
+            router.push('/content-creator')
+            break
+          case 'ADULT':
+            router.push('/')
+            break
+          case 'CHILD':
+            router.push('/kid')
+            break
+          default:
+            router.push('/')
+            break
+        }
+      }
+
       toast({
-        description: result.payload.message
+        description: result.payload.message || 'Đăng nhập thành công!'
       })
-      router.back()
-      router.refresh()
     } catch (error: any) {
-      console.log(error.payload)
+      console.log(error)
 
       handleErrorApi({
         error,

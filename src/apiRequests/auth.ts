@@ -5,7 +5,7 @@ import {
   LogoutBodyType,
   RefreshTokenBodyType,
   RefreshTokenResType,
-  RegisterBodyType,
+  RegisterBodyFormType,
   RegisterResType
 } from '@/schemaValidations/auth.schema'
 
@@ -50,7 +50,9 @@ const authApiRequest = {
   },
   setTokenToCookie: (body: { accessToken: string; refreshToken: string }) =>
     http.post('/api/auth/token', body, { baseUrl: '' }),
-  register: (body: RegisterBodyType) => http.post<RegisterResType>('/auth/register', body)
+  register: (body: RegisterBodyFormType) => http.post<RegisterResType>('/auth/register', body),
+  sendOTP: ({ id, code }: { id: string; code: string }) => http.post<LoginResType>('/api/auth/active', { id, code }),
+  sSendOTP: ({ id, code }: { id: string; code: string }) => http.post<LoginResType>('/auth/active', { id, code })
 }
 
 export default authApiRequest

@@ -14,11 +14,20 @@ import { Checkbox } from '@/components/ui/checkbox'
 import { useRegisterMutation } from '@/queries/useAuth'
 import InputPassword from '@/components/input-password'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
+import { CalendarIcon } from 'lucide-react'
+import { format } from 'date-fns'
+import { Calendar } from '@/components/ui/calendar'
 
 export default function RegisterForm({ className }: { className?: string }) {
   const { toast } = useToast()
   const router = useRouter()
   const registerMutation = useRegisterMutation()
+
+  // Tính toán ngày mặc định (5 năm trước)
+  const defaultDate = new Date()
+  defaultDate.setFullYear(defaultDate.getFullYear() - 16) // Đặt mặc định là 16 tuổi
+
   const form = useForm<RegisterBodyType>({
     resolver: zodResolver(RegisterBody),
     defaultValues: {
@@ -27,7 +36,7 @@ export default function RegisterForm({ className }: { className?: string }) {
       password: '',
       confirmPassword: '',
       gender: 'MALE',
-      dob: 1900,
+      dob: format(defaultDate, 'yyyy-MM-dd'),
       term: false
     }
   })
@@ -36,13 +45,15 @@ export default function RegisterForm({ className }: { className?: string }) {
   async function onSubmit(values: RegisterBodyType) {
     if (registerMutation.isPending) return
     try {
-      const result = await registerMutation.mutateAsync(values)
+      // Tách confirmPassword và term ra khỏi dữ liệu gửi đi
+      // eslint-disable-next-line no-unused-vars
+      const result = await registerMutation.mutateAsync((({ confirmPassword, term, ...rest }) => rest)(values))
 
       toast({
-        description: result.payload.message
+        description: result.payload.message || 'Đăng ký thành công'
       })
+
       router.push('/login')
-      router.refresh()
     } catch (error: any) {
       handleErrorApi({
         error,
@@ -84,7 +95,7 @@ export default function RegisterForm({ className }: { className?: string }) {
             </FormItem>
           )}
         />
-        <div className='sm:flex items-center justify-between'>
+        <div className='grid grid-cols-1 gap-4 md:grid-cols-2'>
           <FormField
             control={form.control}
             name='gender'
@@ -92,9 +103,9 @@ export default function RegisterForm({ className }: { className?: string }) {
               <FormItem>
                 <FormLabel>Giới tính</FormLabel>
                 <FormControl>
-                  <Select {...field} onValueChange={field.onChange} defaultValue={field.value}>
+                  <Select onValueChange={field.onChange} defaultValue={field.value}>
                     <FormControl>
-                      <SelectTrigger className='w-80'>
+                      <SelectTrigger>
                         <SelectValue placeholder='Hãy chọn giới tính của bạn' />
                       </SelectTrigger>
                     </FormControl>
@@ -109,15 +120,50 @@ export default function RegisterForm({ className }: { className?: string }) {
               </FormItem>
             )}
           />
+          {/* Date Picker cho ngày sinh */}
           <FormField
             control={form.control}
             name='dob'
             render={({ field }) => (
-              <FormItem>
-                <FormLabel>Năm sinh</FormLabel>
-                <FormControl>
-                  <Input className='h-10 w-60' placeholder='Năm sinh' type='number' {...field} />
-                </FormControl>
+              <FormItem className='flex-1'>
+                <FormLabel>Ngày sinh</FormLabel>
+                <Popover>
+                  <FormControl>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant={'outline'}
+                        className={cn('w-full text-left font-normal h-9', !field.value && 'text-muted-foreground')}
+                      >
+                        {field.value ? format(new Date(field.value), 'dd/MM/yyyy') : <span>Chọn ngày sinh</span>}
+                        <CalendarIcon className='ml-auto h-4 w-4 opacity-50' />
+                      </Button>
+                    </PopoverTrigger>
+                  </FormControl>
+                  <PopoverContent className='w-auto p-0' align='start'>
+                    <Calendar
+                      mode='single'
+                      selected={field.value ? new Date(field.value) : undefined}
+                      onSelect={(date) => {
+                        if (date) {
+                          // Format ngày thành "YYYY-MM-DD" cho backend
+                          field.onChange(format(date, 'yyyy-MM-dd'))
+                        }
+                      }}
+                      disabled={(date) => {
+                        // Vô hiệu hóa ngày tương lai
+                        return (
+                          date > new Date() ||
+                          // Vô hiệu hóa ngày dưới 5 tuổi
+                          date > new Date(new Date().setFullYear(new Date().getFullYear() - 5))
+                        )
+                      }}
+                      initialFocus
+                      fromYear={1940}
+                      toYear={new Date().getFullYear() - 5}
+                      defaultMonth={defaultDate}
+                    />
+                  </PopoverContent>
+                </Popover>
                 <FormMessage />
               </FormItem>
             )}

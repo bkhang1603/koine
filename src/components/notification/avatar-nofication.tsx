@@ -70,14 +70,22 @@ function AvatarNotification() {
     }
   }
 
+  // Hàm trợ giúp để lấy chữ cái đầu cho avatar fallback
+  const getAvatarInitials = () => {
+    if (account?.username && account.username.length > 0) {
+      return account.username.slice(0, 2).toUpperCase()
+    } else if (account?.email && account.email.length > 0) {
+      return account.email.slice(0, 2).toUpperCase()
+    }
+    return 'HI' // Fallback mặc định
+  }
+
   return (
     <Popover>
       <PopoverTrigger asChild>
         <Avatar className='cursor-pointer select-none'>
           <AvatarImage src={account?.avatarUrl} alt='avatar' />
-          <AvatarFallback>
-            {account?.username.slice(0, 2).toUpperCase() || account?.email.slice(0, 2).toUpperCase()}
-          </AvatarFallback>
+          <AvatarFallback>{account ? getAvatarInitials() : 'HI'}</AvatarFallback>
         </Avatar>
       </PopoverTrigger>
       <PopoverContent align='end'>
@@ -88,9 +96,7 @@ function AvatarNotification() {
           >
             <Avatar className='cursor-pointer w-9 h-9'>
               <AvatarImage src={account?.avatarUrl} />
-              <AvatarFallback>
-                {account?.username.slice(0, 2).toUpperCase() || account?.email.slice(0, 2).toUpperCase()}
-              </AvatarFallback>
+              <AvatarFallback>{account ? getAvatarInitials() : 'HI'}</AvatarFallback>
             </Avatar>
 
             <p className='font-medium text-base line-clamp-1'>{account?.username || account?.email}</p>

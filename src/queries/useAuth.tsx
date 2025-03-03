@@ -24,3 +24,9 @@ export const useRegisterMutation = () => {
     mutationFn: authApiRequest.register
   })
 }
+
+export const useSendOTPMutation = () => {
+  return useMutation({
+    mutationFn: authApiRequest.sendOTP
+  })
+}

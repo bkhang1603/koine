@@ -37,7 +37,7 @@ function BlogComments({ id }: { id: string }) {
   const comments = data1?.payload?.data.commentsWithReplies || []
   const totalComments = data1?.payload?.data.totalComments || 0
   const commentMutation = useBlogCommentCreateMutation()
-  const { data: data2 } = useBlogReactQuery({ id })
+  const { data: data2 } = useBlogReactQuery({ id, enabled: !!role })
   const totalReacts = data2?.payload?.data.totalReacts || 0
   const isReacted = data2?.payload?.data.isReact || false
   const reactMutation = useBlogReactUpdateMutation()

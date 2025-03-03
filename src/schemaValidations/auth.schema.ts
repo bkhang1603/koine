@@ -114,12 +114,33 @@ export const RegisterBody = z
         }
       ),
     gender: z.enum(GenderValues, { message: 'Hãy chọn giới tính của bạn.' }),
-    dob: z.coerce
-      .number()
-      .min(1900, {
-        message: 'Năm sinh không hợp lệ.'
+    dob: z
+      .string()
+      .refine((v) => v, {
+        message: 'Hãy chọn ngày sinh của bạn.'
       })
-      .max(new Date().getFullYear()),
+      .refine(
+        (dateString) => {
+          // Chuyển chuỗi ngày thành Date object
+          const birthDate = new Date(dateString)
+
+          // Lấy ngày hiện tại
+          const today = new Date()
+
+          // Tính ngày 5 năm trước
+          const minDate = new Date()
+          minDate.setFullYear(today.getFullYear() - 5)
+
+          // Đảm bảo ngày sinh hợp lệ (không phải Invalid Date)
+          const isValidDate = !isNaN(birthDate.getTime())
+
+          // Kiểm tra ngày sinh có trước ngày tối thiểu (5 năm trước) không
+          return isValidDate && birthDate <= minDate
+        },
+        {
+          message: 'Bạn phải từ 5 tuổi trở lên để đăng ký tài khoản.'
+        }
+      ),
     term: z.boolean().refine((v) => v, { message: 'Bạn cần phải đồng ý với các chính sách của chúng tôi.' })
   })
   .strict()
@@ -134,6 +155,18 @@ export const RegisterBody = z
   })
 
 export type RegisterBodyType = z.TypeOf<typeof RegisterBody>
+
+export const RegisterBodyForm = z
+  .object({
+    username: z.string(),
+    email: z.string(),
+    password: z.string(),
+    gender: z.enum(GenderValues),
+    dob: z.string()
+  })
+  .strict()
+
+export type RegisterBodyFormType = z.TypeOf<typeof RegisterBodyForm>
 
 export const RegisterRes = z.object({
   data: z.object({

@@ -110,6 +110,14 @@ const request = async <Response>(
         }
       )
     } else if (res.status === AUTHENTICATION_ERROR_STATUS) {
+      // Kiểm tra xem đây có phải là request đăng nhập không
+      const isLoginRequest = url.includes('/auth/login') || url === 'api/auth/login'
+
+      // Nếu là request đăng nhập thì không redirect, chỉ ném lỗi bình thường
+      if (isLoginRequest) {
+        throw new HttpError(data)
+      }
+
       if (isClient) {
         if (!clientLogoutRequest) {
           clientLogoutRequest = fetch('/api/auth/logout', {
