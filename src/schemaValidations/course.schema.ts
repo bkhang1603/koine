@@ -106,6 +106,7 @@ export const UserCoursesRes = z.object({
 
 export const UserCourseProgressData = z.object({
   status: z.string(),
+  title: z.string(),
   chapters: z.array(
     z.object({
       id: z.string(),

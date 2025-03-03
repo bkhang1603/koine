@@ -144,6 +144,9 @@ export const accountOrder = z
     status: z.string(),
     isDeleted: z.boolean(),
     deletedNote: z.string().nullable(),
+    orderCode: z.string(),
+    createdAtFormatted: z.string(),
+    updatedAtFormatted: z.string(),
     orderDetails: z.array(
       z.object({
         id: z.string(),
@@ -157,7 +160,9 @@ export const accountOrder = z
         totalPrice: z.number(),
         isDeleted: z.boolean(),
         createdAt: z.string(),
-        updatedAt: z.string()
+        updatedAt: z.string(),
+        itemTitle: z.string(),
+        itemImageUrl: z.string()
       })
     ),
     deliveryInfo: z.object({
@@ -166,6 +171,12 @@ export const accountOrder = z
       address: z.string(),
       status: z.string()
     }),
+    orderStatusHistory: z.array(
+      z.object({
+        status: z.string(),
+        timestamp: z.string()
+      })
+    ),
     createdAt: z.string(),
     updatedAt: z.string()
   })

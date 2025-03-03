@@ -1,8 +1,10 @@
 'use client'
 
+import images from '@/assets/images'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { Progress } from '@/components/ui/progress'
+import { useCourseByAccount } from '@/queries/useAccount'
 import Image from 'next/image'
 import Link from 'next/link'
 
@@ -60,12 +62,15 @@ const achievements = [
 ]
 
 function KidHomePage() {
+  const { data } = useCourseByAccount()
+  const courses = data?.payload.data ?? []
+
   return (
     <div className='container mx-auto px-4 py-8'>
       {/* Hero Section */}
       <div className='relative h-[400px] rounded-3xl overflow-hidden mb-12'>
-        <Image src='/images/kid-hero.png' alt='Hero banner' fill className='object-cover' />
-        <div className='absolute inset-0 bg-gradient-to-r from-primary/80 to-transparent' />
+        <Image src={images.toy} alt='Hero banner' fill quality={100} className='object-cover' />
+        <div className='absolute inset-0 bg-gradient-to-r from-primary/50 to-transparent' />
         <div className='absolute bottom-12 left-12 text-white max-w-xl'>
           <h1 className='text-4xl font-bold mb-4'>Chào mừng quay trở lại! 👋</h1>
           <p className='text-xl mb-6 opacity-90'>Hôm nay bạn muốn học gì? Hãy cùng khám phá những điều thú vị nhé!</p>
@@ -95,30 +100,28 @@ function KidHomePage() {
           </Button>
         </div>
         <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
-          {recentCourses.map((course) => (
+          {courses.map((course) => (
             <Link href={`/kid/course/${course.id}`} key={course.id}>
               <Card className='h-full hover:shadow-lg transition-shadow overflow-hidden'>
                 <div className='flex gap-6 p-6'>
                   <div className='relative w-32 h-32 rounded-xl overflow-hidden flex-shrink-0'>
-                    <Image src={course.image} alt={course.title} fill className='object-cover' />
+                    <Image src={course.imageUrl} alt={course.title} fill className='object-cover' />
                   </div>
                   <div className='flex-1'>
                     <div className='flex items-center gap-2 mb-2'>
                       <span className='bg-primary/10 text-primary text-sm px-3 py-1 rounded-full'>
-                        {course.category}
+                        {course.categories[0].name}
                       </span>
                       <span className='bg-secondary/10 text-secondary text-sm px-3 py-1 rounded-full'>
-                        {course.level}
+                        {course.categories[0].name}
                       </span>
                     </div>
                     <h3 className='text-xl font-bold mb-2'>{course.title}</h3>
                     <div className='space-y-2'>
-                      <Progress value={course.progress} className='h-2' />
+                      <Progress value={course.completionRate} className='h-2' />
                       <div className='flex justify-between text-sm text-gray-600'>
-                        <span>
-                          {course.completedLessons}/{course.totalLessons} bài học
-                        </span>
-                        <span>{course.progress}% hoàn thành</span>
+                        <span>10/20 bài học</span>
+                        <span>{course.completionRate}% hoàn thành</span>
                       </div>
                     </div>
                   </div>

@@ -40,7 +40,7 @@ export default function CoursePage() {
   const progress = courseProgress?.payload.data.courseCompletionPercentage
   const totalLesson = courseProgress?.payload.data.totalLessonsInCourse
   const totalCompletedLesson = courseProgress?.payload.data.totalCompletedLessonsInCourse
-  const courseName = 'Khóa học của tôi'
+  const courseName = courseProgress?.payload.data.title ?? 'Khóa học'
 
   const rId = search.get('rId') ?? courseProgressData[0]?.lessons[0]?.id
 

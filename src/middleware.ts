@@ -103,6 +103,9 @@ const commonPrivatePaths = ['/setting', '/setting/:path*', '/learn', '/learn/:pa
 // Kết hợp tất cả đường dẫn cần xác thực
 const privatePaths = [...commonPrivatePaths, ...Object.values(roleBasedPaths).flat()]
 
+// Đường dẫn không cho phép tìm thấy nếu không đăng nhập đúng role
+const unAuthPrivatePaths = [...Object.values(roleBasedPaths).flat()]
+
 const unAuthPaths = ['/login', '/register']
 
 // Hàm decode JWT không cần thư viện
@@ -158,6 +161,11 @@ export function middleware(request: NextRequest) {
   if (maintenanceMode) {
     const url = new URL('/maintenance', request.url)
     return NextResponse.redirect(url)
+  }
+
+  // 0. Nếu chưa đăng nhập mà cố tình vào các role đặc biệt thì sẽ hiện trang maintenance
+  if (unAuthPrivatePaths.some((path) => pathname.startsWith(path.split('/:')[0]) && !refreshToken)) {
+    return NextResponse.rewrite(new URL('/unauthorized', request.url))
   }
 
   // 1. Chưa đăng nhập thì không cho vào private paths
