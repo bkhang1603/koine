@@ -11,19 +11,10 @@ import { Badge } from '@/components/ui/badge'
 import { useToast } from '@/components/ui/use-toast'
 import { Users2, GraduationCap, Clock, Search, Plus, X, ChevronRight } from 'lucide-react'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-
-interface ChildAccount {
-  id: string
-  username: string
-  avatar: string
-  lastActive: string
-  activeCourses: number
-  completedCourses: number
-  totalStudyTime: number
-}
+import { useGetChildAccount } from '@/queries/useAccount'
 
 // Thêm interface cho filters
-interface Filters {
+type Filters = {
   search: string
   status: 'all' | 'active' | 'inactive'
   sort: 'recent' | 'name' | 'courses'
@@ -38,19 +29,8 @@ export default function ChildAccountPage() {
   })
   const { toast } = useToast()
 
-  // Mock data
-  const childAccounts: ChildAccount[] = [
-    {
-      id: '1',
-      username: 'anna2024',
-      avatar: '/avatars/01.png',
-      lastActive: '5 phút trước',
-      activeCourses: 2,
-      completedCourses: 3,
-      totalStudyTime: 45 // hours
-    }
-    // Thêm mock data...
-  ]
+  const { data } = useGetChildAccount()
+  const childAccounts = data?.payload.data || []
 
   return (
     <div className='space-y-8'>
@@ -92,7 +72,7 @@ export default function ChildAccountPage() {
                 <p className='text-sm text-gray-600 font-medium'>Khóa học đang học</p>
                 <div className='flex items-baseline gap-1 mt-1'>
                   <span className='text-2xl font-bold text-gray-900'>
-                    {childAccounts.reduce((sum, account) => sum + account.activeCourses, 0)}
+                    {childAccounts.reduce((sum, account) => sum + account.totalCoursesCompleted, 0)}
                   </span>
                   <span className='text-sm text-gray-500'>khóa học</span>
                 </div>
@@ -113,9 +93,7 @@ export default function ChildAccountPage() {
               <div className='relative'>
                 <p className='text-sm text-gray-600 font-medium'>Tổng thời gian học</p>
                 <div className='flex items-baseline gap-1 mt-1'>
-                  <span className='text-2xl font-bold text-gray-900'>
-                    {childAccounts.reduce((sum, account) => sum + account.totalStudyTime, 0)}
-                  </span>
+                  <span className='text-2xl font-bold text-gray-900'>10</span>
                   <span className='text-sm text-gray-500'>giờ</span>
                 </div>
               </div>
@@ -227,7 +205,7 @@ export default function ChildAccountPage() {
       {/* Account List */}
       <div className='grid gap-6 md:grid-cols-2 lg:grid-cols-3'>
         {childAccounts.map((account) => (
-          <Link key={account.id} href={`/setting/child-account/${account.id}`}>
+          <Link key={account.childId} href={`/setting/child-account/${account.childId}`}>
             <Card
               className='group border-none shadow-md hover:shadow-xl hover:-translate-y-0.5 
               transition-all duration-300 bg-white'
@@ -237,18 +215,18 @@ export default function ChildAccountPage() {
                 <div className='p-6 pb-4 border-b border-gray-100'>
                   <div className='flex items-center gap-3'>
                     <Avatar className='h-10 w-10 ring-2 ring-primary/10'>
-                      <AvatarImage src={account.avatar} alt={account.username} />
+                      <AvatarImage src={account.childImageUrl} alt={account.childName} />
                       <AvatarFallback className='bg-primary/5 text-primary'>
-                        {account.username[0].toUpperCase()}
+                        {account.childName[0].toUpperCase()}
                       </AvatarFallback>
                     </Avatar>
                     <div className='flex-1 min-w-0'>
                       <h3 className='font-medium text-gray-900 truncate group-hover:text-primary transition-colors'>
-                        {account.username}
+                        {account.childName}
                       </h3>
                       <p className='text-sm text-gray-500 flex items-center gap-1.5'>
                         <Clock className='w-3.5 h-3.5' />
-                        {account.lastActive}
+                        10 phút trước
                       </p>
                     </div>
                   </div>
@@ -261,7 +239,7 @@ export default function ChildAccountPage() {
                     <div className='flex items-center justify-between text-sm'>
                       <span className='text-gray-600'>Khóa học đang học</span>
                       <Badge variant='secondary' className='bg-primary/5 text-primary border-none font-medium'>
-                        {account.activeCourses} khóa học
+                        {account.totalCoursesCompleted} khóa học
                       </Badge>
                     </div>
                     <div className='h-2 bg-gray-100 rounded-full overflow-hidden'>
@@ -269,24 +247,24 @@ export default function ChildAccountPage() {
                         className='h-full bg-gradient-to-r from-primary to-primary/80 transition-all 
                         group-hover:from-primary/80 group-hover:to-primary'
                         style={{
-                          width: `${(account.activeCourses / (account.activeCourses + account.completedCourses)) * 100}%`
+                          width: `${(account.totalCoursesCompleted / (account.totalCoursesCompleted + account.totalCourse)) * 100}%`
                         }}
                       />
                     </div>
                     <div className='flex items-center justify-between text-xs text-gray-500'>
                       <span>Đang học</span>
-                      <span>{account.completedCourses} khóa học đã hoàn thành</span>
+                      <span>{account.totalCoursesCompleted} khóa học đã hoàn thành</span>
                     </div>
                   </div>
 
                   {/* Learning Stats */}
                   <div className='grid grid-cols-2 gap-3 text-center'>
                     <div className='p-3 rounded-xl bg-gray-50'>
-                      <p className='text-2xl font-semibold text-primary'>{account.totalStudyTime}</p>
+                      <p className='text-2xl font-semibold text-primary'>10</p>
                       <p className='text-xs text-gray-500 mt-1'>Giờ học</p>
                     </div>
                     <div className='p-3 rounded-xl bg-gray-50'>
-                      <p className='text-2xl font-semibold text-green-600'>{account.completedCourses}</p>
+                      <p className='text-2xl font-semibold text-green-600'>{account.totalCoursesCompleted}</p>
                       <p className='text-xs text-gray-500 mt-1'>Đã hoàn thành</p>
                     </div>
                   </div>

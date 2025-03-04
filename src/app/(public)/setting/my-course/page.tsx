@@ -18,7 +18,7 @@ export default function MyCoursesPage() {
   const [searchQuery, setSearchQuery] = useState('')
   const [category, setCategory] = useState('all')
 
-  const { data, isLoading, isError } = useCourseByAccount()
+  const { data, isLoading, isError } = useCourseByAccount({ page_size: 10, page_index: 1 })
   const allCourses = data?.payload.data || []
 
   // Filtered courses based on search query and category
@@ -332,7 +332,7 @@ export default function MyCoursesPage() {
                           <p className='text-xs font-medium text-gray-500 uppercase tracking-wider'>Bài học</p>
                           <p className='font-medium text-gray-700 flex items-center gap-2'>
                             <BookOpen className='w-4 h-4 text-gray-400' />
-                            10/20 bài
+                            {course.totalLessonFinished}/{course.totalLesson} bài
                           </p>
                         </div>
                         <div className='space-y-1'>

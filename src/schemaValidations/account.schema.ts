@@ -21,6 +21,7 @@ export const courseByAccount = z.object({
   id: z.string(),
   title: z.string(),
   description: z.string(),
+  level: z.string(),
   durationDisplay: z.string(),
   categories: z.array(
     z.object({
@@ -28,6 +29,8 @@ export const courseByAccount = z.object({
       name: z.string()
     })
   ),
+  totalLesson: z.number(),
+  totalLessonFinished: z.number(),
   completionRate: z.number(),
   author: z.string(),
   imageUrl: z.string(),
@@ -140,6 +143,7 @@ export const accountOrder = z
     id: z.string(),
     userId: z.string(),
     totalAmount: z.number(),
+    paymentMethod: z.string(),
     orderDate: z.string(),
     status: z.string(),
     isDeleted: z.boolean(),
@@ -194,6 +198,64 @@ export const accountOrderRes = z.object({
   })
 })
 
+export const myChildAccount = z.object({
+  childId: z.string(),
+  childName: z.string(),
+  childImageUrl: z.string(),
+  totalCourse: z.number(),
+  totalCoursesCompleted: z.number()
+})
+
+export const myChildAccountRes = z.object({
+  data: z.array(myChildAccount),
+  message: z.string()
+})
+
+export const myChildAccountById = z.object({
+  id: z.string(),
+  title: z.string(),
+  username: z.string(),
+  role: z.enum(RoleValues),
+  phone: z.string(),
+  firstName: z.string(),
+  lastName: z.string(),
+  dob: z.string(),
+  address: z.string()
+})
+
+export const myChildAccountByIdRes = z.object({
+  data: myChildAccountById,
+  message: z.string()
+})
+
+export const suggestCoursesFree = z.object({
+  id: z.string(),
+  title: z.string(),
+  description: z.string(),
+  level: z.string(),
+  durations: z.string(),
+  durationsDisplay: z.string(),
+  imageUrl: z.string(),
+  categories: z.array(
+    z.object({
+      id: z.string(),
+      name: z.string()
+    })
+  )
+})
+
+export const suggestCoursesFreeRes = z.object({
+  data: z.array(suggestCoursesFree),
+  message: z.string(),
+  pagination: z.object({
+    pageSize: z.number(),
+    totalItem: z.number(),
+    currentPage: z.number(),
+    totalPage: z.number(),
+    maxPageSize: z.number()
+  })
+})
+
 export type AccountResType = z.TypeOf<typeof accountRes>
 
 export type CourseByAccountResType = z.TypeOf<typeof courseByAccountRes>
@@ -209,3 +271,9 @@ export type AccountOneAddressResType = z.TypeOf<typeof accountOneAddressRes>
 export type AccountAddressBodyType = z.TypeOf<typeof accountAddressBody>
 
 export type AccountOrderResType = z.TypeOf<typeof accountOrderRes>
+
+export type MyChildAccountResType = z.TypeOf<typeof myChildAccountRes>
+
+export type MyChildAccountByIdResType = z.TypeOf<typeof myChildAccountByIdRes>
+
+export type SuggestCoursesFreeResType = z.TypeOf<typeof suggestCoursesFreeRes>

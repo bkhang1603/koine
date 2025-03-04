@@ -15,6 +15,8 @@ import { useForm } from 'react-hook-form'
 import * as z from 'zod'
 import icons from '@/assets/icons'
 import { useSendOTPMutation } from '@/queries/useAuth'
+import { useAppStore } from '@/components/app-provider'
+import { handleErrorApi } from '@/lib/utils'
 
 // Tạo schema cho form OTP
 const otpSchema = z.object({
@@ -25,6 +27,7 @@ type OtpFormValues = z.infer<typeof otpSchema>
 type ValidationStatus = 'input' | 'loading' | 'success' | 'error'
 
 export default function OTPPage() {
+  const setRole = useAppStore((state) => state.setRole)
   const [status, setStatus] = useState<ValidationStatus>('input')
   const [message, setMessage] = useState<string>('')
   const [timeLeft, setTimeLeft] = useState(120) // Mặc định 2 phút
@@ -49,17 +52,36 @@ export default function OTPPage() {
     }
   })
 
+  useEffect(() => {
+    setRole()
+  }, [setRole])
+
   // Tính toán thời gian còn lại dựa trên tham số time
   useEffect(() => {
+    let timer: NodeJS.Timeout
+
     // Nếu có tham số time từ URL, tính thời gian còn lại
     if (timeParam) {
       try {
-        const codeCreationTime = new Date(decodeURIComponent(timeParam)).getTime()
-        const expiryTime = codeCreationTime + 5 * 60 * 1000 // 5 phút tính bằng milliseconds
+        // Giải mã timeParam và xử lý đúng định dạng thời gian
+        const decodedTime = decodeURIComponent(timeParam)
+        // console.log('Decoded time:', decodedTime) // Log để debug
+
+        // Tạo đối tượng Date từ chuỗi thời gian và điều chỉnh múi giờ (trừ 7 giờ)
+        const codeCreationTime = new Date(decodedTime).getTime()
+        // Không cần điều chỉnh thời gian hiện tại vì nó đã ở đúng múi giờ local
+        // const now = new Date().getTime()
+        const expiryTime = codeCreationTime + 5 * 60 * 1000 - 7 * 60 * 1000 * 60 // 5 phút (300,000 ms)
+
+        // Thời gian hiển thị cho người dùng đã được điều chỉnh
+        // console.log('Creation time (adjusted):', new Date(codeCreationTime).toLocaleString())
+        // console.log('Expiry time (adjusted):', new Date(expiryTime).toLocaleString())
+        // console.log('Current time:', new Date(now).toLocaleString())
+        // console.log('Initial remaining seconds:', Math.max(0, Math.floor((expiryTime - now) / 1000)))
 
         const updateTimeLeft = () => {
-          const now = new Date().getTime()
-          const remaining = Math.max(0, Math.floor((expiryTime - now) / 1000))
+          const currentTime = new Date().getTime()
+          const remaining = Math.max(0, Math.floor((expiryTime - currentTime) / 1000))
           setTimeLeft(remaining)
 
           if (remaining <= 0) {
@@ -67,23 +89,37 @@ export default function OTPPage() {
           }
         }
 
-        updateTimeLeft() // Cập nhật ngay lần đầu
-        const timer = setInterval(updateTimeLeft, 1000)
-        return () => clearInterval(timer)
+        // Cập nhật ngay lần đầu
+        updateTimeLeft()
+
+        // Cập nhật mỗi giây
+        timer = setInterval(updateTimeLeft, 1000)
       } catch (error) {
         console.error('Lỗi khi phân tích tham số time:', error)
+        // Fallback mặc định nếu có lỗi
+        setTimeLeft(300) // 5 phút mặc định
       }
     } else {
-      // Nếu không có tham số time, sử dụng countdown mặc định 120s
-      if (timeLeft <= 0 || status !== 'input') return
-
-      const timer = setInterval(() => {
-        setTimeLeft((prev) => prev - 1)
-      }, 1000)
-
-      return () => clearInterval(timer)
+      // Xử lý khi không có timeParam (giữ nguyên code cũ)
+      if (status === 'input') {
+        setTimeLeft(120)
+        timer = setInterval(() => {
+          setTimeLeft((prev) => {
+            if (prev <= 1) {
+              clearInterval(timer)
+              return 0
+            }
+            return prev - 1
+          })
+        }, 1000)
+      }
     }
-  }, [timeParam, timeLeft, status])
+
+    // Cleanup function khi component unmount
+    return () => {
+      if (timer) clearInterval(timer)
+    }
+  }, [timeParam, status]) // Chỉ phụ thuộc vào timeParam và status
 
   // Xử lý gửi form
   const onSubmit = async (values: OtpFormValues) => {
@@ -92,10 +128,13 @@ export default function OTPPage() {
     try {
       if (id) {
         // Nếu có ID từ URL, gọi API với ID và code
-        await sendOTPMutation.mutateAsync({
+        const result = await sendOTPMutation.mutateAsync({
           id,
           code: values.otp
         })
+
+        // Lấy role từ response và set vào global state
+        setRole(result.payload.data.account.role)
 
         setStatus('success')
         setMessage('Tài khoản đã được xác thực thành công!')
@@ -120,7 +159,11 @@ export default function OTPPage() {
       }
     } catch (error: any) {
       setStatus('error')
-      setMessage(error.message || 'Mã OTP không đúng hoặc đã hết hạn. Vui lòng thử lại.')
+      // setMessage(error.message || 'Mã OTP không đúng hoặc đã hết hạn. Vui lòng thử lại.')
+      handleErrorApi({
+        error,
+        setError: form.setError
+      })
     }
   }
 

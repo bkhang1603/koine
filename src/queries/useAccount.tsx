@@ -9,10 +9,10 @@ export const useAccountProfile = ({ enabled }: { enabled?: boolean }) => {
   })
 }
 
-export const useCourseByAccount = () => {
+export const useCourseByAccount = ({ page_size, page_index }: { page_size?: number; page_index?: number }) => {
   return useQuery({
-    queryKey: ['course-by-account'],
-    queryFn: accountApiRequest.getAccountCourse
+    queryKey: ['course-by-account', page_size, page_index],
+    queryFn: () => accountApiRequest.getAccountCourse({ page_size, page_index })
   })
 }
 
@@ -82,9 +82,38 @@ export const useDeleteAccountAddressMutation = () => {
   })
 }
 
-export const useGetAccountOrders = () => {
+export const useGetAccountOrders = ({
+  status,
+  page_index,
+  page_size
+}: {
+  status: 'PROCESSING' | 'DELIVERING' | 'CANCELLED' | 'COMPLETED'
+  page_index: number
+  page_size: number
+}) => {
   return useQuery({
-    queryKey: ['account-orders'],
-    queryFn: accountApiRequest.getAccountOrders
+    queryKey: ['account-orders', status, page_index, page_size],
+    queryFn: () => accountApiRequest.getAccountOrders({ status, page_index, page_size })
+  })
+}
+
+export const useGetChildAccount = () => {
+  return useQuery({
+    queryKey: ['child-account'],
+    queryFn: accountApiRequest.getChildAccount
+  })
+}
+
+export const useGetChildAccountById = (id: string) => {
+  return useQuery({
+    queryKey: ['child-account-by-id', id],
+    queryFn: () => accountApiRequest.getChildAccountById(id)
+  })
+}
+
+export const useSuggestCoursesFree = () => {
+  return useQuery({
+    queryKey: ['suggest-courses-free'],
+    queryFn: accountApiRequest.getSuggestCoursesFree
   })
 }

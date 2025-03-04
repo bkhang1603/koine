@@ -5,199 +5,270 @@ import Image from 'next/image'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Progress } from '@/components/ui/progress'
 import { Card } from '@/components/ui/card'
+import { useGetCourseProgressQuery } from '@/queries/useCourse'
+import { BookOpen, Clock, CheckCircle2, LockKeyhole, ChevronRight, Home } from 'lucide-react'
+import { Skeleton } from '@/components/ui/skeleton'
+import Link from 'next/link'
+import { cn } from '@/lib/utils'
 
-const courseDetails = {
-  id: 1,
-  title: 'Toán học vui vẻ 🔢',
-  description: 'Khám phá thế giới số học qua các trò chơi thú vị và bài tập tương tác. Phù hợp cho trẻ từ 6-8 tuổi.',
-  level: 'Dễ',
-  progress: 60,
-  totalLessons: 20,
-  completedLessons: 12,
-  image: '/images/math-course.png',
-  category: 'Toán học',
-  lessons: [
-    {
-      id: 1,
-      title: 'Phép cộng vui vẻ',
-      description: 'Học cách cộng số qua trò chơi thú vị',
-      duration: '15 phút',
-      stars: 50,
-      isCompleted: true
-    },
-    {
-      id: 2,
-      title: 'Phép trừ thần kỳ',
-      description: 'Khám phá phép trừ qua các ví dụ sinh động',
-      duration: '20 phút',
-      stars: 40,
-      isCompleted: true
-    }
-    // Thêm các bài học khác...
-  ],
-  games: [
-    {
-      id: 1,
-      title: 'Giải cứu số học',
-      description: 'Giải các câu đố để cứu các con số',
-      image: '/images/game-1.png',
-      stars: 100
-    },
-    {
-      id: 2,
-      title: 'Đua xe số học',
-      description: 'Đua xe bằng cách giải toán nhanh',
-      image: '/images/game-2.png',
-      stars: 80
-    }
-  ],
-  achievements: [
-    {
-      id: 1,
-      title: 'Nhà vô địch Cộng',
-      description: 'Hoàn thành tất cả bài tập phép cộng',
-      icon: '🏆',
-      isUnlocked: true
-    },
-    {
-      id: 2,
-      title: 'Cao thủ Trừ',
-      description: 'Đạt điểm tuyệt đối trong phép trừ',
-      icon: '🌟',
-      isUnlocked: false
-    }
-  ]
-}
+function CourseDetailPage({ params }: { params: { courseId: string } }) {
+  const { courseId } = params
+  const { data, isLoading } = useGetCourseProgressQuery({ id: courseId })
+  const course = data?.payload.data || null
 
-function CourseDetailPage() {
+  // Breadcrumb component
+  const Breadcrumb = () => (
+    <div className='mb-6 flex items-center gap-1 text-sm'>
+      <Link
+        href='/kid/dashboard'
+        className='flex items-center gap-1 text-gray-500 hover:text-primary transition-colors'
+      >
+        <Home className='h-4 w-4' />
+        <span className='hidden sm:inline'>Trang chính</span>
+      </Link>
+      <ChevronRight className='h-4 w-4 text-gray-400' />
+      <Link href='/kid/course' className='text-gray-500 hover:text-primary transition-colors'>
+        Khóa học
+      </Link>
+      {!isLoading && course && (
+        <>
+          <ChevronRight className='h-4 w-4 text-gray-400' />
+          <span className='text-gray-800 font-medium truncate max-w-[180px]'>{course.title}</span>
+        </>
+      )}
+    </div>
+  )
+
+  // Render skeleton while loading
+  if (isLoading) {
+    return (
+      <div className='container mx-auto px-4 py-8'>
+        <Breadcrumb />
+
+        {/* Course Header Skeleton */}
+        <div className='flex flex-col md:flex-row gap-8 mb-12'>
+          {/* Course Image Skeleton */}
+          <div className='relative w-full md:w-1/2 h-[300px] rounded-2xl overflow-hidden'>
+            <Skeleton className='h-full w-full' />
+          </div>
+
+          {/* Course Progress Skeleton */}
+          <div className='w-full md:w-1/2 bg-white rounded-2xl p-6 shadow-lg'>
+            <div className='mb-6'>
+              <Skeleton className='h-7 w-48 mb-2' />
+              <Skeleton className='h-3 w-full mb-2' />
+              <Skeleton className='h-5 w-36 mt-2' />
+            </div>
+
+            <div className='grid grid-cols-2 gap-4 mb-6'>
+              <div className='bg-primary/10 rounded-xl p-4'>
+                <div className='flex items-center gap-2'>
+                  <Skeleton className='h-5 w-5 rounded-full' />
+                  <Skeleton className='h-4 w-24' />
+                </div>
+                <Skeleton className='h-8 w-12 mt-2' />
+              </div>
+              <div className='bg-green-100 rounded-xl p-4'>
+                <div className='flex items-center gap-2'>
+                  <Skeleton className='h-5 w-5 rounded-full' />
+                  <Skeleton className='h-4 w-24' />
+                </div>
+                <Skeleton className='h-8 w-12 mt-2' />
+              </div>
+            </div>
+
+            <Skeleton className='h-12 w-full rounded-full' />
+          </div>
+        </div>
+
+        {/* Tabs Skeleton */}
+        <div className='space-y-6'>
+          <div className='grid grid-cols-2 gap-4 h-12'>
+            <Skeleton className='h-full w-full rounded-full' />
+            <Skeleton className='h-full w-full rounded-full' />
+          </div>
+
+          {/* Chapters Skeleton */}
+          <div className='space-y-6'>
+            {[1, 2, 3].map((i) => (
+              <Card key={`chapter-skeleton-${i}`} className='p-6'>
+                <div className='mb-4'>
+                  <Skeleton className='h-7 w-3/4 mb-2' />
+                  <div className='flex items-center gap-4 text-sm'>
+                    <div className='flex items-center gap-2'>
+                      <Skeleton className='h-4 w-4 rounded-full' />
+                      <Skeleton className='h-4 w-16' />
+                    </div>
+                    <div className='flex items-center gap-2'>
+                      <Skeleton className='h-4 w-4 rounded-full' />
+                      <Skeleton className='h-4 w-20' />
+                    </div>
+                  </div>
+                </div>
+
+                <div className='space-y-4'>
+                  {[1, 2, 3].map((j) => (
+                    <div key={`lesson-skeleton-${i}-${j}`} className='flex items-center gap-4 p-4 rounded-lg'>
+                      <Skeleton className='h-6 w-6 rounded-full flex-shrink-0' />
+                      <div className='flex-1 min-w-0'>
+                        <Skeleton className='h-5 w-3/4 mb-1' />
+                        <Skeleton className='h-4 w-1/2' />
+                      </div>
+                      <div className='flex items-center gap-2'>
+                        <Skeleton className='h-4 w-4 rounded-full' />
+                        <Skeleton className='h-4 w-16' />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </Card>
+            ))}
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  if (!course) {
+    return (
+      <div className='container mx-auto px-4 py-8'>
+        <Breadcrumb />
+        <div className='flex flex-col items-center justify-center min-h-[400px] gap-4'>
+          <h3 className='text-lg font-medium text-gray-900'>Không tìm thấy khóa học</h3>
+          <p className='text-gray-500'>Khóa học không tồn tại hoặc đã bị xóa</p>
+          <Button asChild>
+            <Link href='/kid/course'>Quay lại danh sách khóa học</Link>
+          </Button>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className='container mx-auto px-4 py-8'>
+      <Breadcrumb />
+
       {/* Course Header */}
       <div className='flex flex-col md:flex-row gap-8 mb-12'>
         <div className='relative w-full md:w-1/2 h-[300px] rounded-2xl overflow-hidden'>
-          <Image src={courseDetails.image} alt={courseDetails.title} fill className='object-cover' />
+          <Image src={course.imageUrl} alt={course.title} fill className='object-cover' />
           <div className='absolute inset-0 bg-gradient-to-t from-black/60 to-transparent' />
           <div className='absolute bottom-6 left-6 text-white'>
             <div className='flex items-center gap-2 mb-2'>
-              <span className='bg-white/20 px-3 py-1 rounded-full text-sm'>{courseDetails.category}</span>
-              <span className='bg-white/20 px-3 py-1 rounded-full text-sm'>Cấp độ: {courseDetails.level}</span>
+              <span className='bg-white/20 px-3 py-1 rounded-full text-sm'>{course.status}</span>
             </div>
-            <h1 className='text-3xl font-bold mb-2'>{courseDetails.title}</h1>
-            <p className='text-lg opacity-90'>{courseDetails.description}</p>
+            <h1 className='text-3xl font-bold mb-2'>{course.title}</h1>
+            <p className='text-lg opacity-90'>{course.description}</p>
           </div>
         </div>
         <div className='w-full md:w-1/2 bg-white rounded-2xl p-6 shadow-lg'>
           <div className='mb-6'>
             <h3 className='text-xl font-bold mb-2'>Tiến độ của bạn</h3>
-            <Progress value={courseDetails.progress} className='h-3' />
+            <Progress value={course.courseCompletionPercentage} className='h-3' />
             <p className='text-sm text-gray-600 mt-2'>
-              {courseDetails.completedLessons}/{courseDetails.totalLessons} bài học đã hoàn thành
+              {course.totalCompletedLessonsInCourse}/{course.totalLessonsInCourse} bài học đã hoàn thành
             </p>
           </div>
-          <div className='grid grid-cols-3 gap-4 mb-6'>
-            <div className='bg-primary/10 rounded-xl p-4 text-center'>
-              <p className='text-3xl font-bold text-primary'>⭐️</p>
-              <p className='text-sm text-gray-600'>250 sao</p>
+          <div className='grid grid-cols-2 gap-4 mb-6'>
+            <div className='bg-primary/10 rounded-xl p-4'>
+              <div className='flex items-center gap-2'>
+                <BookOpen className='h-5 w-5 text-primary' />
+                <p className='text-sm text-gray-600'>Tổng số bài học</p>
+              </div>
+              <p className='text-2xl font-bold text-primary mt-2'>{course.totalLessonsInCourse}</p>
             </div>
-            <div className='bg-secondary/10 rounded-xl p-4 text-center'>
-              <p className='text-3xl font-bold text-secondary'>🏆</p>
-              <p className='text-sm text-gray-600'>3 huy hiệu</p>
-            </div>
-            <div className='bg-green-100 rounded-xl p-4 text-center'>
-              <p className='text-3xl font-bold text-green-600'>⏱️</p>
-              <p className='text-sm text-gray-600'>4 giờ</p>
+            <div className='bg-green-100 rounded-xl p-4'>
+              <div className='flex items-center gap-2'>
+                <CheckCircle2 className='h-5 w-5 text-green-600' />
+                <p className='text-sm text-gray-600'>Đã hoàn thành</p>
+              </div>
+              <p className='text-2xl font-bold text-green-600 mt-2'>{course.totalCompletedLessonsInCourse}</p>
             </div>
           </div>
-          <Button size='lg' className='w-full rounded-full'>
-            Tiếp tục học 🚀
+          <Button size='lg' className='w-full rounded-full' asChild>
+            <Link href={`/kid/course/${courseId}/learn`}>Tiếp tục học 🚀</Link>
           </Button>
         </div>
       </div>
 
       {/* Course Content */}
-      <Tabs defaultValue='lessons' className='space-y-6'>
-        <TabsList className='grid w-full grid-cols-3 gap-4 bg-transparent'>
+      <Tabs defaultValue='chapters' className='space-y-6'>
+        <TabsList className='grid w-full grid-cols-2 gap-4 bg-transparent h-12'>
           <TabsTrigger
-            value='lessons'
-            className='data-[state=active]:bg-primary data-[state=active]:text-white rounded-full'
+            value='chapters'
+            className='data-[state=active]:bg-primary data-[state=active]:text-white rounded-full bg-slate-100 h-full'
           >
-            Bài học 📚
+            Chương học 📚
           </TabsTrigger>
           <TabsTrigger
-            value='games'
-            className='data-[state=active]:bg-primary data-[state=active]:text-white rounded-full'
+            value='progress'
+            className='data-[state=active]:bg-primary data-[state=active]:text-white rounded-full bg-slate-100 h-full'
           >
-            Trò chơi 🎮
-          </TabsTrigger>
-          <TabsTrigger
-            value='achievements'
-            className='data-[state=active]:bg-primary data-[state=active]:text-white rounded-full'
-          >
-            Thành tích 🏆
+            Tiến độ 📊
           </TabsTrigger>
         </TabsList>
 
-        <TabsContent value='lessons' className='space-y-6'>
-          {courseDetails.lessons.map((lesson) => (
-            <Card key={lesson.id} className='p-6 hover:shadow-lg transition-shadow'>
-              <div className='flex items-center gap-6'>
-                <div className='w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center'>
-                  {lesson.isCompleted ? <span className='text-2xl'>✅</span> : <span className='text-2xl'>📝</span>}
-                </div>
-                <div className='flex-1'>
-                  <h3 className='text-xl font-bold mb-2'>
-                    Bài {lesson.id}: {lesson.title}
-                  </h3>
-                  <p className='text-gray-600 mb-2'>{lesson.description}</p>
-                  <div className='flex items-center gap-4'>
-                    <div className='flex items-center gap-2'>
-                      <span>⭐️</span>
-                      <span className='text-sm text-gray-600'>{lesson.stars} sao</span>
-                    </div>
-                    <div className='flex items-center gap-2'>
-                      <span>⏱️</span>
-                      <span className='text-sm text-gray-600'>{lesson.duration}</span>
-                    </div>
+        {/* Content unchanged */}
+        <TabsContent value='chapters' className='space-y-6'>
+          {course.chapters.map((chapter) => (
+            <Card key={chapter.id} className='p-6'>
+              <div className='mb-4'>
+                <h3 className='text-xl font-bold mb-2'>
+                  Chương {chapter.sequence}: {chapter.title}
+                </h3>
+                <div className='flex items-center gap-4 text-sm text-gray-600'>
+                  <div className='flex items-center gap-2'>
+                    <Clock className='h-4 w-4' />
+                    <span>{chapter.durationsDisplay}</span>
+                  </div>
+                  <div className='flex items-center gap-2'>
+                    <BookOpen className='h-4 w-4' />
+                    <span>{chapter.lessons.length} bài học</span>
                   </div>
                 </div>
-                <Button variant={lesson.isCompleted ? 'outline' : 'default'} className='rounded-full'>
-                  {lesson.isCompleted ? 'Học lại 🔄' : 'Bắt đầu ▶️'}
-                </Button>
+              </div>
+
+              <div className='space-y-4'>
+                {chapter.lessons.map((lesson) => (
+                  <div
+                    key={lesson.id}
+                    className={cn(
+                      'flex items-center gap-4 p-4 rounded-lg transition-colors',
+                      lesson.status === 'YET' ? 'hover:bg-gray-50 cursor-pointer' : 'opacity-70'
+                    )}
+                    onClick={() => {
+                      if (lesson.status === 'YET') {
+                        // Navigate to lesson
+                        window.location.href = `/kid/course/${courseId}/lesson/${lesson.id}`
+                      }
+                    }}
+                  >
+                    <div className='flex-shrink-0'>
+                      {lesson.status === 'YET' ? (
+                        <CheckCircle2 className='h-6 w-6 text-green-500' />
+                      ) : (
+                        <LockKeyhole className='h-6 w-6 text-gray-400' />
+                      )}
+                    </div>
+                    <div className='flex-1 min-w-0'>
+                      <h4 className='font-medium text-gray-900'>
+                        Bài {lesson.sequence}: {lesson.title}
+                      </h4>
+                      <p className='text-sm text-gray-500'>{lesson.description}</p>
+                    </div>
+                    <div className='flex items-center gap-2 text-sm text-gray-500'>
+                      <Clock className='h-4 w-4' />
+                      <span>{lesson.durationsDisplay}</span>
+                    </div>
+                  </div>
+                ))}
               </div>
             </Card>
           ))}
         </TabsContent>
 
-        <TabsContent value='games' className='grid grid-cols-1 md:grid-cols-2 gap-6'>
-          {courseDetails.games.map((game) => (
-            <Card key={game.id} className='p-6 hover:shadow-lg transition-shadow'>
-              <div className='relative h-48 mb-4 rounded-xl overflow-hidden'>
-                <Image src={game.image} alt={game.title} fill className='object-cover' />
-              </div>
-              <h3 className='text-xl font-bold mb-2'>{game.title}</h3>
-              <p className='text-gray-600 mb-4'>{game.description}</p>
-              <div className='flex items-center justify-between'>
-                <div className='flex items-center gap-2'>
-                  <span>⭐️</span>
-                  <span className='text-sm text-gray-600'>{game.stars} sao</span>
-                </div>
-                <Button className='rounded-full'>Chơi ngay 🎮</Button>
-              </div>
-            </Card>
-          ))}
-        </TabsContent>
-
-        <TabsContent value='achievements' className='grid grid-cols-2 md:grid-cols-4 gap-6'>
-          {courseDetails.achievements.map((achievement) => (
-            <Card key={achievement.id} className={`p-6 text-center ${!achievement.isUnlocked ? 'opacity-50' : ''}`}>
-              <div className='w-20 h-20 mx-auto mb-4 bg-primary/10 rounded-full flex items-center justify-center'>
-                <span className='text-3xl'>{achievement.icon}</span>
-              </div>
-              <h3 className='font-bold mb-2'>{achievement.title}</h3>
-              <p className='text-sm text-gray-600'>{achievement.description}</p>
-              {!achievement.isUnlocked && <div className='mt-2 text-sm text-primary'>🔒 Chưa mở khóa</div>}
-            </Card>
-          ))}
+        <TabsContent value='progress' className='grid gap-6'>
+          {/* Progress content unchanged */}
         </TabsContent>
       </Tabs>
     </div>

@@ -1,12 +1,9 @@
 'use client'
 
 import { useState } from 'react'
-import { Input } from '@/components/ui/input'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import {
-  Search,
   Package,
   BookOpen,
   Calendar,
@@ -20,87 +17,80 @@ import {
 import { Separator } from '@/components/ui/separator'
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
-import {
-  Pagination,
-  PaginationContent,
-  PaginationEllipsis,
-  PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious
-} from '@/components/ui/pagination'
 import { useGetAccountOrders } from '@/queries/useAccount'
 import { Skeleton } from '@/components/ui/skeleton'
+import Image from 'next/image'
+import { cn } from '@/lib/utils'
+import { Pagination } from '@/components/pagination'
+
+type OrderStatus = 'PROCESSING' | 'DELIVERING' | 'CANCELLED' | 'COMPLETED'
 
 const statusColorMap = {
-  PENDING: 'bg-yellow-100 text-yellow-800',
+  DELIVERING: 'bg-yellow-100 text-yellow-800',
   PROCESSING: 'bg-blue-100 text-blue-800',
   COMPLETED: 'bg-green-100 text-green-800',
   CANCELLED: 'bg-red-100 text-red-800'
 } as const
 
 const statusTextMap = {
-  PENDING: 'Chờ xử lý',
+  DELIVERING: 'Chờ xử lý',
   PROCESSING: 'Đang xử lý',
   COMPLETED: 'Hoàn thành',
   CANCELLED: 'Đã hủy'
 } as const
 
 export default function OrderPage() {
-  const [search, setSearch] = useState('')
-  const [status, setStatus] = useState('all')
-  const { data, isFetching, isError } = useGetAccountOrders()
+  const [status, setStatus] = useState<OrderStatus>('PROCESSING')
+  const [currentPage, setCurrentPage] = useState(1)
+  const pageSize = 10
 
-  const orders = data?.payload.data || []
-
-  // Lọc đơn hàng theo search và status
-  const filteredOrders = orders.filter((order) => {
-    const matchesSearch = search
-      ? order.orderCode.toLowerCase().includes(search.toLowerCase()) ||
-        order.orderDetails.some((detail) => detail.itemTitle.toLowerCase().includes(search.toLowerCase()))
-      : true
-
-    const matchesStatus = status !== 'all' ? order.status.toLowerCase() === status.toUpperCase() : true
-
-    return matchesSearch && matchesStatus
+  const { data, isFetching, isError } = useGetAccountOrders({
+    status,
+    page_index: currentPage,
+    page_size: pageSize
   })
 
+  const orders = data?.payload.data || []
+  const totalPages = data?.payload.pagination.totalPage ?? 1
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page)
+  }
+
   const handleClearFilters = () => {
-    setSearch('')
-    setStatus('all')
+    setStatus('PROCESSING')
   }
 
   return (
     <div className='container max-w-7xl mx-auto py-6 space-y-8'>
-      {/* Header */}
-      <div>
-        <h1 className='text-3xl font-bold'>Đơn hàng của tôi</h1>
-        <p className='text-muted-foreground mt-1'>Quản lý và theo dõi các đơn hàng của bạn</p>
-      </div>
-
-      {/* Filters */}
-      <div className='flex flex-col sm:flex-row gap-4'>
-        <div className='relative flex-1'>
-          <Search className='absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground' />
-          <Input
-            placeholder='Tìm kiếm đơn hàng...'
-            className='pl-9'
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-          />
+      <div className='flex justify-between items-center'>
+        {/* Header */}
+        <div>
+          <h1 className='text-3xl font-bold'>Đơn hàng của tôi</h1>
+          <p className='text-muted-foreground mt-1'>Quản lý và theo dõi các đơn hàng của bạn</p>
         </div>
-        <Select value={status} onValueChange={setStatus}>
-          <SelectTrigger className='w-full sm:w-[180px]'>
-            <SelectValue placeholder='Trạng thái' />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value='all'>Tất cả trạng thái</SelectItem>
-            <SelectItem value='PENDING'>Chờ xử lý</SelectItem>
-            <SelectItem value='PROCESSING'>Đang xử lý</SelectItem>
-            <SelectItem value='COMPLETED'>Hoàn thành</SelectItem>
-            <SelectItem value='CANCELLED'>Đã hủy</SelectItem>
-          </SelectContent>
-        </Select>
+
+        {/* Status Filter Buttons */}
+        <div className='flex gap-2'>
+          {(Object.entries(statusTextMap) as [OrderStatus, string][]).map(([statusKey, text]) => (
+            <Button
+              key={statusKey}
+              variant={status === statusKey ? 'default' : 'outline'}
+              onClick={() => {
+                setStatus(statusKey)
+                setCurrentPage(1)
+              }}
+              className={cn(
+                'min-w-[120px]',
+                status === statusKey
+                  ? 'bg-primary text-white hover:bg-primary/90'
+                  : `${statusColorMap[statusKey]} hover:opacity-90`
+              )}
+            >
+              {text}
+            </Button>
+          ))}
+        </div>
       </div>
 
       {/* Order List */}
@@ -199,7 +189,7 @@ export default function OrderPage() {
         )}
 
         {/* No Results From Search/Filter */}
-        {!isFetching && !isError && orders.length > 0 && filteredOrders.length === 0 && (
+        {!isFetching && !isError && orders.length > 0 && orders.length === 0 && (
           <Card className='border-dashed'>
             <CardContent className='p-6 flex flex-col items-center justify-center py-12 text-center'>
               <div className='rounded-full bg-muted p-4 mb-4'>
@@ -220,8 +210,8 @@ export default function OrderPage() {
         {/* Actual Orders */}
         {!isFetching &&
           !isError &&
-          filteredOrders.length > 0 &&
-          filteredOrders.map((order) => (
+          orders.length > 0 &&
+          orders.map((order) => (
             <Card key={order.id}>
               <Link href={`/setting/order/${order.id}`}>
                 <CardContent className='p-6'>
@@ -238,11 +228,11 @@ export default function OrderPage() {
                         <div className='flex items-center gap-4 text-sm text-muted-foreground'>
                           <div className='flex items-center gap-1'>
                             <Calendar className='h-4 w-4' />
-                            {order.orderDate}
+                            {order.createdAtFormatted}
                           </div>
                           <div className='flex items-center gap-1'>
                             <CreditCard className='h-4 w-4' />
-                            Thanh toán chuyển khoản
+                            {order.paymentMethod === 'COD' ? 'Thanh toán khi nhận hàng' : 'Thanh toán online'}
                           </div>
                         </div>
                       </div>
@@ -268,7 +258,16 @@ export default function OrderPage() {
                               .filter((detail) => !!detail.courseId)
                               .map((detail) => (
                                 <div key={detail.id} className='flex items-center gap-3'>
-                                  <div className='w-12 h-12 rounded-lg bg-muted' />
+                                  {/* <div className='w-12 h-12 rounded-lg bg-muted' /> */}
+                                  <div className='w-12 h-12 rounded-lg overflow-hidden'>
+                                    <Image
+                                      src={detail.itemImageUrl}
+                                      alt={detail.itemTitle}
+                                      width={50}
+                                      height={50}
+                                      className='object-cover w-full h-full'
+                                    />
+                                  </div>
                                   <div>
                                     <div className='font-medium'>{detail.itemTitle}</div>
                                     <div className='text-sm text-muted-foreground'>
@@ -293,7 +292,16 @@ export default function OrderPage() {
                               .filter((detail) => !!detail.productId)
                               .map((detail) => (
                                 <div key={detail.id} className='flex items-center gap-3'>
-                                  <div className='w-12 h-12 rounded-lg bg-muted' />
+                                  {/* <div className='w-12 h-12 rounded-lg bg-muted' /> */}
+                                  <div className='w-12 h-12 rounded-lg overflow-hidden'>
+                                    <Image
+                                      src={detail.itemImageUrl}
+                                      alt={detail.itemTitle}
+                                      width={50}
+                                      height={50}
+                                      className='object-cover w-full h-full'
+                                    />
+                                  </div>
                                   <div>
                                     <div className='font-medium'>{detail.itemTitle}</div>
                                     <div className='text-sm text-muted-foreground'>
@@ -321,33 +329,10 @@ export default function OrderPage() {
           ))}
       </div>
 
-      {/* Pagination - chỉ hiển thị khi có dữ liệu */}
-      {!isFetching && !isError && filteredOrders.length > 0 && (
+      {/* Pagination */}
+      {!isFetching && !isError && orders.length > 0 && totalPages > 1 && (
         <div className='flex justify-center'>
-          <Pagination>
-            <PaginationContent>
-              <PaginationItem>
-                <PaginationPrevious href='#' />
-              </PaginationItem>
-              <PaginationItem>
-                <PaginationLink href='#'>1</PaginationLink>
-              </PaginationItem>
-              <PaginationItem>
-                <PaginationLink href='#' isActive>
-                  2
-                </PaginationLink>
-              </PaginationItem>
-              <PaginationItem>
-                <PaginationLink href='#'>3</PaginationLink>
-              </PaginationItem>
-              <PaginationItem>
-                <PaginationEllipsis />
-              </PaginationItem>
-              <PaginationItem>
-                <PaginationNext href='#' />
-              </PaginationItem>
-            </PaginationContent>
-          </Pagination>
+          <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={handlePageChange} />
         </div>
       )}
     </div>

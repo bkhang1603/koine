@@ -51,7 +51,8 @@ const authApiRequest = {
   setTokenToCookie: (body: { accessToken: string; refreshToken: string }) =>
     http.post('/api/auth/token', body, { baseUrl: '' }),
   register: (body: RegisterBodyFormType) => http.post<RegisterResType>('/auth/register', body),
-  sendOTP: ({ id, code }: { id: string; code: string }) => http.post<LoginResType>('/api/auth/active', { id, code }),
+  sendOTP: ({ id, code }: { id: string; code: string }) =>
+    http.post<LoginResType>('/api/auth/otp', { id, code }, { baseUrl: '' }),
   sSendOTP: ({ id, code }: { id: string; code: string }) => http.post<LoginResType>('/auth/active', { id, code })
 }
 

@@ -8,31 +8,6 @@ import { useCourseByAccount } from '@/queries/useAccount'
 import Image from 'next/image'
 import Link from 'next/link'
 
-const recentCourses = [
-  {
-    id: 1,
-    title: 'Toán học vui vẻ 🔢',
-    description: 'Khám phá thế giới số học qua các trò chơi thú vị',
-    progress: 60,
-    totalLessons: 20,
-    completedLessons: 12,
-    image: '/images/math-course.png',
-    category: 'Toán học',
-    level: 'Dễ'
-  },
-  {
-    id: 2,
-    title: 'Tiếng Anh cho bé 🌎',
-    description: 'Học tiếng Anh qua các bài hát và trò chơi',
-    progress: 30,
-    totalLessons: 25,
-    completedLessons: 8,
-    image: '/images/english-course.png',
-    category: 'Ngoại ngữ',
-    level: 'Dễ'
-  }
-]
-
 const recommendedCourses = [
   {
     id: 3,
@@ -62,7 +37,7 @@ const achievements = [
 ]
 
 function KidHomePage() {
-  const { data } = useCourseByAccount()
+  const { data } = useCourseByAccount({ page_size: 2, page_index: 1 })
   const courses = data?.payload.data ?? []
 
   return (
@@ -109,14 +84,19 @@ function KidHomePage() {
                   </div>
                   <div className='flex-1'>
                     <div className='flex items-center gap-2 mb-2'>
-                      <span className='bg-primary/10 text-primary text-sm px-3 py-1 rounded-full'>
+                      {/* <span className='bg-primary/10 text-primary text-sm px-3 py-1 rounded-full'>
                         {course.categories[0].name}
                       </span>
                       <span className='bg-secondary/10 text-secondary text-sm px-3 py-1 rounded-full'>
                         {course.categories[0].name}
-                      </span>
+                      </span> */}
+                      {course.categories.map((category) => (
+                        <span key={category.id} className='bg-primary/10 text-primary text-sm px-3 py-1 rounded-full'>
+                          {category.name}
+                        </span>
+                      ))}
                     </div>
-                    <h3 className='text-xl font-bold mb-2'>{course.title}</h3>
+                    <h3 className='text-xl font-bold mb-2 line-clamp-1'>{course.title}</h3>
                     <div className='space-y-2'>
                       <Progress value={course.completionRate} className='h-2' />
                       <div className='flex justify-between text-sm text-gray-600'>
