@@ -1,11 +1,13 @@
 'use client'
+import { use } from 'react'
 
 import { CustomerInfo } from '@/components/private/salesman/customer-detail/customer-info'
 import { CustomerSidebar } from '@/components/private/salesman/customer-detail/customer-sidebar'
 import { mockCustomers } from '@/app/(private)/salesman/_mock/data'
 import { notFound } from 'next/navigation'
 
-export default function CustomerDetailPage({ params }: { params: { id: string } }) {
+export default function CustomerDetailPage(props: { params: Promise<{ id: string }> }) {
+  const params = use(props.params)
   const customer = mockCustomers.find((c) => c.id === params.id)
 
   if (!customer) {

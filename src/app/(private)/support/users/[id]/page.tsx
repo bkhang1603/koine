@@ -1,4 +1,5 @@
 'use client'
+import { use } from 'react'
 
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -15,12 +16,13 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { cn } from '@/lib/utils'
 
 interface UserDetailPageProps {
-  params: {
+  params: Promise<{
     id: string
-  }
+  }>
 }
 
-export default function UserDetailPage({ params }: UserDetailPageProps) {
+export default function UserDetailPage(props: UserDetailPageProps) {
+  const params = use(props.params)
   const user = getUser(params.id)
 
   if (!user) {

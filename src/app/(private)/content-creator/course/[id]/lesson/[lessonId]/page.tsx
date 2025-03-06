@@ -13,13 +13,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Label } from '@/components/ui/label'
 import { useState } from 'react'
 
-interface LessonEditorPageProps {
-  params: {
-    id: string
-    lessonId: string
-  }
-}
-
 interface Question {
   id: string
   content: string
@@ -30,7 +23,7 @@ interface Question {
   }[]
 }
 
-export default function LessonEditorPage({}: LessonEditorPageProps) {
+export default function LessonEditorPage() {
   const router = useRouter()
   const [lesson, setLesson] = useState<Lesson>({
     id: '',

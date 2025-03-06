@@ -27,10 +27,7 @@ const courseApiRequest = {
     keyword?: string | string[] | undefined
   }) =>
     http.get<CoursesResType>(
-      `/courses?page_index=${page_index}&page_size=${page_size}&keyword=${keyword}&category=${category}&range=${range}&sort=${sort}`,
-      {
-        cache: 'no-cache'
-      }
+      `/courses?page_index=${page_index}&page_size=${page_size}&keyword=${keyword}&category=${category}&range=${range}&sort=${sort}`
     ),
   getCourse: (id: string) =>
     http.get<CourseResType>(`/courses/${id}`, {

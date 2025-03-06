@@ -5,7 +5,7 @@ import { HttpError } from '@/lib/http'
 
 export async function POST(request: Request) {
   const body = (await request.json()) as { id: string; code: string }
-  const cookieStore = cookies()
+  const cookieStore = await cookies()
   try {
     const { payload } = await authApiRequest.sSendOTP(body)
     // console.log(payload)

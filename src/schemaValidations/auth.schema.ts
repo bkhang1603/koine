@@ -169,16 +169,17 @@ export const RegisterBodyForm = z
 export type RegisterBodyFormType = z.TypeOf<typeof RegisterBodyForm>
 
 export const RegisterRes = z.object({
-  data: z.object({
-    accessToken: z.string(),
-    refreshToken: z.string(),
-    account: z.object({
-      id: z.number(),
-      name: z.string(),
-      email: z.string(),
-      role: z.enum(RoleValues)
-    })
-  }),
+  // data: z.object({
+  //   accessToken: z.string(),
+  //   refreshToken: z.string(),
+  //   account: z.object({
+  //     id: z.number(),
+  //     name: z.string(),
+  //     email: z.string(),
+  //     role: z.enum(RoleValues)
+  //   })
+  // }),
+  data: z.string(),
   message: z.string()
 })
 
@@ -216,3 +217,9 @@ export const LoginGoogleRes = z.object({
 })
 
 export type LoginGoogleResType = z.TypeOf<typeof LoginGoogleRes>
+
+export const ResendOTPRes = z.object({
+  message: z.string()
+})
+
+export type ResendOTPResType = z.TypeOf<typeof ResendOTPRes>

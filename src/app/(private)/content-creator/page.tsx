@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button'
 import { Progress } from '@/components/ui/progress'
 import { BookOpen, Star, MessageSquare, Eye, Clock, FileText, Users } from 'lucide-react'
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
+import Link from 'next/link'
 
 const quickStats = [
   {
@@ -98,16 +99,16 @@ export default function DashboardPage() {
       {/* Quick Actions */}
       <div className='flex flex-wrap gap-4'>
         <Button className='flex items-center gap-2' asChild>
-          <a href='/content-creator/blog/new'>
+          <Link href='/content-creator/blog/new'>
             <FileText className='w-4 h-4' />
             Tạo bài viết
-          </a>
+          </Link>
         </Button>
         <Button className='flex items-center gap-2' asChild>
-          <a href='/content-creator/course/new'>
+          <Link href='/content-creator/course/new'>
             <BookOpen className='w-4 h-4' />
             Tạo khóa học
-          </a>
+          </Link>
         </Button>
         <Button variant='outline' className='flex items-center gap-2' asChild>
           <a href='/content-creator/comments'>

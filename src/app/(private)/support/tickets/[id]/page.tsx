@@ -1,4 +1,5 @@
 'use client'
+import { use } from 'react'
 
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -11,12 +12,13 @@ import Link from 'next/link'
 import { getTicket, getUser } from '../../_data/mock'
 
 interface TicketDetailPageProps {
-  params: {
+  params: Promise<{
     id: string
-  }
+  }>
 }
 
-export default function TicketDetailPage({ params }: TicketDetailPageProps) {
+export default function TicketDetailPage(props: TicketDetailPageProps) {
+  const params = use(props.params)
   const ticket = getTicket(params.id)
   const user = ticket ? getUser(ticket.userId) : null
 

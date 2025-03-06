@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, use } from 'react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
@@ -44,7 +44,8 @@ interface LearningActivity {
   score?: number
 }
 
-export default function ChildAccountDetailPage({ params }: { params: { id: string } }) {
+export default function ChildAccountDetailPage(props: { params: Promise<{ id: string }> }) {
+  const params = use(props.params)
   const { toast } = useToast()
   const [showReportDialog, setShowReportDialog] = useState(false)
   const [reportReason, setReportReason] = useState('')

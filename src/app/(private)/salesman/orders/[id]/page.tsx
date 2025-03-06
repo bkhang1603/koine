@@ -1,4 +1,5 @@
 'use client'
+import { use } from 'react'
 
 import { Button } from '@/components/ui/button'
 import { mockOrders } from '../../_mock/data'
@@ -15,7 +16,8 @@ const orderStatusConfig = {
   cancelled: { label: 'Đã hủy', color: 'text-red-600' }
 } as const
 
-export default function OrderDetailPage({ params }: { params: { id: string } }) {
+export default function OrderDetailPage(props: { params: Promise<{ id: string }> }) {
+  const params = use(props.params)
   const order = mockOrders.find((o) => o.id === params.id)
 
   if (!order) {

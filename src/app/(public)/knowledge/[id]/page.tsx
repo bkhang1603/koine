@@ -1,19 +1,25 @@
 import blogApiRequest from '@/apiRequests/blog'
 import BlogComments from '@/components/public/parent/knowledge/blog-comments'
-import { BlogResType } from '@/schemaValidations/blog.schema'
-import { BookOpen, CalendarDays, ChevronRight } from 'lucide-react'
+import { CalendarDays } from 'lucide-react'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
-import Link from 'next/link'
+import { wrapServerApi } from '@/lib/server-utils'
 
-async function BlogDetailPage({ params: { id } }: { params: { id: string } }) {
-  let blog: BlogResType['data'] | null = null
+async function BlogDetailPage(props: { params: Promise<{ id: string }> }) {
+  const params = await props.params
 
-  try {
-    const { payload } = await blogApiRequest.getBlog(id)
-    blog = payload.data
-  } catch (error) {
-    console.log(error)
-  }
+  const { id } = params
+
+  // let blog: BlogResType['data'] | null = null
+
+  const data = await wrapServerApi(() => blogApiRequest.getBlog(id))
+  const blog = data?.payload?.data
+
+  // try {
+  //   const { payload } = await blogApiRequest.getBlog(id)
+  //   blog = payload.data
+  // } catch (error) {
+  //   console.log(error)
+  // }
 
   if (!blog) {
     return <div>Blog không tồn tại</div>
@@ -21,20 +27,6 @@ async function BlogDetailPage({ params: { id } }: { params: { id: string } }) {
 
   return (
     <main>
-      {/* Breadcrumb Navigation */}
-      <nav className='py-3 sm:py-4'>
-        <div className='container max-w-4xl'>
-          <div className='flex items-center text-sm text-muted-foreground'>
-            <Link href='/knowledge' className='flex items-center hover:text-primary transition-colors'>
-              <BookOpen className='w-3.5 h-3.5 mr-1' />
-              <span>Kiến thức</span>
-            </Link>
-            <ChevronRight className='w-3.5 h-3.5 mx-2' />
-            <span className='truncate max-w-[180px] sm:max-w-xs text-gray-600 font-medium'>{blog.title}</span>
-          </div>
-        </div>
-      </nav>
-
       {/* Blog Header */}
       <header className='relative bg-gradient-to-b from-gray-50/50'>
         <div className='container max-w-4xl pt-10 pb-12'>

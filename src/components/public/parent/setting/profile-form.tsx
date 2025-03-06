@@ -17,8 +17,8 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { Calendar } from '@/components/ui/calendar'
 import { format, parse } from 'date-fns'
 import { vi } from 'date-fns/locale'
-import Loading from '@/components/loading'
 import { Card } from '@/components/ui/card'
+import { ProfileFormSkeleton } from './profile-form-skeleton'
 
 export function ProfileForm() {
   const [file, setFile] = useState<File | null>(null)
@@ -27,7 +27,7 @@ export function ProfileForm() {
   const updateAccountProfileMutation = useUpdateAccountProfileMutation()
   const uploadImageMutation = useUploadImageMutation()
 
-  const { data } = useAccountProfileById()
+  const { data, isFetching } = useAccountProfileById()
   const profile = data?.payload.data ?? null
 
   const form = useForm<AccountProfileBodyType>({
@@ -45,10 +45,10 @@ export function ProfileForm() {
   useEffect(() => {
     if (profile) {
       form.reset({
-        firstName: profile.firstName,
-        lastName: profile.lastName,
-        dob: profile.dob,
-        avatarUrl: profile.avatarUrl
+        firstName: profile.firstName ?? '',
+        lastName: profile.lastName ?? '',
+        dob: profile.dob ?? '',
+        avatarUrl: profile.avatarUrl ?? ''
       })
     }
   }, [profile, form])
@@ -97,12 +97,8 @@ export function ProfileForm() {
     }
   }
 
-  if (!profile) {
-    return (
-      <div className='flex items-center justify-center h-40'>
-        <Loading />
-      </div>
-    )
+  if (isFetching) {
+    return <ProfileFormSkeleton />
   }
 
   return (

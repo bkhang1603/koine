@@ -1,4 +1,5 @@
 'use client'
+import { use } from 'react'
 
 import { Button } from '@/components/ui/button'
 import Image from 'next/image'
@@ -11,7 +12,8 @@ import { Skeleton } from '@/components/ui/skeleton'
 import Link from 'next/link'
 import { cn } from '@/lib/utils'
 
-function CourseDetailPage({ params }: { params: { courseId: string } }) {
+function CourseDetailPage(props: { params: Promise<{ courseId: string }> }) {
+  const params = use(props.params)
   const { courseId } = params
   const { data, isLoading } = useGetCourseProgressQuery({ id: courseId })
   const course = data?.payload.data || null
@@ -19,10 +21,7 @@ function CourseDetailPage({ params }: { params: { courseId: string } }) {
   // Breadcrumb component
   const Breadcrumb = () => (
     <div className='mb-6 flex items-center gap-1 text-sm'>
-      <Link
-        href='/kid/dashboard'
-        className='flex items-center gap-1 text-gray-500 hover:text-primary transition-colors'
-      >
+      <Link href='/kid' className='flex items-center gap-1 text-gray-500 hover:text-primary transition-colors'>
         <Home className='h-4 w-4' />
         <span className='hidden sm:inline'>Trang chính</span>
       </Link>
@@ -42,7 +41,7 @@ function CourseDetailPage({ params }: { params: { courseId: string } }) {
   // Render skeleton while loading
   if (isLoading) {
     return (
-      <div className='container mx-auto px-4 py-8'>
+      <div className='py-8'>
         <Breadcrumb />
 
         {/* Course Header Skeleton */}
@@ -131,7 +130,7 @@ function CourseDetailPage({ params }: { params: { courseId: string } }) {
 
   if (!course) {
     return (
-      <div className='container mx-auto px-4 py-8'>
+      <div className='py-8'>
         <Breadcrumb />
         <div className='flex flex-col items-center justify-center min-h-[400px] gap-4'>
           <h3 className='text-lg font-medium text-gray-900'>Không tìm thấy khóa học</h3>
@@ -145,7 +144,7 @@ function CourseDetailPage({ params }: { params: { courseId: string } }) {
   }
 
   return (
-    <div className='container mx-auto px-4 py-8'>
+    <div className='py-8'>
       <Breadcrumb />
 
       {/* Course Header */}
@@ -268,7 +267,114 @@ function CourseDetailPage({ params }: { params: { courseId: string } }) {
         </TabsContent>
 
         <TabsContent value='progress' className='grid gap-6'>
-          {/* Progress content unchanged */}
+          {/* Overview Card */}
+          <Card className='p-6'>
+            <div className='grid md:grid-cols-3 gap-6'>
+              <div className='bg-primary/5 rounded-2xl p-6 text-center'>
+                <div className='inline-flex items-center justify-center w-12 h-12 rounded-full bg-primary/10 text-primary mb-4'>
+                  <BookOpen className='w-6 h-6' />
+                </div>
+                <h4 className='text-3xl font-bold mb-1'>{course.totalLessonsInCourse}</h4>
+                <p className='text-gray-600'>Tổng số bài học</p>
+              </div>
+
+              <div className='bg-green-50 rounded-2xl p-6 text-center'>
+                <div className='inline-flex items-center justify-center w-12 h-12 rounded-full bg-green-100 text-green-600 mb-4'>
+                  <CheckCircle2 className='w-6 h-6' />
+                </div>
+                <h4 className='text-3xl font-bold text-green-600 mb-1'>{course.totalCompletedLessonsInCourse}</h4>
+                <p className='text-gray-600'>Bài học đã hoàn thành</p>
+              </div>
+
+              <div className='bg-blue-50 rounded-2xl p-6 text-center'>
+                <div className='inline-flex items-center justify-center w-12 h-12 rounded-full bg-blue-100 text-blue-600 mb-4'>
+                  <Clock className='w-6 h-6' />
+                </div>
+                <h4 className='text-3xl font-bold text-blue-600 mb-1'>{course.courseCompletionPercentage}</h4>
+                <p className='text-gray-600'>Tổng thời gian học</p>
+              </div>
+            </div>
+          </Card>
+
+          {/* Progress by Chapter */}
+          {course.chapters.map((chapter) => (
+            <Card key={chapter.id} className='p-6'>
+              <div className='flex items-center justify-between mb-6'>
+                <div>
+                  <h3 className='text-lg font-bold mb-1'>
+                    Chương {chapter.sequence}: {chapter.title}
+                  </h3>
+                  <div className='flex items-center gap-4 text-sm text-gray-600'>
+                    <div className='flex items-center gap-1.5'>
+                      <BookOpen className='h-4 w-4' />
+                      <span>{chapter.lessons.length} bài học</span>
+                    </div>
+                    <div className='flex items-center gap-1.5'>
+                      <Clock className='h-4 w-4' />
+                      <span>{chapter.durationsDisplay}</span>
+                    </div>
+                  </div>
+                </div>
+                <div className='text-right'>
+                  <p className='text-2xl font-bold text-primary mb-1'>
+                    {chapter.lessons.filter((lesson) => lesson.status === 'YET').length}/{chapter.lessons.length}
+                  </p>
+                  <p className='text-sm text-gray-600'>bài học hoàn thành</p>
+                </div>
+              </div>
+
+              {/* Progress Bar */}
+              <div className='space-y-2 mb-6'>
+                <div className='w-full bg-gray-100 rounded-full h-3 overflow-hidden'>
+                  <div
+                    className='bg-primary h-full rounded-full transition-all duration-300'
+                    style={{
+                      width: `${(chapter.lessons.filter((lesson) => lesson.status === 'YET').length / chapter.lessons.length) * 100}%`
+                    }}
+                  />
+                </div>
+              </div>
+
+              {/* Lesson List */}
+              <div className='space-y-3'>
+                {chapter.lessons.map((lesson) => (
+                  <div
+                    key={lesson.id}
+                    className='flex items-center gap-4 p-4 rounded-xl bg-gray-50 hover:bg-gray-100 transition-colors'
+                  >
+                    <div className='flex-shrink-0'>
+                      {lesson.status === 'YET' ? (
+                        <div className='w-8 h-8 rounded-full bg-green-100 flex items-center justify-center'>
+                          <CheckCircle2 className='w-5 h-5 text-green-600' />
+                        </div>
+                      ) : (
+                        <div className='w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center'>
+                          <LockKeyhole className='w-5 h-5 text-gray-400' />
+                        </div>
+                      )}
+                    </div>
+                    <div className='flex-1 min-w-0'>
+                      <h4 className='font-medium text-gray-900 truncate'>
+                        Bài {lesson.sequence}: {lesson.title}
+                      </h4>
+                      <p className='text-sm text-gray-500 truncate'>{lesson.description}</p>
+                    </div>
+                    <div className='flex items-center gap-4'>
+                      <div className='flex items-center gap-1.5 text-sm text-gray-500'>
+                        <Clock className='h-4 w-4' />
+                        <span>{lesson.durationsDisplay}</span>
+                      </div>
+                      {lesson.status === 'YET' && (
+                        <Button variant='ghost' size='sm' className='rounded-full'>
+                          Xem lại <ChevronRight className='w-4 h-4 ml-1' />
+                        </Button>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </Card>
+          ))}
         </TabsContent>
       </Tabs>
     </div>

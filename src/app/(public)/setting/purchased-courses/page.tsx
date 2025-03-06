@@ -6,10 +6,11 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Input } from '@/components/ui/input'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
-import { Search, Filter, PlayCircle, Users2, Clock, BookOpen, Gift, Sparkles, Calendar } from 'lucide-react'
+import { Search, PlayCircle, Users2, Clock, BookOpen, Gift, Sparkles, Calendar } from 'lucide-react'
 import Image from 'next/image'
 import { Progress } from '@/components/ui/progress'
 import { cn } from '@/lib/utils'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 
 interface PurchasedCourse {
   id: number
@@ -75,13 +76,54 @@ const mockChildAccounts = [
 
 export default function PurchasedCoursesPage() {
   const [courses] = useState(mockCourses)
+  const [searchQuery, setSearchQuery] = useState('')
+  const [statusFilter, setStatusFilter] = useState('all')
+  const [dateFilter, setDateFilter] = useState('all')
 
   return (
     <div className='space-y-8'>
       {/* Header */}
       <div>
         <h3 className='text-2xl font-semibold'>Khóa học đã mua</h3>
-        <p className='text-sm text-gray-500 mt-1'>Quản lý và kích hoạt các khóa học bạn đã mua</p>
+        <p className='text-sm text-gray-500 mt-1'>Quản lý các khóa học bạn đã mua</p>
+      </div>
+
+      {/* Search and Filters - UI đồng nhất */}
+      <div className='flex flex-col md:flex-row gap-4 items-center justify-between'>
+        <div className='w-full md:w-auto relative'>
+          <Search className='absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400' />
+          <Input
+            placeholder='Tìm kiếm khóa học...'
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className='pl-9 md:w-[300px] border-gray-200 focus:border-primary/30 focus:ring-primary/20'
+          />
+        </div>
+
+        <div className='flex flex-col sm:flex-row gap-4 w-full md:w-auto'>
+          <Select value={statusFilter} onValueChange={setStatusFilter}>
+            <SelectTrigger className='w-full sm:w-[180px] border-gray-200'>
+              <SelectValue placeholder='Trạng thái' />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value='all'>Tất cả trạng thái</SelectItem>
+              <SelectItem value='active'>Đang hoạt động</SelectItem>
+              <SelectItem value='expired'>Đã hết hạn</SelectItem>
+            </SelectContent>
+          </Select>
+
+          <Select value={dateFilter} onValueChange={setDateFilter}>
+            <SelectTrigger className='w-full sm:w-[180px] border-gray-200'>
+              <SelectValue placeholder='Thời gian' />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value='all'>Tất cả thời gian</SelectItem>
+              <SelectItem value='thisMonth'>Tháng này</SelectItem>
+              <SelectItem value='lastMonth'>Tháng trước</SelectItem>
+              <SelectItem value='last3Months'>3 tháng qua</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
       </div>
 
       {/* Stats Overview */}
@@ -148,24 +190,6 @@ export default function PurchasedCoursesPage() {
           </CardContent>
         </Card>
       </div>
-
-      {/* Search and Filters */}
-      <Card className='border-none shadow-md'>
-        <CardContent className='p-6'>
-          <div className='flex-1 flex justify-between gap-4'>
-            <div className='relative flex-1'>
-              <Search className='absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400' />
-              <Input
-                placeholder='Tìm kiếm khóa học...'
-                className='pl-9 border-gray-200 focus:border-primary/30 focus:ring-primary/20'
-              />
-            </div>
-            <Button variant='outline' size='icon' className='border-gray-200 hover:bg-gray-100'>
-              <Filter className='h-4 w-4 text-gray-500' />
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
 
       {/* Course Grid */}
       <div className='grid gap-6 md:grid-cols-2'>

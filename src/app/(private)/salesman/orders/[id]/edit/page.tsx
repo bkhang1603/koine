@@ -1,4 +1,5 @@
 'use client'
+import { use } from 'react'
 
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -9,7 +10,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Textarea } from '@/components/ui/textarea'
 import { useRouter } from 'next/navigation'
 
-export default function EditOrderPage({ params }: { params: { id: string } }) {
+export default function EditOrderPage(props: { params: Promise<{ id: string }> }) {
+  const params = use(props.params)
   const router = useRouter()
   const order = mockOrders.find((o) => o.id === params.id)
 

@@ -1,4 +1,5 @@
 'use client'
+import { use } from 'react'
 
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -11,12 +12,13 @@ import Link from 'next/link'
 import { getRefund, getUser } from '../../_data/mock'
 
 interface RefundDetailPageProps {
-  params: {
+  params: Promise<{
     id: string
-  }
+  }>
 }
 
-export default function RefundDetailPage({ params }: RefundDetailPageProps) {
+export default function RefundDetailPage(props: RefundDetailPageProps) {
+  const params = use(props.params)
   const refund = getRefund(params.id)
   const user = refund ? getUser(refund.userId) : null
 

@@ -1,10 +1,12 @@
 'use client'
+import { use } from 'react'
 
 import { ProductForm } from '@/components/private/salesman/product-form'
 import { mockProducts } from '../../../_mock/data'
 import { useRouter } from 'next/navigation'
 
-export default function EditProductPage({ params }: { params: { id: string } }) {
+export default function EditProductPage(props: { params: Promise<{ id: string }> }) {
+  const params = use(props.params)
   const router = useRouter()
   const product = mockProducts.find((p) => p.id === params.id)
 

@@ -6,7 +6,8 @@ import {
   RefreshTokenBodyType,
   RefreshTokenResType,
   RegisterBodyFormType,
-  RegisterResType
+  RegisterResType,
+  ResendOTPResType
 } from '@/schemaValidations/auth.schema'
 
 const authApiRequest = {
@@ -53,7 +54,8 @@ const authApiRequest = {
   register: (body: RegisterBodyFormType) => http.post<RegisterResType>('/auth/register', body),
   sendOTP: ({ id, code }: { id: string; code: string }) =>
     http.post<LoginResType>('/api/auth/otp', { id, code }, { baseUrl: '' }),
-  sSendOTP: ({ id, code }: { id: string; code: string }) => http.post<LoginResType>('/auth/active', { id, code })
+  sSendOTP: ({ id, code }: { id: string; code: string }) => http.post<LoginResType>('/auth/active', { id, code }),
+  resendOTP: (id: string) => http.post<ResendOTPResType>(`/auth/retry-active/${id}`, null)
 }
 
 export default authApiRequest

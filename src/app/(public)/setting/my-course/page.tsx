@@ -55,6 +55,43 @@ export default function MyCoursesPage() {
         <p className='text-sm text-gray-500 mt-1'>Quản lý và theo dõi tiến độ học tập của bạn</p>
       </div>
 
+      {/* Search and Filters - UI đồng nhất */}
+      <div className='flex flex-col md:flex-row gap-4 items-center justify-between'>
+        <div className='w-full md:w-auto relative'>
+          <Search className='absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400' />
+          <Input
+            placeholder='Tìm kiếm khóa học...'
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className='pl-9 md:w-[300px] border-gray-200 focus:border-primary/30 focus:ring-primary/20'
+          />
+        </div>
+
+        <div className='flex flex-col sm:flex-row gap-4 w-full md:w-auto'>
+          <Select value={category} onValueChange={setCategory}>
+            <SelectTrigger className='w-full sm:w-[180px] border-gray-200'>
+              <SelectValue placeholder='Danh mục' />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value='all'>Tất cả danh mục</SelectItem>
+              <SelectItem value='soft-skills'>Kỹ năng mềm</SelectItem>
+              <SelectItem value='technical'>Kỹ thuật</SelectItem>
+            </SelectContent>
+          </Select>
+
+          <Select value='recent'>
+            <SelectTrigger className='w-full sm:w-[180px] border-gray-200'>
+              <SelectValue placeholder='Sắp xếp theo' />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value='recent'>Gần đây nhất</SelectItem>
+              <SelectItem value='name'>Tên khóa học</SelectItem>
+              <SelectItem value='progress'>Tiến độ</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+      </div>
+
       {/* Stats Cards - Loading State */}
       {isLoading ? (
         <div className='grid grid-cols-1 md:grid-cols-3 gap-6'>
@@ -136,35 +173,6 @@ export default function MyCoursesPage() {
           </Card>
         </div>
       )}
-
-      {/* Filters */}
-      <Card className='border-none shadow-md'>
-        <CardContent className='p-6'>
-          <div className='flex-1 flex flex-col sm:flex-row justify-between gap-4'>
-            <div className='relative flex-1'>
-              <Search className='absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400' />
-              <Input
-                placeholder='Tìm khóa học...'
-                className='pl-9 border-gray-200 focus:border-primary/30 focus:ring-primary/20'
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                disabled={isLoading || allCourses.length === 0}
-              />
-            </div>
-            <Select value={category} onValueChange={setCategory} disabled={isLoading || allCourses.length === 0}>
-              <SelectTrigger className='w-full sm:w-[180px] border-gray-200'>
-                <SelectValue placeholder='Danh mục' />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value='all'>Tất cả danh mục</SelectItem>
-                {/* Thêm danh mục từ API nếu cần */}
-                <SelectItem value='soft-skills'>Kỹ năng mềm</SelectItem>
-                <SelectItem value='technical'>Kỹ thuật</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-        </CardContent>
-      </Card>
 
       {/* Loading State for Courses */}
       {isLoading && (

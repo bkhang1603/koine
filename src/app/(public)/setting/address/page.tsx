@@ -26,9 +26,11 @@ import {
 } from '@/components/ui/alert-dialog'
 import { AccountAddressBodyType, AccountOneAddressResType } from '@/schemaValidations/account.schema'
 import { toast } from '@/components/ui/use-toast'
+import { EmptyAddress } from '@/components/public/parent/setting/empty-address'
+import { AddressSkeleton } from '@/components/public/parent/setting/address-skeleton'
 
 export default function AddressPage() {
-  const { data } = useGetAccountAddress()
+  const { data, isLoading } = useGetAccountAddress()
   const editMutation = useUpdateAccountAddressMutation()
   const deleteMutation = useDeleteAccountAddressMutation()
 
@@ -87,112 +89,107 @@ export default function AddressPage() {
       <Separator />
 
       {/* Address List */}
-      <div className='grid gap-6'>
-        {addresses.map((address) => (
-          <Card
-            key={address.id}
-            className={`p-6 ${address.isDefault ? 'border-2 border-primary/10 bg-primary/5' : ''}`}
-          >
-            <div className='flex items-start justify-between mb-6'>
-              <div className='flex items-center gap-2 text-primary'>
-                {address.isDefault ? <MapPinnedIcon className='w-5 h-5' /> : <Building2 className='w-5 h-5' />}
-                <span className='font-medium'>{address.tag}</span>
-              </div>
-              <div className='flex items-center gap-2'>
-                {!address.isDefault && (
-                  <Button
-                    variant='ghost'
-                    size='sm'
-                    className='h-8 text-gray-500 hover:text-primary'
-                    onClick={() =>
-                      handleSetDefault({
-                        id: address.id,
-                        address
-                      })
-                    }
-                  >
-                    <CheckCircle2 className='w-4 h-4 mr-1' />
-                    Đặt mặc định
-                  </Button>
-                )}
-                {address.isDefault && (
-                  <span className='px-2 py-1 bg-primary/10 text-primary text-xs rounded-full font-medium'>
-                    Mặc định
-                  </span>
-                )}
-                <Button
-                  variant='ghost'
-                  size='sm'
-                  className='h-8 text-gray-500 hover:text-primary'
-                  onClick={() => setEditingAddress(address)}
-                >
-                  <PenLine className='w-4 h-4' />
-                </Button>
-                <AlertDialog>
-                  <AlertDialogTrigger asChild>
-                    <Button variant='ghost' size='sm' className='h-8 text-gray-500 hover:text-red-500'>
-                      <Trash2 className='w-4 h-4' />
-                    </Button>
-                  </AlertDialogTrigger>
-                  <AlertDialogContent>
-                    <AlertDialogHeader>
-                      <AlertDialogTitle>Xóa địa chỉ</AlertDialogTitle>
-                      <AlertDialogDescription>
-                        Bạn có chắc chắn muốn xóa địa chỉ này? Hành động này không thể hoàn tác.
-                      </AlertDialogDescription>
-                    </AlertDialogHeader>
-                    <AlertDialogFooter>
-                      <AlertDialogCancel>Hủy</AlertDialogCancel>
-                      <AlertDialogAction
-                        onClick={() => handleDeleteAddress(address.id)}
-                        className='bg-red-500 hover:bg-red-600'
+      {isLoading ? (
+        <AddressSkeleton />
+      ) : (
+        <div className='grid gap-6'>
+          {addresses.length === 0 ? (
+            <EmptyAddress onAddAddress={() => setShowAddForm(true)} />
+          ) : (
+            addresses.map((address) => (
+              <Card
+                key={address.id}
+                className={`p-6 ${address.isDefault ? 'border-2 border-primary/10 bg-primary/5' : ''}`}
+              >
+                <div className='flex items-start justify-between mb-6'>
+                  <div className='flex items-center gap-2 text-primary'>
+                    {address.isDefault ? <MapPinnedIcon className='w-5 h-5' /> : <Building2 className='w-5 h-5' />}
+                    <span className='font-medium'>{address.tag}</span>
+                  </div>
+                  <div className='flex items-center gap-2'>
+                    {!address.isDefault && (
+                      <Button
+                        variant='ghost'
+                        size='sm'
+                        className='h-8 text-gray-500 hover:text-primary'
+                        onClick={() =>
+                          handleSetDefault({
+                            id: address.id,
+                            address
+                          })
+                        }
                       >
-                        Xóa
-                      </AlertDialogAction>
-                    </AlertDialogFooter>
-                  </AlertDialogContent>
-                </AlertDialog>
-              </div>
-            </div>
+                        <CheckCircle2 className='w-4 h-4 mr-1' />
+                        Đặt mặc định
+                      </Button>
+                    )}
+                    {address.isDefault && (
+                      <span className='px-2 py-1 bg-primary/10 text-primary text-xs rounded-full font-medium'>
+                        Mặc định
+                      </span>
+                    )}
+                    <Button
+                      variant='ghost'
+                      size='sm'
+                      className='h-8 text-gray-500 hover:text-primary'
+                      onClick={() => setEditingAddress(address)}
+                    >
+                      <PenLine className='w-4 h-4' />
+                    </Button>
+                    <AlertDialog>
+                      <AlertDialogTrigger asChild>
+                        <Button variant='ghost' size='sm' className='h-8 text-gray-500 hover:text-red-500'>
+                          <Trash2 className='w-4 h-4' />
+                        </Button>
+                      </AlertDialogTrigger>
+                      <AlertDialogContent>
+                        <AlertDialogHeader>
+                          <AlertDialogTitle>Xóa địa chỉ</AlertDialogTitle>
+                          <AlertDialogDescription>
+                            Bạn có chắc chắn muốn xóa địa chỉ này? Hành động này không thể hoàn tác.
+                          </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                          <AlertDialogCancel>Hủy</AlertDialogCancel>
+                          <AlertDialogAction
+                            onClick={() => handleDeleteAddress(address.id)}
+                            className='bg-red-500 hover:bg-red-600'
+                          >
+                            Xóa
+                          </AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
+                  </div>
+                </div>
 
-            <div className='grid md:grid-cols-2 gap-8'>
-              <div className='space-y-4'>
-                <div>
-                  <Label className='text-gray-500 text-sm'>Họ và tên người nhận</Label>
-                  <div className='font-medium mt-1'>{address.name}</div>
+                <div className='grid md:grid-cols-2 gap-8'>
+                  <div className='space-y-4'>
+                    <div>
+                      <Label className='text-gray-500 text-sm'>Họ và tên người nhận</Label>
+                      <div className='font-medium mt-1'>{address.name}</div>
+                    </div>
+                    <div>
+                      <Label className='text-gray-500 text-sm'>Số điện thoại</Label>
+                      <div className='font-medium mt-1'>{address.phone}</div>
+                    </div>
+                  </div>
+                  <div className='space-y-4'>
+                    <div>
+                      <Label className='text-gray-500 text-sm'>Địa chỉ</Label>
+                      <div className='font-medium mt-1'>{address.address}</div>
+                    </div>
+                    <div>
+                      <Label className='text-gray-500 text-sm'>Khu vực</Label>
+                      <div className='font-medium mt-1'>Vietnam</div>
+                    </div>
+                  </div>
                 </div>
-                <div>
-                  <Label className='text-gray-500 text-sm'>Số điện thoại</Label>
-                  <div className='font-medium mt-1'>{address.phone}</div>
-                </div>
-              </div>
-              <div className='space-y-4'>
-                <div>
-                  <Label className='text-gray-500 text-sm'>Địa chỉ</Label>
-                  <div className='font-medium mt-1'>{address.address}</div>
-                </div>
-                <div>
-                  <Label className='text-gray-500 text-sm'>Khu vực</Label>
-                  <div className='font-medium mt-1'>Vietnam</div>
-                </div>
-              </div>
-            </div>
-          </Card>
-        ))}
-
-        {addresses.length === 0 && (
-          <div className='text-center py-8 text-gray-500'>
-            <p>Bạn chưa có địa chỉ nào</p>
-            <Button
-              className='mt-4 bg-primary/5 text-primary hover:bg-primary/10 gap-2'
-              onClick={() => setShowAddForm(true)}
-            >
-              <Plus className='w-4 h-4' />
-              Thêm địa chỉ mới
-            </Button>
-          </div>
-        )}
-      </div>
+              </Card>
+            ))
+          )}
+        </div>
+      )}
 
       {/* Add/Edit Address Form */}
       <AddressForm open={showAddForm} onOpenChange={setShowAddForm} mode='add' />

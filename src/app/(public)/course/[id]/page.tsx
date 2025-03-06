@@ -1,12 +1,11 @@
-import { handleErrorApi } from '@/lib/utils'
 import courseApiRequest from '@/apiRequests/course'
-import { CourseResType } from '@/schemaValidations/course.schema'
 import { FileText, Video, MonitorPlay, Clock, Users2, BarChart, PlayCircle, ChevronRight, BookOpen } from 'lucide-react'
 import Image from 'next/image'
 import { Card } from '@/components/ui/card'
-import EnrollButton from '../../../../components/public/parent/course/enroll-button'
-import CourseButton from '../../../../components/public/parent/course/course-button'
+import EnrollButton from '@/components/public/parent/course/enroll-button'
+import CourseButton from '@/components/public/parent/course/course-button'
 import Link from 'next/link'
+import { wrapServerApi } from '@/lib/server-utils'
 
 const formatDuration = (minutes: number) => {
   const hours = Math.floor(minutes / 60)
@@ -29,15 +28,22 @@ const getLessonIcon = (type: string) => {
   }
 }
 
-export default async function CourseDetail({ params: { id } }: { params: { id: string } }) {
-  let courseData: CourseResType['data'] | null = null
+export default async function CourseDetail(props: { params: Promise<{ id: string }> }) {
+  const params = await props.params
 
-  try {
-    const { payload } = await courseApiRequest.getCourse(id)
-    courseData = payload.data
-  } catch (error) {
-    handleErrorApi({ error })
-  }
+  const { id } = params
+
+  // let courseData: CourseResType['data'] | null = null
+
+  const data = await wrapServerApi(() => courseApiRequest.getCourse(id))
+  const courseData = data?.payload?.data
+
+  // try {
+  //   const { payload } = await courseApiRequest.getCourse(id)
+  //   courseData = payload.data
+  // } catch (error) {
+  //   handleErrorApi({ error })
+  // }
 
   if (!courseData) {
     return <p>Không tìm thấy khóa học</p>

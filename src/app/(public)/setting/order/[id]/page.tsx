@@ -1,4 +1,5 @@
 'use client'
+import { use } from 'react'
 
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -133,8 +134,9 @@ const MOCK_ORDER = {
   ]
 }
 
-export default function OrderDetailPage({ params }: { params: { id: string } }) {
-  const { data: orderData, isLoading, error } = useGetOrder({ id: params.id })
+export default function OrderDetailPage(props: { params: Promise<{ id: string }> }) {
+  const params = use(props.params)
+  const { isLoading, error } = useGetOrder({ id: params.id })
   const order = MOCK_ORDER
 
   if (isLoading) {
