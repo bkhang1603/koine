@@ -93,6 +93,8 @@ export const metadata: Metadata = {
     'og:image:height': '630',
     'og:image:type': 'image/png',
     'msapplication-TileImage':
+      'https://koine-bucket-v4.s3.ap-southeast-2.amazonaws.com/image_8318c5f6-5945-4e9a-8d0a-a7841bf139b4_png',
+    'link:image_src':
       'https://koine-bucket-v4.s3.ap-southeast-2.amazonaws.com/image_8318c5f6-5945-4e9a-8d0a-a7841bf139b4_png'
   }
 }
