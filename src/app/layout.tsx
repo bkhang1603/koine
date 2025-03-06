@@ -4,7 +4,6 @@ import { cn } from '@/lib/utils'
 import { Toaster } from '@/components/ui/toaster'
 import AppProvider from '@/components/app-provider'
 import { Roboto } from 'next/font/google'
-import envConfig from '@/config'
 import { Analytics } from '@vercel/analytics/react'
 import { SpeedInsights } from '@vercel/speed-insights/next'
 
@@ -56,7 +55,11 @@ export const metadata: Metadata = {
     url: 'https://koine.id.vn',
     images: [
       {
-        url: `${envConfig.NEXT_PUBLIC_URL}/images/welcome.png`
+        url: 'https://koine-bucket-v4.s3.ap-southeast-2.amazonaws.com/image_8318c5f6-5945-4e9a-8d0a-a7841bf139b4_png',
+        width: 1200,
+        height: 630,
+        alt: 'Koine - Nền tảng giáo dục giới tính cho trẻ em',
+        type: 'image/png'
       }
     ]
   },
@@ -68,7 +71,30 @@ export const metadata: Metadata = {
       'de-DE': '/de-DE'
     }
   },
-  metadataBase: new URL('https://koine.id.vn')
+  metadataBase: new URL('https://koine.id.vn'),
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Nền tảng giáo dục giới tính cho trẻ em | Koine',
+    description:
+      'Koine là nền tảng giáo dục giới tính cho trẻ em với các khóa học chất lượng cao từ các chuyên gia hàng đầu.',
+    images: [
+      {
+        url: 'https://koine-bucket-v4.s3.ap-southeast-2.amazonaws.com/image_8318c5f6-5945-4e9a-8d0a-a7841bf139b4_png',
+        width: 1200,
+        height: 630,
+        alt: 'Koine - Nền tảng giáo dục giới tính cho trẻ em'
+      }
+    ],
+    creator: '@koine',
+    site: '@koine'
+  },
+  other: {
+    'og:image:width': '1200',
+    'og:image:height': '630',
+    'og:image:type': 'image/png',
+    'msapplication-TileImage':
+      'https://koine-bucket-v4.s3.ap-southeast-2.amazonaws.com/image_8318c5f6-5945-4e9a-8d0a-a7841bf139b4_png'
+  }
 }
 
 export default async function RootLayout({
