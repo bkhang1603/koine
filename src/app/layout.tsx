@@ -19,7 +19,7 @@ export const metadata: Metadata = {
     default: 'Nền tảng giáo dục giới tính cho trẻ em | Koine'
   },
   description:
-    'Koine là nền tảng giáo dục giới tính cho trẻ em với các khóa học chất lượng cao từ các chuyên gia hàng đầu. Hãy tham gia ngay để giúp con bạn phát triển toàn diện nhất!',
+    'Koine là nền tảng giáo dục giới tính trực tuyến hàng đầu dành cho trẻ em. Chúng tôi cung cấp các khóa học chất lượng cao, được thiết kế bởi các chuyên gia giáo dục và tâm lý học.',
   authors: [{ name: 'Koine', url: 'https://koine.id.vn' }],
   keywords: [
     'Koine',
@@ -46,22 +46,21 @@ export const metadata: Metadata = {
     follow: true
   },
   openGraph: {
-    locale: 'vi_VN',
-    type: 'website',
-    siteName: 'Koine',
-    title: 'Nền tảng giáo dục giới tính cho trẻ em | Koine',
+    title: 'Koine - Nền tảng giáo dục giới tính cho trẻ em',
     description:
-      'Koine là nền tảng giáo dục giới tính cho trẻ em với các khóa học chất lượng cao từ các chuyên gia hàng đầu.',
-    url: 'https://koine.id.vn',
+      'Koine là nền tảng giáo dục giới tính trực tuyến hàng đầu dành cho trẻ em. Chúng tôi cung cấp các khóa học chất lượng cao, được thiết kế bởi các chuyên gia giáo dục và tâm lý học.',
+    url: 'https://koine.edu.vn',
+    siteName: 'Koine',
     images: [
       {
-        url: 'https://koine-bucket-v4.s3.ap-southeast-2.amazonaws.com/image_8318c5f6-5945-4e9a-8d0a-a7841bf139b4_png',
+        url: '/images/og-image.png',
         width: 1200,
         height: 630,
-        alt: 'Koine - Nền tảng giáo dục giới tính cho trẻ em',
-        type: 'image/png'
+        alt: 'Koine - Nền tảng giáo dục giới tính cho trẻ em'
       }
-    ]
+    ],
+    locale: 'vi_VN',
+    type: 'website'
   },
   alternates: {
     canonical: 'https://koine.id.vn',
@@ -71,32 +70,7 @@ export const metadata: Metadata = {
       'de-DE': '/de-DE'
     }
   },
-  metadataBase: new URL('https://koine.id.vn'),
-  twitter: {
-    card: 'summary_large_image',
-    title: 'Nền tảng giáo dục giới tính cho trẻ em | Koine',
-    description:
-      'Koine là nền tảng giáo dục giới tính cho trẻ em với các khóa học chất lượng cao từ các chuyên gia hàng đầu.',
-    images: [
-      {
-        url: 'https://koine-bucket-v4.s3.ap-southeast-2.amazonaws.com/image_8318c5f6-5945-4e9a-8d0a-a7841bf139b4_png',
-        width: 1200,
-        height: 630,
-        alt: 'Koine - Nền tảng giáo dục giới tính cho trẻ em'
-      }
-    ],
-    creator: '@koine',
-    site: '@koine'
-  },
-  other: {
-    'og:image:width': '1200',
-    'og:image:height': '630',
-    'og:image:type': 'image/png',
-    'msapplication-TileImage':
-      'https://koine-bucket-v4.s3.ap-southeast-2.amazonaws.com/image_8318c5f6-5945-4e9a-8d0a-a7841bf139b4_png',
-    'link:image_src':
-      'https://koine-bucket-v4.s3.ap-southeast-2.amazonaws.com/image_8318c5f6-5945-4e9a-8d0a-a7841bf139b4_png'
-  }
+  metadataBase: new URL('https://koine.id.vn')
 }
 
 export default async function RootLayout({
