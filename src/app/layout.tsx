@@ -49,7 +49,7 @@ export const metadata: Metadata = {
     title: 'Koine - Nền tảng giáo dục giới tính cho trẻ em',
     description:
       'Koine là nền tảng giáo dục giới tính trực tuyến hàng đầu dành cho trẻ em. Chúng tôi cung cấp các khóa học chất lượng cao, được thiết kế bởi các chuyên gia giáo dục và tâm lý học.',
-    url: 'https://koine.edu.vn',
+    url: 'https://koine.id.vn',
     siteName: 'Koine',
     images: [
       {
