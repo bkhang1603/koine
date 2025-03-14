@@ -16,11 +16,24 @@ import { ScrollArea } from '@/components/ui/scroll-area'
 import { useCreateOrderMutation } from '@/queries/useOrder'
 import { DeliveryMethod } from '@/constants/type'
 import { useRouter } from 'next/navigation'
+import { getCheckoutBuyNowFromLocalStorage, getCheckoutDataFromLocalStorage } from '@/lib/utils'
 
 export default function Checkout() {
   const checkoutData = useAppStore((state) => state.checkoutData)
+  const checkoutBuyNow = useAppStore((state) => state.checkoutBuyNow)
   const pickAddress = useAppStore((state) => state.pickAddress)
   const setPickAddress = useAppStore((state) => state.setPickAddress)
+  const [type, setType] = useState<'cart' | 'buyNow'>('cart')
+  const checkoutBuyNowFromLocalStorage = getCheckoutBuyNowFromLocalStorage()
+  const checkoutFormLocalStorage = getCheckoutDataFromLocalStorage()
+
+  useEffect(() => {
+    if (checkoutFormLocalStorage) {
+      setType('cart')
+    } else if (checkoutBuyNowFromLocalStorage) {
+      setType('buyNow')
+    }
+  }, [checkoutBuyNow, checkoutBuyNowFromLocalStorage, checkoutFormLocalStorage])
 
   const { data } = useGetAccountAddress()
   const createOrderMutation = useCreateOrderMutation()
@@ -50,7 +63,16 @@ export default function Checkout() {
     const orderData = {
       arrayCartDetailIds: checkoutData?.cartDetails?.map((item) => item.id) ?? [],
       deliveryInfoId: pickAddress.id,
-      deliMethod: shippingMethod
+      deliMethod: shippingMethod,
+      itemId: checkoutBuyNow?.id ?? null,
+      quantity: checkoutBuyNow?.quantity ?? null,
+      itemType: (checkoutBuyNow?.product !== null
+        ? 'PRODUCT'
+        : checkoutBuyNow?.course !== null
+          ? 'COURSE'
+          : checkoutBuyNow?.combo !== null
+            ? 'COMBO'
+            : null) as 'PRODUCT' | 'COURSE' | 'COMBO' | null
     }
 
     try {
@@ -76,47 +98,87 @@ export default function Checkout() {
         <div className='lg:col-span-3'>
           <Card className='mb-4 p-4'>
             <h2 className='font-semibold mb-4'>Sản phẩm</h2>
-            {checkoutData?.cartDetails.map((item, index) => (
-              <CardContent
-                className={`p-0 pb-4 ${index !== checkoutData.cartDetails.length - 1 ? 'border-b mb-4' : ''}`}
-                key={index}
-              >
-                {item.product !== null && (
+            {type === 'cart' &&
+              checkoutData?.cartDetails.map((item, index) => (
+                <CardContent
+                  className={`p-0 pb-4 ${index !== checkoutData.cartDetails.length - 1 ? 'border-b mb-4' : ''}`}
+                  key={index}
+                >
+                  {item.product !== null && (
+                    <div className='flex items-start'>
+                      <Image
+                        src={item.product.imageUrl}
+                        alt={item.product.name}
+                        width={80}
+                        height={80}
+                        className='w-20 h-20 object-cover rounded-md'
+                      />
+                      <div className='flex-grow ml-4'>
+                        <h3 className='font-medium'>{item.product.name}</h3>
+
+                        <p className='text-sm text-gray-500'>Số lượng: {item.quantity}</p>
+                      </div>
+                      <span className='font-medium'>{item.totalPrice.toLocaleString()}đ</span>
+                    </div>
+                  )}
+
+                  {item.course !== null && (
+                    <div className='flex items-start'>
+                      <Image
+                        src={item.course.imageUrl}
+                        alt={item.course.title}
+                        width={80}
+                        height={80}
+                        className='w-20 h-20 object-cover rounded-md'
+                      />
+                      <div className='flex-grow ml-4'>
+                        <h3 className='font-medium'>{item.course.title}</h3>
+                        <p className='text-sm text-gray-500'>Số lượng: {item.quantity}</p>
+                      </div>
+                      <span className='font-medium'>{item.totalPrice.toLocaleString()}đ</span>
+                    </div>
+                  )}
+                </CardContent>
+              ))}
+
+            {type === 'buyNow' && (
+              <CardContent className='p-0 pb-4'>
+                {checkoutBuyNow?.product !== null && (
                   <div className='flex items-start'>
                     <Image
-                      src={item.product.imageUrl}
-                      alt={item.product.name}
+                      src={checkoutBuyNow?.product.imageUrl ?? ''}
+                      alt={checkoutBuyNow?.product.name ?? ''}
                       width={80}
                       height={80}
                       className='w-20 h-20 object-cover rounded-md'
                     />
                     <div className='flex-grow ml-4'>
-                      <h3 className='font-medium'>{item.product.name}</h3>
+                      <h3 className='font-medium'>{checkoutBuyNow?.product.name}</h3>
 
-                      <p className='text-sm text-gray-500'>Số lượng: {item.quantity}</p>
+                      <p className='text-sm text-gray-500'>Số lượng: {checkoutBuyNow?.quantity}</p>
                     </div>
-                    <span className='font-medium'>{item.totalPrice.toLocaleString()}đ</span>
+                    <span className='font-medium'>{checkoutBuyNow?.totalPrice.toLocaleString()}đ</span>
                   </div>
                 )}
 
-                {item.course !== null && (
+                {checkoutBuyNow?.course !== null && (
                   <div className='flex items-start'>
                     <Image
-                      src={item.course.imageUrl}
-                      alt={item.course.title}
+                      src={checkoutBuyNow?.course.imageUrl ?? ''}
+                      alt={checkoutBuyNow?.course.title ?? ''}
                       width={80}
                       height={80}
                       className='w-20 h-20 object-cover rounded-md'
                     />
                     <div className='flex-grow ml-4'>
-                      <h3 className='font-medium'>{item.course.title}</h3>
-                      <p className='text-sm text-gray-500'>Số lượng: {item.quantity}</p>
+                      <h3 className='font-medium'>{checkoutBuyNow?.course.title}</h3>
+                      <p className='text-sm text-gray-500'>Số lượng: {checkoutBuyNow?.quantity}</p>
                     </div>
-                    <span className='font-medium'>{item.totalPrice.toLocaleString()}đ</span>
+                    <span className='font-medium'>{checkoutBuyNow?.totalPrice.toLocaleString()}đ</span>
                   </div>
                 )}
               </CardContent>
-            ))}
+            )}
           </Card>
 
           <Card className='mb-4'>
@@ -220,7 +282,8 @@ export default function Checkout() {
               <div className='space-y-2 mb-2 border-b border-gray-300 pb-2'>
                 <div className='flex justify-between text-sm'>
                   <span className='text-gray-600'>Tạm tính</span>
-                  <span>{checkoutData?.totalAmount.toLocaleString()}đ</span>
+                  {type === 'cart' && <span>{checkoutData?.totalAmount.toLocaleString()}đ</span>}
+                  {type === 'buyNow' && <span>{checkoutBuyNow?.totalPrice.toLocaleString()}đ</span>}
                 </div>
                 <div className='flex justify-between text-sm'>
                   <span className='text-gray-600'>Phí vận chuyển</span>
@@ -235,8 +298,12 @@ export default function Checkout() {
                 <span>Tổng tiền</span>
                 <span className='text-xl text-red-600'>
                   {shippingMethod === DeliveryMethod.EXPEDITED
-                    ? ((checkoutData?.totalAmount ?? 0) + 50000).toLocaleString()
-                    : ((checkoutData?.totalAmount ?? 0) + 26000).toLocaleString()}
+                    ? (
+                        ((type === 'cart' ? checkoutData?.totalAmount : checkoutBuyNow?.totalPrice) ?? 0) + 50000
+                      ).toLocaleString()
+                    : (
+                        ((type === 'cart' ? checkoutData?.totalAmount : checkoutBuyNow?.totalPrice) ?? 0) + 26000
+                      ).toLocaleString()}
                   đ
                 </span>
               </div>

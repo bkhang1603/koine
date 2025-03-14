@@ -51,3 +51,11 @@ export const DeliveryMethodValues = [
   DeliveryMethod.EXPEDITED,
   DeliveryMethod.NONESHIP
 ] as const
+
+export const OrderType = {
+  COURSE: 'COURSE',
+  PRODUCT: 'PRODUCT',
+  COMBO: 'COMBO'
+} as const
+
+export const OrderTypeValues = [OrderType.COURSE, OrderType.PRODUCT, OrderType.COMBO] as const

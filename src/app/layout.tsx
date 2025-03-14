@@ -6,6 +6,7 @@ import AppProvider from '@/components/app-provider'
 import { Roboto } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/react'
 import { SpeedInsights } from '@vercel/speed-insights/next'
+import NextTopLoader from 'nextjs-toploader'
 
 const roboto = Roboto({
   weight: ['100', '300', '400', '500', '700'],
@@ -83,6 +84,7 @@ export default async function RootLayout({
       <body className={cn('min-h-screen bg-background antialiased', roboto.className)}>
         <AppProvider>
           {children}
+          <NextTopLoader showSpinner={false} color='hsl(var(--primary))' />
           <Toaster />
           <Analytics />
           <SpeedInsights />

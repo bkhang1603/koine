@@ -185,6 +185,19 @@ export const removeCheckoutDataFromLocalStorage = () => {
   isBrowser && localStorage.removeItem('checkoutData')
 }
 
+export const setCheckoutBuyNowToLocalStorage = (data: any) => {
+  isBrowser && localStorage.setItem('checkoutBuyNow', JSON.stringify(data))
+}
+
+export const getCheckoutBuyNowFromLocalStorage = () => {
+  const data = isBrowser && localStorage.getItem('checkoutBuyNow')
+  return data ? JSON.parse(data) : null
+}
+
+export const removeCheckoutBuyNowFromLocalStorage = () => {
+  isBrowser && localStorage.removeItem('checkoutBuyNow')
+}
+
 export const checkAndSetTokenToCookieByLoginGoogle = async ({
   accessToken,
   refreshToken,

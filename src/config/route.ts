@@ -7,6 +7,8 @@ const configRoute = {
   knowledge: '/knowledge',
   service: '/service',
   product: '/product',
+  cart: '/cart',
+  checkout: '/checkout',
   login: '/login',
   register: '/register',
   forgotPassword: '/forgot-password',
