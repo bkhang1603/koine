@@ -2,15 +2,8 @@
 
 import { useState, use } from 'react'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
-import { Badge } from '@/components/ui/badge'
-import { Progress } from '@/components/ui/progress'
-import { Switch } from '@/components/ui/switch'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { ArrowLeft, BookOpen, Clock, AlertCircle, Check, Award } from 'lucide-react'
+import { ArrowLeft, AlertCircle, BookOpen, Settings, LayoutDashboard, Users } from 'lucide-react'
 import Link from 'next/link'
-import Image from 'next/image'
 import { useToast } from '@/components/ui/use-toast'
 import {
   Dialog,
@@ -20,107 +13,36 @@ import {
   DialogHeader,
   DialogTitle
 } from '@/components/ui/dialog'
-
-interface ActivatedCourse {
-  id: number
-  title: string
-  thumbnail: string
-  progress: number
-  totalLessons: number
-  completedLessons: number
-  lastAccessed: string
-  isVisible: boolean
-  category: string
-  activatedDate: string
-  expiryDate: string
-}
-
-interface LearningActivity {
-  id: number
-  type: 'course_start' | 'course_complete' | 'lesson_complete' | 'quiz_complete'
-  title: string
-  courseName?: string
-  timestamp: string
-  score?: number
-}
+import { Textarea } from '@/components/ui/textarea'
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
+import { useGetChildAccountById } from '@/queries/useAccount'
+import { CourseCard } from '@/components/child-account/CourseCard'
+import { EmptyCourses } from '@/components/child-account/EmptyCourses'
+import Loading from '@/components/loading'
+import { ProfileSection } from '@/components/child-account/sections/ProfileSection'
+import { ProgressBar } from '@/components/child-account/stats/ProgressBar'
+import { SidebarItem } from '@/components/child-account/sidebar/SidebarItem'
+import { DashboardStats } from '@/components/child-account/stats/DashboardStats'
+import { AccountHeader } from '@/components/child-account/AccountHeader'
+import { SettingsSection } from '@/components/child-account/sections/SettingsSection'
 
 export default function ChildAccountDetailPage(props: { params: Promise<{ id: string }> }) {
   const params = use(props.params)
+  const { data, isLoading, error } = useGetChildAccountById(params.id)
+  const childData = data?.payload?.data
+
   const { toast } = useToast()
   const [showReportDialog, setShowReportDialog] = useState(false)
   const [reportReason, setReportReason] = useState('')
   const [hideAllCourses, setHideAllCourses] = useState(false)
+  const [activeView, setActiveView] = useState('dashboard')
 
-  // State cho danh sách khóa học
-  const [activatedCourses, setActivatedCourses] = useState<ActivatedCourse[]>([
-    {
-      id: 1,
-      title: 'Khóa học lập trình Python cơ bản',
-      thumbnail: '/placeholder.svg',
-      progress: 75,
-      totalLessons: 24,
-      completedLessons: 18,
-      lastAccessed: '2 giờ trước',
-      isVisible: true,
-      category: 'Lập trình',
-      activatedDate: '15/03/2024',
-      expiryDate: '15/03/2025'
-    },
-    {
-      id: 2,
-      title: 'Khóa học tiếng Anh giao tiếp',
-      thumbnail: '/placeholder.svg',
-      progress: 45,
-      totalLessons: 30,
-      completedLessons: 14,
-      lastAccessed: '1 ngày trước',
-      isVisible: false,
-      category: 'Ngoại ngữ',
-      activatedDate: '10/03/2024',
-      expiryDate: '10/03/2025'
-    }
-  ])
-
-  // Thêm state cho learning history
-  const [learningHistory] = useState<LearningActivity[]>([
-    {
-      id: 1,
-      type: 'course_start',
-      title: 'Bắt đầu khóa học',
-      courseName: 'Khóa học lập trình Python cơ bản',
-      timestamp: '20/03/2024 09:30'
-    },
-    {
-      id: 2,
-      type: 'lesson_complete',
-      title: 'Hoàn thành bài học: Biến và kiểu dữ liệu',
-      courseName: 'Khóa học lập trình Python cơ bản',
-      timestamp: '20/03/2024 10:15'
-    },
-    {
-      id: 3,
-      type: 'quiz_complete',
-      title: 'Hoàn thành bài kiểm tra',
-      courseName: 'Khóa học lập trình Python cơ bản',
-      timestamp: '20/03/2024 10:45',
-      score: 85
-    }
-  ])
-
-  // Add account state after other states
-  const [account] = useState({
-    id: params.id,
-    username: 'anna2024',
-    avatar: '/avatars/01.png',
-    lastActive: '5 phút trước'
-  })
+  // Các courses dùng để hiển thị
+  const courses = childData?.courses || []
 
   // Handler để toggle visibility của một khóa học
-  const toggleCourseVisibility = (courseId: number) => {
-    setActivatedCourses((courses) =>
-      courses.map((course) => (course.id === courseId ? { ...course, isVisible: !course.isVisible } : course))
-    )
-
+  // eslint-disable-next-line no-unused-vars
+  const toggleCourseVisibility = (courseId: string) => {
     toast({
       title: 'Đã cập nhật trạng thái',
       description: 'Thay đổi sẽ được áp dụng cho tài khoản con của bạn'
@@ -130,245 +52,237 @@ export default function ChildAccountDetailPage(props: { params: Promise<{ id: st
   // Handler để ẩn/hiện tất cả khóa học
   const toggleAllCourses = (hide: boolean) => {
     setHideAllCourses(hide)
-    setActivatedCourses((courses) => courses.map((course) => ({ ...course, isVisible: !hide })))
-
     toast({
       title: hide ? 'Đã ẩn tất cả khóa học' : 'Đã hiện tất cả khóa học',
       description: 'Thay đổi sẽ được áp dụng cho tài khoản con của bạn'
     })
   }
 
-  // Handler để gửi báo cáo
+  // Handler để báo cáo vấn đề
   const handleSubmitReport = () => {
     if (!reportReason.trim()) {
       toast({
-        title: 'Lỗi',
-        description: 'Vui lòng nhập lý do báo cáo',
+        title: 'Chưa nhập nội dung',
+        description: 'Vui lòng mô tả vấn đề bạn gặp phải',
         variant: 'destructive'
       })
       return
     }
 
-    // Gửi báo cáo lên server
     toast({
       title: 'Đã gửi báo cáo',
-      description: 'Chúng tôi sẽ xem xét và phản hồi sớm nhất'
+      description: 'Chúng tôi sẽ xem xét vấn đề của bạn trong thời gian sớm nhất'
     })
     setShowReportDialog(false)
     setReportReason('')
   }
 
-  return (
-    <div className='space-y-6'>
-      {/* Back Button */}
-      <div>
-        <Button variant='ghost' size='sm' asChild className='mb-6'>
-          <Link href='/setting/child-account' className='flex items-center gap-2'>
-            <ArrowLeft className='h-4 w-4' />
-            Quay lại danh sách
-          </Link>
-        </Button>
+  // Tính toán số liệu thống kê
+  const getStats = () => {
+    const totalCourses = courses.length
+    const completedCourses = courses.filter((c) => (c.completionRate || 0) === 100).length
+    const inProgressCourses = courses.filter((c) => (c.completionRate || 0) < 100 && (c.completionRate || 0) > 0).length
+    const notStartedCourses = courses.filter((c) => (c.completionRate || 0) === 0).length
 
-        {/* Header */}
-        <div className='flex items-center justify-between'>
-          <div className='flex items-center gap-3'>
-            <Avatar className='h-10 w-10 border-2 border-primary/10'>
-              <AvatarImage src={account.avatar} alt={account.username} />
-              <AvatarFallback>{account.username[0].toUpperCase()}</AvatarFallback>
-            </Avatar>
-            <div>
-              <h3 className='text-lg font-semibold'>{account.username}</h3>
-              <p className='text-sm text-gray-500'>Hoạt động: {account.lastActive}</p>
-            </div>
-          </div>
-          <Button
-            variant='outline'
-            size='sm'
-            className='text-red-500 hover:text-red-600 hover:bg-red-50'
-            onClick={() => setShowReportDialog(true)}
-          >
-            <AlertCircle className='w-4 h-4 mr-2' />
-            Báo cáo vấn đề
+    const overallProgress = totalCourses
+      ? Math.round(courses.reduce((acc, c) => acc + (c.completionRate || 0), 0) / totalCourses)
+      : 0
+
+    return {
+      totalCourses,
+      completedCourses,
+      inProgressCourses,
+      notStartedCourses,
+      overallProgress,
+      completionPercentage: totalCourses ? Math.round((completedCourses / totalCourses) * 100) : 0
+    }
+  }
+
+  // Hiển thị loading khi đang tải dữ liệu
+  if (isLoading) {
+    return (
+      <div className='flex items-center justify-center min-h-[60vh]'>
+        <Loading />
+      </div>
+    )
+  }
+
+  // Hiển thị lỗi nếu có
+  if (error || !childData) {
+    return (
+      <div className='p-8 text-center'>
+        <AlertCircle className='h-12 w-12 text-red-500 mx-auto mb-4' />
+        <h3 className='text-lg font-medium text-gray-900 mb-2'>Không thể tải thông tin</h3>
+        <p className='text-gray-500 mb-4'>Đã có lỗi xảy ra khi tải thông tin tài khoản con.</p>
+        <Button asChild>
+          <Link href='/setting/child-account'>Quay lại danh sách</Link>
+        </Button>
+      </div>
+    )
+  }
+
+  const stats = getStats()
+
+  return (
+    <div className='bg-gray-50'>
+      {/* Header with back button */}
+      <div className='bg-white border-b border-gray-200 sticky top-0 z-10'>
+        <div className='container mx-auto px-4 py-3 flex items-center'>
+          <Button variant='ghost' className='mr-2' asChild>
+            <Link href='/setting/child-account'>
+              <ArrowLeft className='h-4 w-4 mr-1' />
+              Quay lại
+            </Link>
           </Button>
+          <h1 className='text-xl font-semibold'>Quản lý tài khoản con</h1>
         </div>
       </div>
 
-      {/* Tabs */}
-      <Tabs defaultValue='activated-courses' className='space-y-6'>
-        <TabsList>
-          <TabsTrigger value='activated-courses'>Khóa học đã kích hoạt</TabsTrigger>
-          <TabsTrigger value='learning-history'>Lịch sử học tập</TabsTrigger>
-          <TabsTrigger value='settings'>Cài đặt</TabsTrigger>
-        </TabsList>
+      <main className='container mx-auto px-4 py-6'>
+        {/* Account Header */}
+        <AccountHeader childData={childData} onReportClick={() => setShowReportDialog(true)} />
 
-        <TabsContent value='activated-courses'>
-          <div className='space-y-6'>
-            {/* Course Management */}
-            {activatedCourses.map((course) => (
-              <Card key={course.id} className='overflow-hidden border-none shadow-md'>
-                <CardContent className='p-6'>
-                  <div className='flex gap-6'>
-                    {/* Course Thumbnail */}
-                    <div className='relative w-48 h-32 rounded-lg overflow-hidden shrink-0'>
-                      <Image src={course.thumbnail} alt={course.title} fill className='object-cover' />
-                    </div>
-
-                    {/* Course Info */}
-                    <div className='flex-1 min-w-0 space-y-4'>
-                      <div className='flex items-start justify-between'>
-                        <div>
-                          <h4 className='font-medium text-gray-900'>{course.title}</h4>
-                          <div className='flex items-center gap-3 mt-1'>
-                            <Badge variant='secondary' className='bg-primary/5 text-primary'>
-                              {course.category}
-                            </Badge>
-                            <span className='text-sm text-gray-500'>Kích hoạt: {course.activatedDate}</span>
-                          </div>
-                        </div>
-                        <div className='flex items-center gap-2'>
-                          <Switch
-                            checked={course.isVisible}
-                            onCheckedChange={() => toggleCourseVisibility(course.id)}
-                            className='data-[state=checked]:bg-primary'
-                          />
-                          <span className='text-sm text-gray-600'>{course.isVisible ? 'Hiện' : 'Ẩn'}</span>
-                        </div>
-                      </div>
-
-                      {/* Progress */}
-                      <div className='space-y-2'>
-                        <div className='flex items-center justify-between text-sm'>
-                          <div className='flex items-center gap-4'>
-                            <span className='text-gray-600'>Tiến độ học tập</span>
-                            <span className='text-primary font-medium'>{course.progress}%</span>
-                          </div>
-                          <span className='text-gray-500'>
-                            {course.completedLessons}/{course.totalLessons} bài học
-                          </span>
-                        </div>
-                        <Progress value={course.progress} className='h-2' />
-                      </div>
-
-                      {/* Stats */}
-                      <div className='flex items-center gap-6 pt-2'>
-                        <div className='flex items-center gap-2 text-sm text-gray-500'>
-                          <Clock className='w-4 h-4' />
-                          <span>Học gần nhất: {course.lastAccessed}</span>
-                        </div>
-                        <div className='flex items-center gap-2 text-sm text-gray-500'>
-                          <BookOpen className='w-4 h-4' />
-                          <span>Hết hạn: {course.expiryDate}</span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
+        {/* Main Content */}
+        <div className='mt-6 flex flex-col md:flex-row gap-6'>
+          {/* Sidebar */}
+          <div className='w-full md:w-64 bg-white p-4 rounded-lg shadow-sm'>
+            <div className='space-y-1'>
+              <SidebarItem
+                icon={LayoutDashboard}
+                label='Tổng quan'
+                active={activeView === 'dashboard'}
+                onClick={() => setActiveView('dashboard')}
+              />
+              <SidebarItem
+                icon={BookOpen}
+                label='Khóa học'
+                active={activeView === 'courses'}
+                onClick={() => setActiveView('courses')}
+              />
+              <SidebarItem
+                icon={Users}
+                label='Thông tin cá nhân'
+                active={activeView === 'profile'}
+                onClick={() => setActiveView('profile')}
+              />
+              <SidebarItem
+                icon={Settings}
+                label='Cài đặt'
+                active={activeView === 'settings'}
+                onClick={() => setActiveView('settings')}
+              />
+            </div>
           </div>
-        </TabsContent>
 
-        <TabsContent value='learning-history'>
-          <Card className='border-none shadow-md'>
-            <CardHeader>
-              <CardTitle>Lịch sử học tập</CardTitle>
-            </CardHeader>
-            <CardContent>
+          {/* Content Area */}
+          <div className='flex-1'>
+            {/* Dashboard View */}
+            {activeView === 'dashboard' && (
               <div className='space-y-6'>
-                {learningHistory.map((activity) => (
-                  <div key={activity.id} className='flex gap-4 items-start'>
-                    <div className='w-8 h-8 rounded-full bg-primary/5 flex items-center justify-center shrink-0'>
-                      {activity.type === 'course_start' && <BookOpen className='w-4 h-4 text-primary' />}
-                      {activity.type === 'lesson_complete' && <Check className='w-4 h-4 text-green-600' />}
-                      {activity.type === 'quiz_complete' && <Award className='w-4 h-4 text-yellow-600' />}
-                    </div>
-                    <div className='flex-1 space-y-1'>
-                      <p className='text-sm font-medium text-gray-900'>{activity.title}</p>
-                      {activity.courseName && <p className='text-sm text-gray-500'>{activity.courseName}</p>}
-                      {activity.score && <p className='text-sm text-gray-500'>Điểm số: {activity.score}/100</p>}
-                      <p className='text-xs text-gray-400'>{activity.timestamp}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
+                <DashboardStats stats={stats} />
 
-        <TabsContent value='settings'>
-          <Card className='border-none shadow-md'>
-            <CardHeader>
-              <CardTitle>Cài đặt tài khoản</CardTitle>
-            </CardHeader>
-            <CardContent className='space-y-6'>
-              <div className='space-y-4'>
-                <h4 className='font-medium'>Quyền truy cập khóa học</h4>
-                <div className='space-y-4'>
-                  <div className='flex items-center justify-between py-3 border-b'>
-                    <div className='space-y-0.5'>
-                      <p className='text-sm font-medium'>Ẩn tất cả khóa học</p>
-                      <p className='text-sm text-gray-500'>Tạm thời ẩn tất cả khóa học đã kích hoạt</p>
-                    </div>
-                    <Switch
-                      checked={hideAllCourses}
-                      onCheckedChange={toggleAllCourses}
-                      className='data-[state=checked]:bg-primary'
-                    />
-                  </div>
-                  <div className='flex items-center justify-between py-3 border-b'>
-                    <div className='space-y-0.5'>
-                      <p className='text-sm font-medium'>Tự động ẩn khóa học đã hoàn thành</p>
-                      <p className='text-sm text-gray-500'>Ẩn khóa học sau khi hoàn thành tất cả bài học</p>
-                    </div>
-                    <Switch className='data-[state=checked]:bg-primary' />
-                  </div>
-                  <div className='flex items-center justify-between py-3 border-b'>
-                    <div className='space-y-0.5'>
-                      <p className='text-sm font-medium'>Giới hạn thời gian học</p>
-                      <p className='text-sm text-gray-500'>Chỉ cho phép truy cập trong khung giờ quy định</p>
-                    </div>
-                    <Switch className='data-[state=checked]:bg-primary' />
-                  </div>
-                </div>
-              </div>
+                <Card className='border-none shadow-sm'>
+                  <CardHeader className='pb-2'>
+                    <CardTitle>Tổng quan khóa học</CardTitle>
+                    <CardDescription>Tiến độ học tập của {childData.firstName}</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className='space-y-8'>
+                      <div className='flex flex-col space-y-3'>
+                        <ProgressBar
+                          value={stats.overallProgress}
+                          label='Tiến độ học tập tổng thể'
+                          color='bg-primary'
+                        />
+                        <ProgressBar value={stats.completionPercentage} label='Tỉ lệ hoàn thành' color='bg-green-500' />
+                      </div>
 
-              <div className='space-y-4'>
-                <h4 className='font-medium'>Thông báo</h4>
-                <div className='space-y-4'>
-                  <div className='flex items-center justify-between py-3 border-b'>
-                    <div className='space-y-0.5'>
-                      <p className='text-sm font-medium'>Thông báo tiến độ học tập</p>
-                      <p className='text-sm text-gray-500'>Nhận thông báo khi con hoàn thành bài học</p>
+                      {courses.length === 0 ? (
+                        <div className='text-center py-6'>
+                          <BookOpen className='h-12 w-12 text-gray-300 mx-auto mb-3' />
+                          <h3 className='text-lg font-medium text-gray-700 mb-1'>Chưa có khóa học nào</h3>
+                          <p className='text-gray-500'>Tài khoản này chưa được đăng ký khóa học nào</p>
+                        </div>
+                      ) : (
+                        <div className='space-y-4'>
+                          <h3 className='font-medium text-gray-800'>Khóa học gần đây</h3>
+                          <div className='grid gap-4'>
+                            {courses.slice(0, 2).map((course) => (
+                              <CourseCard
+                                key={course.id}
+                                courses={course}
+                                onToggleVisibility={toggleCourseVisibility}
+                              />
+                            ))}
+                            {courses.length > 2 && (
+                              <div className='text-center pt-2'>
+                                <Button variant='outline' onClick={() => setActiveView('courses')}>
+                                  Xem tất cả {courses.length} khóa học
+                                </Button>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      )}
                     </div>
-                    <Switch className='data-[state=checked]:bg-primary' defaultChecked />
-                  </div>
-                  <div className='flex items-center justify-between py-3 border-b'>
-                    <div className='space-y-0.5'>
-                      <p className='text-sm font-medium'>Cảnh báo không hoạt động</p>
-                      <p className='text-sm text-gray-500'>Thông báo khi tài khoản không hoạt động trong 7 ngày</p>
-                    </div>
-                    <Switch className='data-[state=checked]:bg-primary' defaultChecked />
-                  </div>
-                </div>
+                  </CardContent>
+                </Card>
               </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-      </Tabs>
+            )}
+
+            {/* Courses View */}
+            {activeView === 'courses' && (
+              <div className='space-y-6'>
+                <Card className='border-none shadow-sm'>
+                  <CardHeader className='pb-2'>
+                    <CardTitle>Danh sách khóa học</CardTitle>
+                    <CardDescription>
+                      {courses.length ? `${courses.length} khóa học đã đăng ký` : 'Chưa có khóa học nào được đăng ký'}
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className='space-y-4'>
+                      {courses.length === 0 ? (
+                        <EmptyCourses />
+                      ) : (
+                        courses.map((course) => (
+                          <CourseCard key={course.id} courses={course} onToggleVisibility={toggleCourseVisibility} />
+                        ))
+                      )}
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+            )}
+
+            {/* Profile View */}
+            {activeView === 'profile' && <ProfileSection childData={childData} />}
+
+            {/* Settings View */}
+            {activeView === 'settings' && (
+              <SettingsSection
+                hideAllCourses={hideAllCourses}
+                toggleAllCourses={toggleAllCourses}
+                childName={childData.firstName}
+              />
+            )}
+          </div>
+        </div>
+      </main>
 
       {/* Report Dialog */}
       <Dialog open={showReportDialog} onOpenChange={setShowReportDialog}>
-        <DialogContent>
+        <DialogContent className='max-w-md'>
           <DialogHeader>
             <DialogTitle>Báo cáo vấn đề</DialogTitle>
             <DialogDescription>Vui lòng mô tả chi tiết vấn đề bạn gặp phải với tài khoản này</DialogDescription>
           </DialogHeader>
           <div className='space-y-4 py-4'>
-            <textarea
-              className='w-full min-h-[100px] p-3 rounded-md border border-gray-200 focus:outline-none focus:ring-2 focus:ring-primary/20'
+            <Textarea
               placeholder='Mô tả vấn đề...'
               value={reportReason}
               onChange={(e) => setReportReason(e.target.value)}
+              className='min-h-[120px]'
             />
           </div>
           <DialogFooter>

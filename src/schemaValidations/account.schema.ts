@@ -211,17 +211,39 @@ export const myChildAccountRes = z.object({
   message: z.string()
 })
 
-export const myChildAccountById = z.object({
-  id: z.string(),
-  title: z.string(),
-  username: z.string(),
-  role: z.enum(RoleValues),
-  phone: z.string(),
-  firstName: z.string(),
-  lastName: z.string(),
-  dob: z.string(),
-  address: z.string()
-})
+export const myChildAccountById = z
+  .object({
+    userId: z.string(),
+    username: z.string(),
+    firstName: z.string(),
+    lastName: z.string(),
+    avatarUrl: z.string(),
+    gender: z.string(),
+    dob: z.string(),
+    courses: z.array(
+      z.object({
+        id: z.string(),
+        title: z.string(),
+        description: z.string(),
+        durationDisplay: z.string(),
+        categories: z.array(
+          z.object({
+            id: z.string(),
+            name: z.string()
+          })
+        ),
+        totalLesson: z.number(),
+        totalLessonFinished: z.number(),
+        completionRate: z.number(),
+        author: z.string(),
+        imageUrl: z.string(),
+        createdAtFormatted: z.string(),
+        updatedAtFormatted: z.string(),
+        level: z.string()
+      })
+    )
+  })
+  .strict()
 
 export const myChildAccountByIdRes = z.object({
   data: myChildAccountById,
