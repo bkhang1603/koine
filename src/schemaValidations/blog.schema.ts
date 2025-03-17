@@ -92,10 +92,11 @@ export const BlogCommentUpdateRes = z.object({
 
 export const BlogBodyData = z
   .object({
-    title: z.string(),
-    description: z.string(),
-    content: z.string(),
-    imageUrl: z.string()
+    title: z.string().min(1, 'Tiêu đề không được để trống'),
+    content: z.string().min(1, 'Nội dung không được để trống'),
+    description: z.string().min(1, 'Mô tả không được để trống'),
+    imageUrl: z.string().min(1, 'Ảnh đại diện không được để trống'),
+    categoryIds: z.array(z.string()).default([])
   })
   .strict()
 
@@ -152,6 +153,11 @@ export const CategoryBlogDetailRes = z.object({
   statusCode: z.number()
 })
 
+export const CategoryBlogCreateReq = z.object({
+  name: z.string(),
+  description: z.string()
+})
+
 export type BlogsResType = z.TypeOf<typeof BlogsRes>
 
 export type BlogResType = z.TypeOf<typeof BlogRes>
@@ -171,3 +177,5 @@ export type BlogBodyResType = z.TypeOf<typeof BlogBodyRes>
 export type CategoryBlogResType = z.TypeOf<typeof CategoryBlogRes>
 
 export type CategoryBlogDetailResType = z.TypeOf<typeof CategoryBlogDetailRes>
+
+export type CategoryBlogCreateReqType = z.TypeOf<typeof CategoryBlogCreateReq>

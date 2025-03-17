@@ -7,7 +7,7 @@ export const TokenType = {
 export const Role = {
   Admin: 'ADMIN',
   Manager: 'MANAGER',
-  ContentCreator: 'CONTENT-CREATOR',
+  ContentCreator: 'CONTENT_CREATOR',
   Accounting: 'ACCOUNTING',
   Adult: 'ADULT',
   Child: 'CHILD',

@@ -109,6 +109,21 @@ export const useBlogCommentUpdateMutation = () => {
   })
 }
 
+export const useBlogQuery = ({
+  page_index,
+  search,
+  page_size
+}: {
+  page_index?: number
+  search?: string
+  page_size?: number
+}) => {
+  return useQuery({
+    queryKey: ['blogs', page_index, search, page_size],
+    queryFn: () => blogApiRequest.getBlogs({ page_index, search, page_size })
+  })
+}
+
 // Content Creator
 export const useBlogCreateMutation = () => {
   const queryClient = useQueryClient()
@@ -130,10 +145,11 @@ export const useCategoryBlogQuery = () => {
   })
 }
 
-export const useCategoryBlogDetailQuery = ({ id }: { id: string }) => {
+export const useCategoryBlogDetailQuery = ({ id, enabled }: { id: string; enabled?: boolean }) => {
   return useQuery({
     queryKey: ['categoryBlog', id],
-    queryFn: () => blogApiRequest.getCategoryBlogDetail(id)
+    queryFn: () => blogApiRequest.getCategoryBlogDetail(id),
+    enabled
   })
 }
 

@@ -74,7 +74,7 @@ export default function LoginForm({ className }: { className?: string }) {
           case 'SUPPORTER':
             router.push('/supporter')
             break
-          case 'CONTENT-CREATOR':
+          case 'CONTENT_CREATOR':
             router.push('/content-creator')
             break
           case 'ADULT':

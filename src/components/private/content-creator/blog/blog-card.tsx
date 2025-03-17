@@ -9,24 +9,31 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { formatDistanceToNow } from 'date-fns'
 import { vi } from 'date-fns/locale'
 
-export interface BlogCardProps {
-  post: {
+type Post = {
+  id: string
+  title: string
+  description: string
+  imageUrl: string
+  creatorInfo: {
     id: string
-    title: string
-    description: string
-    imageUrl: string
-    creatorInfo: {
-      id: string
-      firstName: string
-      avatarUrl: string
-    }
-    totalReact: number
-    totalComment: number
-    createdAt: string
-    updatedAt: string
-    category: string[]
-    status: string
+    firstName: string
+    avatarUrl: string
   }
+  totalReact: number
+  totalComment: number
+  createdAt: string
+  updatedAt: string
+  categories?: [
+    {
+      id: string
+      name: string
+    }
+  ]
+  status?: string
+}
+
+export interface BlogCardProps {
+  post: Post
   onDelete: (id: string) => void
   onNavigate: (url: string) => void
 }
@@ -36,8 +43,8 @@ export const BlogCard: React.FC<BlogCardProps> = ({ post, onDelete, onNavigate }
     <Card className='group overflow-hidden transition-all hover:shadow-md'>
       <div className='relative aspect-video'>
         <Image src={post.imageUrl} alt={post.title} fill className='object-cover' />
-        <Badge className='absolute top-4 right-4' variant={post.status === 'published' ? 'default' : 'secondary'}>
-          {post.status === 'published' ? 'Đã xuất bản' : 'Bản nháp'}
+        <Badge className='absolute top-4 right-4' variant={post.status === 'VISIBLE' ? 'default' : 'secondary'}>
+          {post.status === 'VISIBLE' ? 'Đã xuất bản' : 'Bản nháp'}
         </Badge>
       </div>
 
@@ -45,9 +52,9 @@ export const BlogCard: React.FC<BlogCardProps> = ({ post, onDelete, onNavigate }
         <div className='flex items-center gap-2 mb-4'>
           <Tags className='w-4 h-4 text-muted-foreground' />
           <div className='flex flex-wrap gap-1.5'>
-            {post.category.map((cat, index) => (
+            {post.categories?.map((cat, index) => (
               <Badge key={index} variant='outline' className='px-2 py-0.5 text-xs font-normal'>
-                {cat}
+                {cat.name}
               </Badge>
             ))}
           </div>
@@ -83,10 +90,6 @@ export const BlogCard: React.FC<BlogCardProps> = ({ post, onDelete, onNavigate }
             <div className='flex items-center gap-1.5'>
               <MessageSquare className='w-4 h-4' />
               <span>{post.totalComment}</span>
-            </div>
-            <div className='flex items-center gap-1.5'>
-              <Clock className='w-4 h-4' />
-              <span>Cập nhật {formatDistanceToNow(new Date(post.updatedAt), { addSuffix: true, locale: vi })}</span>
             </div>
           </div>
 

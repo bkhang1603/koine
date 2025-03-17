@@ -6,20 +6,21 @@ import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { ArrowLeft, Upload, Loader2, Save } from 'lucide-react'
 import Link from 'next/link'
-import { blogCategories } from '@/app/(private)/content-creator/_mock/data'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import RichTextEditor from '@/components/rich-text-editor'
 import { useState, useRef } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { BlogBodyData, BlogDataResType } from '@/schemaValidations/blog.schema'
 import { useUploadImageMutation } from '@/queries/useUpload'
-import { useBlogCreateMutation } from '@/queries/useBlog'
+import { useBlogCreateMutation, useCategoryBlogQuery } from '@/queries/useBlog'
 import { toast } from '@/components/ui/use-toast'
 import { handleErrorApi } from '@/lib/utils'
 import { useRouter } from 'next/navigation'
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { Badge } from '@/components/ui/badge'
+import { X } from 'lucide-react'
 
 // LocalStorage key for saving draft
 const BLOG_DRAFT_KEY = 'blog_draft_data'
@@ -34,6 +35,9 @@ export default function NewBlogPage({ localDraft }: { localDraft: BlogDataResTyp
   const uploadMutation = useUploadImageMutation()
   const createBlogMutation = useBlogCreateMutation()
 
+  const { data: categoriesResponse } = useCategoryBlogQuery()
+  const categories = categoriesResponse?.payload?.data || []
+
   // Initialize the form with React Hook Form
   const form = useForm<BlogDataResType>({
     resolver: zodResolver(BlogBodyData),
@@ -41,7 +45,8 @@ export default function NewBlogPage({ localDraft }: { localDraft: BlogDataResTyp
       title: localDraft?.title || '',
       content: localDraft?.content || '',
       description: localDraft?.description || '',
-      imageUrl: localDraft?.imageUrl || ''
+      imageUrl: localDraft?.imageUrl || '',
+      categoryIds: localDraft?.categoryIds || []
     }
   })
 
@@ -73,8 +78,13 @@ export default function NewBlogPage({ localDraft }: { localDraft: BlogDataResTyp
           const uploadResult = await uploadMutation.mutateAsync(formData)
 
           if (uploadResult?.payload?.data) {
-            // Update imageUrl with the real URL from server
-            data.imageUrl = uploadResult.payload.data
+            // Đảm bảo imageUrl luôn là string dù API trả về mảng hay string đơn lẻ
+            const imageUrl = Array.isArray(uploadResult.payload.data)
+              ? uploadResult.payload.data[0] // Lấy phần tử đầu tiên nếu là mảng
+              : uploadResult.payload.data // Sử dụng nguyên nếu là string
+
+            // Update imageUrl với URL thực từ server
+            data.imageUrl = imageUrl
           } else {
             throw new Error('Không thể tải hình ảnh lên')
           }
@@ -93,7 +103,8 @@ export default function NewBlogPage({ localDraft }: { localDraft: BlogDataResTyp
         title: data.title,
         content: data.content,
         description: data.description,
-        imageUrl: data.imageUrl
+        imageUrl: data.imageUrl,
+        categoryIds: data.categoryIds
       })
 
       // Clear draft from localStorage after successful submission
@@ -246,33 +257,75 @@ export default function NewBlogPage({ localDraft }: { localDraft: BlogDataResTyp
                 )}
               />
 
-              <div className='space-y-2'>
-                <label className='text-sm font-medium'>Danh mục</label>
-                <Select
-                  onValueChange={(value) => {
-                    // Handle category selection manually
-                    const formData = form.getValues()
-                    const newData = {
-                      ...formData,
-                      categoryIds: [value]
-                    }
+              <FormField
+                control={form.control}
+                name='categoryIds'
+                render={({ field }) => {
+                  // Đảm bảo field.value luôn là mảng
+                  const selectedIds = Array.isArray(field.value) ? field.value : []
 
-                    // Store in localStorage with the manually added categoryIds
-                    localStorage.setItem(BLOG_DRAFT_KEY, JSON.stringify(newData))
-                  }}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder='Chọn danh mục' />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {blogCategories.map((category) => (
-                      <SelectItem key={category.id} value={category.id}>
-                        {category.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
+                  // Tìm tên danh mục đã chọn để hiển thị
+                  const selectedCategories = categories
+                    .filter((cat) => selectedIds.includes(cat.id))
+                    .map((cat) => ({ id: cat.id, name: cat.name }))
+
+                  // Hàm xử lý khi chọn một danh mục
+                  const handleSelect = (value: string) => {
+                    // Nếu đã chọn rồi thì không làm gì
+                    if (selectedIds.includes(value)) return
+
+                    // Thêm vào danh sách đã chọn
+                    field.onChange([...selectedIds, value])
+                  }
+
+                  // Hàm xử lý khi xóa một danh mục
+                  const handleRemove = (id: string) => {
+                    field.onChange(selectedIds.filter((catId) => catId !== id))
+                  }
+
+                  return (
+                    <FormItem className='space-y-2'>
+                      <FormLabel className='text-sm font-medium'>Danh mục</FormLabel>
+                      <div className='space-y-2'>
+                        <Select onValueChange={handleSelect}>
+                          <SelectTrigger>
+                            <SelectValue placeholder='Chọn danh mục' />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {categories.map((category) => (
+                              <SelectItem
+                                key={category.id}
+                                value={category.id}
+                                disabled={selectedIds.includes(category.id)}
+                              >
+                                {category.name}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+
+                        {/* Hiển thị các thẻ đã chọn */}
+                        <div className='flex flex-wrap gap-1 mt-2'>
+                          {selectedCategories.map((category) => (
+                            <Badge key={category.id} variant='secondary' className='px-2 py-1'>
+                              {category.name}
+                              <button
+                                type='button'
+                                onClick={() => handleRemove(category.id)}
+                                className='ml-1 rounded-full outline-none hover:text-destructive'
+                              >
+                                <X className='h-3 w-3' />
+                              </button>
+                            </Badge>
+                          ))}
+                        </div>
+
+                        <FormMessage />
+                      </div>
+                    </FormItem>
+                  )
+                }}
+              />
             </CardContent>
           </Card>
         </div>

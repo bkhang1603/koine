@@ -7,6 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { useState } from 'react'
 import { CategoryTable } from '@/components/private/content-creator/blog/category-table'
 import { CreateCategoryDialog } from '@/components/private/content-creator/blog/create-category-dialog'
+import { EditCategoryDialog } from '@/components/private/content-creator/blog/edit-category-dialog'
 import Loading from '@/components/loading'
 import {
   useCategoryBlogCreateMutation,
@@ -15,7 +16,6 @@ import {
   useCategoryBlogQuery,
   useCategoryBlogUpdateMutation
 } from '@/queries/useBlog'
-import { CategoryBlogData } from '@/schemaValidations/blog.schema'
 import { useToast } from '@/components/ui/use-toast'
 
 type CategoryFormData = {
@@ -25,58 +25,97 @@ type CategoryFormData = {
 
 export default function BlogCategoriesPage() {
   const [createDialogOpen, setCreateDialogOpen] = useState(false)
+  const [editDialogOpen, setEditDialogOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
   const [statusFilter, setStatusFilter] = useState('all')
-  const [editingCategory, setEditingCategory] = useState<
-    { id: string; name: string; description: string } | undefined
-  >()
+  const [editingCategoryId, setEditingCategoryId] = useState<string | undefined>()
 
   const { toast } = useToast()
   const { data: categoriesResponse, isLoading } = useCategoryBlogQuery()
-  const { data: categoryDetail } = useCategoryBlogDetailQuery({ id: editingCategory?.id || '' })
+
+  // Chỉ query category detail khi đang edit và có ID
+  const { data: categoryDetailResponse } = useCategoryBlogDetailQuery({
+    id: editingCategoryId || '',
+    enabled: !!editingCategoryId
+  })
+
   const createCategoryMutation = useCategoryBlogCreateMutation()
   const updateCategoryMutation = useCategoryBlogUpdateMutation()
   const deleteCategoryMutation = useCategoryBlogDeleteMutation()
 
   const categories = categoriesResponse?.payload?.data || []
+  const categoryDetail = categoryDetailResponse?.payload?.data
 
-  const filteredCategories = categories.filter((category: typeof CategoryBlogData._type) => {
-    const matchesSearch =
-      category.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      (category.description?.toLowerCase() || '').includes(searchQuery.toLowerCase())
+  const handleCreate = async (data: CategoryFormData) => {
+    // Trim dữ liệu trước khi gửi
+    const trimmedData = {
+      name: data.name.trim(),
+      description: data.description.trim()
+    }
 
-    if (statusFilter === 'all') return matchesSearch
-    return matchesSearch
-  })
-
-  const handleCreateUpdate = async (data: CategoryFormData) => {
     try {
-      if (editingCategory) {
-        await updateCategoryMutation.mutateAsync({
-          id: editingCategory.id,
-          data: {
-            name: data.name,
-            description: data.description
-          }
-        })
-        toast({
-          title: 'Thành công',
-          description: 'Cập nhật danh mục thành công'
-        })
-      } else {
-        await createCategoryMutation.mutateAsync(data)
-        toast({
-          title: 'Thành công',
-          description: 'Thêm danh mục mới thành công'
-        })
-      }
+      await createCategoryMutation.mutateAsync(trimmedData)
+      toast({
+        title: 'Thành công',
+        description: 'Thêm danh mục mới thành công'
+      })
+      setCreateDialogOpen(false)
     } catch (error) {
       toast({
         variant: 'destructive',
         title: 'Có lỗi xảy ra',
         description: 'Vui lòng thử lại sau'
       })
-      throw error
+    }
+  }
+
+  const handleUpdate = async (data: CategoryFormData) => {
+    if (!editingCategoryId || !categoryDetail) return
+
+    // Trim dữ liệu từ form
+    const trimmedData = {
+      name: data.name.trim(),
+      description: data.description.trim()
+    }
+
+    // So sánh với dữ liệu gốc
+    const originalData = {
+      name: categoryDetail.name,
+      description: categoryDetail.description
+    }
+
+    // Kiểm tra xem có thay đổi gì không
+    const hasChanges = trimmedData.name !== originalData.name || trimmedData.description !== originalData.description
+
+    // Nếu không có thay đổi, đóng dialog và thông báo
+    if (!hasChanges) {
+      toast({
+        title: 'Thông báo',
+        description: 'Không có thay đổi nào để cập nhật',
+        variant: 'default'
+      })
+      setEditDialogOpen(false)
+      setTimeout(() => setEditingCategoryId(undefined), 300)
+      return
+    }
+
+    try {
+      await updateCategoryMutation.mutateAsync({
+        id: editingCategoryId,
+        data: trimmedData // Sử dụng dữ liệu đã trim
+      })
+      toast({
+        title: 'Thành công',
+        description: 'Cập nhật danh mục thành công'
+      })
+      setEditDialogOpen(false)
+      setTimeout(() => setEditingCategoryId(undefined), 300)
+    } catch (error) {
+      toast({
+        variant: 'destructive',
+        title: 'Có lỗi xảy ra',
+        description: 'Vui lòng thử lại sau'
+      })
     }
   }
 
@@ -93,7 +132,20 @@ export default function BlogCategoriesPage() {
         title: 'Có lỗi xảy ra',
         description: 'Vui lòng thử lại sau'
       })
-      throw error
+    }
+  }
+
+  // Hàm xử lý khi ấn nút Edit
+  const handleEdit = (id: string) => {
+    setEditingCategoryId(id)
+    setTimeout(() => setEditDialogOpen(true), 100)
+  }
+
+  // Xử lý khi đóng dialog
+  const handleCloseEditDialog = (open: boolean) => {
+    if (!open) {
+      setEditDialogOpen(false)
+      setTimeout(() => setEditingCategoryId(undefined), 300)
     }
   }
 
@@ -113,19 +165,14 @@ export default function BlogCategoriesPage() {
           <h1 className='text-2xl font-bold'>Quản lý danh mục Blog</h1>
           <p className='text-sm text-muted-foreground mt-1'>Quản lý các danh mục cho bài viết blog</p>
         </div>
-        <Button
-          onClick={() => {
-            setEditingCategory(undefined)
-            setCreateDialogOpen(true)
-          }}
-        >
+        <Button onClick={() => setCreateDialogOpen(true)}>
           <Plus className='w-4 h-4 mr-2' />
           Thêm danh mục
         </Button>
       </div>
 
       {/* Search and Filters */}
-      <div className='flex flex-col sm:flex-row gap-4 mb-6'>
+      <div className='flex flex-col sm:flex-row gap-4 mb-6 w-full justify-start md:justify-between'>
         <div className='relative flex-1 max-w-[500px]'>
           <Search className='absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground' />
           <Input
@@ -147,27 +194,26 @@ export default function BlogCategoriesPage() {
         </Select>
       </div>
 
-      <CategoryTable
-        data={filteredCategories}
-        searchQuery={searchQuery}
-        statusFilter={statusFilter}
-        onEdit={(category) => {
-          setEditingCategory(category)
-          setCreateDialogOpen(true)
-        }}
-        onDelete={handleDelete}
-      />
+      <CategoryTable data={categories} onEdit={handleEdit} onDelete={handleDelete} />
 
+      {/* Dialog tạo mới */}
       <CreateCategoryDialog
         open={createDialogOpen}
-        onOpenChange={(open) => {
-          setCreateDialogOpen(open)
-          if (!open) setEditingCategory(undefined)
-        }}
-        initialData={editingCategory}
-        onSubmit={handleCreateUpdate}
-        isLoading={createCategoryMutation.isPending || updateCategoryMutation.isPending}
+        onOpenChange={setCreateDialogOpen}
+        onSubmit={handleCreate}
+        isLoading={createCategoryMutation.isPending}
       />
+
+      {/* Dialog chỉnh sửa */}
+      {editDialogOpen && (
+        <EditCategoryDialog
+          categoryDetail={categoryDetail}
+          open={editDialogOpen}
+          onOpenChange={handleCloseEditDialog}
+          onSubmit={handleUpdate}
+          isLoading={updateCategoryMutation.isPending}
+        />
+      )}
     </div>
   )
 }

@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 'use client'
 
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
@@ -13,20 +14,11 @@ interface CategoryTableProps {
     description: string
     status?: 'active' | 'inactive'
   }>
-  searchQuery: string
-  statusFilter: string
-  onEdit: (category: { id: string; name: string; description: string }) => void
+  onEdit: (id: string) => void
   onDelete: (id: string) => Promise<void>
 }
 
-export function CategoryTable({ data, statusFilter, onEdit, onDelete }: CategoryTableProps) {
-  const filteredData = data.filter((category) => {
-    if (statusFilter !== 'all' && category.status !== statusFilter) {
-      return false
-    }
-    return true
-  })
-
+export function CategoryTable({ onEdit, onDelete, data }: CategoryTableProps) {
   return (
     <div className='rounded-md border'>
       <Table>
@@ -39,14 +31,14 @@ export function CategoryTable({ data, statusFilter, onEdit, onDelete }: Category
           </TableRow>
         </TableHeader>
         <TableBody>
-          {filteredData.length === 0 ? (
+          {data.length === 0 ? (
             <TableRow>
               <TableCell colSpan={4} className='text-center h-24 text-muted-foreground'>
                 Không tìm thấy danh mục nào
               </TableCell>
             </TableRow>
           ) : (
-            filteredData.map((category) => (
+            data.map((category) => (
               <TableRow key={category.id}>
                 <TableCell className='font-medium'>{category.name}</TableCell>
                 <TableCell>
@@ -80,7 +72,7 @@ export function CategoryTable({ data, statusFilter, onEdit, onDelete }: Category
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align='end'>
-                      <DropdownMenuItem onClick={() => onEdit(category)}>
+                      <DropdownMenuItem onClick={() => onEdit(category.id)}>
                         <Pencil className='mr-2 h-4 w-4' />
                         Chỉnh sửa
                       </DropdownMenuItem>
