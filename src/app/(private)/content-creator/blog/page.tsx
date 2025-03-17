@@ -9,7 +9,7 @@ import { BlogCard } from '@/components/private/content-creator/blog/blog-card'
 import { BlogFilters } from '@/components/private/content-creator/blog/blog-filters'
 import { EmptyBlogs } from '@/components/private/content-creator/blog/empty-blogs'
 import { DeleteBlogDialog } from '@/components/private/content-creator/blog/delete-blog-dialog'
-import { useBlogQuery, useCategoryBlogQuery } from '@/queries/useBlog'
+import { useBlogQuery } from '@/queries/useBlog'
 import { useToast } from '@/components/ui/use-toast'
 import { Skeleton } from '@/components/ui/skeleton'
 
@@ -74,7 +74,7 @@ export default function BlogPage() {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
   const [selectedBlog, setSelectedBlog] = useState<string | null>(null)
   const [pageIndex, setPageIndex] = useState(1)
-  const [pageSize, setPageSize] = useState(10)
+  const [pageSize] = useState(10)
   const router = useRouter()
   const { toast } = useToast()
 
@@ -89,8 +89,8 @@ export default function BlogPage() {
   })
 
   // Lấy danh sách danh mục để hiển thị trong filter
-  const { data: categoriesResponse } = useCategoryBlogQuery()
-  const categories = categoriesResponse?.payload?.data || []
+  // const { data: categoriesResponse } = useCategoryBlogQuery()
+  // const categories = categoriesResponse?.payload?.data || []
 
   // Mutation xóa blog
   // const deleteBlogMutation = useBlogDeleteMutation()

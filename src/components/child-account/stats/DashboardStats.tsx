@@ -20,4 +20,4 @@ export const DashboardStats: React.FC<DashboardStatsProps> = ({ stats }) => (
     <StatCard icon={Activity} label='Đang tiến hành' value={stats.inProgressCourses} color='text-blue-600' />
     <StatCard icon={Clock} label='Tiến độ tổng thể' value={`${stats.overallProgress}%`} color='text-purple-600' />
   </div>
-) 
+)

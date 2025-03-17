@@ -24,4 +24,4 @@ export const StatCard: React.FC<StatCardProps> = ({ icon: Icon, label, value, co
       </div>
     </CardContent>
   </Card>
-) 
+)

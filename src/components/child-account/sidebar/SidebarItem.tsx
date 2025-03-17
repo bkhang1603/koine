@@ -18,4 +18,4 @@ export const SidebarItem: React.FC<SidebarItemProps> = ({ icon: Icon, label, act
     <Icon className='h-5 w-5' />
     <span>{label}</span>
   </button>
-) 
+)

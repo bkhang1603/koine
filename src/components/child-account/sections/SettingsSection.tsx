@@ -77,4 +77,4 @@ export const SettingsSection: React.FC<SettingsSectionProps> = ({ hideAllCourses
       </div>
     </CardContent>
   </Card>
-) 
+)

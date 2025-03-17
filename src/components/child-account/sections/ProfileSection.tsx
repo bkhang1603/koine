@@ -30,7 +30,7 @@ export const ProfileSection: React.FC<ProfileSectionProps> = ({ childData }) => 
             </AvatarFallback>
           </Avatar>
         </div>
-        
+
         {/* Thông tin cơ bản */}
         <div className='w-full md:w-auto flex-1 space-y-4'>
           <div className='grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4'>
@@ -41,13 +41,13 @@ export const ProfileSection: React.FC<ProfileSectionProps> = ({ childData }) => 
                 {childData.firstName} {childData.lastName}
               </p>
             </div>
-            
+
             {/* Tài khoản */}
             <div>
               <p className='text-sm text-gray-500 mb-1'>Tài khoản</p>
               <p className='font-medium'>{childData.username}</p>
             </div>
-            
+
             {/* Ngày sinh */}
             {childData.dob && (
               <div>
@@ -55,7 +55,7 @@ export const ProfileSection: React.FC<ProfileSectionProps> = ({ childData }) => 
                 <p className='font-medium'>{childData.dob}</p>
               </div>
             )}
-            
+
             {/* Giới tính */}
             {childData.gender && (
               <div>
@@ -68,4 +68,4 @@ export const ProfileSection: React.FC<ProfileSectionProps> = ({ childData }) => 
       </div>
     </CardContent>
   </Card>
-) 
+)
