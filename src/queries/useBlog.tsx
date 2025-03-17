@@ -108,3 +108,70 @@ export const useBlogCommentUpdateMutation = () => {
     }
   })
 }
+
+// Content Creator
+export const useBlogCreateMutation = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: blogApiRequest.createBlog,
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ['blogs']
+      })
+    }
+  })
+}
+
+export const useCategoryBlogQuery = () => {
+  return useQuery({
+    queryKey: ['categoryBlog'],
+    queryFn: () => blogApiRequest.getCategoryBlog()
+  })
+}
+
+export const useCategoryBlogDetailQuery = ({ id }: { id: string }) => {
+  return useQuery({
+    queryKey: ['categoryBlog', id],
+    queryFn: () => blogApiRequest.getCategoryBlogDetail(id)
+  })
+}
+
+export const useCategoryBlogCreateMutation = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: blogApiRequest.createCategoryBlog,
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ['categoryBlog']
+      })
+    }
+  })
+}
+
+export const useCategoryBlogUpdateMutation = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: blogApiRequest.updateCategoryBlog,
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ['categoryBlog']
+      })
+    }
+  })
+}
+
+export const useCategoryBlogDeleteMutation = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: blogApiRequest.deleteCategoryBlog,
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ['categoryBlog']
+      })
+    }
+  })
+}

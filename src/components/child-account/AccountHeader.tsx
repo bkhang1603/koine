@@ -1,7 +1,6 @@
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
-import { AlertCircle, Edit, User, Clock, Award, Settings } from 'lucide-react'
-import { Badge } from '@/components/ui/badge'
+import { AlertCircle, User, Clock, Award, Settings } from 'lucide-react'
 
 interface AccountHeaderProps {
   childData: {
@@ -20,7 +19,7 @@ export const AccountHeader = ({ childData, onReportClick }: AccountHeaderProps) 
       <div className='absolute top-0 right-0 w-64 h-64 bg-gradient-to-bl from-primary/5 to-transparent rounded-full transform translate-x-1/2 -translate-y-1/2'></div>
       <div className='absolute bottom-0 left-0 w-32 h-32 bg-gradient-to-tr from-blue-50 to-transparent rounded-full transform -translate-x-1/2 translate-y-1/2'></div>
 
-      <div className='flex flex-col md:flex-row md:items-center justify-between gap-4 relative z-10'>
+      <div className='flex flex-col md:flex-row md:items-center justify-between gap-4 relative'>
         <div className='flex items-center gap-5'>
           <div className='relative'>
             <Avatar className='h-20 w-20 border-4 border-primary/10 shadow-sm'>

@@ -53,8 +53,6 @@ export default function AddressPage() {
 
   const handleSetDefault = async ({ id, address }: { id: string; address: AccountAddressBodyType }) => {
     try {
-      console.log({ address })
-
       await editMutation.mutateAsync({
         id,
         name: address.name,

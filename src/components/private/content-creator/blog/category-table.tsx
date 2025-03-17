@@ -15,9 +15,11 @@ interface CategoryTableProps {
   }>
   searchQuery: string
   statusFilter: string
+  onEdit: (category: { id: string; name: string; description: string }) => void
+  onDelete: (id: string) => Promise<void>
 }
 
-export function CategoryTable({ data, statusFilter }: CategoryTableProps) {
+export function CategoryTable({ data, statusFilter, onEdit, onDelete }: CategoryTableProps) {
   const filteredData = data.filter((category) => {
     if (statusFilter !== 'all' && category.status !== statusFilter) {
       return false
@@ -30,10 +32,10 @@ export function CategoryTable({ data, statusFilter }: CategoryTableProps) {
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead>Tên danh mục</TableHead>
+            <TableHead className='w-[200px]'>Tên danh mục</TableHead>
             <TableHead>Mô tả</TableHead>
-            <TableHead>Trạng thái</TableHead>
-            <TableHead className='w-[100px]'>Thao tác</TableHead>
+            <TableHead className='w-[220px]'>Trạng thái</TableHead>
+            <TableHead className='w-[80px]'>Thao tác</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -46,8 +48,12 @@ export function CategoryTable({ data, statusFilter }: CategoryTableProps) {
           ) : (
             filteredData.map((category) => (
               <TableRow key={category.id}>
-                <TableCell>{category.name}</TableCell>
-                <TableCell>{category.description}</TableCell>
+                <TableCell className='font-medium'>{category.name}</TableCell>
+                <TableCell>
+                  <div className='line-clamp-2' title={category.description}>
+                    {category.description}
+                  </div>
+                </TableCell>
                 <TableCell>
                   <Badge
                     variant={category.status === 'active' ? 'default' : 'secondary'}
@@ -74,11 +80,11 @@ export function CategoryTable({ data, statusFilter }: CategoryTableProps) {
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align='end'>
-                      <DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => onEdit(category)}>
                         <Pencil className='mr-2 h-4 w-4' />
                         Chỉnh sửa
                       </DropdownMenuItem>
-                      <DropdownMenuItem className='text-destructive'>
+                      <DropdownMenuItem className='text-destructive' onClick={() => onDelete(category.id)}>
                         <Trash className='mr-2 h-4 w-4' />
                         Xóa
                       </DropdownMenuItem>
