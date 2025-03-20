@@ -6,7 +6,7 @@ import { Card, CardContent } from '@/components/ui/card'
 import { BellIcon, CheckCircle2, Clock, BookOpen, AlertTriangle } from 'lucide-react'
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Badge } from '@/components/ui/badge'
-import { useGetAccountNotifications } from '@/queries/useAccount'
+import { useGetAccountNotifications, useUpdateAccountNotificationsMutation } from '@/queries/useAccount'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useToast } from '@/components/ui/use-toast'
 import { formatDistanceToNow } from 'date-fns'
@@ -14,6 +14,7 @@ import { vi } from 'date-fns/locale'
 
 export default function NotificationsPage() {
   const { data, isLoading } = useGetAccountNotifications({ page_index: 1, page_size: 100 })
+  const updateNotificationsMutation = useUpdateAccountNotificationsMutation()
   const notifications = useMemo(() => data?.payload.data.response || [], [data])
   const [activeTab, setActiveTab] = useState('all')
   const { toast } = useToast()
@@ -34,10 +35,15 @@ export default function NotificationsPage() {
   }, [notifications, activeTab])
 
   // Đánh dấu đã đọc tất cả
-  const handleMarkAllAsRead = () => {
-    toast({
-      description: 'Đã đánh dấu tất cả thông báo là đã đọc'
-    })
+  const handleMarkAllAsRead = async () => {
+    try {
+      await updateNotificationsMutation.mutateAsync()
+      toast({
+        description: 'Đã đánh dấu tất cả thông báo là đã đọc'
+      })
+    } catch (error) {
+      console.log(error)
+    }
   }
 
   // Hiển thị icon theo loại thông báo

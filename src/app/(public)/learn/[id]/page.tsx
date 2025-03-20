@@ -7,7 +7,7 @@ import { useGetCourseProgressQuery, useGetLessonQuery, useUpdateCourseProgressMu
 import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { handleErrorApi } from '@/lib/utils'
-import { useCallback, use, useEffect } from 'react'
+import { useCallback, use, useEffect, useRef } from 'react'
 import { UserCourseProgressResType } from '@/schemaValidations/course.schema'
 import { Breadcrumb } from '@/components/learn/Breadcrumb'
 import { Sidebar } from '@/components/learn/Sidebar'
@@ -16,6 +16,7 @@ import { WelcomeScreen } from '@/components/learn/WelcomeScreen'
 import { NavigationButtons } from '@/components/learn/NavigationButtons'
 import { LoadingSkeleton } from '@/components/learn/LoadingSkeleton'
 import { AlertTriangle } from 'lucide-react'
+import { useGetStillLearningCourse } from '@/queries/useAccount'
 
 type Lesson = UserCourseProgressResType['data']['chapters'][0]['lessons'][0]
 
@@ -75,6 +76,36 @@ function LearnPage(props: { params: Promise<{ id: string }> }) {
 
   const course = data?.payload.data || null
   const lesson = lessonData?.payload.data || null
+
+  const { refetch: refetchStillLearning } = useGetStillLearningCourse()
+  const refetchIntervalRef = useRef<NodeJS.Timeout | null>(null)
+
+  useEffect(() => {
+    // Gọi refetch ngay lập tức khi component mount
+    refetchStillLearning()
+    console.log('Initial refetch at:', new Date().toLocaleTimeString())
+
+    // Clear previous interval if exists
+    if (refetchIntervalRef.current) {
+      clearInterval(refetchIntervalRef.current)
+    }
+
+    // Set new interval
+    const intervalTime = 300000 // 30 seconds for testing, change to 300000 (5 minutes) in production
+    refetchIntervalRef.current = setInterval(() => {
+      refetchStillLearning()
+      console.log('Interval refetch at:', new Date().toLocaleTimeString())
+    }, intervalTime)
+
+    // Cleanup on unmount
+    return () => {
+      console.log('Cleaning up interval at:', new Date().toLocaleTimeString())
+      if (refetchIntervalRef.current) {
+        clearInterval(refetchIntervalRef.current)
+        refetchIntervalRef.current = null
+      }
+    }
+  }, [refetchStillLearning])
 
   // Auto-select first lesson when course data is loaded and no lessonId is provided
   useEffect(() => {

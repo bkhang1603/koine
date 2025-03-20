@@ -415,6 +415,27 @@ export const accountNotificationsRes = z.object({
   message: z.string()
 })
 
+export const listChildAccount = z.object({
+  id: z.string(),
+  role: z.enum(RoleValues),
+  parentId: z.string(),
+  createAt: z.string(),
+  createAtFormatted: z.string(),
+  userDetail: z.object({
+    firstName: z.string(),
+    lastName: z.string(),
+    dob: z.string(),
+    address: z.string(),
+    gender: z.string(),
+    avatarUrl: z.string()
+  })
+})
+
+export const listChildAccountRes = z.object({
+  data: z.array(listChildAccount),
+  message: z.string()
+})
+
 export type AccountResType = z.TypeOf<typeof accountRes>
 
 export type CourseByAccountResType = z.TypeOf<typeof courseByAccountRes>
@@ -444,3 +465,5 @@ export type RegisterChildAccountResType = z.TypeOf<typeof registerChildAccountRe
 export type AccountStoreResType = z.TypeOf<typeof accountStoreRes>
 
 export type AccountNotificationsResType = z.TypeOf<typeof accountNotificationsRes>
+
+export type ListChildAccountResType = z.TypeOf<typeof listChildAccountRes>

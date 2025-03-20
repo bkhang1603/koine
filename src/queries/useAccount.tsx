@@ -144,3 +144,41 @@ export const useGetAccountNotifications = ({ page_index, page_size }: { page_ind
     queryFn: () => accountApiRequest.getAccountNotifications({ page_index, page_size })
   })
 }
+
+export const useUpdateAccountNotificationMutation = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: accountApiRequest.updateAccountNotification,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['account-notifications'] })
+    }
+  })
+}
+
+export const useUpdateAccountNotificationsMutation = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: accountApiRequest.updateAccountNotifications,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['account-notifications'] })
+    }
+  })
+}
+
+// Still learning course
+export const useGetStillLearningCourse = () => {
+  return useQuery({
+    queryKey: ['still-learning-course'],
+    queryFn: accountApiRequest.stillLearningCourse
+  })
+}
+
+// List child account
+export const useGetListChildAccount = () => {
+  return useQuery({
+    queryKey: ['list-child-account'],
+    queryFn: accountApiRequest.getListChildAccount
+  })
+}

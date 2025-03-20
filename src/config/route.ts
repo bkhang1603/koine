@@ -18,7 +18,7 @@ const configRoute = {
     order: '/setting/order',
     address: '/setting/address',
     payment: '/setting/payment',
-    notification: '/setting/notification',
+    notifications: '/setting/notifications',
     security: '/setting/security'
   },
   profile: '/profile',

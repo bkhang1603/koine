@@ -10,6 +10,7 @@ import {
   AccountResType,
   AccountStoreResType,
   CourseByAccountResType,
+  ListChildAccountResType,
   MyChildAccountByIdResType,
   MyChildAccountResType,
   RegisterChildAccountBodyType,
@@ -45,7 +46,11 @@ const accountApiRequest = {
     http.post<RegisterChildAccountResType>('/auth/register-child', body),
   getAccountNotifications: ({ page_index, page_size }: { page_index: number; page_size: number }) =>
     http.get<AccountNotificationsResType>(`/notification?page_index=${page_index}&page_size=${page_size}`),
-  getAccountStore: () => http.get<AccountStoreResType>('/courses/my-store')
+  updateAccountNotification: (id: string) => http.put<AccountNotificationsResType>(`/notification/read/${id}`, {}),
+  updateAccountNotifications: () => http.put<AccountNotificationsResType>(`/notification/read`, {}),
+  getAccountStore: () => http.get<AccountStoreResType>('/courses/my-store'),
+  stillLearningCourse: () => http.get(`/user-progresses/still-learning`),
+  getListChildAccount: () => http.get<ListChildAccountResType>(`/users/my-child`)
 }
 
 export default accountApiRequest

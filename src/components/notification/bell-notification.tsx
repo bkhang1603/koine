@@ -5,18 +5,21 @@ import { Button } from '@/components/ui/button'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import socket from '@/lib/socket'
-import { useGetAccountNotifications } from '@/queries/useAccount'
+import { useGetAccountNotifications, useUpdateAccountNotificationsMutation } from '@/queries/useAccount'
 import { Bell, ChevronRight, CheckCircle2 } from 'lucide-react'
 import { format } from 'date-fns'
 import { vi } from 'date-fns/locale'
 import { useEffect } from 'react'
 import { Badge } from '@/components/ui/badge'
 import { Separator } from '@/components/ui/separator'
+import Link from 'next/link'
+import configRoute from '@/config/route'
 
 function BellNotification() {
   const user = useAppStore((state) => state.user)
-  const { data, isLoading } = useGetAccountNotifications({ page_index: 1, page_size: 100 })
+  const { data, isLoading, refetch } = useGetAccountNotifications({ page_index: 1, page_size: 100 })
   const notifications = data?.payload.data.response || []
+  const updateNotificationsMutation = useUpdateAccountNotificationsMutation()
 
   useEffect(() => {
     if (user) {
@@ -34,7 +37,7 @@ function BellNotification() {
     }
 
     function getNotifications() {
-      console.log('get notifications')
+      refetch()
     }
 
     function login() {
@@ -58,10 +61,18 @@ function BellNotification() {
 
       socket.off('disconnect', onDisconnect)
     }
-  }, [user])
+  }, [user, refetch])
 
   // Count unread notifications
   const unreadCount = notifications.filter((notification) => !notification.isRead).length
+
+  const handleMarkAllAsRead = async () => {
+    try {
+      await updateNotificationsMutation.mutateAsync()
+    } catch (error) {
+      console.log(error)
+    }
+  }
 
   return (
     <Popover>
@@ -87,7 +98,7 @@ function BellNotification() {
               </Badge>
             )}
           </h3>
-          <Button variant='ghost' size='sm' className='text-xs h-8 hover:bg-gray-100'>
+          <Button variant='ghost' size='sm' className='text-xs h-8 hover:bg-gray-100' onClick={handleMarkAllAsRead}>
             Đánh dấu đã đọc
           </Button>
         </div>
@@ -168,9 +179,11 @@ function BellNotification() {
         {/* Footer with view all button */}
         {notifications.length > 0 && (
           <div className='p-3 bg-gray-50 border-t'>
-            <Button variant='outline' className='w-full justify-between bg-white hover:bg-gray-50' size='sm'>
-              <span>Xem tất cả thông báo</span>
-              <ChevronRight className='h-4 w-4 ml-1' />
+            <Button variant='outline' className='w-full justify-between bg-white hover:bg-gray-50' size='sm' asChild>
+              <Link href={configRoute.setting.notifications}>
+                <span>Xem tất cả thông báo</span>
+                <ChevronRight className='h-4 w-4 ml-1' />
+              </Link>
             </Button>
           </div>
         )}
