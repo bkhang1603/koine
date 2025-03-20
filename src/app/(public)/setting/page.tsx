@@ -1,20 +1,19 @@
 import { ProfileForm } from '@/components/public/parent/setting/profile-form'
-import { Separator } from '@/components/ui/separator'
+import { User } from 'lucide-react'
 
 export default function SettingPage() {
   return (
-    <div className='max-w-4xl mx-auto space-y-8'>
+    <div className='space-y-8'>
       {/* Header */}
-      <div className='flex items-center justify-between'>
-        <div>
-          <h3 className='text-2xl font-semibold'>Hồ sơ cá nhân</h3>
-          <p className='text-sm text-gray-500 mt-1'>
-            Điền thông tin cá nhân của bạn để chúng tôi có thể hiển thị chính xác thông tin của bạn.
-          </p>
+      <div>
+        <div className='flex items-center gap-2'>
+          <User className='h-5 w-5 text-primary' />
+          <h2 className='text-xl font-medium text-gray-900'>Hồ sơ cá nhân</h2>
         </div>
+        <p className='text-sm text-gray-500 mt-1 md:ml-7'>
+          Điền thông tin cá nhân của bạn để chúng tôi có thể hiển thị chính xác thông tin của bạn.
+        </p>
       </div>
-
-      <Separator />
 
       <ProfileForm />
     </div>

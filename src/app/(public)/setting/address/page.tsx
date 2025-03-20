@@ -1,33 +1,23 @@
 'use client'
 
 import { Button } from '@/components/ui/button'
-import { Card } from '@/components/ui/card'
-import { Label } from '@/components/ui/label'
-import { Separator } from '@/components/ui/separator'
 import {
   useDeleteAccountAddressMutation,
   useGetAccountAddress,
   useUpdateAccountAddressMutation
 } from '@/queries/useAccount'
-import { Plus, Trash2, Building2, CheckCircle2, PenLine, MapPinnedIcon } from 'lucide-react'
+import { Filter, MapPin, Plus, Search } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import AddressForm from '@/components/public/parent/setting/address-form'
 import { handleErrorApi } from '@/lib/utils'
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger
-} from '@/components/ui/alert-dialog'
 import { AccountAddressBodyType, AccountOneAddressResType } from '@/schemaValidations/account.schema'
 import { toast } from '@/components/ui/use-toast'
 import { EmptyAddress } from '@/components/public/parent/setting/empty-address'
 import { AddressSkeleton } from '@/components/public/parent/setting/address-skeleton'
+import { AddressCard } from '@/components/public/parent/setting/address/AddressCard'
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { Input } from '@/components/ui/input'
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 
 export default function AddressPage() {
   const { data, isLoading } = useGetAccountAddress()
@@ -35,14 +25,16 @@ export default function AddressPage() {
   const deleteMutation = useDeleteAccountAddressMutation()
 
   const addresses = useMemo(() => data?.payload.data ?? [], [data?.payload.data])
-
   const [showAddForm, setShowAddForm] = useState(false)
   const [editingAddress, setEditingAddress] = useState<AccountOneAddressResType['data']>()
+  const [activeTab, setActiveTab] = useState('all')
+  const [searchTerm, setSearchTerm] = useState('')
+  const [sortOption, setSortOption] = useState('recent')
 
+  // Xử lý xóa địa chỉ
   const handleDeleteAddress = async (id: string) => {
     try {
       await deleteMutation.mutateAsync(id)
-
       toast({
         description: 'Xóa địa chỉ thành công'
       })
@@ -51,6 +43,7 @@ export default function AddressPage() {
     }
   }
 
+  // Xử lý đặt địa chỉ mặc định
   const handleSetDefault = async ({ id, address }: { id: string; address: AccountAddressBodyType }) => {
     try {
       await editMutation.mutateAsync({
@@ -61,7 +54,6 @@ export default function AddressPage() {
         tag: address.tag,
         isDefault: true
       })
-
       toast({
         description: 'Đặt mặc định thành công'
       })
@@ -70,122 +62,159 @@ export default function AddressPage() {
     }
   }
 
+  // Lọc địa chỉ dựa trên tab và tìm kiếm
+  const filteredAddresses = useMemo(() => {
+    let filtered = [...addresses]
+
+    // Lọc theo tab
+    if (activeTab === 'default') {
+      filtered = filtered.filter((address) => address.isDefault)
+    } else if (activeTab === 'home') {
+      filtered = filtered.filter((address) => address.tag === 'Nhà riêng')
+    } else if (activeTab === 'office') {
+      filtered = filtered.filter((address) => address.tag === 'Văn phòng')
+    }
+
+    // Lọc theo từ khóa tìm kiếm
+    if (searchTerm) {
+      const search = searchTerm.toLowerCase()
+      filtered = filtered.filter(
+        (address) =>
+          address.name.toLowerCase().includes(search) ||
+          address.phone.toLowerCase().includes(search) ||
+          address.address.toLowerCase().includes(search)
+      )
+    }
+
+    // Sắp xếp
+    if (sortOption === 'recent') {
+      filtered.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+    } else if (sortOption === 'name') {
+      filtered.sort((a, b) => a.name.localeCompare(b.name))
+    }
+
+    return filtered
+  }, [addresses, activeTab, searchTerm, sortOption])
+
   return (
-    <div className='max-w-4xl mx-auto space-y-8'>
-      {/* Header */}
-      <div className='flex items-center justify-between'>
+    <div className='space-y-6'>
+      {/* Header with Title and Add Button */}
+      <div className='flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4'>
         <div>
-          <h3 className='text-2xl font-semibold'>Địa chỉ của tôi</h3>
-          <p className='text-sm text-gray-500 mt-1'>Quản lý địa chỉ giao hàng và thanh toán của bạn</p>
+          <div className='flex items-center gap-2'>
+            <MapPin className='h-5 w-5 text-primary' />
+            <h2 className='text-xl font-medium text-gray-900'>Sổ địa chỉ</h2>
+          </div>
+          <p className='text-sm text-gray-500 mt-1 md:ml-7'>Quản lý danh sách địa chỉ giao hàng của bạn</p>
         </div>
-        <Button className='bg-primary/5 text-primary hover:bg-primary/10 gap-2' onClick={() => setShowAddForm(true)}>
-          <Plus className='w-4 h-4' />
+
+        <Button onClick={() => setShowAddForm(true)} className='bg-gradient-to-r from-primary to-primary/90 shadow-md'>
+          <Plus className='mr-2 h-4 w-4' />
           Thêm địa chỉ mới
         </Button>
       </div>
 
-      <Separator />
+      {/* Filter and Search Bar */}
+      <div className='bg-white border border-gray-100 shadow-sm rounded-lg overflow-hidden'>
+        <div className='p-4 border-b border-gray-100 flex flex-col sm:flex-row gap-3'>
+          <Tabs defaultValue='all' value={activeTab} onValueChange={setActiveTab} className='w-full sm:w-auto'>
+            <TabsList className='bg-gray-100/90 grid w-full grid-cols-4 h-9'>
+              <TabsTrigger value='all' className='text-xs'>
+                Tất cả
+              </TabsTrigger>
+              <TabsTrigger value='default' className='text-xs'>
+                Mặc định
+              </TabsTrigger>
+              <TabsTrigger value='home' className='text-xs'>
+                Nhà riêng
+              </TabsTrigger>
+              <TabsTrigger value='office' className='text-xs'>
+                Văn phòng
+              </TabsTrigger>
+            </TabsList>
+          </Tabs>
+
+          <div className='flex-1 flex gap-2'>
+            <div className='relative flex-1'>
+              <Search className='absolute left-2.5 top-2.5 h-4 w-4 text-gray-400' />
+              <Input
+                type='search'
+                placeholder='Tìm kiếm địa chỉ...'
+                className='pl-9 h-9 text-sm focus-visible:ring-primary'
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+            </div>
+
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant='outline' size='sm' className='h-9 gap-1 border-gray-200'>
+                  <Filter className='h-3.5 w-3.5' />
+                  <span className='text-xs'>Sắp xếp</span>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align='end' className='w-48'>
+                <DropdownMenuItem
+                  onClick={() => setSortOption('recent')}
+                  className={sortOption === 'recent' ? 'bg-primary/5 text-primary' : ''}
+                >
+                  Mới nhất
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={() => setSortOption('name')}
+                  className={sortOption === 'name' ? 'bg-primary/5 text-primary' : ''}
+                >
+                  Theo tên A-Z
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+        </div>
+      </div>
 
       {/* Address List */}
       {isLoading ? (
         <AddressSkeleton />
+      ) : filteredAddresses.length === 0 ? (
+        searchTerm ? (
+          <div className='text-center py-14 bg-gradient-to-b from-gray-50 to-white rounded-lg border border-dashed border-gray-200'>
+            <div className='flex flex-col items-center'>
+              <Search className='h-12 w-12 text-gray-300 mb-3' />
+              <h3 className='text-lg font-medium text-gray-800 mb-2'>Không tìm thấy địa chỉ</h3>
+              <p className='text-sm text-gray-500 max-w-md'>
+                Không tìm thấy địa chỉ nào phù hợp với từ khóa &quot;{searchTerm}&quot;.
+              </p>
+            </div>
+          </div>
+        ) : addresses.length === 0 ? (
+          <EmptyAddress onAddAddress={() => setShowAddForm(true)} />
+        ) : (
+          <div className='text-center py-14 bg-gradient-to-b from-gray-50 to-white rounded-lg border border-dashed border-gray-200'>
+            <div className='flex flex-col items-center'>
+              <MapPin className='h-12 w-12 text-gray-300 mb-3' />
+              <h3 className='text-lg font-medium text-gray-800 mb-2'>Không có địa chỉ nào</h3>
+              <p className='text-sm text-gray-500 max-w-md'>Không tìm thấy địa chỉ nào trong danh mục này.</p>
+            </div>
+          </div>
+        )
       ) : (
-        <div className='grid gap-6'>
-          {addresses.length === 0 ? (
-            <EmptyAddress onAddAddress={() => setShowAddForm(true)} />
-          ) : (
-            addresses.map((address) => (
-              <Card
-                key={address.id}
-                className={`p-6 ${address.isDefault ? 'border-2 border-primary/10 bg-primary/5' : ''}`}
-              >
-                <div className='flex items-start justify-between mb-6'>
-                  <div className='flex items-center gap-2 text-primary'>
-                    {address.isDefault ? <MapPinnedIcon className='w-5 h-5' /> : <Building2 className='w-5 h-5' />}
-                    <span className='font-medium'>{address.tag}</span>
-                  </div>
-                  <div className='flex items-center gap-2'>
-                    {!address.isDefault && (
-                      <Button
-                        variant='ghost'
-                        size='sm'
-                        className='h-8 text-gray-500 hover:text-primary'
-                        onClick={() =>
-                          handleSetDefault({
-                            id: address.id,
-                            address
-                          })
-                        }
-                      >
-                        <CheckCircle2 className='w-4 h-4 mr-1' />
-                        Đặt mặc định
-                      </Button>
-                    )}
-                    {address.isDefault && (
-                      <span className='px-2 py-1 bg-primary/10 text-primary text-xs rounded-full font-medium'>
-                        Mặc định
-                      </span>
-                    )}
-                    <Button
-                      variant='ghost'
-                      size='sm'
-                      className='h-8 text-gray-500 hover:text-primary'
-                      onClick={() => setEditingAddress(address)}
-                    >
-                      <PenLine className='w-4 h-4' />
-                    </Button>
-                    <AlertDialog>
-                      <AlertDialogTrigger asChild>
-                        <Button variant='ghost' size='sm' className='h-8 text-gray-500 hover:text-red-500'>
-                          <Trash2 className='w-4 h-4' />
-                        </Button>
-                      </AlertDialogTrigger>
-                      <AlertDialogContent>
-                        <AlertDialogHeader>
-                          <AlertDialogTitle>Xóa địa chỉ</AlertDialogTitle>
-                          <AlertDialogDescription>
-                            Bạn có chắc chắn muốn xóa địa chỉ này? Hành động này không thể hoàn tác.
-                          </AlertDialogDescription>
-                        </AlertDialogHeader>
-                        <AlertDialogFooter>
-                          <AlertDialogCancel>Hủy</AlertDialogCancel>
-                          <AlertDialogAction
-                            onClick={() => handleDeleteAddress(address.id)}
-                            className='bg-red-500 hover:bg-red-600'
-                          >
-                            Xóa
-                          </AlertDialogAction>
-                        </AlertDialogFooter>
-                      </AlertDialogContent>
-                    </AlertDialog>
-                  </div>
-                </div>
-
-                <div className='grid md:grid-cols-2 gap-8'>
-                  <div className='space-y-4'>
-                    <div>
-                      <Label className='text-gray-500 text-sm'>Họ và tên người nhận</Label>
-                      <div className='font-medium mt-1'>{address.name}</div>
-                    </div>
-                    <div>
-                      <Label className='text-gray-500 text-sm'>Số điện thoại</Label>
-                      <div className='font-medium mt-1'>{address.phone}</div>
-                    </div>
-                  </div>
-                  <div className='space-y-4'>
-                    <div>
-                      <Label className='text-gray-500 text-sm'>Địa chỉ</Label>
-                      <div className='font-medium mt-1'>{address.address}</div>
-                    </div>
-                    <div>
-                      <Label className='text-gray-500 text-sm'>Khu vực</Label>
-                      <div className='font-medium mt-1'>Vietnam</div>
-                    </div>
-                  </div>
-                </div>
-              </Card>
-            ))
-          )}
+        <div className='grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4'>
+          {filteredAddresses.map((address) => (
+            <AddressCard
+              key={address.id}
+              address={{
+                id: address.id,
+                name: address.name,
+                phone: address.phone,
+                address: address.address,
+                tag: address.tag,
+                isDefault: address.isDefault
+              }}
+              onSetDefault={() => handleSetDefault({ id: address.id, address })}
+              onEdit={() => setEditingAddress(address)}
+              onDelete={() => handleDeleteAddress(address.id)}
+            />
+          ))}
         </div>
       )}
 

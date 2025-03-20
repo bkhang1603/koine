@@ -1,92 +1,51 @@
 'use client'
 
-import { useState, use } from 'react'
+import { useState } from 'react'
+import { useParams } from 'next/navigation'
 import { Button } from '@/components/ui/button'
-import { ArrowLeft, AlertCircle, BookOpen, Settings, LayoutDashboard, Users } from 'lucide-react'
-import Link from 'next/link'
-import { useToast } from '@/components/ui/use-toast'
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle
-} from '@/components/ui/dialog'
-import { Textarea } from '@/components/ui/textarea'
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
+import { Card, CardContent } from '@/components/ui/card'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { useGetChildAccountById } from '@/queries/useAccount'
-import { CourseCard } from '@/components/child-account/CourseCard'
-import { EmptyCourses } from '@/components/child-account/EmptyCourses'
-import Loading from '@/components/loading'
-import { ProfileSection } from '@/components/child-account/sections/ProfileSection'
-import { ProgressBar } from '@/components/child-account/stats/ProgressBar'
-import { SidebarItem } from '@/components/child-account/sidebar/SidebarItem'
-import { DashboardStats } from '@/components/child-account/stats/DashboardStats'
-import { AccountHeader } from '@/components/child-account/AccountHeader'
-import { SettingsSection } from '@/components/child-account/sections/SettingsSection'
+import { courseByChildTabs } from '@/lib/constants'
+import { ArrowLeft, CalendarDays, UserCircle } from 'lucide-react'
+import Link from 'next/link'
+import { ProfileHeader } from '@/components/public/parent/setting/child-account/detail/ProfileHeader'
+import { DashboardStats } from '@/components/public/parent/setting/child-account/stats/DashboardStats'
+import { CourseCardList } from '@/components/public/parent/setting/child-account/detail/CourseCardList'
+import { EmptyCourses } from '@/components/public/parent/setting/child-account/detail/EmptyCourses'
+import { ProfileSkeleton } from '@/components/public/parent/setting/child-account/detail/ProfileSkeleton'
 
-export default function ChildAccountDetailPage(props: { params: Promise<{ id: string }> }) {
-  const params = use(props.params)
-  const { data, isLoading, error } = useGetChildAccountById(params.id)
-  const childData = data?.payload?.data
+export default function ChildAccountDetailPage() {
+  const params = useParams()
+  const childId = params.id as string
+  const [activeTab, setActiveTab] = useState('all')
 
-  const { toast } = useToast()
-  const [showReportDialog, setShowReportDialog] = useState(false)
-  const [reportReason, setReportReason] = useState('')
-  const [hideAllCourses, setHideAllCourses] = useState(false)
-  const [activeView, setActiveView] = useState('dashboard')
+  const { data, isLoading } = useGetChildAccountById(childId)
+  const childAccount = data?.payload.data
 
-  // Các courses dùng để hiển thị
-  const courses = childData?.courses || []
+  // Tính toán các thống kê cho dashboard
+  const calculateStats = () => {
+    if (!childAccount)
+      return {
+        totalCourses: 0,
+        completedCourses: 0,
+        inProgressCourses: 0,
+        notStartedCourses: 0,
+        overallProgress: 0,
+        completionPercentage: 0
+      }
 
-  // Handler để toggle visibility của một khóa học
-  // eslint-disable-next-line no-unused-vars
-  const toggleCourseVisibility = (courseId: string) => {
-    toast({
-      title: 'Đã cập nhật trạng thái',
-      description: 'Thay đổi sẽ được áp dụng cho tài khoản con của bạn'
-    })
-  }
+    const totalCourses = childAccount.courses.length
+    const completedCourses = childAccount.courses.filter((c) => c.completionRate === 100).length
+    const inProgressCourses = childAccount.courses.filter((c) => c.completionRate > 0 && c.completionRate < 100).length
+    const notStartedCourses = childAccount.courses.filter((c) => c.completionRate === 0).length
 
-  // Handler để ẩn/hiện tất cả khóa học
-  const toggleAllCourses = (hide: boolean) => {
-    setHideAllCourses(hide)
-    toast({
-      title: hide ? 'Đã ẩn tất cả khóa học' : 'Đã hiện tất cả khóa học',
-      description: 'Thay đổi sẽ được áp dụng cho tài khoản con của bạn'
-    })
-  }
+    const overallProgress =
+      totalCourses > 0
+        ? Math.round(childAccount.courses.reduce((sum, course) => sum + course.completionRate, 0) / totalCourses)
+        : 0
 
-  // Handler để báo cáo vấn đề
-  const handleSubmitReport = () => {
-    if (!reportReason.trim()) {
-      toast({
-        title: 'Chưa nhập nội dung',
-        description: 'Vui lòng mô tả vấn đề bạn gặp phải',
-        variant: 'destructive'
-      })
-      return
-    }
-
-    toast({
-      title: 'Đã gửi báo cáo',
-      description: 'Chúng tôi sẽ xem xét vấn đề của bạn trong thời gian sớm nhất'
-    })
-    setShowReportDialog(false)
-    setReportReason('')
-  }
-
-  // Tính toán số liệu thống kê
-  const getStats = () => {
-    const totalCourses = courses.length
-    const completedCourses = courses.filter((c) => (c.completionRate || 0) === 100).length
-    const inProgressCourses = courses.filter((c) => (c.completionRate || 0) < 100 && (c.completionRate || 0) > 0).length
-    const notStartedCourses = courses.filter((c) => (c.completionRate || 0) === 0).length
-
-    const overallProgress = totalCourses
-      ? Math.round(courses.reduce((acc, c) => acc + (c.completionRate || 0), 0) / totalCourses)
-      : 0
+    const completionPercentage = totalCourses > 0 ? Math.round((completedCourses / totalCourses) * 100) : 0
 
     return {
       totalCourses,
@@ -94,205 +53,124 @@ export default function ChildAccountDetailPage(props: { params: Promise<{ id: st
       inProgressCourses,
       notStartedCourses,
       overallProgress,
-      completionPercentage: totalCourses ? Math.round((completedCourses / totalCourses) * 100) : 0
+      completionPercentage
     }
   }
 
-  // Hiển thị loading khi đang tải dữ liệu
-  if (isLoading) {
-    return (
-      <div className='flex items-center justify-center min-h-[60vh]'>
-        <Loading />
-      </div>
-    )
-  }
+  // Lọc khóa học dựa vào tab đang active
+  const getFilteredCourses = () => {
+    if (!childAccount) return []
 
-  // Hiển thị lỗi nếu có
-  if (error || !childData) {
-    return (
-      <div className='p-8 text-center'>
-        <AlertCircle className='h-12 w-12 text-red-500 mx-auto mb-4' />
-        <h3 className='text-lg font-medium text-gray-900 mb-2'>Không thể tải thông tin</h3>
-        <p className='text-gray-500 mb-4'>Đã có lỗi xảy ra khi tải thông tin tài khoản con.</p>
-        <Button asChild>
-          <Link href='/setting/child-account'>Quay lại danh sách</Link>
-        </Button>
-      </div>
-    )
+    switch (activeTab) {
+      case 'completed':
+        return childAccount.courses.filter((course) => course.completionRate === 100)
+      case 'in-progress':
+        return childAccount.courses.filter((course) => course.completionRate > 0 && course.completionRate < 100)
+      case 'not-started':
+        return childAccount.courses.filter((course) => course.completionRate === 0)
+      default:
+        return childAccount.courses
+    }
   }
-
-  const stats = getStats()
 
   return (
-    <div className='bg-gray-50'>
-      {/* Header with back button */}
-      <div className='bg-white border-b border-gray-200 sticky top-0'>
-        <div className='container mx-auto px-4 py-3 flex items-center'>
-          <Button variant='ghost' className='mr-2' asChild>
-            <Link href='/setting/child-account'>
-              <ArrowLeft className='h-4 w-4 mr-1' />
-              Quay lại
-            </Link>
+    <div className='space-y-8'>
+      {/* Back Button và Page Header */}
+      <div className='flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4'>
+        <Link href='/setting/child-account'>
+          <Button variant='outline' size='sm' className='mb-4 sm:mb-0 gap-1'>
+            <ArrowLeft className='h-4 w-4' />
+            Quay lại
           </Button>
-          <h1 className='text-xl font-semibold'>Quản lý tài khoản con</h1>
-        </div>
+        </Link>
+        <h2 className='text-2xl font-semibold'>Quản lý tài khoản con</h2>
       </div>
 
-      <main className='container mx-auto px-4 py-6'>
-        {/* Account Header */}
-        <AccountHeader childData={childData} onReportClick={() => setShowReportDialog(true)} />
+      {/* Thông báo hướng dẫn */}
+      <div className='bg-blue-50 p-4 rounded-lg border border-blue-100'>
+        <p className='text-blue-800 text-sm'>
+          Trang này giúp bạn theo dõi quá trình học tập của con. Bạn có thể quản lý danh sách khóa học, xem tiến độ học
+          tập và ẩn/hiện khóa học cho tài khoản của con.
+        </p>
+      </div>
 
-        {/* Main Content */}
-        <div className='mt-6 flex flex-col md:flex-row gap-6'>
-          {/* Sidebar */}
-          <div className='w-full md:w-64 bg-white p-4 rounded-lg shadow-sm'>
-            <div className='space-y-1'>
-              <SidebarItem
-                icon={LayoutDashboard}
-                label='Tổng quan'
-                active={activeView === 'dashboard'}
-                onClick={() => setActiveView('dashboard')}
-              />
-              <SidebarItem
-                icon={BookOpen}
-                label='Khóa học'
-                active={activeView === 'courses'}
-                onClick={() => setActiveView('courses')}
-              />
-              <SidebarItem
-                icon={Users}
-                label='Thông tin cá nhân'
-                active={activeView === 'profile'}
-                onClick={() => setActiveView('profile')}
-              />
-              <SidebarItem
-                icon={Settings}
-                label='Cài đặt'
-                active={activeView === 'settings'}
-                onClick={() => setActiveView('settings')}
-              />
+      {isLoading ? (
+        <ProfileSkeleton />
+      ) : childAccount ? (
+        <>
+          {/* Phần thông tin profile với thiết kế mới */}
+          <ProfileHeader
+            profile={{
+              userId: childAccount.userId,
+              username: childAccount.username,
+              fullName: `${childAccount.firstName} ${childAccount.lastName}`,
+              avatarUrl: childAccount.avatarUrl,
+              metadata: [
+                {
+                  icon: <UserCircle className='h-4 w-4 text-gray-500' />,
+                  label: childAccount.gender === 'MALE' ? 'Nam' : 'Nữ'
+                },
+                {
+                  icon: <CalendarDays className='h-4 w-4 text-gray-500' />,
+                  label: childAccount.dob
+                }
+              ]
+            }}
+          />
+
+          {/* Dashboard Stats */}
+          <div className='mt-8'>
+            <h3 className='text-lg font-medium mb-4'>Tổng quan tiến độ học tập</h3>
+            <DashboardStats stats={calculateStats()} />
+          </div>
+
+          {/* Tabs Khóa học */}
+          <div className='mt-8'>
+            <Tabs defaultValue='all' value={activeTab} onValueChange={setActiveTab} className='w-full'>
+              <div className='flex justify-between items-center mb-4'>
+                <h3 className='text-lg font-medium'>Khóa học đã đăng ký</h3>
+                <TabsList className='bg-gray-100/80'>
+                  {courseByChildTabs.map((tab: any) => (
+                    <TabsTrigger key={tab.value} value={tab.value} className='data-[state=active]:bg-white'>
+                      {tab.label}
+                    </TabsTrigger>
+                  ))}
+                </TabsList>
+              </div>
+
+              {courseByChildTabs.map((tab: any) => (
+                <TabsContent key={tab.value} value={tab.value} className='mt-0'>
+                  <CourseCardList
+                    courses={getFilteredCourses()}
+                    emptyState={
+                      <EmptyCourses
+                        title={`Không có khóa học nào ${tab.emptyText}`}
+                        description='Hãy khám phá các khóa học phù hợp và thêm vào danh sách học tập của trẻ.'
+                      />
+                    }
+                  />
+                </TabsContent>
+              ))}
+            </Tabs>
+          </div>
+        </>
+      ) : (
+        <Card>
+          <CardContent className='p-8 flex flex-col items-center justify-center text-center'>
+            <div className='h-16 w-16 rounded-full bg-amber-50 flex items-center justify-center mb-4'>
+              <UserCircle className='h-8 w-8 text-amber-500' />
             </div>
-          </div>
-
-          {/* Content Area */}
-          <div className='flex-1'>
-            {/* Dashboard View */}
-            {activeView === 'dashboard' && (
-              <div className='space-y-6'>
-                <DashboardStats stats={stats} />
-
-                <Card className='border-none shadow-sm'>
-                  <CardHeader className='pb-2'>
-                    <CardTitle>Tổng quan khóa học</CardTitle>
-                    <CardDescription>Tiến độ học tập của {childData.firstName}</CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div className='space-y-8'>
-                      <div className='flex flex-col space-y-3'>
-                        <ProgressBar
-                          value={stats.overallProgress}
-                          label='Tiến độ học tập tổng thể'
-                          color='bg-primary'
-                        />
-                        <ProgressBar value={stats.completionPercentage} label='Tỉ lệ hoàn thành' color='bg-green-500' />
-                      </div>
-
-                      {courses.length === 0 ? (
-                        <div className='text-center py-6'>
-                          <BookOpen className='h-12 w-12 text-gray-300 mx-auto mb-3' />
-                          <h3 className='text-lg font-medium text-gray-700 mb-1'>Chưa có khóa học nào</h3>
-                          <p className='text-gray-500'>Tài khoản này chưa được đăng ký khóa học nào</p>
-                        </div>
-                      ) : (
-                        <div className='space-y-4'>
-                          <h3 className='font-medium text-gray-800'>Khóa học gần đây</h3>
-                          <div className='grid gap-4'>
-                            {courses.slice(0, 2).map((course) => (
-                              <CourseCard
-                                key={course.id}
-                                courses={course}
-                                onToggleVisibility={toggleCourseVisibility}
-                              />
-                            ))}
-                            {courses.length > 2 && (
-                              <div className='text-center pt-2'>
-                                <Button variant='outline' onClick={() => setActiveView('courses')}>
-                                  Xem tất cả {courses.length} khóa học
-                                </Button>
-                              </div>
-                            )}
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  </CardContent>
-                </Card>
-              </div>
-            )}
-
-            {/* Courses View */}
-            {activeView === 'courses' && (
-              <div className='space-y-6'>
-                <Card className='border-none shadow-sm'>
-                  <CardHeader className='pb-2'>
-                    <CardTitle>Danh sách khóa học</CardTitle>
-                    <CardDescription>
-                      {courses.length ? `${courses.length} khóa học đã đăng ký` : 'Chưa có khóa học nào được đăng ký'}
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div className='space-y-4'>
-                      {courses.length === 0 ? (
-                        <EmptyCourses />
-                      ) : (
-                        courses.map((course) => (
-                          <CourseCard key={course.id} courses={course} onToggleVisibility={toggleCourseVisibility} />
-                        ))
-                      )}
-                    </div>
-                  </CardContent>
-                </Card>
-              </div>
-            )}
-
-            {/* Profile View */}
-            {activeView === 'profile' && <ProfileSection childData={childData} />}
-
-            {/* Settings View */}
-            {activeView === 'settings' && (
-              <SettingsSection
-                hideAllCourses={hideAllCourses}
-                toggleAllCourses={toggleAllCourses}
-                childName={childData.firstName}
-              />
-            )}
-          </div>
-        </div>
-      </main>
-
-      {/* Report Dialog */}
-      <Dialog open={showReportDialog} onOpenChange={setShowReportDialog}>
-        <DialogContent className='max-w-md'>
-          <DialogHeader>
-            <DialogTitle>Báo cáo vấn đề</DialogTitle>
-            <DialogDescription>Vui lòng mô tả chi tiết vấn đề bạn gặp phải với tài khoản này</DialogDescription>
-          </DialogHeader>
-          <div className='space-y-4 py-4'>
-            <Textarea
-              placeholder='Mô tả vấn đề...'
-              value={reportReason}
-              onChange={(e) => setReportReason(e.target.value)}
-              className='min-h-[120px]'
-            />
-          </div>
-          <DialogFooter>
-            <Button variant='outline' onClick={() => setShowReportDialog(false)}>
-              Hủy
+            <h3 className='text-xl font-semibold mb-2'>Không tìm thấy tài khoản con</h3>
+            <p className='text-gray-500 max-w-md mb-6'>
+              Không thể tìm thấy thông tin tài khoản con này. Tài khoản có thể đã bị xóa hoặc bạn không có quyền truy
+              cập.
+            </p>
+            <Button asChild>
+              <Link href='/setting/child-account'>Quay lại danh sách tài khoản</Link>
             </Button>
-            <Button onClick={handleSubmitReport}>Gửi báo cáo</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+          </CardContent>
+        </Card>
+      )}
     </div>
   )
 }

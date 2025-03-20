@@ -14,7 +14,7 @@ interface DashboardStatsProps {
 }
 
 export const DashboardStats: React.FC<DashboardStatsProps> = ({ stats }) => (
-  <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4'>
+  <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
     <StatCard icon={BookOpen} label='Tổng số khóa học' value={stats.totalCourses} color='text-gray-600' />
     <StatCard icon={Star} label='Đã hoàn thành' value={stats.completedCourses} color='text-green-600' />
     <StatCard icon={Activity} label='Đang tiến hành' value={stats.inProgressCourses} color='text-blue-600' />

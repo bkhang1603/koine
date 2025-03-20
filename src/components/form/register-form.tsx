@@ -157,9 +157,6 @@ export default function RegisterForm({ className }: { className?: string }) {
                         )
                       }}
                       initialFocus
-                      fromYear={1940}
-                      toYear={new Date().getFullYear() - 5}
-                      defaultMonth={defaultDate}
                     />
                   </PopoverContent>
                 </Popover>

@@ -1,55 +1,46 @@
 import { Skeleton } from '@/components/ui/skeleton'
-import { Card } from '@/components/ui/card'
+import { Card, CardContent } from '@/components/ui/card'
 
 export function AddressSkeleton() {
   return (
-    <div className='space-y-6'>
-      {/* Skeleton cho các địa chỉ */}
-      <div className='grid gap-6 md:grid-cols-2'>
-        {[1, 2, 3, 4].map((i) => (
-          <Card key={i} className='p-6'>
-            {/* Header với tag và default badge */}
-            <div className='flex items-start justify-between mb-6'>
-              <div className='flex items-center gap-2'>
-                <Skeleton className='w-5 h-5 rounded-full' />
-                <Skeleton className='h-5 w-20' />
-              </div>
-              <div className='flex items-center gap-2'>
-                <Skeleton className='h-8 w-24 rounded-md' />
-                <Skeleton className='h-8 w-8 rounded-md' />
-                <Skeleton className='h-8 w-8 rounded-md' />
+    <div className='grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4'>
+      {[1, 2, 3, 4, 5, 6].map((i) => (
+        <Card key={i} className='overflow-hidden border-gray-100 shadow-sm'>
+          <CardContent className='p-0'>
+            {/* Tag badge */}
+            <div className='pt-4 px-4 flex'>
+              <Skeleton className='h-5 w-16 rounded-full' />
+              {i % 3 === 0 && <Skeleton className='h-5 w-16 rounded-full ml-2' />}
+            </div>
+
+            {/* Main content */}
+            <div className='p-4 pb-3'>
+              <div className='flex items-start gap-3'>
+                <Skeleton className='flex-shrink-0 h-8 w-8 rounded-full' />
+
+                <div className='flex-1 space-y-3'>
+                  <div>
+                    <Skeleton className='h-4 w-32 mb-1.5' />
+                    <Skeleton className='h-3.5 w-24' />
+                  </div>
+
+                  <div className='space-y-1.5'>
+                    <Skeleton className='h-3.5 w-full' />
+                    <Skeleton className='h-3.5 w-5/6' />
+                  </div>
+                </div>
               </div>
             </div>
 
-            {/* Grid layout cho thông tin địa chỉ */}
-            <div className='grid md:grid-cols-2 gap-8'>
-              {/* Cột trái - Thông tin liên hệ */}
-              <div className='space-y-4'>
-                <div>
-                  <Skeleton className='h-4 w-24 mb-1' />
-                  <Skeleton className='h-6 w-40' />
-                </div>
-                <div>
-                  <Skeleton className='h-4 w-24 mb-1' />
-                  <Skeleton className='h-6 w-32' />
-                </div>
-              </div>
-
-              {/* Cột phải - Thông tin địa chỉ */}
-              <div className='space-y-4'>
-                <div>
-                  <Skeleton className='h-4 w-24 mb-1' />
-                  <Skeleton className='h-6 w-full' />
-                </div>
-                <div>
-                  <Skeleton className='h-4 w-24 mb-1' />
-                  <Skeleton className='h-6 w-20' />
-                </div>
-              </div>
+            {/* Action buttons */}
+            <div className='flex border-t border-gray-100'>
+              <Skeleton className='h-10 flex-1' />
+              <Skeleton className='h-10 flex-1' />
+              <Skeleton className='h-10 w-10' />
             </div>
-          </Card>
-        ))}
-      </div>
+          </CardContent>
+        </Card>
+      ))}
     </div>
   )
 }

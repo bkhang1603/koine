@@ -8,21 +8,17 @@ interface EmptyAddressProps {
 
 export function EmptyAddress({ onAddAddress }: EmptyAddressProps) {
   return (
-    <Card className='border-dashed border-2 shadow-sm'>
-      <CardContent className='p-12 flex flex-col items-center justify-center text-center'>
-        <div className='h-20 w-20 rounded-full bg-primary/10 flex items-center justify-center mb-6'>
-          <MapPin className='h-10 w-10 text-primary' />
+    <Card className='border-dashed border border-gray-200 shadow-none bg-gradient-to-b from-gray-50/80 to-white'>
+      <CardContent className='p-8 sm:p-12 flex flex-col items-center justify-center text-center'>
+        <div className='h-16 w-16 rounded-full bg-gradient-to-br from-blue-50 to-primary/5 flex items-center justify-center mb-5 shadow-sm'>
+          <MapPin className='h-7 w-7 text-primary/80' />
         </div>
-        <h3 className='text-xl font-semibold text-gray-900 mb-3'>Bạn chưa có địa chỉ nào</h3>
-        <p className='text-gray-500 max-w-md mb-8'>
-          Thêm địa chỉ giao hàng để chúng tôi có thể gửi sách và tài liệu học tập đến tận nơi cho bạn.
+        <h3 className='text-lg font-medium text-gray-800 mb-2'>Chưa có địa chỉ nào</h3>
+        <p className='text-sm text-gray-500 max-w-md mb-6'>
+          Thêm địa chỉ giao hàng và thanh toán để thuận tiện cho việc mua sắm và nhận hàng tại nhà.
         </p>
-        <Button
-          onClick={onAddAddress}
-          size='lg'
-          className='bg-gradient-to-r from-primary to-primary/90 shadow-lg shadow-primary/25'
-        >
-          <Plus className='mr-2 h-5 w-5' />
+        <Button onClick={onAddAddress} className='bg-gradient-to-r from-primary to-primary/90 shadow-md'>
+          <Plus className='h-4 w-4 mr-2' />
           Thêm địa chỉ mới
         </Button>
       </CardContent>
