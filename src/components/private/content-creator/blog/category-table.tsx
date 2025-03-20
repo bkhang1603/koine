@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 'use client'
 
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
@@ -13,41 +14,38 @@ interface CategoryTableProps {
     description: string
     status?: 'active' | 'inactive'
   }>
-  searchQuery: string
-  statusFilter: string
+  onEdit: (id: string) => void
+  onDelete: (id: string) => Promise<void>
 }
 
-export function CategoryTable({ data, statusFilter }: CategoryTableProps) {
-  const filteredData = data.filter((category) => {
-    if (statusFilter !== 'all' && category.status !== statusFilter) {
-      return false
-    }
-    return true
-  })
-
+export function CategoryTable({ onEdit, onDelete, data }: CategoryTableProps) {
   return (
     <div className='rounded-md border'>
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead>Tên danh mục</TableHead>
+            <TableHead className='w-[200px]'>Tên danh mục</TableHead>
             <TableHead>Mô tả</TableHead>
-            <TableHead>Trạng thái</TableHead>
-            <TableHead className='w-[100px]'>Thao tác</TableHead>
+            <TableHead className='w-[220px]'>Trạng thái</TableHead>
+            <TableHead className='w-[80px]'>Thao tác</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
-          {filteredData.length === 0 ? (
+          {data.length === 0 ? (
             <TableRow>
               <TableCell colSpan={4} className='text-center h-24 text-muted-foreground'>
                 Không tìm thấy danh mục nào
               </TableCell>
             </TableRow>
           ) : (
-            filteredData.map((category) => (
+            data.map((category) => (
               <TableRow key={category.id}>
-                <TableCell>{category.name}</TableCell>
-                <TableCell>{category.description}</TableCell>
+                <TableCell className='font-medium'>{category.name}</TableCell>
+                <TableCell>
+                  <div className='line-clamp-2' title={category.description}>
+                    {category.description}
+                  </div>
+                </TableCell>
                 <TableCell>
                   <Badge
                     variant={category.status === 'active' ? 'default' : 'secondary'}
@@ -74,11 +72,11 @@ export function CategoryTable({ data, statusFilter }: CategoryTableProps) {
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align='end'>
-                      <DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => onEdit(category.id)}>
                         <Pencil className='mr-2 h-4 w-4' />
                         Chỉnh sửa
                       </DropdownMenuItem>
-                      <DropdownMenuItem className='text-destructive'>
+                      <DropdownMenuItem className='text-destructive' onClick={() => onDelete(category.id)}>
                         <Trash className='mr-2 h-4 w-4' />
                         Xóa
                       </DropdownMenuItem>

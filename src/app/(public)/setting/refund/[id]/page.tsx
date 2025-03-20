@@ -1,4 +1,5 @@
 'use client'
+import { use } from 'react'
 
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -49,7 +50,8 @@ const statusTextMap = {
   rejected: 'Đã từ chối'
 }
 
-export default function RefundDetailPage({ params }: { params: { id: string } }) {
+export default function RefundDetailPage(props: { params: Promise<{ id: string }> }) {
+  const params = use(props.params)
   // Mock data - thay thế bằng API call thực tế
   const refund: RefundItem = {
     id: 'REF-001',

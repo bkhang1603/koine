@@ -1,383 +1,176 @@
 'use client'
 
 import { useState } from 'react'
+import { useParams } from 'next/navigation'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
-import { Badge } from '@/components/ui/badge'
-import { Progress } from '@/components/ui/progress'
-import { Switch } from '@/components/ui/switch'
+import { Card, CardContent } from '@/components/ui/card'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { ArrowLeft, BookOpen, Clock, AlertCircle, Check, Award } from 'lucide-react'
+import { useGetChildAccountById } from '@/queries/useAccount'
+import { courseByChildTabs } from '@/lib/constants'
+import { ArrowLeft, CalendarDays, UserCircle } from 'lucide-react'
 import Link from 'next/link'
-import Image from 'next/image'
-import { useToast } from '@/components/ui/use-toast'
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle
-} from '@/components/ui/dialog'
+import { ProfileHeader } from '@/components/public/parent/setting/child-account/detail/ProfileHeader'
+import { DashboardStats } from '@/components/public/parent/setting/child-account/stats/DashboardStats'
+import { CourseCardList } from '@/components/public/parent/setting/child-account/detail/CourseCardList'
+import { EmptyCourses } from '@/components/public/parent/setting/child-account/detail/EmptyCourses'
+import { ProfileSkeleton } from '@/components/public/parent/setting/child-account/detail/ProfileSkeleton'
 
-interface ActivatedCourse {
-  id: number
-  title: string
-  thumbnail: string
-  progress: number
-  totalLessons: number
-  completedLessons: number
-  lastAccessed: string
-  isVisible: boolean
-  category: string
-  activatedDate: string
-  expiryDate: string
-}
+export default function ChildAccountDetailPage() {
+  const params = useParams()
+  const childId = params.id as string
+  const [activeTab, setActiveTab] = useState('all')
 
-interface LearningActivity {
-  id: number
-  type: 'course_start' | 'course_complete' | 'lesson_complete' | 'quiz_complete'
-  title: string
-  courseName?: string
-  timestamp: string
-  score?: number
-}
+  const { data, isLoading } = useGetChildAccountById(childId)
+  const childAccount = data?.payload.data
 
-export default function ChildAccountDetailPage({ params }: { params: { id: string } }) {
-  const { toast } = useToast()
-  const [showReportDialog, setShowReportDialog] = useState(false)
-  const [reportReason, setReportReason] = useState('')
-  const [hideAllCourses, setHideAllCourses] = useState(false)
+  // Tính toán các thống kê cho dashboard
+  const calculateStats = () => {
+    if (!childAccount)
+      return {
+        totalCourses: 0,
+        completedCourses: 0,
+        inProgressCourses: 0,
+        notStartedCourses: 0,
+        overallProgress: 0,
+        completionPercentage: 0
+      }
 
-  // State cho danh sách khóa học
-  const [activatedCourses, setActivatedCourses] = useState<ActivatedCourse[]>([
-    {
-      id: 1,
-      title: 'Khóa học lập trình Python cơ bản',
-      thumbnail: '/placeholder.svg',
-      progress: 75,
-      totalLessons: 24,
-      completedLessons: 18,
-      lastAccessed: '2 giờ trước',
-      isVisible: true,
-      category: 'Lập trình',
-      activatedDate: '15/03/2024',
-      expiryDate: '15/03/2025'
-    },
-    {
-      id: 2,
-      title: 'Khóa học tiếng Anh giao tiếp',
-      thumbnail: '/placeholder.svg',
-      progress: 45,
-      totalLessons: 30,
-      completedLessons: 14,
-      lastAccessed: '1 ngày trước',
-      isVisible: false,
-      category: 'Ngoại ngữ',
-      activatedDate: '10/03/2024',
-      expiryDate: '10/03/2025'
+    const totalCourses = childAccount.courses.length
+    const completedCourses = childAccount.courses.filter((c) => c.completionRate === 100).length
+    const inProgressCourses = childAccount.courses.filter((c) => c.completionRate > 0 && c.completionRate < 100).length
+    const notStartedCourses = childAccount.courses.filter((c) => c.completionRate === 0).length
+
+    const overallProgress =
+      totalCourses > 0
+        ? Math.round(childAccount.courses.reduce((sum, course) => sum + course.completionRate, 0) / totalCourses)
+        : 0
+
+    const completionPercentage = totalCourses > 0 ? Math.round((completedCourses / totalCourses) * 100) : 0
+
+    return {
+      totalCourses,
+      completedCourses,
+      inProgressCourses,
+      notStartedCourses,
+      overallProgress,
+      completionPercentage
     }
-  ])
-
-  // Thêm state cho learning history
-  const [learningHistory] = useState<LearningActivity[]>([
-    {
-      id: 1,
-      type: 'course_start',
-      title: 'Bắt đầu khóa học',
-      courseName: 'Khóa học lập trình Python cơ bản',
-      timestamp: '20/03/2024 09:30'
-    },
-    {
-      id: 2,
-      type: 'lesson_complete',
-      title: 'Hoàn thành bài học: Biến và kiểu dữ liệu',
-      courseName: 'Khóa học lập trình Python cơ bản',
-      timestamp: '20/03/2024 10:15'
-    },
-    {
-      id: 3,
-      type: 'quiz_complete',
-      title: 'Hoàn thành bài kiểm tra',
-      courseName: 'Khóa học lập trình Python cơ bản',
-      timestamp: '20/03/2024 10:45',
-      score: 85
-    }
-  ])
-
-  // Add account state after other states
-  const [account] = useState({
-    id: params.id,
-    username: 'anna2024',
-    avatar: '/avatars/01.png',
-    lastActive: '5 phút trước'
-  })
-
-  // Handler để toggle visibility của một khóa học
-  const toggleCourseVisibility = (courseId: number) => {
-    setActivatedCourses((courses) =>
-      courses.map((course) => (course.id === courseId ? { ...course, isVisible: !course.isVisible } : course))
-    )
-
-    toast({
-      title: 'Đã cập nhật trạng thái',
-      description: 'Thay đổi sẽ được áp dụng cho tài khoản con của bạn'
-    })
   }
 
-  // Handler để ẩn/hiện tất cả khóa học
-  const toggleAllCourses = (hide: boolean) => {
-    setHideAllCourses(hide)
-    setActivatedCourses((courses) => courses.map((course) => ({ ...course, isVisible: !hide })))
+  // Lọc khóa học dựa vào tab đang active
+  const getFilteredCourses = () => {
+    if (!childAccount) return []
 
-    toast({
-      title: hide ? 'Đã ẩn tất cả khóa học' : 'Đã hiện tất cả khóa học',
-      description: 'Thay đổi sẽ được áp dụng cho tài khoản con của bạn'
-    })
-  }
-
-  // Handler để gửi báo cáo
-  const handleSubmitReport = () => {
-    if (!reportReason.trim()) {
-      toast({
-        title: 'Lỗi',
-        description: 'Vui lòng nhập lý do báo cáo',
-        variant: 'destructive'
-      })
-      return
+    switch (activeTab) {
+      case 'completed':
+        return childAccount.courses.filter((course) => course.completionRate === 100)
+      case 'in-progress':
+        return childAccount.courses.filter((course) => course.completionRate > 0 && course.completionRate < 100)
+      case 'not-started':
+        return childAccount.courses.filter((course) => course.completionRate === 0)
+      default:
+        return childAccount.courses
     }
-
-    // Gửi báo cáo lên server
-    toast({
-      title: 'Đã gửi báo cáo',
-      description: 'Chúng tôi sẽ xem xét và phản hồi sớm nhất'
-    })
-    setShowReportDialog(false)
-    setReportReason('')
   }
 
   return (
-    <div className='space-y-6'>
-      {/* Back Button */}
-      <div>
-        <Button variant='ghost' size='sm' asChild className='mb-6'>
-          <Link href='/setting/child-account' className='flex items-center gap-2'>
+    <div className='space-y-8'>
+      {/* Back Button và Page Header */}
+      <div className='flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4'>
+        <Link href='/setting/child-account'>
+          <Button variant='outline' size='sm' className='mb-4 sm:mb-0 gap-1'>
             <ArrowLeft className='h-4 w-4' />
-            Quay lại danh sách
-          </Link>
-        </Button>
-
-        {/* Header */}
-        <div className='flex items-center justify-between'>
-          <div className='flex items-center gap-3'>
-            <Avatar className='h-10 w-10 border-2 border-primary/10'>
-              <AvatarImage src={account.avatar} alt={account.username} />
-              <AvatarFallback>{account.username[0].toUpperCase()}</AvatarFallback>
-            </Avatar>
-            <div>
-              <h3 className='text-lg font-semibold'>{account.username}</h3>
-              <p className='text-sm text-gray-500'>Hoạt động: {account.lastActive}</p>
-            </div>
-          </div>
-          <Button
-            variant='outline'
-            size='sm'
-            className='text-red-500 hover:text-red-600 hover:bg-red-50'
-            onClick={() => setShowReportDialog(true)}
-          >
-            <AlertCircle className='w-4 h-4 mr-2' />
-            Báo cáo vấn đề
+            Quay lại
           </Button>
-        </div>
+        </Link>
+        <h2 className='text-2xl font-semibold'>Quản lý tài khoản con</h2>
       </div>
 
-      {/* Tabs */}
-      <Tabs defaultValue='activated-courses' className='space-y-6'>
-        <TabsList>
-          <TabsTrigger value='activated-courses'>Khóa học đã kích hoạt</TabsTrigger>
-          <TabsTrigger value='learning-history'>Lịch sử học tập</TabsTrigger>
-          <TabsTrigger value='settings'>Cài đặt</TabsTrigger>
-        </TabsList>
+      {/* Thông báo hướng dẫn */}
+      <div className='bg-blue-50 p-4 rounded-lg border border-blue-100'>
+        <p className='text-blue-800 text-sm'>
+          Trang này giúp bạn theo dõi quá trình học tập của con. Bạn có thể quản lý danh sách khóa học, xem tiến độ học
+          tập và ẩn/hiện khóa học cho tài khoản của con.
+        </p>
+      </div>
 
-        <TabsContent value='activated-courses'>
-          <div className='space-y-6'>
-            {/* Course Management */}
-            {activatedCourses.map((course) => (
-              <Card key={course.id} className='overflow-hidden border-none shadow-md'>
-                <CardContent className='p-6'>
-                  <div className='flex gap-6'>
-                    {/* Course Thumbnail */}
-                    <div className='relative w-48 h-32 rounded-lg overflow-hidden shrink-0'>
-                      <Image src={course.thumbnail} alt={course.title} fill className='object-cover' />
-                    </div>
+      {isLoading ? (
+        <ProfileSkeleton />
+      ) : childAccount ? (
+        <>
+          {/* Phần thông tin profile với thiết kế mới */}
+          <ProfileHeader
+            profile={{
+              userId: childAccount.userId,
+              username: childAccount.username,
+              fullName: `${childAccount.firstName} ${childAccount.lastName}`,
+              avatarUrl: childAccount.avatarUrl,
+              metadata: [
+                {
+                  icon: <UserCircle className='h-4 w-4 text-gray-500' />,
+                  label: childAccount.gender === 'MALE' ? 'Nam' : 'Nữ'
+                },
+                {
+                  icon: <CalendarDays className='h-4 w-4 text-gray-500' />,
+                  label: childAccount.dob
+                }
+              ]
+            }}
+          />
 
-                    {/* Course Info */}
-                    <div className='flex-1 min-w-0 space-y-4'>
-                      <div className='flex items-start justify-between'>
-                        <div>
-                          <h4 className='font-medium text-gray-900'>{course.title}</h4>
-                          <div className='flex items-center gap-3 mt-1'>
-                            <Badge variant='secondary' className='bg-primary/5 text-primary'>
-                              {course.category}
-                            </Badge>
-                            <span className='text-sm text-gray-500'>Kích hoạt: {course.activatedDate}</span>
-                          </div>
-                        </div>
-                        <div className='flex items-center gap-2'>
-                          <Switch
-                            checked={course.isVisible}
-                            onCheckedChange={() => toggleCourseVisibility(course.id)}
-                            className='data-[state=checked]:bg-primary'
-                          />
-                          <span className='text-sm text-gray-600'>{course.isVisible ? 'Hiện' : 'Ẩn'}</span>
-                        </div>
-                      </div>
-
-                      {/* Progress */}
-                      <div className='space-y-2'>
-                        <div className='flex items-center justify-between text-sm'>
-                          <div className='flex items-center gap-4'>
-                            <span className='text-gray-600'>Tiến độ học tập</span>
-                            <span className='text-primary font-medium'>{course.progress}%</span>
-                          </div>
-                          <span className='text-gray-500'>
-                            {course.completedLessons}/{course.totalLessons} bài học
-                          </span>
-                        </div>
-                        <Progress value={course.progress} className='h-2' />
-                      </div>
-
-                      {/* Stats */}
-                      <div className='flex items-center gap-6 pt-2'>
-                        <div className='flex items-center gap-2 text-sm text-gray-500'>
-                          <Clock className='w-4 h-4' />
-                          <span>Học gần nhất: {course.lastAccessed}</span>
-                        </div>
-                        <div className='flex items-center gap-2 text-sm text-gray-500'>
-                          <BookOpen className='w-4 h-4' />
-                          <span>Hết hạn: {course.expiryDate}</span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
+          {/* Dashboard Stats */}
+          <div className='mt-8'>
+            <h3 className='text-lg font-medium mb-4'>Tổng quan tiến độ học tập</h3>
+            <DashboardStats stats={calculateStats()} />
           </div>
-        </TabsContent>
 
-        <TabsContent value='learning-history'>
-          <Card className='border-none shadow-md'>
-            <CardHeader>
-              <CardTitle>Lịch sử học tập</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className='space-y-6'>
-                {learningHistory.map((activity) => (
-                  <div key={activity.id} className='flex gap-4 items-start'>
-                    <div className='w-8 h-8 rounded-full bg-primary/5 flex items-center justify-center shrink-0'>
-                      {activity.type === 'course_start' && <BookOpen className='w-4 h-4 text-primary' />}
-                      {activity.type === 'lesson_complete' && <Check className='w-4 h-4 text-green-600' />}
-                      {activity.type === 'quiz_complete' && <Award className='w-4 h-4 text-yellow-600' />}
-                    </div>
-                    <div className='flex-1 space-y-1'>
-                      <p className='text-sm font-medium text-gray-900'>{activity.title}</p>
-                      {activity.courseName && <p className='text-sm text-gray-500'>{activity.courseName}</p>}
-                      {activity.score && <p className='text-sm text-gray-500'>Điểm số: {activity.score}/100</p>}
-                      <p className='text-xs text-gray-400'>{activity.timestamp}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value='settings'>
-          <Card className='border-none shadow-md'>
-            <CardHeader>
-              <CardTitle>Cài đặt tài khoản</CardTitle>
-            </CardHeader>
-            <CardContent className='space-y-6'>
-              <div className='space-y-4'>
-                <h4 className='font-medium'>Quyền truy cập khóa học</h4>
-                <div className='space-y-4'>
-                  <div className='flex items-center justify-between py-3 border-b'>
-                    <div className='space-y-0.5'>
-                      <p className='text-sm font-medium'>Ẩn tất cả khóa học</p>
-                      <p className='text-sm text-gray-500'>Tạm thời ẩn tất cả khóa học đã kích hoạt</p>
-                    </div>
-                    <Switch
-                      checked={hideAllCourses}
-                      onCheckedChange={toggleAllCourses}
-                      className='data-[state=checked]:bg-primary'
-                    />
-                  </div>
-                  <div className='flex items-center justify-between py-3 border-b'>
-                    <div className='space-y-0.5'>
-                      <p className='text-sm font-medium'>Tự động ẩn khóa học đã hoàn thành</p>
-                      <p className='text-sm text-gray-500'>Ẩn khóa học sau khi hoàn thành tất cả bài học</p>
-                    </div>
-                    <Switch className='data-[state=checked]:bg-primary' />
-                  </div>
-                  <div className='flex items-center justify-between py-3 border-b'>
-                    <div className='space-y-0.5'>
-                      <p className='text-sm font-medium'>Giới hạn thời gian học</p>
-                      <p className='text-sm text-gray-500'>Chỉ cho phép truy cập trong khung giờ quy định</p>
-                    </div>
-                    <Switch className='data-[state=checked]:bg-primary' />
-                  </div>
-                </div>
+          {/* Tabs Khóa học */}
+          <div className='mt-8'>
+            <Tabs defaultValue='all' value={activeTab} onValueChange={setActiveTab} className='w-full'>
+              <div className='flex justify-between items-center mb-4'>
+                <h3 className='text-lg font-medium'>Khóa học đã đăng ký</h3>
+                <TabsList className='bg-gray-100/80'>
+                  {courseByChildTabs.map((tab: any) => (
+                    <TabsTrigger key={tab.value} value={tab.value} className='data-[state=active]:bg-white'>
+                      {tab.label}
+                    </TabsTrigger>
+                  ))}
+                </TabsList>
               </div>
 
-              <div className='space-y-4'>
-                <h4 className='font-medium'>Thông báo</h4>
-                <div className='space-y-4'>
-                  <div className='flex items-center justify-between py-3 border-b'>
-                    <div className='space-y-0.5'>
-                      <p className='text-sm font-medium'>Thông báo tiến độ học tập</p>
-                      <p className='text-sm text-gray-500'>Nhận thông báo khi con hoàn thành bài học</p>
-                    </div>
-                    <Switch className='data-[state=checked]:bg-primary' defaultChecked />
-                  </div>
-                  <div className='flex items-center justify-between py-3 border-b'>
-                    <div className='space-y-0.5'>
-                      <p className='text-sm font-medium'>Cảnh báo không hoạt động</p>
-                      <p className='text-sm text-gray-500'>Thông báo khi tài khoản không hoạt động trong 7 ngày</p>
-                    </div>
-                    <Switch className='data-[state=checked]:bg-primary' defaultChecked />
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-      </Tabs>
-
-      {/* Report Dialog */}
-      <Dialog open={showReportDialog} onOpenChange={setShowReportDialog}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Báo cáo vấn đề</DialogTitle>
-            <DialogDescription>Vui lòng mô tả chi tiết vấn đề bạn gặp phải với tài khoản này</DialogDescription>
-          </DialogHeader>
-          <div className='space-y-4 py-4'>
-            <textarea
-              className='w-full min-h-[100px] p-3 rounded-md border border-gray-200 focus:outline-none focus:ring-2 focus:ring-primary/20'
-              placeholder='Mô tả vấn đề...'
-              value={reportReason}
-              onChange={(e) => setReportReason(e.target.value)}
-            />
+              {courseByChildTabs.map((tab: any) => (
+                <TabsContent key={tab.value} value={tab.value} className='mt-0'>
+                  <CourseCardList
+                    courses={getFilteredCourses()}
+                    emptyState={
+                      <EmptyCourses
+                        title={`Không có khóa học nào ${tab.emptyText}`}
+                        description='Hãy khám phá các khóa học phù hợp và thêm vào danh sách học tập của trẻ.'
+                      />
+                    }
+                  />
+                </TabsContent>
+              ))}
+            </Tabs>
           </div>
-          <DialogFooter>
-            <Button variant='outline' onClick={() => setShowReportDialog(false)}>
-              Hủy
+        </>
+      ) : (
+        <Card>
+          <CardContent className='p-8 flex flex-col items-center justify-center text-center'>
+            <div className='h-16 w-16 rounded-full bg-amber-50 flex items-center justify-center mb-4'>
+              <UserCircle className='h-8 w-8 text-amber-500' />
+            </div>
+            <h3 className='text-xl font-semibold mb-2'>Không tìm thấy tài khoản con</h3>
+            <p className='text-gray-500 max-w-md mb-6'>
+              Không thể tìm thấy thông tin tài khoản con này. Tài khoản có thể đã bị xóa hoặc bạn không có quyền truy
+              cập.
+            </p>
+            <Button asChild>
+              <Link href='/setting/child-account'>Quay lại danh sách tài khoản</Link>
             </Button>
-            <Button onClick={handleSubmitReport}>Gửi báo cáo</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+          </CardContent>
+        </Card>
+      )}
     </div>
   )
 }

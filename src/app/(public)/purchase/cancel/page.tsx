@@ -55,7 +55,7 @@ function CancelPurchasePage() {
         </div>
 
         <div className='space-y-3'>
-          <Button variant='default' className='w-full gap-2' onClick={() => (window.location.href = '/checkout')}>
+          <Button variant='default' className='w-full gap-2'>
             <RotateCcw className='h-4 w-4' />
             Thử lại thanh toán
           </Button>

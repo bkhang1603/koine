@@ -7,7 +7,7 @@ export const TokenType = {
 export const Role = {
   Admin: 'ADMIN',
   Manager: 'MANAGER',
-  ContentCreator: 'CONTENT-CREATOR',
+  ContentCreator: 'CONTENT_CREATOR',
   Accounting: 'ACCOUNTING',
   Adult: 'ADULT',
   Child: 'CHILD',
@@ -51,3 +51,11 @@ export const DeliveryMethodValues = [
   DeliveryMethod.EXPEDITED,
   DeliveryMethod.NONESHIP
 ] as const
+
+export const OrderType = {
+  COURSE: 'COURSE',
+  PRODUCT: 'PRODUCT',
+  COMBO: 'COMBO'
+} as const
+
+export const OrderTypeValues = [OrderType.COURSE, OrderType.PRODUCT, OrderType.COMBO] as const

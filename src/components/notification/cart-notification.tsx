@@ -16,7 +16,6 @@ function CartNotification() {
     totalItems: 0
   }
   const cartTotal = data?.payload?.data.totalItems || 0
-  console.log(data?.payload.data)
 
   return (
     <Popover>

@@ -1,4 +1,5 @@
 'use client'
+import { use } from 'react'
 
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -10,7 +11,8 @@ import Image from 'next/image'
 import { Separator } from '@/components/ui/separator'
 import { PriceInfoCard } from '@/components/private/salesman/price-info-card'
 
-export default function CourseDetailPage({ params }: { params: { id: string } }) {
+export default function CourseDetailPage(props: { params: Promise<{ id: string }> }) {
+  const params = use(props.params)
   const course = mockCourses.find((c) => c.id === params.id)
 
   if (!course) {

@@ -9,7 +9,10 @@ import {
   removeTokensFromLocalStorage,
   setCheckoutDataToLocalStorage,
   getCheckoutDataFromLocalStorage,
-  removeCheckoutDataFromLocalStorage
+  removeCheckoutDataFromLocalStorage,
+  getCheckoutBuyNowFromLocalStorage,
+  setCheckoutBuyNowToLocalStorage,
+  removeCheckoutBuyNowFromLocalStorage
 } from '@/lib/utils'
 import { RoleType } from '@/types/jwt.types'
 import type { Socket } from 'socket.io-client'
@@ -17,6 +20,7 @@ import { create } from 'zustand'
 import RefreshToken from '@/components/refresh-token'
 import { AccountOneAddressResType, AccountResType } from '@/schemaValidations/account.schema'
 import { CartDetailResType } from '@/schemaValidations/cart-detail.schema'
+import { OrderBuyNowResType } from '@/schemaValidations/order.schema'
 
 // Default
 // staleTime: 0
@@ -55,6 +59,8 @@ type AppStoreType = {
   setCheckoutData: (data?: CartDetailResType['data'] | undefined) => void
   pickAddress: AccountOneAddressResType['data'] | undefined
   setPickAddress: (address?: AccountOneAddressResType['data'] | undefined) => void
+  checkoutBuyNow: OrderBuyNowResType['data'] | undefined
+  setCheckoutBuyNow: (data?: OrderBuyNowResType['data'] | undefined) => void
 }
 
 export const useAppStore = create<AppStoreType>((set) => ({
@@ -84,13 +90,27 @@ export const useAppStore = create<AppStoreType>((set) => ({
     set({ checkoutData: data })
 
     if (data) {
+      removeCheckoutBuyNowFromLocalStorage()
       setCheckoutDataToLocalStorage(data)
     } else {
       removeCheckoutDataFromLocalStorage()
+      removeCheckoutBuyNowFromLocalStorage()
     }
   },
   pickAddress: undefined,
-  setPickAddress: (address?: AccountOneAddressResType['data'] | undefined) => set({ pickAddress: address })
+  setPickAddress: (address?: AccountOneAddressResType['data'] | undefined) => set({ pickAddress: address }),
+  checkoutBuyNow: undefined,
+  setCheckoutBuyNow: (data?: OrderBuyNowResType['data'] | undefined) => {
+    set({ checkoutBuyNow: data })
+
+    if (data) {
+      removeCheckoutDataFromLocalStorage()
+      setCheckoutBuyNowToLocalStorage(data)
+    } else {
+      removeCheckoutBuyNowFromLocalStorage()
+      removeCheckoutDataFromLocalStorage()
+    }
+  }
 }))
 
 // export const useAppContext = () => {
@@ -99,6 +119,7 @@ export const useAppStore = create<AppStoreType>((set) => ({
 export default function AppProvider({ children }: { children: React.ReactNode }) {
   const setRole = useAppStore((state) => state.setRole)
   const setCheckoutData = useAppStore((state) => state.setCheckoutData)
+  const setCheckoutBuyNow = useAppStore((state) => state.setCheckoutBuyNow)
 
   // const [socket, setSocket] = useState<Socket | undefined>()
   // const [role, setRoleState] = useState<RoleType | undefined>()
@@ -118,9 +139,14 @@ export default function AppProvider({ children }: { children: React.ReactNode })
         setCheckoutData(checkoutData)
       }
 
+      const checkoutBuyNow = getCheckoutBuyNowFromLocalStorage()
+      if (checkoutBuyNow) {
+        setCheckoutBuyNow(checkoutBuyNow)
+      }
+
       count.current++
     }
-  }, [setRole, setCheckoutData])
+  }, [setRole, setCheckoutData, setCheckoutBuyNow])
 
   // useEffect(() => {
   //   const checkoutData = getCheckoutDataFromLocalStorage()

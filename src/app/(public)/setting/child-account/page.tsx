@@ -1,17 +1,24 @@
 'use client'
 
 import { useState } from 'react'
-import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card, CardContent } from '@/components/ui/card'
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog'
-import { Badge } from '@/components/ui/badge'
 import { useToast } from '@/components/ui/use-toast'
-import { Users2, GraduationCap, Clock, Search, Plus, X, ChevronRight } from 'lucide-react'
+import { Search, Plus, CalendarIcon, Eye, EyeOff, Users } from 'lucide-react'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { useGetChildAccount } from '@/queries/useAccount'
+import { useGetChildAccount, useRegisterChildAccountMutation } from '@/queries/useAccount'
+import { EmptyChildAccounts } from '@/components/public/parent/setting/empty-child-accounts'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { useForm } from 'react-hook-form'
+import { registerChildAccountBody, RegisterChildAccountBodyType } from '@/schemaValidations/account.schema'
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
+import { handleErrorApi } from '@/lib/utils'
+import { ChildAccountCard } from '@/components/public/parent/setting/child-account/ChildAccountCard'
+import { ChildAccountListSkeleton } from '@/components/public/parent/setting/child-account/ChildAccountListSkeleton'
+import { Skeleton } from '@/components/ui/skeleton'
 
 // Thêm interface cho filters
 type Filters = {
@@ -29,299 +36,343 @@ export default function ChildAccountPage() {
   })
   const { toast } = useToast()
 
-  const { data } = useGetChildAccount()
+  const { data, isLoading } = useGetChildAccount()
   const childAccounts = data?.payload.data || []
+
+  const registerChildAccountMutation = useRegisterChildAccountMutation()
+
+  // Filter các account dựa trên query search
+  const filteredAccounts = childAccounts.filter((account) =>
+    account.childName.toLowerCase().includes(filters.search.toLowerCase())
+  )
+
+  // Thêm form với react-hook-form và zod validation
+  const form = useForm<RegisterChildAccountBodyType>({
+    resolver: zodResolver(registerChildAccountBody),
+    defaultValues: {
+      username: '',
+      password: '',
+      firstName: '',
+      lastName: '',
+      gender: 'MALE',
+      dob: ''
+    }
+  })
+
+  // Thêm state để quản lý việc hiển thị password
+  const [showPassword, setShowPassword] = useState(false)
+
+  // Xử lý khi submit form
+  const onSubmit = async (values: RegisterChildAccountBodyType) => {
+    try {
+      await registerChildAccountMutation.mutateAsync(values)
+      toast({
+        title: 'Thành công',
+        description: 'Đã tạo tài khoản con mới'
+      })
+      setShowAddDialog(false)
+      form.reset() // Reset form sau khi thành công
+    } catch (error) {
+      handleErrorApi({
+        error,
+        setError: form.setError
+      })
+    }
+  }
+
+  function handleAddAccount() {
+    setShowAddDialog(true)
+  }
 
   return (
     <div className='space-y-8'>
-      {/* Header */}
-      <div>
-        <h3 className='text-2xl font-semibold'>Tài khoản con</h3>
-        <p className='text-sm text-gray-500 mt-1'>Quản lý và theo dõi tiến độ học tập của con</p>
-      </div>
-
-      {/* Stats Cards */}
-      <div className='grid grid-cols-1 md:grid-cols-3 gap-6'>
-        <Card className='relative overflow-hidden border-none shadow-md bg-gradient-to-br from-primary/5 to-primary/10'>
-          <CardContent className='pt-6'>
-            <div className='flex items-center gap-4'>
-              <div className='h-14 w-14 rounded-xl bg-primary/10 flex items-center justify-center'>
-                <Users2 className='h-7 w-7 text-primary' />
-              </div>
-              <div className='relative'>
-                <p className='text-sm text-gray-600 font-medium'>Tổng số tài khoản</p>
-                <div className='flex items-baseline gap-1 mt-1'>
-                  <span className='text-2xl font-bold text-gray-900'>{childAccounts.length}</span>
-                  <span className='text-sm text-gray-500'>tài khoản</span>
-                </div>
-              </div>
-            </div>
-            <div className='absolute right-4 bottom-4 opacity-10'>
-              <Users2 className='h-16 w-16 text-primary' />
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className='relative overflow-hidden border-none shadow-md bg-gradient-to-br from-green-50 to-green-100/50'>
-          <CardContent className='pt-6'>
-            <div className='flex items-center gap-4'>
-              <div className='h-14 w-14 rounded-xl bg-green-100 flex items-center justify-center'>
-                <GraduationCap className='h-7 w-7 text-green-600' />
-              </div>
-              <div className='relative'>
-                <p className='text-sm text-gray-600 font-medium'>Khóa học đang học</p>
-                <div className='flex items-baseline gap-1 mt-1'>
-                  <span className='text-2xl font-bold text-gray-900'>
-                    {childAccounts.reduce((sum, account) => sum + account.totalCoursesCompleted, 0)}
-                  </span>
-                  <span className='text-sm text-gray-500'>khóa học</span>
-                </div>
-              </div>
-            </div>
-            <div className='absolute right-4 bottom-4 opacity-10'>
-              <GraduationCap className='h-16 w-16 text-green-600' />
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className='relative overflow-hidden border-none shadow-md bg-gradient-to-br from-blue-50 to-blue-100/50'>
-          <CardContent className='pt-6'>
-            <div className='flex items-center gap-4'>
-              <div className='h-14 w-14 rounded-xl bg-blue-100 flex items-center justify-center'>
-                <Clock className='h-7 w-7 text-blue-600' />
-              </div>
-              <div className='relative'>
-                <p className='text-sm text-gray-600 font-medium'>Tổng thời gian học</p>
-                <div className='flex items-baseline gap-1 mt-1'>
-                  <span className='text-2xl font-bold text-gray-900'>10</span>
-                  <span className='text-sm text-gray-500'>giờ</span>
-                </div>
-              </div>
-            </div>
-            <div className='absolute right-4 bottom-4 opacity-10'>
-              <Clock className='h-16 w-16 text-blue-600' />
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Search and Filters */}
-      <div className='flex flex-col gap-6'>
-        <Card className='border-none shadow-md'>
-          <CardContent className='p-6'>
-            <div className='flex flex-col lg:flex-row gap-4'>
-              {/* Search */}
-              <div className='relative flex-1'>
-                <Search className='absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400' />
-                <Input
-                  placeholder='Tìm kiếm theo tên tài khoản...'
-                  value={filters.search}
-                  onChange={(e) => setFilters((prev) => ({ ...prev, search: e.target.value }))}
-                  className='pl-9 border-gray-200 focus:border-primary/30 focus:ring-primary/20 w-full'
-                />
-              </div>
-
-              {/* Filters */}
-              <div className='flex flex-col sm:flex-row gap-4 lg:w-auto'>
-                <Select
-                  value={filters.status}
-                  onValueChange={(value: Filters['status']) => setFilters((prev) => ({ ...prev, status: value }))}
-                >
-                  <SelectTrigger className='w-full sm:w-[180px] border-gray-200'>
-                    <SelectValue placeholder='Trạng thái' />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value='all'>Tất cả trạng thái</SelectItem>
-                    <SelectItem value='active'>Đang hoạt động</SelectItem>
-                    <SelectItem value='inactive'>Không hoạt động</SelectItem>
-                  </SelectContent>
-                </Select>
-
-                <Button
-                  onClick={() => setShowAddDialog(true)}
-                  className='bg-gradient-to-r from-primary to-primary/90 hover:from-primary/90 hover:to-primary
-                    shadow-lg shadow-primary/25 hover:shadow-xl hover:shadow-primary/20 w-full sm:w-auto'
-                >
-                  <Plus className='w-4 h-4 mr-2' />
-                  Thêm tài khoản con
-                </Button>
-              </div>
-            </div>
-
-            {/* Active Filters */}
-            {(filters.search || filters.status !== 'all' || filters.sort !== 'recent') && (
-              <div className='flex flex-wrap gap-2 mt-4 pt-4 border-t border-gray-100'>
-                {filters.search && (
-                  <Badge variant='secondary' className='gap-1'>
-                    Tìm kiếm: {filters.search}
-                    <X
-                      className='w-3 h-3 cursor-pointer'
-                      onClick={() => setFilters((prev) => ({ ...prev, search: '' }))}
-                    />
-                  </Badge>
-                )}
-                {filters.status !== 'all' && (
-                  <Badge variant='secondary' className='gap-1'>
-                    {filters.status === 'active' ? 'Đang hoạt động' : 'Không hoạt động'}
-                    <X
-                      className='w-3 h-3 cursor-pointer'
-                      onClick={() => setFilters((prev) => ({ ...prev, status: 'all' }))}
-                    />
-                  </Badge>
-                )}
-                {filters.sort !== 'recent' && (
-                  <Badge variant='secondary' className='gap-1'>
-                    Sắp xếp: {filters.sort === 'name' ? 'Theo tên' : 'Số khóa học'}
-                    <X
-                      className='w-3 h-3 cursor-pointer'
-                      onClick={() => setFilters((prev) => ({ ...prev, sort: 'recent' }))}
-                    />
-                  </Badge>
-                )}
-                <Button
-                  variant='ghost'
-                  size='sm'
-                  onClick={() => setFilters({ search: '', status: 'all', sort: 'recent' })}
-                  className='text-sm text-gray-500 hover:text-gray-700'
-                >
-                  Xóa bộ lọc
-                </Button>
-              </div>
-            )}
-          </CardContent>
-        </Card>
-
-        {/* Results Count */}
-        <div className='flex items-center justify-between px-2'>
-          <p className='text-sm text-gray-500'>
-            Hiển thị <span className='font-medium text-gray-900'>{childAccounts.length}</span> tài khoản
-          </p>
-          <p className='text-sm text-gray-500'>
-            Cập nhật lần cuối: <span className='font-medium text-gray-900'>2 phút trước</span>
-          </p>
+      {isLoading ? (
+        <div>
+          <div className='flex items-center gap-2'>
+            <Skeleton className='h-5 w-5' />
+            <Skeleton className='h-5 w-20' />
+          </div>
+          <Skeleton className='h-4 w-40 mt-1' />
         </div>
-      </div>
+      ) : (
+        <>
+          {/* Header */}
+          <div>
+            <div className='flex items-center gap-2'>
+              <Users className='h-5 w-5 text-primary' />
+              <h2 className='text-xl font-medium text-gray-900'>Tài khoản con</h2>
+            </div>
+            <p className='text-sm text-gray-500 mt-1 md:ml-7'>Quản lý và theo dõi tiến độ học tập của con</p>
+          </div>
+
+          {/* Search and Filters - Styled like my-course */}
+          <div className='flex flex-col md:flex-row gap-4 items-center justify-between'>
+            <div className='w-full md:w-auto relative'>
+              <Search className='absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400' />
+              <Input
+                placeholder='Tìm kiếm tài khoản con...'
+                value={filters.search}
+                onChange={(e) => setFilters((prev) => ({ ...prev, search: e.target.value }))}
+                className='pl-9 md:w-[300px] border-gray-200 focus:border-primary/30 focus:ring-primary/20'
+              />
+            </div>
+
+            <div className='flex flex-col sm:flex-row gap-4 w-full md:w-auto'>
+              <Select
+                value={filters.status}
+                onValueChange={(value: any) => setFilters((prev) => ({ ...prev, status: value }))}
+              >
+                <SelectTrigger className='w-full sm:w-[180px] border-gray-200'>
+                  <SelectValue placeholder='Trạng thái' />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value='all'>Tất cả trạng thái</SelectItem>
+                  <SelectItem value='active'>Đang hoạt động</SelectItem>
+                  <SelectItem value='inactive'>Không hoạt động</SelectItem>
+                </SelectContent>
+              </Select>
+
+              <Select
+                value={filters.sort}
+                onValueChange={(value: any) => setFilters((prev) => ({ ...prev, sort: value }))}
+              >
+                <SelectTrigger className='w-full sm:w-[180px] border-gray-200'>
+                  <SelectValue placeholder='Sắp xếp theo' />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value='recent'>Gần đây nhất</SelectItem>
+                  <SelectItem value='name'>Tên</SelectItem>
+                  <SelectItem value='courses'>Số khóa học</SelectItem>
+                </SelectContent>
+              </Select>
+
+              <Button
+                onClick={handleAddAccount}
+                className='w-full sm:w-auto bg-gradient-to-r from-primary to-primary/90 shadow-lg shadow-primary/25'
+              >
+                <Plus className='mr-2 h-4 w-4' />
+                Tạo tài khoản mới
+              </Button>
+            </div>
+          </div>
+        </>
+      )}
 
       {/* Account List */}
-      <div className='grid gap-6 md:grid-cols-2 lg:grid-cols-3'>
-        {childAccounts.map((account) => (
-          <Link key={account.childId} href={`/setting/child-account/${account.childId}`}>
-            <Card
-              className='group border-none shadow-md hover:shadow-xl hover:-translate-y-0.5 
-              transition-all duration-300 bg-white'
+      {isLoading ? (
+        <ChildAccountListSkeleton />
+      ) : childAccounts.length === 0 ? (
+        <EmptyChildAccounts onAddAccount={handleAddAccount} />
+      ) : !isLoading && filteredAccounts.length === 0 ? (
+        // Không tìm thấy tài khoản nào phù hợp với tìm kiếm
+        <Card className='border-dashed border-2 shadow-sm'>
+          <CardContent className='p-8 flex flex-col items-center justify-center text-center'>
+            <div className='h-16 w-16 rounded-full bg-amber-50 flex items-center justify-center mb-4'>
+              <Search className='h-8 w-8 text-amber-500' />
+            </div>
+            <h3 className='text-xl font-semibold text-gray-900 mb-2'>Không tìm thấy tài khoản</h3>
+            <p className='text-gray-500 max-w-md mb-6'>
+              Không có tài khoản nào phù hợp với tiêu chí tìm kiếm của bạn. Vui lòng thử với từ khóa khác.
+            </p>
+            <Button
+              variant='outline'
+              onClick={() => {
+                setFilters({
+                  ...filters,
+                  search: ''
+                })
+              }}
             >
-              <CardContent className='p-0'>
-                {/* Card Header with Avatar */}
-                <div className='p-6 pb-4 border-b border-gray-100'>
-                  <div className='flex items-center gap-3'>
-                    <Avatar className='h-10 w-10 ring-2 ring-primary/10'>
-                      <AvatarImage src={account.childImageUrl} alt={account.childName} />
-                      <AvatarFallback className='bg-primary/5 text-primary'>
-                        {account.childName[0].toUpperCase()}
-                      </AvatarFallback>
-                    </Avatar>
-                    <div className='flex-1 min-w-0'>
-                      <h3 className='font-medium text-gray-900 truncate group-hover:text-primary transition-colors'>
-                        {account.childName}
-                      </h3>
-                      <p className='text-sm text-gray-500 flex items-center gap-1.5'>
-                        <Clock className='w-3.5 h-3.5' />
-                        10 phút trước
-                      </p>
-                    </div>
-                  </div>
-                </div>
+              Xóa tìm kiếm
+            </Button>
+          </CardContent>
+        </Card>
+      ) : (
+        <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6'>
+          {filteredAccounts.map((account) => (
+            <ChildAccountCard key={account.childId} account={account} />
+          ))}
 
-                {/* Card Content */}
-                <div className='p-6 space-y-6'>
-                  {/* Course Progress */}
-                  <div className='space-y-2'>
-                    <div className='flex items-center justify-between text-sm'>
-                      <span className='text-gray-600'>Khóa học đang học</span>
-                      <Badge variant='secondary' className='bg-primary/5 text-primary border-none font-medium'>
-                        {account.totalCoursesCompleted} khóa học
-                      </Badge>
-                    </div>
-                    <div className='h-2 bg-gray-100 rounded-full overflow-hidden'>
-                      <div
-                        className='h-full bg-gradient-to-r from-primary to-primary/80 transition-all 
-                        group-hover:from-primary/80 group-hover:to-primary'
-                        style={{
-                          width: `${(account.totalCoursesCompleted / (account.totalCoursesCompleted + account.totalCourse)) * 100}%`
-                        }}
-                      />
-                    </div>
-                    <div className='flex items-center justify-between text-xs text-gray-500'>
-                      <span>Đang học</span>
-                      <span>{account.totalCoursesCompleted} khóa học đã hoàn thành</span>
-                    </div>
-                  </div>
+          {/* Card để thêm tài khoản mới */}
+          <Card
+            className='border-dashed border-2 shadow-sm hover:border-primary/30 transition-all duration-300 flex items-center justify-center cursor-pointer'
+            onClick={handleAddAccount}
+          >
+            <CardContent className='p-8 flex flex-col items-center justify-center text-center'>
+              <div className='h-12 w-12 rounded-full bg-primary/5 flex items-center justify-center mb-3'>
+                <Plus className='h-6 w-6 text-primary' />
+              </div>
+              <p className='text-gray-500'>Thêm tài khoản con</p>
+            </CardContent>
+          </Card>
+        </div>
+      )}
 
-                  {/* Learning Stats */}
-                  <div className='grid grid-cols-2 gap-3 text-center'>
-                    <div className='p-3 rounded-xl bg-gray-50'>
-                      <p className='text-2xl font-semibold text-primary'>10</p>
-                      <p className='text-xs text-gray-500 mt-1'>Giờ học</p>
-                    </div>
-                    <div className='p-3 rounded-xl bg-gray-50'>
-                      <p className='text-2xl font-semibold text-green-600'>{account.totalCoursesCompleted}</p>
-                      <p className='text-xs text-gray-500 mt-1'>Đã hoàn thành</p>
-                    </div>
-                  </div>
-
-                  {/* Action Button */}
-                  <Button
-                    variant='ghost'
-                    className='w-full bg-gray-50 hover:bg-primary/5 hover:text-primary border-none
-                    transition-colors group/btn flex items-center justify-between'
-                  >
-                    <span>Xem chi tiết tài khoản</span>
-                    <ChevronRight className='w-4 h-4 group-hover/btn:translate-x-0.5 transition-transform' />
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-          </Link>
-        ))}
-      </div>
-
-      {/* Add Account Dialog */}
+      {/* Add Account Dialog - Cập nhật */}
       <Dialog open={showAddDialog} onOpenChange={setShowAddDialog}>
-        <DialogContent>
+        <DialogContent className='sm:max-w-[500px]'>
           <DialogHeader>
             <DialogTitle>Thêm tài khoản con mới</DialogTitle>
           </DialogHeader>
-          <div className='space-y-4 py-4'>
-            <div className='space-y-2'>
-              <label className='text-sm font-medium'>Tên đăng nhập</label>
-              <Input placeholder='Nhập tên đăng nhập' className='border-gray-200' />
-            </div>
-            <div className='space-y-2'>
-              <label className='text-sm font-medium'>Mật khẩu</label>
-              <Input type='password' placeholder='Nhập mật khẩu' className='border-gray-200' />
-            </div>
-            <div className='space-y-2'>
-              <label className='text-sm font-medium'>Xác nhận mật khẩu</label>
-              <Input type='password' placeholder='Nhập lại mật khẩu' className='border-gray-200' />
-            </div>
-          </div>
-          <DialogFooter>
-            <Button variant='outline' onClick={() => setShowAddDialog(false)}>
-              Hủy
-            </Button>
-            <Button
-              onClick={() => {
-                toast({
-                  title: 'Thành công',
-                  description: 'Đã tạo tài khoản con mới'
-                })
-                setShowAddDialog(false)
-              }}
-              className='bg-gradient-to-r from-primary to-primary/90'
-            >
-              Tạo tài khoản
-            </Button>
-          </DialogFooter>
+
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-5 py-2'>
+              {/* Tên đăng nhập */}
+              <FormField
+                control={form.control}
+                name='username'
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className='text-sm font-medium'>Tên đăng nhập</FormLabel>
+                    <FormControl>
+                      <Input placeholder='Nhập tên đăng nhập' className='border-gray-200' {...field} />
+                    </FormControl>
+                    <FormMessage className='text-xs mt-1' />
+                  </FormItem>
+                )}
+              />
+
+              {/* Mật khẩu */}
+              <FormField
+                control={form.control}
+                name='password'
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className='text-sm font-medium'>Mật khẩu</FormLabel>
+                    <FormControl>
+                      <div className='relative'>
+                        <Input
+                          type={showPassword ? 'text' : 'password'}
+                          placeholder='Nhập mật khẩu'
+                          className='border-gray-200 pr-10'
+                          {...field}
+                        />
+                        <Button
+                          type='button'
+                          variant='ghost'
+                          size='sm'
+                          className='absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent'
+                          onClick={() => setShowPassword(!showPassword)}
+                        >
+                          {showPassword ? (
+                            <EyeOff className='h-4 w-4 text-gray-400' />
+                          ) : (
+                            <Eye className='h-4 w-4 text-gray-400' />
+                          )}
+                          <span className='sr-only'>{showPassword ? 'Ẩn mật khẩu' : 'Hiển thị mật khẩu'}</span>
+                        </Button>
+                      </div>
+                    </FormControl>
+                    <FormMessage className='text-xs mt-1' />
+                  </FormItem>
+                )}
+              />
+
+              {/* Họ và tên đệm */}
+              <FormField
+                control={form.control}
+                name='firstName'
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className='text-sm font-medium'>Họ và tên đệm</FormLabel>
+                    <FormControl>
+                      <Input placeholder='Nhập họ và tên đệm' className='border-gray-200' {...field} />
+                    </FormControl>
+                    <FormMessage className='text-xs mt-1' />
+                  </FormItem>
+                )}
+              />
+
+              {/* Tên */}
+              <FormField
+                control={form.control}
+                name='lastName'
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className='text-sm font-medium'>Tên</FormLabel>
+                    <FormControl>
+                      <Input placeholder='Nhập tên' className='border-gray-200' {...field} />
+                    </FormControl>
+                    <FormMessage className='text-xs mt-1' />
+                  </FormItem>
+                )}
+              />
+
+              {/* Giới tính */}
+              <FormField
+                control={form.control}
+                name='gender'
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className='text-sm font-medium'>Giới tính</FormLabel>
+                    <FormControl>
+                      <RadioGroup onValueChange={field.onChange} defaultValue={field.value} className='flex gap-6 mt-2'>
+                        <FormItem className='flex items-center space-x-2 space-y-0'>
+                          <FormControl>
+                            <RadioGroupItem value='MALE' />
+                          </FormControl>
+                          <FormLabel className='text-sm font-normal cursor-pointer'>Nam</FormLabel>
+                        </FormItem>
+                        <FormItem className='flex items-center space-x-2 space-y-0'>
+                          <FormControl>
+                            <RadioGroupItem value='FEMALE' />
+                          </FormControl>
+                          <FormLabel className='text-sm font-normal cursor-pointer'>Nữ</FormLabel>
+                        </FormItem>
+                      </RadioGroup>
+                    </FormControl>
+                    <FormMessage className='text-xs mt-1' />
+                  </FormItem>
+                )}
+              />
+
+              {/* Ngày sinh */}
+              <FormField
+                control={form.control}
+                name='dob'
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className='text-sm font-medium'>Ngày sinh</FormLabel>
+                    <FormControl>
+                      <div className='relative'>
+                        <Input placeholder='MM/DD/YYYY (VD: 01/15/2015)' className='border-gray-200' {...field} />
+                        <CalendarIcon className='w-4 h-4 absolute right-3 top-1/2 -translate-y-1/2 text-gray-400' />
+                      </div>
+                    </FormControl>
+                    <FormMessage className='text-xs mt-1' />
+                    <p className='text-xs text-muted-foreground mt-1'>Nhập theo định dạng: Tháng/Ngày/Năm</p>
+                  </FormItem>
+                )}
+              />
+
+              <DialogFooter className='mt-6'>
+                <Button
+                  variant='outline'
+                  type='button'
+                  onClick={() => {
+                    form.reset()
+                    setShowAddDialog(false)
+                  }}
+                >
+                  Hủy
+                </Button>
+                <Button
+                  type='submit'
+                  className='bg-gradient-to-r from-primary to-primary/90'
+                  disabled={registerChildAccountMutation.isPending}
+                >
+                  {registerChildAccountMutation.isPending ? (
+                    <>
+                      <span className='w-4 h-4 border-2 border-white/30 border-t-white/90 rounded-full animate-spin mr-2' />
+                      Đang tạo...
+                    </>
+                  ) : (
+                    'Tạo tài khoản'
+                  )}
+                </Button>
+              </DialogFooter>
+            </form>
+          </Form>
         </DialogContent>
       </Dialog>
     </div>

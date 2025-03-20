@@ -9,7 +9,8 @@ import Link from 'next/link'
 import { Plus, Sparkles } from 'lucide-react'
 import { CourseMobileFilter } from '@/components/public/parent/course/course-mobile-filter'
 
-export default function CoursePage({ searchParams }: { searchParams?: searchParams }) {
+export default async function CoursePage(props: { searchParams?: Promise<searchParams> }) {
+  const searchParams = await props.searchParams
   return (
     <main>
       <Image

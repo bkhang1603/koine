@@ -7,9 +7,12 @@ import {
   AccountProfileBodyType,
   AccountProfileResType,
   AccountResType,
+  AccountStoreResType,
   CourseByAccountResType,
   MyChildAccountByIdResType,
   MyChildAccountResType,
+  RegisterChildAccountBodyType,
+  RegisterChildAccountResType,
   SuggestCoursesFreeResType
 } from '@/schemaValidations/account.schema'
 
@@ -36,7 +39,11 @@ const accountApiRequest = {
     http.get<AccountOrderResType>(`/orders/my-orders?status=${status}&page_index=${page_index}&page_size=${page_size}`),
   getChildAccount: () => http.get<MyChildAccountResType>('/users/my-child-course'),
   getChildAccountById: (id: string) => http.get<MyChildAccountByIdResType>(`/users/my-child-course/${id}`),
-  getSuggestCoursesFree: () => http.get<SuggestCoursesFreeResType>('/courses/suggest-courses-free')
+  getSuggestCoursesFree: () => http.get<SuggestCoursesFreeResType>('/courses/suggest-courses-free'),
+  registerChildAccount: (body: RegisterChildAccountBodyType) =>
+    http.post<RegisterChildAccountResType>('/auth/register-child', body),
+  getAccountNotifications: () => http.get<any>('/notification/user'),
+  getAccountStore: () => http.get<AccountStoreResType>('/courses/my-store')
 }
 
 export default accountApiRequest

@@ -2,23 +2,14 @@
 
 import { Button } from '@/components/ui/button'
 import { Plus, Search } from 'lucide-react'
-import { courseCategories } from '@/app/(private)/content-creator/_mock/data'
 import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { useState } from 'react'
-import { CategoryTable } from '@/components/private/content-creator/blog/category-table'
-import { CreateCategoryDialog } from '@/components/private/content-creator/blog/create-category-dialog'
 
 export default function CourseCategoriesPage() {
-  const [createDialogOpen, setCreateDialogOpen] = useState(false)
+  const [, setCreateDialogOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
   const [statusFilter, setStatusFilter] = useState('all')
-
-  const filteredCategories = courseCategories.filter(
-    (category) =>
-      category.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      category.description.toLowerCase().includes(searchQuery.toLowerCase())
-  )
 
   return (
     <div className='container mx-auto px-4 py-6 space-y-8'>
@@ -57,9 +48,9 @@ export default function CourseCategoriesPage() {
         </Select>
       </div>
 
-      <CategoryTable data={filteredCategories} searchQuery={searchQuery} statusFilter={statusFilter} />
+      {/* <CategoryTable data={filteredCategories} /> */}
 
-      <CreateCategoryDialog open={createDialogOpen} onOpenChange={setCreateDialogOpen} />
+      {/* <CreateCategoryDialog open={createDialogOpen} onOpenChange={setCreateDialogOpen} /> */}
     </div>
   )
 }

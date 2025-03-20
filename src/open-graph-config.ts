@@ -1,5 +1,3 @@
-import envConfig from '@/config'
-
 const baseOpenGraphConfig = {
   openGraph: {
     locale: 'vi_VN',
@@ -11,7 +9,8 @@ const baseOpenGraphConfig = {
     url: 'https://koine.id.vn',
     images: [
       {
-        url: `${envConfig.NEXT_PUBLIC_URL}/images/welcome.png`
+        // url: `${envConfig.NEXT_PUBLIC_URL}/images/welcome.png`
+        url: 'https://koine-bucket-v4.s3.ap-southeast-2.amazonaws.com/image_8318c5f6-5945-4e9a-8d0a-a7841bf139b4_png'
       }
     ]
   }

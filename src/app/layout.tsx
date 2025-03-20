@@ -1,13 +1,12 @@
 import type { Metadata } from 'next'
 import './globals.css'
 import { cn } from '@/lib/utils'
-import { ThemeProvider } from '@/components/theme-provider'
 import { Toaster } from '@/components/ui/toaster'
 import AppProvider from '@/components/app-provider'
 import { Roboto } from 'next/font/google'
-import envConfig from '@/config'
 import { Analytics } from '@vercel/analytics/react'
 import { SpeedInsights } from '@vercel/speed-insights/next'
+import NextTopLoader from 'nextjs-toploader'
 
 const roboto = Roboto({
   weight: ['100', '300', '400', '500', '700'],
@@ -21,7 +20,7 @@ export const metadata: Metadata = {
     default: 'Nền tảng giáo dục giới tính cho trẻ em | Koine'
   },
   description:
-    'Koine là nền tảng giáo dục giới tính cho trẻ em với các khóa học chất lượng cao từ các chuyên gia hàng đầu. Hãy tham gia ngay để giúp con bạn phát triển toàn diện nhất!',
+    'Koine là nền tảng giáo dục giới tính trực tuyến hàng đầu dành cho trẻ em. Chúng tôi cung cấp các khóa học chất lượng cao, được thiết kế bởi các chuyên gia giáo dục và tâm lý học.',
   authors: [{ name: 'Koine', url: 'https://koine.id.vn' }],
   keywords: [
     'Koine',
@@ -48,18 +47,21 @@ export const metadata: Metadata = {
     follow: true
   },
   openGraph: {
-    locale: 'vi_VN',
-    type: 'website',
-    siteName: 'Koine',
-    title: 'Nền tảng giáo dục giới tính cho trẻ em | Koine',
+    title: 'Koine - Nền tảng giáo dục giới tính cho trẻ em',
     description:
-      'Koine là nền tảng giáo dục giới tính cho trẻ em với các khóa học chất lượng cao từ các chuyên gia hàng đầu.',
+      'Koine là nền tảng giáo dục giới tính trực tuyến hàng đầu dành cho trẻ em. Chúng tôi cung cấp các khóa học chất lượng cao, được thiết kế bởi các chuyên gia giáo dục và tâm lý học.',
     url: 'https://koine.id.vn',
+    siteName: 'Koine',
     images: [
       {
-        url: `${envConfig.NEXT_PUBLIC_URL}/images/welcome.png`
+        url: '/images/og-image.jpg',
+        width: 1200,
+        height: 630,
+        alt: 'Koine - Nền tảng giáo dục giới tính cho trẻ em'
       }
-    ]
+    ],
+    locale: 'vi_VN',
+    type: 'website'
   },
   alternates: {
     canonical: 'https://koine.id.vn',
@@ -81,12 +83,11 @@ export default async function RootLayout({
     <html lang='en' suppressHydrationWarning>
       <body className={cn('min-h-screen bg-background antialiased', roboto.className)}>
         <AppProvider>
-          <ThemeProvider attribute='class' defaultTheme='system' enableSystem disableTransitionOnChange>
-            {children}
-            <Toaster />
-            <Analytics />
-            <SpeedInsights />
-          </ThemeProvider>
+          {children}
+          <NextTopLoader showSpinner={false} color='hsl(var(--primary))' />
+          <Toaster />
+          <Analytics />
+          <SpeedInsights />
         </AppProvider>
       </body>
     </html>

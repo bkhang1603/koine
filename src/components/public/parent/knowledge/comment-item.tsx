@@ -3,8 +3,7 @@ import { Button } from '@/components/ui/button'
 import { BlogCommentResType } from '@/schemaValidations/blog.schema'
 import { Camera, MoreHorizontalIcon, SendHorizontal, Smile } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
-import data from '@emoji-mart/data'
-import Picker from '@emoji-mart/react'
+import EmojiPicker from 'emoji-picker-react'
 import { RoleType } from '@/types/jwt.types'
 import {
   useBlogCommentCreateMutation,
@@ -104,7 +103,7 @@ export default function CommentItem({
   }
 
   const handleEmojiSelect = (emoji: any) => {
-    setReplyContent((prev) => prev + emoji.native)
+    setReplyContent((prev) => prev + emoji.emoji)
     setShowEmojiPicker(false)
   }
 
@@ -308,7 +307,7 @@ export default function CommentItem({
 
         {showEmojiPicker && (
           <div className='absolute z-10 mt-2'>
-            <Picker data={data} onEmojiSelect={handleEmojiSelect} />
+            <EmojiPicker onEmojiClick={handleEmojiSelect} searchPlaceholder='Tìm emoji...' width={320} height={400} />
           </div>
         )}
 

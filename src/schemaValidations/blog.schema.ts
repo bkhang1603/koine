@@ -90,6 +90,74 @@ export const BlogCommentUpdateRes = z.object({
   content: z.string()
 })
 
+export const BlogBodyData = z
+  .object({
+    title: z.string().min(1, 'Tiêu đề không được để trống'),
+    content: z.string().min(1, 'Nội dung không được để trống'),
+    description: z.string().min(1, 'Mô tả không được để trống'),
+    imageUrl: z.string().min(1, 'Ảnh đại diện không được để trống'),
+    categoryIds: z.array(z.string()).default([])
+  })
+  .strict()
+
+export const BlogBody = z
+  .object({
+    id: z.string(),
+    creatorId: z.string(),
+    title: z.string(),
+    titleNoTone: z.string(),
+    slug: z.string(),
+    description: z.string(),
+    content: z.string(),
+    imageUrl: z.string(),
+    status: z.string(),
+    isDeleted: z.boolean(),
+    createdAt: z.string(),
+    updatedAt: z.string(),
+    categories: z.array(z.string())
+  })
+  .strict()
+
+export const BlogBodyRes = z.object({
+  data: BlogBody,
+  message: z.string(),
+  statusCode: z.number()
+})
+
+export const CategoryBlogData = z.object({
+  id: z.string(),
+  name: z.string(),
+  description: z.string(),
+  createdAt: z.string(),
+  updatedAt: z.string(),
+  createdAtFormatted: z.string(),
+  updatedAtFormatted: z.string()
+})
+
+export const CategoryBlogRes = z.object({
+  data: z.array(CategoryBlogData),
+  message: z.string(),
+  statusCode: z.number(),
+  pagination: z.object({
+    totalItem: z.number(),
+    pageSize: z.number(),
+    currentPage: z.number(),
+    maxPageSize: z.number(),
+    totalPage: z.number()
+  })
+})
+
+export const CategoryBlogDetailRes = z.object({
+  data: CategoryBlogData,
+  message: z.string(),
+  statusCode: z.number()
+})
+
+export const CategoryBlogCreateReq = z.object({
+  name: z.string(),
+  description: z.string()
+})
+
 export type BlogsResType = z.TypeOf<typeof BlogsRes>
 
 export type BlogResType = z.TypeOf<typeof BlogRes>
@@ -101,3 +169,13 @@ export type BlogCommentResType = z.TypeOf<typeof BlogCommentRes>
 export type BlogCommentCreateReqType = z.TypeOf<typeof BlogCommentCreateReq>
 
 export type BlogCommentUpdateResType = z.TypeOf<typeof BlogCommentUpdateRes>
+
+export type BlogDataResType = z.TypeOf<typeof BlogBodyData>
+
+export type BlogBodyResType = z.TypeOf<typeof BlogBodyRes>
+
+export type CategoryBlogResType = z.TypeOf<typeof CategoryBlogRes>
+
+export type CategoryBlogDetailResType = z.TypeOf<typeof CategoryBlogDetailRes>
+
+export type CategoryBlogCreateReqType = z.TypeOf<typeof CategoryBlogCreateReq>

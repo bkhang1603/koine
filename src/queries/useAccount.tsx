@@ -3,7 +3,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 
 export const useAccountProfile = ({ enabled }: { enabled?: boolean }) => {
   return useQuery({
-    queryKey: ['account-profile'],
+    queryKey: ['account-profile-by-id'],
     queryFn: accountApiRequest.getAccount,
     enabled
   })
@@ -97,6 +97,26 @@ export const useGetAccountOrders = ({
   })
 }
 
+export const useSuggestCoursesFree = () => {
+  return useQuery({
+    queryKey: ['suggest-courses-free'],
+    queryFn: accountApiRequest.getSuggestCoursesFree
+  })
+}
+
+// Register child account
+export const useRegisterChildAccountMutation = () => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: accountApiRequest.registerChildAccount,
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ['child-account']
+      })
+    }
+  })
+}
+
 export const useGetChildAccount = () => {
   return useQuery({
     queryKey: ['child-account'],
@@ -111,9 +131,9 @@ export const useGetChildAccountById = (id: string) => {
   })
 }
 
-export const useSuggestCoursesFree = () => {
+export const useGetAccountStore = () => {
   return useQuery({
-    queryKey: ['suggest-courses-free'],
-    queryFn: accountApiRequest.getSuggestCoursesFree
+    queryKey: ['account-store'],
+    queryFn: accountApiRequest.getAccountStore
   })
 }

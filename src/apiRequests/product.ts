@@ -23,15 +23,9 @@ const productApiRequest = {
     sort?: string | string[] | ['pa' | 'pd' | 'na' | 'nd'] | undefined
   }) =>
     http.get<ProductsResType>(
-      `/products?page_index=${page_index}&page_size=${page_size}&keyword=${search}&range=${range}&category=${category}&sort=${sort}`,
-      {
-        cache: 'no-cache'
-      }
+      `/products?page_index=${page_index}&page_size=${page_size}&keyword=${search}&range=${range}&category=${category}&sort=${sort}`
     ),
-  getProduct: (id: string) =>
-    http.get<ProductResType>(`/products/${id}`, {
-      cache: 'no-cache'
-    }),
+  getProduct: (id: string) => http.get<ProductResType>(`/products/${id}`),
   createProduct: (data: any) => http.post('/products', data),
   updateProduct: (id: string, data: any) => http.put(`/products/${id}`, data),
   deleteProduct: (id: string) => http.delete(`/products/${id}`),

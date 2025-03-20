@@ -1,4 +1,5 @@
 'use client'
+import { use } from 'react'
 
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
@@ -9,7 +10,8 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { cn } from '@/lib/utils'
 
-export default function CourseDetailPage({ params }: { params: { id: string } }) {
+export default function CourseDetailPage(props: { params: Promise<{ id: string }> }) {
+  const params = use(props.params)
   const course = courses.find((c) => c.id === params.id)
 
   if (!course) return null

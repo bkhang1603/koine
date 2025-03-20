@@ -2,21 +2,18 @@ import { Star, Heart, Share2 } from 'lucide-react'
 import BreadCrumbCustom from '@/components/breadcrumb-custom'
 import ProductImage from '@/components/public/parent/product/product-image'
 import productApiRequest from '@/apiRequests/product'
-import { ProductResType } from '@/schemaValidations/product.schema'
 import AddToCartButton from '@/components/public/parent/product/add-to-cart-button'
 import ProductDescription from '@/components/public/parent/product/product-description'
+import { wrapServerApi } from '@/lib/server-utils'
 
-export default async function ProductDetail({ params: { id } }: { params: { id: string } }) {
-  let product: ProductResType['data'] | null = null
-  let overallRating = 0
+export default async function ProductDetail(props: { params: Promise<{ id: string }> }) {
+  const params = await props.params
 
-  try {
-    const { payload } = await productApiRequest.getProduct(id)
-    product = payload.data
-    overallRating = payload.data.averageRating
-  } catch (error) {
-    console.log(error)
-  }
+  const { id } = params
+
+  const data = await wrapServerApi(() => productApiRequest.getProduct(id))
+  const product = data?.payload?.data
+  const overallRating = data?.payload?.data.averageRating ?? 0
 
   if (!product) {
     return <div>Product not found</div>

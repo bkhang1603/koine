@@ -13,11 +13,15 @@ import { ProductResType } from '@/schemaValidations/product.schema'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Minus, Plus } from 'lucide-react'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 
 function AddToCartButton({ product }: { product: ProductResType['data'] }) {
   const role = useAppStore((state) => state.role)
+  const setCheckoutBuyNow = useAppStore((state) => state.setCheckoutBuyNow)
+  const router = useRouter()
+
   const addToCartMutation = useCartDetailCreateMutation()
   const [quantity, setQuantity] = useState(1)
   const form = useForm<AddCartDetailReqType>({
@@ -59,6 +63,32 @@ function AddToCartButton({ product }: { product: ProductResType['data'] }) {
       setQuantity(newQuantity)
       form.setValue('quantity', newQuantity)
     }
+  }
+
+  const handleCheckoutBuyNow = () => {
+    setCheckoutBuyNow({
+      id: product.id,
+      productId: product.id,
+      quantity: quantity,
+      unitPrice: product.price,
+      totalPrice: quantity * product.price,
+      discount: 0,
+      isDeleted: false,
+      product: {
+        name: product.name,
+        description: product.description,
+        imageUrl: product.images[0].imageUrl,
+        stockQuantity: product.stockQuantity
+      },
+      createdAt: '',
+      updatedAt: '',
+      comboId: null,
+      courseId: null,
+      course: null,
+      combo: null
+    })
+
+    router.push(configRoute.checkout)
   }
 
   return (
@@ -153,10 +183,8 @@ function AddToCartButton({ product }: { product: ProductResType['data'] }) {
           )}
 
           {role && (
-            <Button type='button' variant={'secondary'} className='w-full mb-6' asChild>
-              <Link href={``} className='w-full'>
-                Mua ngay
-              </Link>
+            <Button type='button' variant={'secondary'} className='w-full mb-6' onClick={handleCheckoutBuyNow}>
+              Mua ngay
             </Button>
           )}
         </div>

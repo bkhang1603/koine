@@ -88,12 +88,30 @@ export const accountProfileBody = z
       .string()
       .min(1, 'Năm sinh không được để trống')
       .refine(
-        (val) => {
-          const date = new Date(val)
-          return !isNaN(date.getTime())
+        (value) => {
+          if (!value) return true
+
+          // Định dạng mm/dd/yyyy
+          const [month, day, year] = value.split('/').map(Number)
+
+          // Kiểm tra tính hợp lệ của ngày tháng năm
+          if (month < 1 || month > 12 || day < 1 || day > 31 || year < 1900 || year > new Date().getFullYear()) {
+            return false
+          }
+
+          const date = new Date(year, month - 1, day)
+
+          // Kiểm tra xem ngày có tồn tại (ví dụ: không phải 30/02)
+          return (
+            date.getMonth() === month - 1 &&
+            date.getDate() === day &&
+            date.getFullYear() === year &&
+            date <= new Date() &&
+            date >= new Date('1900-01-01')
+          )
         },
         {
-          message: 'Năm sinh không hợp lệ'
+          message: 'Ngày sinh không hợp lệ'
         }
       ),
     avatarUrl: z.string(),
@@ -211,17 +229,39 @@ export const myChildAccountRes = z.object({
   message: z.string()
 })
 
-export const myChildAccountById = z.object({
-  id: z.string(),
-  title: z.string(),
-  username: z.string(),
-  role: z.enum(RoleValues),
-  phone: z.string(),
-  firstName: z.string(),
-  lastName: z.string(),
-  dob: z.string(),
-  address: z.string()
-})
+export const myChildAccountById = z
+  .object({
+    userId: z.string(),
+    username: z.string(),
+    firstName: z.string(),
+    lastName: z.string(),
+    avatarUrl: z.string(),
+    gender: z.string(),
+    dob: z.string(),
+    courses: z.array(
+      z.object({
+        id: z.string(),
+        title: z.string(),
+        description: z.string(),
+        durationDisplay: z.string(),
+        categories: z.array(
+          z.object({
+            id: z.string(),
+            name: z.string()
+          })
+        ),
+        totalLesson: z.number(),
+        totalLessonFinished: z.number(),
+        completionRate: z.number(),
+        author: z.string(),
+        imageUrl: z.string(),
+        createdAtFormatted: z.string(),
+        updatedAtFormatted: z.string(),
+        level: z.string()
+      })
+    )
+  })
+  .strict()
 
 export const myChildAccountByIdRes = z.object({
   data: myChildAccountById,
@@ -256,6 +296,99 @@ export const suggestCoursesFreeRes = z.object({
   })
 })
 
+export const registerChildAccountBody = z.object({
+  username: z
+    .string()
+    .min(6, 'Tên đăng nhập không được dưới 6 ký tự')
+    .max(100, 'Tên đăng nhập không được quá 100 ký tự')
+    .refine((val) => /^[a-zA-Z0-9]+$/.test(val), {
+      message: 'Tên đăng nhập không được chứa ký tự đặc biệt'
+    }),
+  password: z
+    .string()
+    .min(6, {
+      message: 'Mật khẩu phải có ít nhất 6 ký tự.'
+    })
+    .max(100, {
+      message: 'Mật khẩu không được quá 100 ký tự.'
+    })
+    .regex(
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+}{":;'?/>.<,])(?=.*[a-zA-Z0-9!@#$%^&*()_+}{":;'?/>.<,]).{8,}$/,
+      {
+        message: 'Mật khẩu phải có ít nhất 1 chữ hoa, 1 chữ thường, 1 số và 1 ký tự đặc biệt.'
+      }
+    ),
+  firstName: z.string().min(1, 'Họ và tên đệm không được để trống').max(100, 'Họ và tên đệm không được quá 100 ký tự'),
+  lastName: z.string().min(1, 'Tên không được để trống').max(100, 'Tên không được quá 100 ký tự'),
+  gender: z.enum(GenderValues),
+  dob: z
+    .string()
+    .min(1, 'Ngày sinh không được để trống')
+    .refine(
+      (value) => {
+        // Kiểm tra định dạng MM/DD/YYYY
+        if (!value.match(/^\d{1,2}\/\d{1,2}\/\d{4}$/)) {
+          return false
+        }
+
+        const [month, day, year] = value.split('/').map(Number)
+
+        // Kiểm tra tính hợp lệ cơ bản
+        if (month < 1 || month > 12 || day < 1 || day > 31 || year < 1900 || year > new Date().getFullYear()) {
+          return false
+        }
+
+        // Kiểm tra ngày hợp lệ trong tháng
+        const date = new Date(year, month - 1, day)
+        return date.getMonth() === month - 1 && date.getDate() === day && date.getFullYear() === year
+      },
+      {
+        message: 'Ngày sinh không hợp lệ. Vui lòng nhập theo định dạng MM/DD/YYYY (VD: 01/15/2015)'
+      }
+    )
+})
+
+export const registerChildAccountRes = z.object({
+  message: z.string()
+})
+
+export const accountStore = z.object({
+  totalItem: z.number(),
+  details: z.array(
+    z.object({
+      course: z.object({
+        id: z.string(),
+        title: z.string(),
+        level: z.string(),
+        durationDisplay: z.string(),
+        price: z.number(),
+        imageUrl: z.string(),
+        createAtFormatted: z.string(),
+        categories: z.array(
+          z.object({
+            id: z.string(),
+            name: z.string()
+          })
+        )
+      }),
+      quantityAtPurchase: z.number(),
+      unusedQuantity: z.number(),
+      assignedTo: z.array(
+        z.object({
+          id: z.string(),
+          name: z.string(),
+          imageUrl: z.string()
+        })
+      )
+    })
+  )
+})
+
+export const accountStoreRes = z.object({
+  data: accountStore,
+  message: z.string()
+})
+
 export type AccountResType = z.TypeOf<typeof accountRes>
 
 export type CourseByAccountResType = z.TypeOf<typeof courseByAccountRes>
@@ -277,3 +410,9 @@ export type MyChildAccountResType = z.TypeOf<typeof myChildAccountRes>
 export type MyChildAccountByIdResType = z.TypeOf<typeof myChildAccountByIdRes>
 
 export type SuggestCoursesFreeResType = z.TypeOf<typeof suggestCoursesFreeRes>
+
+export type RegisterChildAccountBodyType = z.TypeOf<typeof registerChildAccountBody>
+
+export type RegisterChildAccountResType = z.TypeOf<typeof registerChildAccountRes>
+
+export type AccountStoreResType = z.TypeOf<typeof accountStoreRes>

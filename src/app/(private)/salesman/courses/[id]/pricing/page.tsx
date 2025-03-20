@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, use } from 'react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
@@ -8,7 +8,8 @@ import { mockCourses } from '../../../_mock/data'
 import { ArrowLeft } from 'lucide-react'
 import Link from 'next/link'
 
-export default function CoursePricingPage({ params }: { params: { id: string } }) {
+export default function CoursePricingPage(props: { params: Promise<{ id: string }> }) {
+  const params = use(props.params)
   const course = mockCourses.find((c) => c.id === params.id)
   const [price, setPrice] = useState(course?.price || '')
   const [discount, setDiscount] = useState(course?.discount || '')

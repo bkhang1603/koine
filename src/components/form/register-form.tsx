@@ -3,7 +3,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useRouter } from 'next/navigation'
 import { useForm } from 'react-hook-form'
-
 import { Button } from '@/components/ui/button'
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
@@ -53,7 +52,7 @@ export default function RegisterForm({ className }: { className?: string }) {
         description: result.payload.message || 'Đăng ký thành công'
       })
 
-      router.push('/login')
+      router.push(`/otp?id=${result.payload.data}&time=${encodeURIComponent(new Date().toString())}`)
     } catch (error: any) {
       handleErrorApi({
         error,
@@ -158,9 +157,6 @@ export default function RegisterForm({ className }: { className?: string }) {
                         )
                       }}
                       initialFocus
-                      fromYear={1940}
-                      toYear={new Date().getFullYear() - 5}
-                      defaultMonth={defaultDate}
                     />
                   </PopoverContent>
                 </Popover>

@@ -131,18 +131,6 @@ export const generateSocketInstance = (accessToken: string) => {
   })
 }
 
-export const wrapServerApi = async <T>(fn: () => Promise<T>) => {
-  let result = null
-  try {
-    result = await fn()
-  } catch (error: any) {
-    if (error.digest?.includes('NEXT_REDIRECT')) {
-      throw error
-    }
-  }
-  return result
-}
-
 export const translateRole = (role: string) => {
   switch (role) {
     case 'ADULT':
@@ -195,6 +183,19 @@ export const getCheckoutDataFromLocalStorage = () => {
 
 export const removeCheckoutDataFromLocalStorage = () => {
   isBrowser && localStorage.removeItem('checkoutData')
+}
+
+export const setCheckoutBuyNowToLocalStorage = (data: any) => {
+  isBrowser && localStorage.setItem('checkoutBuyNow', JSON.stringify(data))
+}
+
+export const getCheckoutBuyNowFromLocalStorage = () => {
+  const data = isBrowser && localStorage.getItem('checkoutBuyNow')
+  return data ? JSON.parse(data) : null
+}
+
+export const removeCheckoutBuyNowFromLocalStorage = () => {
+  isBrowser && localStorage.removeItem('checkoutBuyNow')
 }
 
 export const checkAndSetTokenToCookieByLoginGoogle = async ({

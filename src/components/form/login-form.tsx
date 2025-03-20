@@ -16,8 +16,12 @@ import { useLoginMutation } from '@/queries/useAuth'
 import InputPassword from '@/components/input-password'
 import { useEffect } from 'react'
 import { useAppStore } from '@/components/app-provider'
+import { useGetIpMutation } from '@/queries/useIp'
 
 export default function LoginForm({ className }: { className?: string }) {
+  const { data } = useGetIpMutation()
+  const ipAddress = data?.payload.data.clientIp ?? ''
+
   const { toast } = useToast()
   const router = useRouter()
   const loginMutation = useLoginMutation()
@@ -42,7 +46,9 @@ export default function LoginForm({ className }: { className?: string }) {
   async function onSubmit(values: LoginBodyType) {
     if (loginMutation.isPending) return
     try {
-      const result = await loginMutation.mutateAsync(values)
+      const newValues = { ...values, deviceId: ipAddress }
+
+      const result = await loginMutation.mutateAsync(newValues)
 
       setRole(result.payload.data.account.role)
 
@@ -68,7 +74,7 @@ export default function LoginForm({ className }: { className?: string }) {
           case 'SUPPORTER':
             router.push('/supporter')
             break
-          case 'CONTENT-CREATOR':
+          case 'CONTENT_CREATOR':
             router.push('/content-creator')
             break
           case 'ADULT':

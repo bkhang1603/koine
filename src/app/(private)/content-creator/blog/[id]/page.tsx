@@ -1,4 +1,5 @@
 'use client'
+import { use } from 'react'
 
 import Link from 'next/link'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -7,7 +8,8 @@ import { Badge } from '@/components/ui/badge'
 import { ArrowLeft, Calendar, User } from 'lucide-react'
 import Image from 'next/image'
 
-export default function BlogPostDetail({ params }: { params: { id: string } }) {
+export default function BlogPostDetail(props: { params: Promise<{ id: string }> }) {
+  const params = use(props.params)
   const blogPosts = [
     {
       id: 1,

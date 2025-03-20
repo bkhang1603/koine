@@ -1,7 +1,7 @@
 'use client'
 
-import { useEffect, useState } from 'react'
-import { useSearchParams } from 'next/navigation'
+import { useEffect, useRef, useState } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { Loader2, CheckCircle, AlertCircle, RefreshCw, Mail, Clock, MoveRight } from 'lucide-react'
@@ -14,9 +14,10 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
 import * as z from 'zod'
 import icons from '@/assets/icons'
-import { useSendOTPMutation } from '@/queries/useAuth'
+import { useResendOTPMutation, useSendOTPMutation } from '@/queries/useAuth'
 import { useAppStore } from '@/components/app-provider'
 import { handleErrorApi } from '@/lib/utils'
+import { toast } from '@/components/ui/use-toast'
 
 // Tạo schema cho form OTP
 const otpSchema = z.object({
@@ -27,11 +28,14 @@ type OtpFormValues = z.infer<typeof otpSchema>
 type ValidationStatus = 'input' | 'loading' | 'success' | 'error'
 
 export default function OTPPage() {
+  const router = useRouter()
   const setRole = useAppStore((state) => state.setRole)
   const [status, setStatus] = useState<ValidationStatus>('input')
   const [message, setMessage] = useState<string>('')
   const [timeLeft, setTimeLeft] = useState(120) // Mặc định 2 phút
   const searchParams = useSearchParams()
+
+  const inputRef = useRef<HTMLInputElement>(null)
 
   // Lấy ID từ URL params (được truyền từ email)
   const id = searchParams.get('id')
@@ -39,10 +43,8 @@ export default function OTPPage() {
   // Lấy timestamp từ URL params (khi nào OTP được tạo)
   const timeParam = searchParams.get('time')
 
-  const email = searchParams.get('email') || 'email của bạn'
-  const maskedEmail = email.replace(/(.{2})(.*)(@.*)/, '$1***$3')
-
   const sendOTPMutation = useSendOTPMutation()
+  const resendOTPMutation = useResendOTPMutation()
 
   // Khởi tạo form
   const form = useForm<OtpFormValues>({
@@ -56,6 +58,19 @@ export default function OTPPage() {
     setRole()
   }, [setRole])
 
+  // Thêm useEffect để focus vào input khi component mounts
+  useEffect(() => {
+    // Ngắn delay nhỏ để đảm bảo DOM đã render xong
+    const timer = setTimeout(() => {
+      if (status === 'input') {
+        // Focus vào input
+        inputRef.current?.focus()
+      }
+    }, 100)
+
+    return () => clearTimeout(timer)
+  }, [status])
+
   // Tính toán thời gian còn lại dựa trên tham số time
   useEffect(() => {
     let timer: NodeJS.Timeout
@@ -63,25 +78,42 @@ export default function OTPPage() {
     // Nếu có tham số time từ URL, tính thời gian còn lại
     if (timeParam) {
       try {
-        // Giải mã timeParam và xử lý đúng định dạng thời gian
+        // Giải mã timeParam
         const decodedTime = decodeURIComponent(timeParam)
-        // console.log('Decoded time:', decodedTime) // Log để debug
+        // console.log('Decoded time:', decodedTime)
 
-        // Tạo đối tượng Date từ chuỗi thời gian và điều chỉnh múi giờ (trừ 7 giờ)
-        const codeCreationTime = new Date(decodedTime).getTime()
-        // Không cần điều chỉnh thời gian hiện tại vì nó đã ở đúng múi giờ local
-        // const now = new Date().getTime()
-        const expiryTime = codeCreationTime + 5 * 60 * 1000 - 7 * 60 * 1000 * 60 // 5 phút (300,000 ms)
+        // Tạo đối tượng Date từ chuỗi thời gian
+        const decodedDate = new Date(decodedTime)
+        let codeCreationTime = decodedDate.getTime()
 
-        // Thời gian hiển thị cho người dùng đã được điều chỉnh
-        // console.log('Creation time (adjusted):', new Date(codeCreationTime).toLocaleString())
-        // console.log('Expiry time (adjusted):', new Date(expiryTime).toLocaleString())
-        // console.log('Current time:', new Date(now).toLocaleString())
-        // console.log('Initial remaining seconds:', Math.max(0, Math.floor((expiryTime - now) / 1000)))
+        // Kiểm tra xem chuỗi thời gian có chứa GMT hay không
+        const isGMTFormat = decodedTime.includes('GMT')
+
+        // Kiểm tra sự chênh lệch giữa thời gian tạo mã và thời gian hiện tại
+        const currentTime = Date.now()
+        const timeDiff = Math.abs(currentTime - codeCreationTime) / (1000 * 60 * 60) // Chênh lệch tính bằng giờ
+
+        // Nếu chênh lệch > 6 giờ và định dạng có chứa GMT nhưng không có dấu "+"
+        // (tức là JavaScript đã hiểu sai múi giờ)
+        if (timeDiff > 6 && isGMTFormat && !decodedTime.includes('GMT+')) {
+          console.log('Phát hiện lỗi múi giờ, điều chỉnh thời gian -7 giờ')
+          // Điều chỉnh lại thời gian (-7 giờ)
+          codeCreationTime = codeCreationTime - 7 * 60 * 60 * 1000
+        }
+
+        const expiryTime = codeCreationTime + 5 * 60 * 1000 // 5 phút (300,000 ms)
+
+        // Debug logs
+        // console.log('Decoded time:', decodedTime)
+        // console.log('Original creation time:', new Date(decodedDate).toLocaleString())
+        // console.log('Adjusted creation time:', new Date(codeCreationTime).toLocaleString())
+        // console.log('Current time:', new Date(currentTime).toLocaleString())
+        // console.log('Expiry time:', new Date(expiryTime).toLocaleString())
+        // console.log('Time difference (hours):', timeDiff)
 
         const updateTimeLeft = () => {
-          const currentTime = new Date().getTime()
-          const remaining = Math.max(0, Math.floor((expiryTime - currentTime) / 1000))
+          const now = Date.now()
+          const remaining = Math.max(0, Math.floor((expiryTime - now) / 1000))
           setTimeLeft(remaining)
 
           if (remaining <= 0) {
@@ -96,7 +128,6 @@ export default function OTPPage() {
         timer = setInterval(updateTimeLeft, 1000)
       } catch (error) {
         console.error('Lỗi khi phân tích tham số time:', error)
-        // Fallback mặc định nếu có lỗi
         setTimeLeft(300) // 5 phút mặc định
       }
     } else {
@@ -119,7 +150,7 @@ export default function OTPPage() {
     return () => {
       if (timer) clearInterval(timer)
     }
-  }, [timeParam, status]) // Chỉ phụ thuộc vào timeParam và status
+  }, [timeParam, status])
 
   // Xử lý gửi form
   const onSubmit = async (values: OtpFormValues) => {
@@ -167,7 +198,7 @@ export default function OTPPage() {
     }
   }
 
-  // Xử lý gửi lại OTP
+  // Xử lý gửi lại OTP - Cập nhật hàm này
   const handleResendOtp = async () => {
     // Reset OTP input và countdown
     form.reset({ otp: '' })
@@ -175,18 +206,44 @@ export default function OTPPage() {
     try {
       if (id) {
         // Nếu có ID, gọi API gửi lại OTP với ID
+        await resendOTPMutation.mutateAsync(id)
+
+        // Tạo timestamp mới
+        const newTimeParam = new Date().toString()
+
+        // Cập nhật URL với timestamp mới
+        const params = new URLSearchParams()
+        params.set('id', id)
+        params.set('time', newTimeParam)
+        router.push(`/otp?${params.toString()}`)
 
         // Đặt lại thời gian mới (5 phút = 300 giây)
         setTimeLeft(300)
+
+        // Thay alert bằng toast
+        toast({
+          title: 'Thành công',
+          description: 'Mã OTP mới đã được gửi đến email của bạn',
+          variant: 'default'
+        })
       } else {
         // Xử lý case khi không có ID (giữ nguyên code cũ)
         setTimeLeft(120)
-      }
 
-      // Thông báo
-      alert('Mã OTP mới đã được gửi đến ' + maskedEmail)
+        // Thay alert bằng toast
+        toast({
+          title: 'Thành công',
+          description: 'Mã OTP mới đã được gửi đến email của bạn',
+          variant: 'default'
+        })
+      }
     } catch (error: any) {
-      alert('Không thể gửi lại OTP: ' + (error.message || 'Lỗi không xác định'))
+      // Thay alert bằng toast
+      toast({
+        title: 'Lỗi',
+        description: 'Không thể gửi lại OTP: ' + (error.message || 'Lỗi không xác định'),
+        variant: 'destructive'
+      })
     }
   }
 
@@ -244,8 +301,8 @@ export default function OTPPage() {
 
                   <h2 className='text-2xl font-bold text-gray-800'>Xác thực OTP</h2>
                   <p className='text-gray-500 max-w-xs mx-auto'>
-                    Vui lòng nhập mã OTP đã được gửi đến <span className='font-medium text-primary'>{maskedEmail}</span>{' '}
-                    để xác thực tài khoản của bạn
+                    Vui lòng nhập mã OTP đã được gửi đến <span className='font-medium text-primary'>email</span> để xác
+                    thực tài khoản của bạn
                   </p>
                 </motion.div>
               )}
@@ -268,6 +325,7 @@ export default function OTPPage() {
                                     onChange={field.onChange}
                                     onBlur={field.onBlur}
                                     className='gap-2 md:gap-3'
+                                    ref={inputRef}
                                   >
                                     <InputOTPGroup>
                                       {Array.from({ length: 6 }).map((_, index) => (

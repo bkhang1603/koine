@@ -1,107 +1,122 @@
+'use client'
+
 import icons from '@/assets/icons'
-import images from '@/assets/images'
 import { Button } from '@/components/ui/button'
 import configRoute from '@/config/route'
 import Image from 'next/image'
 import Link from 'next/link'
-import type { Metadata } from 'next'
 import RegisterForm from '@/components/form/register-form'
 import envConfig from '@/config'
-
-export const metadata: Metadata = {
-  title: 'Đăng ký',
-  description: 'Đăng ký tài khoản mới trên Koine'
-}
+import { motion } from 'framer-motion'
 
 function RegisterPage() {
   return (
-    <section className='h-screen flex flex-col justify-between'>
-      <div className='container min-h-[100px] flex items-center'>
+    <section className='min-h-screen flex flex-col'>
+      {/* Logo header */}
+      <div className='container min-h-[80px] flex items-center relative z-10'>
         <Link href={configRoute.home}>
           <Image src={icons.logo} alt='Koine logo' width={100} height={100} />
         </Link>
       </div>
 
-      <div className='container flex justify-center items-center flex-col relative mt-10 sm:mt-0'>
-        <h1
-          className='bg-gradient-to-r from-[#FF0059] via-[#FF597D] to-[#2945DE]
-            inline-block text-transparent bg-clip-text text-3xl lg:text-5xl font-bold lg:h-14'
-        >
-          Đăng ký
-        </h1>
+      {/* Main content - centered vertically and horizontally */}
+      <div className='flex-1 flex items-center justify-center pb-20'>
+        <div className='container flex justify-center items-center flex-col relative z-10'>
+          <h1
+            className='bg-gradient-to-r from-[#FF0059] via-[#FF597D] to-[#2945DE]
+              inline-block text-transparent bg-clip-text text-3xl lg:text-5xl font-bold lg:h-14'
+          >
+            Đăng ký
+          </h1>
 
-        <RegisterForm className='mt-7' />
+          <RegisterForm className='mt-7' />
 
-        <div className='my-8 flex items-center w-full md:w-[600px]'>
-          <div className='border-t border-sixth/80 w-full' />
-          <span className='text-sixth text-sm font-medium px-4'>Hoặc</span>
-          <div className='border-t border-sixth/80 w-full' />
+          <div className='my-8 flex items-center w-full md:w-[600px]'>
+            <div className='border-t border-sixth/80 w-full' />
+            <span className='text-sixth text-sm font-medium px-4'>Hoặc</span>
+            <div className='border-t border-sixth/80 w-full' />
+          </div>
+
+          <Button variant='outline' className='w-full md:w-[600px] text-base h-10' disabled>
+            <Image src={icons.facebook} alt='Google' width={24} height={24} className='mr-3' />
+            Đăng ký với Facebook
+          </Button>
+
+          <Button variant='outline' className='w-full md:w-[600px] text-base h-10 mt-5'>
+            <Link href={envConfig.NEXT_PUBLIC_GOOGLE_URL_LOCAL} className='flex items-center justify-center'>
+              <Image src={icons.google} alt='Google' width={24} height={24} className='mr-3' />
+              Đăng ký với Google
+            </Link>
+          </Button>
+
+          <p className='text-secondary font-semibold mt-4 text-center text-sm sm:text-base'>
+            Bạn đã có tài khoản? {''}
+            <Link href={configRoute.login} className='text-sixth hover:text-sixth/80'>
+              Đăng nhập
+            </Link>
+          </p>
         </div>
-
-        <Button variant='outline' className='w-full md:w-[600px] text-base h-10' disabled>
-          <Image src={icons.facebook} alt='Google' width={24} height={24} className='mr-3' />
-          Đăng nhập với Facebook
-        </Button>
-
-        <Button variant='outline' className='w-full md:w-[600px] text-base h-10 mt-5'>
-          <Link href={envConfig.NEXT_PUBLIC_GOOGLE_URL_LOCAL} className='flex items-center justify-center'>
-            <Image src={icons.google} alt='Google' width={24} height={24} className='mr-3' />
-            Đăng nhập với Google
-          </Link>
-        </Button>
-
-        <p className='text-secondary font-semibold mt-4 text-center text-sm sm:text-base'>
-          Bạn đã có tài khoản? {''}
-          <Link href={configRoute.login} className='text-sixth hover:text-sixth/80'>
-            Đăng nhập
-          </Link>
-        </p>
-
-        <Image
-          src={icons.pinkStar}
-          alt='Koine'
-          width={35}
-          height={35}
-          className='hidden sm:block absolute -z-10 top-0 left-0 mt-16 ml-40'
-        />
-        <Image
-          src={icons.blueStar}
-          alt='Koine'
-          width={25}
-          height={25}
-          className='hidden sm:block absolute -z-10 bottom-0 left-0 mb-52 ml-5'
-        />
-        <Image
-          src={icons.lightBlueStar}
-          alt='Koine'
-          width={50}
-          height={50}
-          className='hidden sm:block absolute -z-10 bottom-0 left-0 ml-60 mb-10'
-        />
-        <Image
-          src={icons.pinkStar}
-          alt='Koine'
-          width={40}
-          height={40}
-          className='hidden sm:block absolute -z-10 bottom-0 right-0 mr-5 mb-32'
-        />
-        <Image
-          src={icons.lightBlueStar}
-          alt='Koine'
-          width={20}
-          height={20}
-          className='hidden sm:block absolute -z-10 top-0 right-0 mr-32 mt-32'
-        />
-        <Image
-          src={icons.blueStar}
-          alt='Koine'
-          width={25}
-          height={25}
-          className='hidden sm:block absolute -z-10 bottom-0 right-0 mr-52'
-        />
       </div>
 
-      <Image src={images.loginVector} alt='Koine' width={1800} height={1800} className='w-[100vw] min-h-[200px]' />
+      {/* Animated background shapes */}
+      <div className='fixed inset-0 -z-10'>
+        <motion.div
+          className='absolute w-[500px] h-[500px] rounded-full bg-gradient-to-r from-pink-500/30 to-purple-500/30 blur-3xl'
+          animate={{
+            x: [-100, 100],
+            y: [-50, 50],
+            scale: [0.8, 1.2]
+          }}
+          transition={{
+            duration: 8,
+            repeat: Infinity,
+            repeatType: 'reverse',
+            ease: 'easeInOut'
+          }}
+          style={{
+            top: '20%',
+            left: '10%'
+          }}
+        />
+
+        <motion.div
+          className='absolute w-[400px] h-[400px] rounded-full bg-gradient-to-r from-blue-500/30 to-cyan-500/30 blur-3xl'
+          animate={{
+            x: [100, -100],
+            y: [50, -50],
+            scale: [1.2, 0.8]
+          }}
+          transition={{
+            duration: 10,
+            repeat: Infinity,
+            repeatType: 'reverse',
+            ease: 'easeInOut'
+          }}
+          style={{
+            top: '40%',
+            right: '10%'
+          }}
+        />
+
+        <motion.div
+          className='absolute w-[300px] h-[300px] rounded-full bg-gradient-to-r from-purple-500/20 to-indigo-500/20 blur-3xl'
+          animate={{
+            x: [-50, 50],
+            y: [100, -100],
+            scale: [1, 1.5]
+          }}
+          transition={{
+            duration: 12,
+            repeat: Infinity,
+            repeatType: 'reverse',
+            ease: 'easeInOut'
+          }}
+          style={{
+            bottom: '10%',
+            left: '30%'
+          }}
+        />
+      </div>
     </section>
   )
 }

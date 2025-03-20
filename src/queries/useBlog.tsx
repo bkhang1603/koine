@@ -108,3 +108,86 @@ export const useBlogCommentUpdateMutation = () => {
     }
   })
 }
+
+export const useBlogQuery = ({
+  page_index,
+  search,
+  page_size
+}: {
+  page_index?: number
+  search?: string
+  page_size?: number
+}) => {
+  return useQuery({
+    queryKey: ['blogs', page_index, search, page_size],
+    queryFn: () => blogApiRequest.getBlogs({ page_index, search, page_size })
+  })
+}
+
+// Content Creator
+export const useBlogCreateMutation = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: blogApiRequest.createBlog,
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ['blogs']
+      })
+    }
+  })
+}
+
+export const useCategoryBlogQuery = () => {
+  return useQuery({
+    queryKey: ['categoryBlog'],
+    queryFn: () => blogApiRequest.getCategoryBlog()
+  })
+}
+
+export const useCategoryBlogDetailQuery = ({ id, enabled }: { id: string; enabled?: boolean }) => {
+  return useQuery({
+    queryKey: ['categoryBlog', id],
+    queryFn: () => blogApiRequest.getCategoryBlogDetail(id),
+    enabled
+  })
+}
+
+export const useCategoryBlogCreateMutation = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: blogApiRequest.createCategoryBlog,
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ['categoryBlog']
+      })
+    }
+  })
+}
+
+export const useCategoryBlogUpdateMutation = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: blogApiRequest.updateCategoryBlog,
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ['categoryBlog']
+      })
+    }
+  })
+}
+
+export const useCategoryBlogDeleteMutation = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: blogApiRequest.deleteCategoryBlog,
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ['categoryBlog']
+      })
+    }
+  })
+}

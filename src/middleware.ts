@@ -93,7 +93,7 @@ const publicPaths = ['/', '/course', '/knowledge', '/about', '/contact', '/help/
 // Phân chia rõ ràng các đường dẫn theo role
 const roleBasedPaths = {
   ADMIN: ['/admin', '/admin/:path*'],
-  'CONTENT-CREATOR': ['/content-creator', '/content-creator/:path*'],
+  CONTENT_CREATOR: ['/content-creator', '/content-creator/:path*'],
   CHILD: ['/kid', '/kid/:path*']
 }
 

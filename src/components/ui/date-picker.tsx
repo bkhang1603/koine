@@ -33,8 +33,8 @@ export function DatePicker({ value, onChange }: DatePickerProps) {
           mode='single'
           selected={date}
           onSelect={(newDate) => {
-            setDate(newDate)
-            onChange?.(newDate)
+            setDate(newDate ?? undefined)
+            onChange?.(newDate ?? undefined)
           }}
           initialFocus
         />

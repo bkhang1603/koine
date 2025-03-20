@@ -30,3 +30,9 @@ export const useSendOTPMutation = () => {
     mutationFn: authApiRequest.sendOTP
   })
 }
+
+export const useResendOTPMutation = () => {
+  return useMutation({
+    mutationFn: authApiRequest.resendOTP
+  })
+}

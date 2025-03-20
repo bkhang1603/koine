@@ -41,7 +41,7 @@ function KidHomePage() {
   const courses = data?.payload.data ?? []
 
   return (
-    <div className='container mx-auto px-4 py-8'>
+    <div>
       {/* Hero Section */}
       <div className='relative h-[400px] rounded-3xl overflow-hidden mb-12'>
         <Image src={images.toy} alt='Hero banner' fill quality={100} className='object-cover' />

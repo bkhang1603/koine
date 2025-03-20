@@ -1,124 +1,380 @@
 'use client'
 
+import { useState } from 'react'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
+import { Card, CardContent } from '@/components/ui/card'
 import { Separator } from '@/components/ui/separator'
+import { Shield, ShieldCheck, Lock, Laptop, Smartphone, AlertTriangle, LogOut, Clock } from 'lucide-react'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger
+} from '@/components/ui/alert-dialog'
+import { useToast } from '@/components/ui/use-toast'
 import { Switch } from '@/components/ui/switch'
-import { KeyRound, Smartphone, History } from 'lucide-react'
+import { SecurityForm } from '@/components/public/parent/setting/security-form'
+import { Badge } from '@/components/ui/badge'
 
 export default function SecurityPage() {
+  const { toast } = useToast()
+  const [, setIsLoading] = useState(false)
+
+  // Giả lập danh sách thiết bị
+  const devices = [
+    {
+      id: '1',
+      name: 'Chrome trên Windows',
+      type: 'browser',
+      lastActive: '10 phút trước',
+      location: 'Hà Nội, Việt Nam',
+      ip: '192.168.1.xxx',
+      isCurrentDevice: true
+    },
+    {
+      id: '2',
+      name: 'Safari trên iPhone',
+      type: 'mobile',
+      lastActive: '2 giờ trước',
+      location: 'Hà Nội, Việt Nam',
+      ip: '192.168.2.xxx',
+      isCurrentDevice: false
+    },
+    {
+      id: '3',
+      name: 'Firefox trên Mac',
+      type: 'browser',
+      lastActive: '3 ngày trước',
+      location: 'Hà Nội, Việt Nam',
+      ip: '192.168.3.xxx',
+      isCurrentDevice: false
+    }
+  ]
+
+  // Giả lập lịch sử hoạt động
+  const activities = [
+    {
+      id: '1',
+      type: 'login',
+      device: 'Chrome trên Windows',
+      time: '20/06/2023 15:30',
+      location: 'Hà Nội, Việt Nam',
+      ip: '192.168.1.xxx'
+    },
+    {
+      id: '2',
+      type: 'password_change',
+      device: 'Chrome trên Windows',
+      time: '15/06/2023 10:15',
+      location: 'Hà Nội, Việt Nam',
+      ip: '192.168.1.xxx'
+    },
+    {
+      id: '3',
+      type: 'login_fail',
+      device: 'Unknown',
+      time: '10/06/2023 23:45',
+      location: 'TP.HCM, Việt Nam',
+      ip: '192.168.4.xxx'
+    }
+  ]
+
+  // Xử lý đăng xuất thiết bị
+  const handleLogoutDevice = () => {
+    setIsLoading(true)
+
+    // Giả lập API call
+    setTimeout(() => {
+      setIsLoading(false)
+      toast({
+        description: 'Đã đăng xuất khỏi thiết bị'
+      })
+    }, 1000)
+  }
+
+  // Xử lý đăng xuất tất cả
+  const handleLogoutAllDevices = () => {
+    setIsLoading(true)
+
+    // Giả lập API call
+    setTimeout(() => {
+      setIsLoading(false)
+      toast({
+        description: 'Đã đăng xuất khỏi tất cả thiết bị'
+      })
+    }, 1500)
+  }
+
+  // Xử lý bật/tắt xác thực hai lớp
+  const handleToggle2FA = (enabled: boolean) => {
+    toast({
+      description: `Đã ${enabled ? 'bật' : 'tắt'} xác thực hai lớp`
+    })
+  }
+
   return (
-    <div className='max-w-4xl mx-auto space-y-8'>
+    <div className='space-y-6'>
       {/* Header */}
-      <div>
-        <h3 className='text-2xl font-semibold'>Bảo mật tài khoản</h3>
-        <p className='text-sm text-gray-500 mt-1'>Thiết lập các tùy chọn bảo mật để bảo vệ tài khoản của bạn</p>
+      <div className='flex flex-col md:flex-row md:items-center md:justify-between gap-4'>
+        <div>
+          <div className='flex items-center gap-2'>
+            <Shield className='h-5 w-5 text-primary' />
+            <h2 className='text-xl font-medium text-gray-900'>Bảo mật tài khoản</h2>
+          </div>
+          <p className='text-sm text-gray-500 mt-1 md:ml-7'>
+            Quản lý các thiết lập bảo mật và bảo vệ tài khoản của bạn
+          </p>
+        </div>
       </div>
 
-      <div className='space-y-6'>
-        {/* Password Section */}
-        <Card className='border-none shadow-md'>
-          <CardHeader className='pb-6 border-b'>
-            <CardTitle className='flex items-center gap-2 text-lg font-medium'>
-              <KeyRound className='w-5 h-5 text-primary' />
-              Thay đổi mật khẩu
-            </CardTitle>
-          </CardHeader>
-          <CardContent className='pt-6'>
-            <div className='max-w-xl space-y-4'>
-              <div>
-                <Label className='text-sm text-gray-600 mb-1.5 block'>Mật khẩu hiện tại</Label>
-                <Input type='password' className='h-10 border-gray-200' />
-              </div>
-              <div>
-                <Label className='text-sm text-gray-600 mb-1.5 block'>Mật khẩu mới</Label>
-                <Input type='password' className='h-10 border-gray-200' />
-              </div>
-              <div>
-                <Label className='text-sm text-gray-600 mb-1.5 block'>Xác nhận mật khẩu mới</Label>
-                <Input type='password' className='h-10 border-gray-200' />
-              </div>
-              <Button className='mt-2 bg-primary/5 text-primary hover:bg-primary/10'>Đổi mật khẩu</Button>
+      {/* Password Change */}
+      <Card className='shadow-sm border-gray-100'>
+        <CardContent className='p-6'>
+          <div className='mb-6'>
+            <div className='flex items-center gap-2 mb-1'>
+              <Lock className='h-5 w-5 text-primary' />
+              <h3 className='text-lg font-medium text-gray-900'>Đổi mật khẩu</h3>
             </div>
-          </CardContent>
-        </Card>
+            <p className='text-sm text-gray-500 md:ml-7 mb-6'>Cập nhật mật khẩu của bạn để tăng cường bảo mật</p>
 
-        {/* 2FA Section */}
-        <Card className='border-none shadow-md'>
-          <CardHeader className='pb-6 border-b'>
-            <CardTitle className='flex items-center gap-2 text-lg font-medium'>
-              <Smartphone className='w-5 h-5 text-primary' />
-              Xác thực hai yếu tố
-            </CardTitle>
-          </CardHeader>
-          <CardContent className='pt-6 space-y-6'>
-            <div className='flex items-center justify-between'>
-              <div>
-                <Label className='font-medium block mb-0.5'>Bảo mật hai lớp</Label>
-                <p className='text-sm text-gray-500'>Thêm một lớp bảo mật cho tài khoản của bạn</p>
-              </div>
-              <Switch />
-            </div>
-            <Separator />
-            <div className='flex items-center justify-between'>
-              <div>
-                <Label className='font-medium block mb-0.5'>Thông báo đăng nhập</Label>
-                <p className='text-sm text-gray-500'>Nhận email thông báo khi có đăng nhập mới</p>
-              </div>
-              <Switch defaultChecked />
-            </div>
-          </CardContent>
-        </Card>
+            <Separator className='mb-6' />
 
-        {/* Login History */}
-        <Card className='border-none shadow-md'>
-          <CardHeader className='pb-6 border-b'>
-            <CardTitle className='flex items-center gap-2 text-lg font-medium'>
-              <History className='w-5 h-5 text-primary' />
-              Lịch sử đăng nhập
-            </CardTitle>
-          </CardHeader>
-          <CardContent className='pt-6'>
-            <div className='space-y-6'>
-              {[
-                {
-                  device: 'Chrome trên Windows',
-                  location: 'Ho Chi Minh City, Vietnam',
-                  time: '2 phút trước',
-                  current: true
-                },
-                {
-                  device: 'Safari trên iPhone',
-                  location: 'Ho Chi Minh City, Vietnam',
-                  time: '1 ngày trước'
-                }
-              ].map((session, i) => (
-                <div key={i} className='flex items-center justify-between'>
-                  <div>
-                    <div className='flex items-center gap-2 mb-0.5'>
-                      <span className='font-medium'>{session.device}</span>
-                      {session.current && (
-                        <span className='text-xs bg-primary/5 text-primary px-2 py-0.5 rounded-full font-medium'>
-                          Hiện tại
-                        </span>
+            <SecurityForm />
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Two-Factor Authentication */}
+      <Card className='shadow-sm border-gray-100'>
+        <CardContent className='p-6'>
+          <div className='flex items-center gap-2 mb-1'>
+            <ShieldCheck className='h-5 w-5 text-primary' />
+            <h3 className='text-lg font-medium text-gray-900'>Xác thực hai lớp</h3>
+          </div>
+          <p className='text-sm text-gray-500 md:ml-7 mb-6'>Thêm một lớp bảo mật cho tài khoản của bạn</p>
+
+          <Separator className='mb-6' />
+
+          <div className='space-y-6'>
+            <div className='flex items-center justify-between p-4 bg-primary/5 border border-primary/10 rounded-lg'>
+              <div className='flex items-start gap-4'>
+                <div className='p-2 rounded-full bg-primary/10 flex-shrink-0'>
+                  <ShieldCheck className='h-5 w-5 text-primary' />
+                </div>
+                <div>
+                  <h4 className='font-medium text-gray-900 mb-1'>Xác thực qua Email</h4>
+                  <p className='text-sm text-gray-600'>Nhận mã xác thực qua email mỗi khi đăng nhập từ thiết bị mới</p>
+                </div>
+              </div>
+              <Switch onCheckedChange={handleToggle2FA} />
+            </div>
+
+            <div className='p-4 border border-amber-100 bg-amber-50/50 rounded-lg'>
+              <div className='flex items-start gap-4'>
+                <div className='p-2 rounded-full bg-amber-100 flex-shrink-0'>
+                  <AlertTriangle className='h-5 w-5 text-amber-600' />
+                </div>
+                <div>
+                  <h4 className='font-medium text-gray-900 mb-1'>Bảo mật tài khoản</h4>
+                  <p className='text-sm text-gray-600 mb-3'>
+                    Chúng tôi khuyến nghị bạn nên bật xác thực hai lớp để bảo vệ tài khoản tốt hơn.
+                  </p>
+                  <Button
+                    variant='outline'
+                    size='sm'
+                    className='bg-white border-amber-200 text-amber-700 hover:bg-amber-50'
+                  >
+                    Tìm hiểu thêm
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Active Sessions */}
+      <Card className='shadow-sm border-gray-100'>
+        <CardContent className='p-6'>
+          <div className='flex items-center justify-between mb-1'>
+            <div className='flex items-center gap-2'>
+              <Laptop className='h-5 w-5 text-primary' />
+              <h3 className='text-lg font-medium text-gray-900'>Phiên đăng nhập</h3>
+            </div>
+
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button variant='outline' size='sm' className='text-xs'>
+                  <LogOut className='h-3.5 w-3.5 mr-1.5' />
+                  Đăng xuất tất cả
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Đăng xuất tất cả thiết bị</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    Thao tác này sẽ đăng xuất tài khoản của bạn khỏi tất cả các thiết bị, bao gồm cả thiết bị hiện tại.
+                    Bạn sẽ cần đăng nhập lại.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Hủy</AlertDialogCancel>
+                  <AlertDialogAction onClick={handleLogoutAllDevices} className='bg-red-500 hover:bg-red-600'>
+                    Đăng xuất tất cả
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+          </div>
+
+          <p className='text-sm text-gray-500 md:ml-7 mb-6'>Quản lý các phiên đăng nhập và thiết bị đang hoạt động</p>
+
+          <Separator className='mb-6' />
+
+          <div className='space-y-4'>
+            {devices.map((device) => (
+              <div key={device.id} className='p-4 border border-gray-100 rounded-lg bg-white'>
+                <div className='flex items-start justify-between'>
+                  <div className='flex items-start gap-3'>
+                    <div className={`p-2 rounded-full ${device.type === 'mobile' ? 'bg-blue-50' : 'bg-gray-100'}`}>
+                      {device.type === 'mobile' ? (
+                        <Smartphone className='h-5 w-5 text-blue-500' />
+                      ) : (
+                        <Laptop className='h-5 w-5 text-gray-500' />
                       )}
                     </div>
-                    <p className='text-sm text-gray-500'>{session.location}</p>
-                    <p className='text-xs text-gray-400 mt-0.5'>{session.time}</p>
+
+                    <div>
+                      <div className='flex items-center gap-2'>
+                        <h4 className='font-medium text-gray-900'>{device.name}</h4>
+                        {device.isCurrentDevice && (
+                          <Badge className='bg-green-100 text-green-700 hover:bg-green-100 px-1.5 text-xs font-normal'>
+                            Thiết bị hiện tại
+                          </Badge>
+                        )}
+                      </div>
+
+                      <div className='mt-1 space-y-1 text-xs text-gray-500'>
+                        <p>IP: {device.ip}</p>
+                        <p>Vị trí: {device.location}</p>
+                        <p>Hoạt động gần nhất: {device.lastActive}</p>
+                      </div>
+                    </div>
                   </div>
-                  {!session.current && (
-                    <Button variant='outline' size='sm' className='h-9'>
-                      Đăng xuất
+
+                  {!device.isCurrentDevice && (
+                    <Button
+                      variant='ghost'
+                      size='sm'
+                      className='text-red-500 hover:text-red-600 hover:bg-red-50'
+                      onClick={() => handleLogoutDevice()}
+                    >
+                      <LogOut className='h-4 w-4' />
+                      <span className='sr-only'>Đăng xuất</span>
                     </Button>
                   )}
                 </div>
-              ))}
+              </div>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Recent Activities */}
+      <Card className='shadow-sm border-gray-100'>
+        <CardContent className='p-6'>
+          <div className='flex items-center gap-2 mb-1'>
+            <Clock className='h-5 w-5 text-primary' />
+            <h3 className='text-lg font-medium text-gray-900'>Lịch sử hoạt động</h3>
+          </div>
+          <p className='text-sm text-gray-500 md:ml-7 mb-6'>Các hoạt động gần đây trên tài khoản của bạn</p>
+
+          <Separator className='mb-6' />
+
+          <div className='space-y-4'>
+            {activities.map((activity) => {
+              // Xác định icon và màu dựa vào loại hoạt động
+              let icon, bgColor, textColor
+
+              switch (activity.type) {
+                case 'login':
+                  icon = <Laptop className='h-4 w-4 text-green-500' />
+                  bgColor = 'bg-green-50'
+                  textColor = 'text-green-700'
+                  break
+                case 'login_fail':
+                  icon = <AlertTriangle className='h-4 w-4 text-red-500' />
+                  bgColor = 'bg-red-50'
+                  textColor = 'text-red-700'
+                  break
+                case 'password_change':
+                  icon = <Lock className='h-4 w-4 text-blue-500' />
+                  bgColor = 'bg-blue-50'
+                  textColor = 'text-blue-700'
+                  break
+                default:
+                  icon = <Clock className='h-4 w-4 text-gray-500' />
+                  bgColor = 'bg-gray-100'
+                  textColor = 'text-gray-700'
+              }
+
+              // Xác định tiêu đề hoạt động
+              let title
+
+              switch (activity.type) {
+                case 'login':
+                  title = 'Đăng nhập thành công'
+                  break
+                case 'login_fail':
+                  title = 'Đăng nhập thất bại'
+                  break
+                case 'password_change':
+                  title = 'Thay đổi mật khẩu'
+                  break
+                default:
+                  title = 'Hoạt động không xác định'
+              }
+
+              return (
+                <div key={activity.id} className='p-4 border border-gray-100 rounded-lg'>
+                  <div className='flex items-start gap-3'>
+                    <div className={`p-2 rounded-full ${bgColor}`}>{icon}</div>
+
+                    <div>
+                      <div className='flex items-center gap-2'>
+                        <h4 className='font-medium text-gray-900'>{title}</h4>
+                        <Badge className={`${bgColor} ${textColor} hover:${bgColor} px-1.5 text-xs font-normal`}>
+                          {activity.type === 'login_fail' ? 'Cảnh báo' : 'Thông tin'}
+                        </Badge>
+                      </div>
+
+                      <div className='mt-1 space-y-1 text-xs text-gray-500'>
+                        <p>Thời gian: {activity.time}</p>
+                        <p>Thiết bị: {activity.device}</p>
+                        <p>
+                          Vị trí: {activity.location} • IP: {activity.ip}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )
+            })}
+
+            <div className='text-center pt-2'>
+              <Button variant='outline' size='sm' className='text-xs'>
+                <Clock className='h-3.5 w-3.5 mr-1.5' />
+                Xem thêm lịch sử
+              </Button>
             </div>
-          </CardContent>
-        </Card>
-      </div>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   )
 }

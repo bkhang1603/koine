@@ -1,4 +1,5 @@
 'use client'
+import { use } from 'react'
 
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -9,7 +10,8 @@ import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { useRouter } from 'next/navigation'
 
-export default function EditCustomerPage({ params }: { params: { id: string } }) {
+export default function EditCustomerPage(props: { params: Promise<{ id: string }> }) {
+  const params = use(props.params)
   const router = useRouter()
   const customer = mockCustomers.find((c) => c.id === params.id)
 

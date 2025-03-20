@@ -3,8 +3,6 @@
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
 import { Camera, Heart, MessageCircle, SendHorizontal, Smile } from 'lucide-react'
-import data from '@emoji-mart/data'
-import Picker from '@emoji-mart/react'
 import CommentItem from '@/components/public/parent/knowledge/comment-item'
 import { useAppStore } from '@/components/app-provider'
 import {
@@ -19,6 +17,7 @@ import CommentModal from '@/components/public/parent/knowledge/comment-modal'
 import Loading from '@/components/loading'
 import ShareButton from '@/components/share-button'
 import { useEffect, useRef, useState } from 'react'
+import EmojiPicker from 'emoji-picker-react'
 
 function BlogComments({ id }: { id: string }) {
   const router = useRouter()
@@ -69,8 +68,12 @@ function BlogComments({ id }: { id: string }) {
     }
   }
 
-  const handleEmojiSelect = (emoji: any) => {
-    setContent((prev) => prev + emoji.native)
+  const handleEmojiSelect = (emojiData: any) => {
+    const emoji = emojiData.emoji
+    const cursorPosition = textareaRef.current?.selectionStart || 0
+    const textBeforeCursor = content.slice(0, cursorPosition)
+    const textAfterCursor = content.slice(cursorPosition)
+    setContent(textBeforeCursor + emoji + textAfterCursor)
     setShowEmojiPicker(false)
   }
 
@@ -227,7 +230,7 @@ function BlogComments({ id }: { id: string }) {
 
       {showEmojiPicker && (
         <div className='absolute z-10 mt-2'>
-          <Picker data={data} onEmojiSelect={handleEmojiSelect} />
+          <EmojiPicker onEmojiClick={handleEmojiSelect} searchPlaceholder='Tìm emoji...' width={320} height={400} />
         </div>
       )}
 

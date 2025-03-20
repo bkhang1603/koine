@@ -8,7 +8,8 @@ import { Button } from '@/components/ui/button'
 import { SlidersHorizontal } from 'lucide-react'
 import MobileFilter from '@/components/public/parent/product/mobile-filter'
 
-function ProductPage({ searchParams }: { searchParams?: searchParams }) {
+async function ProductPage(props: { searchParams?: Promise<searchParams> }) {
+  const searchParams = await props.searchParams
   return (
     <main className='pb-28'>
       <div className='h-[15vh] md:h-[20vh] lg:h-[30vh] w-full'>

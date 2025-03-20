@@ -16,7 +16,7 @@ import { useBlogCommentCreateMutation, useGetInfinitiveBlogCommentsQuery } from 
 import { RoleType } from '@/types/jwt.types'
 import { Camera, SendHorizontal, Smile } from 'lucide-react'
 import { useRef, useState } from 'react'
-import Picker from '@emoji-mart/react'
+import EmojiPicker from 'emoji-picker-react'
 
 function CommentModal({
   openModal,
@@ -85,7 +85,7 @@ function CommentModal({
   }
 
   const handleEmojiSelect = (emoji: any) => {
-    setContent((prev) => prev + emoji.native)
+    setContent((prev) => prev + emoji.emoji)
     setShowEmojiPicker(false)
   }
 
@@ -165,7 +165,12 @@ function CommentModal({
 
               {showEmojiPicker && (
                 <div className='absolute z-10 mt-16'>
-                  <Picker data={data} onEmojiSelect={handleEmojiSelect} />
+                  <EmojiPicker
+                    onEmojiClick={handleEmojiSelect}
+                    searchPlaceholder='Tìm emoji...'
+                    width={320}
+                    height={400}
+                  />
                 </div>
               )}
             </div>
