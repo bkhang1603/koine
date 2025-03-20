@@ -2,6 +2,7 @@ import http from '@/lib/http'
 import {
   AccountAddressBodyType,
   AccountAddressResType,
+  AccountNotificationsResType,
   AccountOneAddressResType,
   AccountOrderResType,
   AccountProfileBodyType,
@@ -42,7 +43,8 @@ const accountApiRequest = {
   getSuggestCoursesFree: () => http.get<SuggestCoursesFreeResType>('/courses/suggest-courses-free'),
   registerChildAccount: (body: RegisterChildAccountBodyType) =>
     http.post<RegisterChildAccountResType>('/auth/register-child', body),
-  getAccountNotifications: () => http.get<any>('/notification/user'),
+  getAccountNotifications: ({ page_index, page_size }: { page_index: number; page_size: number }) =>
+    http.get<AccountNotificationsResType>(`/notification?page_index=${page_index}&page_size=${page_size}`),
   getAccountStore: () => http.get<AccountStoreResType>('/courses/my-store')
 }
 

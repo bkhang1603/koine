@@ -95,7 +95,7 @@ export const LessonContent = ({ lesson }: LessonContentProps) => {
             <span>{lesson.durations} phút</span>
           </div>
         </div>
-        <h2 className='text-2xl font-bold'>{lesson.title}</h2>
+        <h2 className='text-2xl font-bold mt-2'>{lesson.title}</h2>
 
         {/* Description */}
         <div className='prose prose-slate max-w-none mt-2'>

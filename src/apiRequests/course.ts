@@ -1,8 +1,10 @@
 import http from '@/lib/http'
 import {
+  AllCoursesForCustomResType,
   CategoryCoursesResType,
   ChaptersResType,
   CourseResType,
+  CourseReviewResType,
   CoursesResType,
   LessonResType,
   LessonsResType,
@@ -45,7 +47,9 @@ const courseApiRequest = {
   getCourseProgress: (id: string) => http.get<UserCourseProgressResType>(`/user-progresses/status/${id}`),
   getChapters: (id: string) => http.get<ChaptersResType>(`/chapters/${id}`),
   getLessons: (id: string) => http.get<LessonsResType>(`/lessons/${id}`),
-  getLesson: (id: string) => http.get<LessonResType>(`/lessons/detail/${id}`)
+  getLesson: (id: string) => http.get<LessonResType>(`/lessons/detail/${id}`),
+  getCourseReview: (id: string) => http.get<CourseReviewResType>(`/courses/${id}/reviews`),
+  getAllCoursesForCustom: () => http.get<AllCoursesForCustomResType>(`/courses/all-basic-course-info`)
 }
 
 export default courseApiRequest

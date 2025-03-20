@@ -90,3 +90,17 @@ export const useGetLessonQuery = ({ id, enabled }: { id: string; enabled?: boole
     enabled
   })
 }
+
+export const useGetCourseReviewQuery = ({ id }: { id: string }) => {
+  return useQuery({
+    queryKey: ['courseReview', id],
+    queryFn: () => courseApiRequest.getCourseReview(id)
+  })
+}
+
+export const useGetAllCoursesForCustomQuery = () => {
+  return useQuery({
+    queryKey: ['allCoursesForCustom'],
+    queryFn: courseApiRequest.getAllCoursesForCustom
+  })
+}

@@ -1,11 +1,24 @@
 import courseApiRequest from '@/apiRequests/course'
-import { FileText, Video, MonitorPlay, Clock, Users2, BarChart, PlayCircle, ChevronRight, BookOpen } from 'lucide-react'
+import {
+  FileText,
+  Video,
+  MonitorPlay,
+  Clock,
+  Users2,
+  BarChart,
+  PlayCircle,
+  ChevronRight,
+  BookOpen,
+  Eye
+} from 'lucide-react'
 import Image from 'next/image'
 import { Card } from '@/components/ui/card'
 import EnrollButton from '@/components/public/parent/course/enroll-button'
 import CourseButton from '@/components/public/parent/course/course-button'
+import CourseReviews from '@/components/public/parent/course/course-reviews'
 import Link from 'next/link'
 import { wrapServerApi } from '@/lib/server-utils'
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 
 const formatDuration = (minutes: number) => {
   const hours = Math.floor(minutes / 60)
@@ -33,17 +46,8 @@ export default async function CourseDetail(props: { params: Promise<{ id: string
 
   const { id } = params
 
-  // let courseData: CourseResType['data'] | null = null
-
   const data = await wrapServerApi(() => courseApiRequest.getCourse(id))
   const courseData = data?.payload?.data
-
-  // try {
-  //   const { payload } = await courseApiRequest.getCourse(id)
-  //   courseData = payload.data
-  // } catch (error) {
-  //   handleErrorApi({ error })
-  // }
 
   if (!courseData) {
     return <p>Không tìm thấy khóa học</p>
@@ -196,19 +200,43 @@ export default async function CourseDetail(props: { params: Promise<{ id: string
                       </div>
                     </div>
                     <div className='divide-y divide-gray-100'>
-                      {chapter.lessons.map((lesson) => (
+                      {chapter.lessons.map((lesson, lessonIndex) => (
                         <div
                           key={lesson.id}
-                          className='p-3 sm:p-4 flex items-center gap-2 sm:gap-3 hover:bg-gray-50 transition-colors'
+                          className={`p-3 sm:p-4 flex items-center justify-between gap-2 sm:gap-3 hover:bg-gray-50 transition-colors`}
                         >
-                          {getLessonIcon(lesson.type)}
-                          <span className='font-medium text-sm sm:text-base text-gray-700'>{lesson.title}</span>
+                          <div className='flex items-center gap-2 sm:gap-3'>
+                            {getLessonIcon(lesson.type)}
+                            <span className='font-medium text-sm sm:text-base text-gray-700'>{lesson.title}</span>
+                          </div>
+
+                          {lessonIndex === 0 && (
+                            <TooltipProvider>
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                  <Link
+                                    href={`/learn/${courseData.id}?lessonId=${lesson.id}&preview=true`}
+                                    className='flex items-center gap-1 px-2.5 py-1 bg-primary/10 text-primary rounded-full text-xs font-medium hover:bg-primary/20 transition-colors'
+                                  >
+                                    <Eye className='w-3.5 h-3.5' />
+                                    <span>Học thử</span>
+                                  </Link>
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                  <p>Xem trước nội dung bài học</p>
+                                </TooltipContent>
+                              </Tooltip>
+                            </TooltipProvider>
+                          )}
                         </div>
                       ))}
                     </div>
                   </Card>
                 ))}
               </div>
+
+              {/* Course Reviews - Added here */}
+              <CourseReviews courseId={id} />
             </div>
           </div>
 

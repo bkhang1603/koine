@@ -137,3 +137,10 @@ export const useGetAccountStore = () => {
     queryFn: accountApiRequest.getAccountStore
   })
 }
+
+export const useGetAccountNotifications = ({ page_index, page_size }: { page_index: number; page_size: number }) => {
+  return useQuery({
+    queryKey: ['account-notifications', page_index, page_size],
+    queryFn: () => accountApiRequest.getAccountNotifications({ page_index, page_size })
+  })
+}

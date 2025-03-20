@@ -222,6 +222,66 @@ export const LessonRes = z.object({
   statusCode: z.number()
 })
 
+export const CourseReviewRes = z.object({
+  data: z.array(
+    z.object({
+      isDeleted: z.boolean(),
+      createdAt: z.string(),
+      updatedAt: z.string(),
+      courseId: z.string(),
+      userId: z.string(),
+      rating: z.number(),
+      review: z.string(),
+      createdAtFormatted: z.string(),
+      updatedAtFormatted: z.string()
+    })
+  ),
+  message: z.string(),
+  statusCode: z.number(),
+  pagination: z.object({
+    totalItem: z.number(),
+    pageSize: z.number(),
+    currentPage: z.number(),
+    maxPageSize: z.number(),
+    totalPage: z.number()
+  })
+})
+
+export const AllCoursesForCustomData = z.object({
+  id: z.string(),
+  title: z.string(),
+  imageUrl: z.string(),
+  description: z.string(),
+  totalChapter: z.number(),
+  chapters: z.array(
+    z.object({
+      id: z.string(),
+      totalLesson: z.number(),
+      lessons: z.array(
+        z.object({
+          id: z.string(),
+          title: z.string(),
+          description: z.string(),
+          type: z.enum(TypeResourceValues)
+        })
+      )
+    })
+  )
+})
+
+export const AllCoursesForCustomRes = z.object({
+  data: z.array(AllCoursesForCustomData),
+  message: z.string(),
+  statusCode: z.number(),
+  pagination: z.object({
+    totalItem: z.number(),
+    pageSize: z.number(),
+    currentPage: z.number(),
+    maxPageSize: z.number(),
+    totalPage: z.number()
+  })
+})
+
 export type CourseResType = z.infer<typeof CourseRes>
 
 export type CoursesResType = z.infer<typeof CoursesRes>
@@ -241,3 +301,7 @@ export type ChaptersResType = z.infer<typeof ChaptersRes>
 export type LessonsResType = z.infer<typeof LessonsRes>
 
 export type LessonResType = z.infer<typeof LessonRes>
+
+export type CourseReviewResType = z.infer<typeof CourseReviewRes>
+
+export type AllCoursesForCustomResType = z.infer<typeof AllCoursesForCustomRes>

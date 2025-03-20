@@ -42,6 +42,15 @@ const queryClient = new QueryClient({
 //   disconnectSocket: () => {}
 // })
 
+type CustomCourse = {
+  chapters: Array<{
+    id: string
+    title?: string
+    lessons: any[]
+    [key: string]: any
+  }>
+}
+
 type AppStoreType = {
   isAuth: boolean
   role: RoleType | undefined
@@ -61,6 +70,8 @@ type AppStoreType = {
   setPickAddress: (address?: AccountOneAddressResType['data'] | undefined) => void
   checkoutBuyNow: OrderBuyNowResType['data'] | undefined
   setCheckoutBuyNow: (data?: OrderBuyNowResType['data'] | undefined) => void
+  customCourse: CustomCourse
+  setCustomCourse: (customCourse: CustomCourse) => void
 }
 
 export const useAppStore = create<AppStoreType>((set) => ({
@@ -110,7 +121,9 @@ export const useAppStore = create<AppStoreType>((set) => ({
       removeCheckoutBuyNowFromLocalStorage()
       removeCheckoutDataFromLocalStorage()
     }
-  }
+  },
+  customCourse: { chapters: [] },
+  setCustomCourse: (customCourse) => set({ customCourse })
 }))
 
 // export const useAppContext = () => {

@@ -389,6 +389,32 @@ export const accountStoreRes = z.object({
   message: z.string()
 })
 
+export const accountNotifications = z.object({
+  isDeleted: z.boolean(),
+  createdAt: z.string(),
+  updatedAt: z.string(),
+  id: z.string(),
+  userId: z.string(),
+  title: z.string(),
+  description: z.string(),
+  type: z.string(),
+  isRead: z.boolean()
+})
+
+export const accountNotificationsRes = z.object({
+  data: z.object({
+    response: z.array(accountNotifications),
+    pagination: z.object({
+      pageSize: z.number(),
+      totalItem: z.number(),
+      currentPage: z.number(),
+      totalPage: z.number(),
+      maxPageSize: z.number()
+    })
+  }),
+  message: z.string()
+})
+
 export type AccountResType = z.TypeOf<typeof accountRes>
 
 export type CourseByAccountResType = z.TypeOf<typeof courseByAccountRes>
@@ -416,3 +442,5 @@ export type RegisterChildAccountBodyType = z.TypeOf<typeof registerChildAccountB
 export type RegisterChildAccountResType = z.TypeOf<typeof registerChildAccountRes>
 
 export type AccountStoreResType = z.TypeOf<typeof accountStoreRes>
+
+export type AccountNotificationsResType = z.TypeOf<typeof accountNotificationsRes>

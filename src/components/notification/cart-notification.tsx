@@ -30,7 +30,7 @@ function CartNotification() {
           )}
         </div>
       </PopoverTrigger>
-      <PopoverContent className='w-80'>
+      <PopoverContent align='end' className='w-80 p-0 rounded-lg border shadow-lg overflow-hidden'>
         <CartPopover data={cartData} />
       </PopoverContent>
     </Popover>

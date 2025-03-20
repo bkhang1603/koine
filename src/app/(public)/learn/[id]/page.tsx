@@ -7,7 +7,7 @@ import { useGetCourseProgressQuery, useGetLessonQuery, useUpdateCourseProgressMu
 import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { handleErrorApi } from '@/lib/utils'
-import { useCallback, use } from 'react'
+import { useCallback, use, useEffect } from 'react'
 import { UserCourseProgressResType } from '@/schemaValidations/course.schema'
 import { Breadcrumb } from '@/components/learn/Breadcrumb'
 import { Sidebar } from '@/components/learn/Sidebar'
@@ -15,6 +15,7 @@ import { LessonContent } from '@/components/learn/LessonContent'
 import { WelcomeScreen } from '@/components/learn/WelcomeScreen'
 import { NavigationButtons } from '@/components/learn/NavigationButtons'
 import { LoadingSkeleton } from '@/components/learn/LoadingSkeleton'
+import { AlertTriangle } from 'lucide-react'
 
 type Lesson = UserCourseProgressResType['data']['chapters'][0]['lessons'][0]
 
@@ -36,12 +37,37 @@ const canAccessLesson = (lesson: any, course: any) => {
   return false
 }
 
+// Helper function to find the first accessible lesson
+const findFirstAccessibleLesson = (course: any) => {
+  if (!course || !course.chapters || course.chapters.length === 0) return null
+
+  // First look for lessons with 'YET' status
+  for (const chapter of course.chapters) {
+    if (!chapter.lessons || chapter.lessons.length === 0) continue
+
+    const yetLesson = chapter.lessons.find((l: any) => l.status === 'YET')
+    if (yetLesson) return yetLesson
+  }
+
+  // If no 'YET' lessons, look for the first 'NOTYET' lesson
+  for (const chapter of course.chapters) {
+    if (!chapter.lessons || chapter.lessons.length === 0) continue
+
+    const notYetLesson = chapter.lessons.find((l: any) => l.status === 'NOTYET')
+    if (notYetLesson) return notYetLesson
+  }
+
+  // If no lessons found with those statuses, return the very first lesson
+  return course.chapters[0]?.lessons[0] || null
+}
+
 function LearnPage(props: { params: Promise<{ id: string }> }) {
   const params = use(props.params)
   const { id } = params
   const router = useRouter()
   const searchParams = useSearchParams()
   const lessonId = searchParams.get('lessonId')
+  const isPreviewMode = searchParams.get('preview') === 'true'
 
   const updateCourseMutation = useUpdateCourseProgressMutation()
   const { data, isLoading } = useGetCourseProgressQuery({ id })
@@ -49,6 +75,16 @@ function LearnPage(props: { params: Promise<{ id: string }> }) {
 
   const course = data?.payload.data || null
   const lesson = lessonData?.payload.data || null
+
+  // Auto-select first lesson when course data is loaded and no lessonId is provided
+  useEffect(() => {
+    if (!lessonId && course && !isLoading) {
+      const firstLesson = findFirstAccessibleLesson(course)
+      if (firstLesson) {
+        router.push(`/learn/${id}?lessonId=${firstLesson.id}`)
+      }
+    }
+  }, [course, isLoading, lessonId, id, router])
 
   const getNextLesson = useCallback(() => {
     if (!course || !lesson) return null
@@ -75,12 +111,6 @@ function LearnPage(props: { params: Promise<{ id: string }> }) {
       try {
         if (status === 'NOTYET') {
           await updateCourseMutation.mutateAsync(lessonId)
-          // const nextLesson = getNextLesson()
-          // if (nextLesson) {
-          //   router.push(`/learn/${id}?lessonId=${nextLesson.id}`)
-          // } else {
-          //   router.push(`/learn/${id}`)
-          // }
         }
       } catch (error) {
         handleErrorApi({ error })
@@ -118,6 +148,86 @@ function LearnPage(props: { params: Promise<{ id: string }> }) {
     [id, router, course]
   )
 
+  // Render preview UI overlay when in preview mode
+  if (isPreviewMode) {
+    return (
+      <div className='pt-32 pb-14 container'>
+        <div className='grid lg:grid-cols-[340px_1fr] gap-8'>
+          {/* Preview sidebar */}
+          <div className='hidden lg:block'>
+            <Card className='p-6 border-none shadow-lg bg-white/90 backdrop-blur-sm sticky top-28'>
+              <div className='space-y-4'>
+                <h3 className='font-semibold text-lg'>Bạn đang xem thử bài học</h3>
+                <p className='text-sm text-muted-foreground'>
+                  Đây là bản xem thử của bài học. Để truy cập toàn bộ khóa học, vui lòng ghi danh khóa học.
+                </p>
+                <Button asChild className='w-full'>
+                  <Link href={`/course/${id}`}>Quay lại trang khóa học</Link>
+                </Button>
+              </div>
+            </Card>
+          </div>
+
+          {/* Main content with preview notice */}
+          <Card className='bg-white backdrop-blur-sm border-none shadow-lg flex flex-col overflow-hidden'>
+            <div className='flex-1 overflow-y-auto'>
+              <div className='p-8'>
+                <div className='max-w-4xl mx-auto'>
+                  {lessonLoading ? (
+                    <div className='space-y-6'>
+                      <Skeleton className='h-10 w-2/3' />
+                      <Skeleton className='h-4 w-full' />
+                      <Skeleton className='h-4 w-3/4' />
+                      <div className='aspect-video'>
+                        <Skeleton className='h-full w-full rounded-2xl' />
+                      </div>
+                    </div>
+                  ) : lesson ? (
+                    <>
+                      <div className='bg-amber-50 border border-amber-200 rounded-lg p-4 mb-6 flex items-start gap-3'>
+                        <AlertTriangle className='text-amber-500 h-5 w-5 mt-0.5 flex-shrink-0' />
+                        <div>
+                          <h4 className='font-medium text-amber-700 mb-1'>Bạn đang xem thử bài học</h4>
+                          <p className='text-sm text-amber-600'>
+                            Đây là nội dung xem thử. Để truy cập đầy đủ khóa học, vui lòng ghi danh.
+                          </p>
+                        </div>
+                      </div>
+                      <LessonContent lesson={lesson} />
+                    </>
+                  ) : (
+                    <div className='text-center py-12'>
+                      <h3 className='text-lg font-medium text-gray-900 mb-2'>Không tìm thấy bài học</h3>
+                      <p className='text-gray-500 mb-6'>Bài học này không khả dụng hoặc không tồn tại</p>
+                      <Button asChild>
+                        <Link href={`/course/${id}`}>Quay lại trang khóa học</Link>
+                      </Button>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {/* Preview footer */}
+            {lesson && (
+              <div className='flex-shrink-0 bg-white py-6 px-8 border-t'>
+                <div className='max-w-4xl mx-auto'>
+                  <div className='flex flex-col sm:flex-row justify-between items-center gap-4'>
+                    <p className='text-sm text-muted-foreground'>Để tiếp tục học, hãy ghi danh khóa học</p>
+                    <Button asChild>
+                      <Link href={`/course/${id}`}>Ghi danh khóa học</Link>
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            )}
+          </Card>
+        </div>
+      </div>
+    )
+  }
+
+  // Continue with regular UI for enrolled users
   if (isLoading) return <LoadingSkeleton />
 
   if (!course) {
