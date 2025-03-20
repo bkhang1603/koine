@@ -6,7 +6,6 @@ import { Course } from './chapter-picker-types'
 interface CourseBrowseViewProps {
   courses: Course[]
   searchQuery: string
-  selectedChapterIds: Set<string>
   onCourseClick: (course: Course) => void
   onSelectAll: (courseId: string, isSelected: boolean) => void
   isCourseFullySelected: (courseId: string) => boolean
@@ -16,7 +15,6 @@ interface CourseBrowseViewProps {
 export const CourseBrowseView = ({
   courses,
   searchQuery,
-  selectedChapterIds,
   onCourseClick,
   onSelectAll,
   isCourseFullySelected,
@@ -38,7 +36,6 @@ export const CourseBrowseView = ({
         <CourseGridItem
           key={course.id}
           course={course}
-          selectedChapterIds={selectedChapterIds}
           onCourseClick={onCourseClick}
           onSelectAll={onSelectAll}
           isCourseFullySelected={isCourseFullySelected}

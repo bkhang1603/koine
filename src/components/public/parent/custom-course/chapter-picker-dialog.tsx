@@ -23,9 +23,8 @@ export const ChapterPickerDialog = ({
   // State
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedChapterIds, setSelectedChapterIds] = useState<Set<string>>(new Set())
-  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid')
   const [activeTab, setActiveTab] = useState<'browse' | 'selected'>('browse')
-  const [activeSection, setActiveSection] = useState<'courses' | 'chapters' | null>('courses')
+  const [activeSection, setActiveSection] = useState<'courses' | 'chapters'>('courses')
   const [activeCourse, setActiveCourse] = useState<Course | null>(null)
 
   // Reset selections when dialog opens/closes
@@ -231,12 +230,10 @@ export const ChapterPickerDialog = ({
               {/* Browse Tab */}
               <TabsContent value='browse' className='h-full data-[state=inactive]:hidden m-0 relative'>
                 {activeSection !== 'chapters' ? (
-                  // Course view with proper scrolling
                   <div className='h-full overflow-auto'>
                     <CourseBrowseView
                       courses={filteredCourses}
                       searchQuery={searchQuery}
-                      selectedChapterIds={selectedChapterIds}
                       onCourseClick={handleCourseClick}
                       onSelectAll={handleSelectAllInCourse}
                       isCourseFullySelected={isCourseFullySelected}
@@ -244,12 +241,10 @@ export const ChapterPickerDialog = ({
                     />
                   </div>
                 ) : (
-                  // Chapter view
                   <div className='h-full'>
                     {activeCourse && (
                       <ChapterView
                         activeCourse={activeCourse}
-                        viewMode={viewMode}
                         selectedChapterIds={selectedChapterIds}
                         onBackClick={handleBackToCourses}
                         onToggleChapter={handleToggleChapter}

@@ -3,14 +3,13 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Badge } from '@/components/ui/badge'
-import { Check, X, ArrowLeft } from 'lucide-react'
+import { X, ArrowLeft, Check } from 'lucide-react'
 import Image from 'next/image'
 import { cn } from '@/lib/utils'
 import { Course } from './chapter-picker-types'
 
 interface ChapterViewProps {
   activeCourse: Course
-  viewMode: 'grid' | 'list'
   selectedChapterIds: Set<string>
   onBackClick: () => void
   onToggleChapter: (chapterId: string) => void
@@ -20,7 +19,6 @@ interface ChapterViewProps {
 
 export const ChapterView = ({
   activeCourse,
-  viewMode,
   selectedChapterIds,
   onBackClick,
   onToggleChapter,
@@ -70,68 +68,32 @@ export const ChapterView = ({
     </div>
 
     <div className='flex-1 overflow-auto px-8 py-8'>
-      <div className={viewMode === 'grid' ? 'grid grid-cols-1 sm:grid-cols-2 gap-4' : 'space-y-3'}>
-        {activeCourse.chapters?.map((chapter, index) =>
-          viewMode === 'grid' ? (
-            <Card
-              key={chapter.id}
-              className={cn(
-                'border overflow-hidden transition-colors',
-                selectedChapterIds.has(chapter.id)
-                  ? 'bg-primary/5 border-primary/30'
-                  : 'hover:border-muted-foreground/30'
-              )}
-            >
-              <CardContent className='p-0'>
-                <div className='p-4 border-b bg-muted/10 flex items-center justify-between'>
-                  <div className='flex items-center gap-3'>
-                    <div className='w-8 h-8 rounded-full bg-muted/50 flex items-center justify-center flex-shrink-0'>
-                      <span className='text-sm font-medium'>{index + 1}</span>
-                    </div>
-                    <h4 className='font-medium'>{chapter.title || `Chương ${index + 1}`}</h4>
+      <div className='grid grid-cols-1 sm:grid-cols-2 gap-4'>
+        {activeCourse.chapters?.map((chapter, index) => (
+          <Card
+            key={chapter.id}
+            className={cn(
+              'border overflow-hidden transition-colors',
+              selectedChapterIds.has(chapter.id) ? 'bg-primary/5 border-primary/30' : 'hover:border-muted-foreground/30'
+            )}
+          >
+            <CardContent className='p-0'>
+              <div className='p-4 border-b bg-muted/10 flex items-center justify-between'>
+                <div className='flex items-center gap-3'>
+                  <div className='w-8 h-8 rounded-full bg-muted/50 flex items-center justify-center flex-shrink-0'>
+                    <span className='text-sm font-medium'>{index + 1}</span>
                   </div>
-
-                  <Checkbox
-                    checked={selectedChapterIds.has(chapter.id)}
-                    onCheckedChange={() => onToggleChapter(chapter.id)}
-                  />
+                  <h4 className='font-medium'>{chapter.title || `Chương ${index + 1}`}</h4>
                 </div>
 
-                <div className='p-4'>
-                  <div className='flex items-center gap-4 mb-3'>
-                    <Badge variant='outline' className='text-xs'>
-                      {chapter.lessons?.length || 0} bài học
-                    </Badge>
-
-                    <Badge variant='outline' className='text-xs'>
-                      {chapter.durationsDisplay || '0 phút'}
-                    </Badge>
-                  </div>
-
-                  {chapter.description && (
-                    <p className='text-sm text-muted-foreground line-clamp-2'>{chapter.description}</p>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
-          ) : (
-            <div
-              key={chapter.id}
-              className={cn(
-                'border rounded-lg p-4 flex items-center transition-colors',
-                selectedChapterIds.has(chapter.id)
-                  ? 'bg-primary/5 border-primary/30'
-                  : 'hover:border-muted-foreground/30'
-              )}
-            >
-              <div className='w-8 h-8 rounded-full bg-muted/50 flex items-center justify-center mr-3 flex-shrink-0'>
-                <span className='text-sm font-medium'>{index + 1}</span>
+                <Checkbox
+                  checked={selectedChapterIds.has(chapter.id)}
+                  onCheckedChange={() => onToggleChapter(chapter.id)}
+                />
               </div>
 
-              <div className='flex-1 min-w-0'>
-                <h4 className='font-medium truncate'>{chapter.title || `Chương ${index + 1}`}</h4>
-
-                <div className='flex items-center gap-2 mt-1'>
+              <div className='p-4'>
+                <div className='flex items-center gap-4 mb-3'>
                   <Badge variant='outline' className='text-xs'>
                     {chapter.lessons?.length || 0} bài học
                   </Badge>
@@ -140,16 +102,14 @@ export const ChapterView = ({
                     {chapter.durationsDisplay || '0 phút'}
                   </Badge>
                 </div>
-              </div>
 
-              <Checkbox
-                className='ml-3'
-                checked={selectedChapterIds.has(chapter.id)}
-                onCheckedChange={() => onToggleChapter(chapter.id)}
-              />
-            </div>
-          )
-        )}
+                {chapter.description && (
+                  <p className='text-sm text-muted-foreground line-clamp-2'>{chapter.description}</p>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+        ))}
       </div>
     </div>
   </div>

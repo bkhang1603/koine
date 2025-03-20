@@ -6,6 +6,7 @@ import { Trash2, BookOpen, Clock } from 'lucide-react'
 import { CoursesResType } from '@/schemaValidations/course.schema'
 import { Card, CardContent } from '@/components/ui/card'
 import { Separator } from '@/components/ui/separator'
+import { Badge } from '@/components/ui/badge'
 
 // Use the same Chapter type as the parent component
 type Chapter = CoursesResType['data'][0]['chapters'][0]

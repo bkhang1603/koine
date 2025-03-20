@@ -9,7 +9,6 @@ import { Course } from './chapter-picker-types'
 
 interface CourseGridItemProps {
   course: Course
-  selectedChapterIds: Set<string>
   onCourseClick: (course: Course) => void
   onSelectAll: (courseId: string, isSelected: boolean) => void
   isCourseFullySelected: (courseId: string) => boolean
