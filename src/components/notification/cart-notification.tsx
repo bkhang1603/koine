@@ -21,7 +21,7 @@ function CartNotification() {
     <Popover>
       <PopoverTrigger asChild>
         <div className='rounded-full bg-gray-50 w-10 h-10 flex justify-center items-center text-primary cursor-pointer relative'>
-          <ShoppingBag />
+          <ShoppingBag className='w-5 h-5' />
 
           {cartTotal > 0 && (
             <div className='absolute -top-2 -right-2 bg-secondary text-white w-5 h-5 flex justify-center items-center rounded-full text-sm cursor-pointer select-none'>

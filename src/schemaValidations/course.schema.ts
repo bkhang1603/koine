@@ -223,19 +223,31 @@ export const LessonRes = z.object({
 })
 
 export const CourseReviewRes = z.object({
-  data: z.array(
-    z.object({
-      isDeleted: z.boolean(),
-      createdAt: z.string(),
-      updatedAt: z.string(),
-      courseId: z.string(),
-      userId: z.string(),
-      rating: z.number(),
-      review: z.string(),
-      createdAtFormatted: z.string(),
-      updatedAtFormatted: z.string()
+  data: z.object({
+    ratingInfos: z.array(
+      z.object({
+        review: z.string(),
+        rating: z.number(),
+        createdAtFormatted: z.string(),
+        updatedAtFormatted: z.string(),
+        user: z.object({
+          id: z.string(),
+          username: z.string()
+        })
+      })
+    ),
+    stars: z.object({
+      totalRating: z.number(),
+      ratings: z.object({
+        1: z.number(),
+        2: z.number(),
+        3: z.number(),
+        4: z.number(),
+        5: z.number()
+      }),
+      averageRating: z.number()
     })
-  ),
+  }),
   message: z.string(),
   statusCode: z.number(),
   pagination: z.object({

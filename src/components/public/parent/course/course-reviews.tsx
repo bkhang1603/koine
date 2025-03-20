@@ -1,134 +1,231 @@
 'use client'
 
 import { useGetCourseReviewQuery } from '@/queries/useCourse'
-import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { Skeleton } from '@/components/ui/skeleton'
-import { Star, StarHalf } from 'lucide-react'
-import { format } from 'date-fns'
-import { vi } from 'date-fns/locale'
+import { Star, MessageSquare, CheckCircle, Award, ThumbsUp, Clock } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import { Separator } from '@/components/ui/separator'
+import { useState, useMemo } from 'react'
+import { cn } from '@/lib/utils'
 
 interface CourseReviewsProps {
   courseId: string
 }
 
 export default function CourseReviews({ courseId }: CourseReviewsProps) {
-  const { data, isLoading, isError } = useGetCourseReviewQuery({ id: courseId })
+  const [selectedFilter, setSelectedFilter] = useState<number | null>(null)
+  const { data, isLoading } = useGetCourseReviewQuery({
+    id: courseId
+  })
 
-  const reviews = data?.payload.data || []
-  //   const averageRating = data?.payload.data?.averageRating || 0
-  const averageRating = 0
-  //   const totalReviews = data?.payload.data?.totalReviews || 0
-  const totalReviews = 0
+  const stars = data?.payload?.data?.stars || {
+    averageRating: 0,
+    totalRating: 0,
+    ratings: { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 }
+  }
+  const averageRating = stars.averageRating || 0
+  const totalReviews = stars.totalRating || 0
+  const ratingsDistribution = stars.ratings || { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 }
 
-  // Function to render stars based on rating
-  const renderStars = (rating: number) => {
-    const stars = []
-    const fullStars = Math.floor(rating)
-    const hasHalfStar = rating % 1 >= 0.5
+  // Move the entire filtering logic into the useMemo
+  const filteredReviews = useMemo(() => {
+    const allReviews = data?.payload?.data?.ratingInfos || []
+    if (selectedFilter === null) return allReviews
+    return allReviews.filter((review) => review.rating === selectedFilter)
+  }, [data, selectedFilter])
 
-    for (let i = 0; i < 5; i++) {
-      if (i < fullStars) {
-        stars.push(<Star key={i} className='w-4 h-4 fill-amber-400 text-amber-400' />)
-      } else if (i === fullStars && hasHalfStar) {
-        stars.push(<StarHalf key={i} className='w-4 h-4 fill-amber-400 text-amber-400' />)
-      } else {
-        stars.push(<Star key={i} className='w-4 h-4 text-gray-300' />)
-      }
+  const handleFilterClick = (rating: number) => {
+    setSelectedFilter(rating === selectedFilter ? null : rating)
+  }
+
+  // Render star rating component
+  const StarRating = ({ rating, size = 'sm' }: { rating: number; size?: 'sm' | 'md' | 'lg' }) => {
+    const sizeClass = {
+      sm: 'w-4 h-4',
+      md: 'w-5 h-5',
+      lg: 'w-6 h-6'
     }
 
-    return stars
-  }
-
-  if (isLoading) {
     return (
-      <div className='mt-12 space-y-8'>
-        <div className='space-y-4'>
-          <Skeleton className='h-8 w-40' />
-          <div className='flex items-center gap-2'>
-            <Skeleton className='h-6 w-6 rounded-full' />
-            <Skeleton className='h-6 w-6 rounded-full' />
-            <Skeleton className='h-6 w-6 rounded-full' />
-            <Skeleton className='h-6 w-6 rounded-full' />
-            <Skeleton className='h-6 w-6 rounded-full' />
-            <Skeleton className='h-5 w-20 ml-2' />
-          </div>
-        </div>
-
-        {[1, 2, 3].map((i) => (
-          <div key={i} className='space-y-3 pb-6 border-b'>
-            <div className='flex items-center gap-3'>
-              <Skeleton className='h-10 w-10 rounded-full' />
-              <div className='space-y-2'>
-                <Skeleton className='h-4 w-32' />
-                <Skeleton className='h-3 w-24' />
-              </div>
-            </div>
-            <div className='space-y-2'>
-              <Skeleton className='h-4 w-full' />
-              <Skeleton className='h-4 w-3/4' />
-            </div>
-          </div>
+      <div className='flex gap-0.5'>
+        {[1, 2, 3, 4, 5].map((star) => (
+          <Star
+            key={star}
+            className={cn(
+              sizeClass[size],
+              star <= rating ? 'fill-primary text-primary' : 'fill-slate-200 text-slate-200'
+            )}
+          />
         ))}
-      </div>
-    )
-  }
-
-  if (isError) {
-    return <div className='mt-12 text-center text-gray-500'>Không thể tải đánh giá. Vui lòng thử lại sau.</div>
-  }
-
-  if (reviews.length === 0) {
-    return (
-      <div className='mt-12'>
-        <h2 className='text-xl sm:text-2xl font-bold mb-6'>Đánh giá từ học viên</h2>
-        <div className='text-center py-10 bg-gray-50 rounded-lg'>
-          <p className='text-gray-500'>Chưa có đánh giá nào cho khóa học này</p>
-        </div>
       </div>
     )
   }
 
   return (
-    <div className='mt-12'>
-      <h2 className='text-xl sm:text-2xl font-bold mb-6'>Đánh giá từ học viên</h2>
-
-      {/* Rating summary */}
-      <div className='bg-gray-50 p-6 rounded-xl mb-8'>
-        <div className='flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-8'>
-          <div className='text-center sm:text-left'>
-            <div className='text-3xl sm:text-4xl font-bold text-gray-900'>{averageRating.toFixed(1)}</div>
-            <div className='flex justify-center sm:justify-start mt-2'>{renderStars(averageRating)}</div>
-            <p className='text-sm text-gray-500 mt-1'>{totalReviews} đánh giá</p>
+    <div className='w-full'>
+      {/* Reviews Header */}
+      <div className='flex flex-col md:flex-row md:justify-between md:items-end space-y-4 md:space-y-0 mb-8'>
+        <div>
+          <h2 className='text-xl font-semibold tracking-tight'>Đánh giá khóa học</h2>
+          <div className='flex items-center gap-4 mt-2'>
+            <div className='flex items-center gap-2'>
+              <div className='text-3xl font-bold text-primary'>{averageRating.toFixed(1)}</div>
+              <StarRating rating={Math.round(averageRating)} size='md' />
+            </div>
+            <Separator orientation='vertical' className='h-6' />
+            <div className='text-sm text-muted-foreground whitespace-nowrap'>{totalReviews} đánh giá</div>
           </div>
+        </div>
 
-          <div className='flex-1 space-y-2'>
-            {/* Here you could add rating distribution bars (5 star, 4 star, etc) */}
+        <div className='flex flex-wrap gap-2 items-center md:justify-end'>
+          <span className='text-sm text-muted-foreground hidden md:inline-block'>Lọc đánh giá:</span>
+          <div className='flex flex-wrap gap-2'>
+            <Button
+              variant={selectedFilter === null ? 'default' : 'outline'}
+              size='sm'
+              onClick={() => setSelectedFilter(null)}
+              className='rounded-full'
+            >
+              Tất cả ({totalReviews})
+            </Button>
+            {[5, 4, 3, 2, 1].map((rating) => {
+              const count = ratingsDistribution[rating as keyof typeof ratingsDistribution]
+              return (
+                <Button
+                  key={rating}
+                  variant={selectedFilter === rating ? 'default' : 'outline'}
+                  size='sm'
+                  onClick={() => handleFilterClick(rating)}
+                  className='rounded-full'
+                >
+                  {rating} sao ({count})
+                </Button>
+              )
+            })}
           </div>
         </div>
       </div>
 
-      {/* Individual reviews */}
-      <div className='space-y-8'>
-        {reviews.map((review, index) => (
-          <div key={index} className='pb-6 border-b last:border-b-0 last:pb-0'>
-            <div className='flex items-start gap-4 mb-3'>
-              <Avatar className='h-10 w-10 border'>
-                <AvatarFallback>{review.userId.charAt(0)}</AvatarFallback>
-              </Avatar>
-              <div>
-                <div className='font-medium'>User {review.userId.substring(0, 8)}</div>
-                <div className='flex items-center gap-2 mt-1'>
-                  <div className='flex'>{renderStars(review.rating)}</div>
-                  <span className='text-xs text-gray-500'>
-                    {format(new Date(review.createdAt), 'dd/MM/yyyy', { locale: vi })}
-                  </span>
+      {/* Reviews Stats Cards */}
+      <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 mb-8'>
+        <div className='bg-card rounded-lg border p-4 flex items-center gap-3'>
+          <div className='w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center'>
+            <Star className='w-5 h-5 text-primary' />
+          </div>
+          <div>
+            <div className='text-sm text-muted-foreground'>Điểm đánh giá</div>
+            <div className='font-medium'>{averageRating.toFixed(1)}/5</div>
+          </div>
+        </div>
+
+        <div className='bg-card rounded-lg border p-4 flex items-center gap-3'>
+          <div className='w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center'>
+            <Award className='w-5 h-5 text-primary' />
+          </div>
+          <div>
+            <div className='text-sm text-muted-foreground'>Tỷ lệ hài lòng</div>
+            <div className='font-medium'>
+              {totalReviews > 0
+                ? Math.round(((ratingsDistribution[4] + ratingsDistribution[5]) / totalReviews) * 100)
+                : 0}
+              %
+            </div>
+          </div>
+        </div>
+
+        <div className='bg-card rounded-lg border p-4 flex items-center gap-3'>
+          <div className='w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center'>
+            <ThumbsUp className='w-5 h-5 text-primary' />
+          </div>
+          <div>
+            <div className='text-sm text-muted-foreground'>Khuyến nghị</div>
+            <div className='font-medium'>{totalReviews > 0 ? 'Đáng học' : 'Chưa có'}</div>
+          </div>
+        </div>
+
+        <div className='bg-card rounded-lg border p-4 flex items-center gap-3'>
+          <div className='w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center'>
+            <Clock className='w-5 h-5 text-primary' />
+          </div>
+          <div>
+            <div className='text-sm text-muted-foreground'>Thời gian phản hồi</div>
+            <div className='font-medium'>Dưới 24 giờ</div>
+          </div>
+        </div>
+      </div>
+
+      <Separator className='mb-8' />
+
+      {/* Reviews List */}
+      {isLoading ? (
+        <div className='space-y-6'>
+          {[1, 2, 3].map((i) => (
+            <div key={i} className='p-6 rounded-lg bg-card border shadow-sm flex items-start gap-4'>
+              <Skeleton className='h-12 w-12 rounded-full' />
+              <div className='flex-1 space-y-4'>
+                <div className='flex justify-between'>
+                  <Skeleton className='h-5 w-32' />
+                  <Skeleton className='h-5 w-24' />
+                </div>
+                <Skeleton className='h-4 w-full' />
+                <Skeleton className='h-4 w-3/4' />
+              </div>
+            </div>
+          ))}
+        </div>
+      ) : filteredReviews.length === 0 ? (
+        <div className='bg-card border border-dashed rounded-lg p-12 text-center'>
+          <MessageSquare className='w-12 h-12 mx-auto text-muted-foreground/40 mb-4' />
+          <h3 className='text-lg font-medium mb-2'>Không tìm thấy đánh giá phù hợp</h3>
+          <p className='text-sm text-muted-foreground'>
+            {selectedFilter ? `Không có đánh giá nào với ${selectedFilter} sao` : 'Khóa học này chưa có đánh giá'}
+          </p>
+        </div>
+      ) : (
+        <div className='space-y-6'>
+          {filteredReviews.map((review, index) => (
+            <div
+              key={index}
+              className='p-6 rounded-lg bg-card border shadow-sm hover:shadow-md transition-shadow duration-300'
+            >
+              <div className='flex items-start gap-4'>
+                {/* User Avatar */}
+                <div className='shrink-0'>
+                  <div className='w-12 h-12 rounded-full bg-gradient-to-br from-primary/10 to-primary/20 border border-primary/10 flex items-center justify-center font-medium text-primary text-lg shadow-sm'>
+                    {review.user.username.charAt(0).toUpperCase()}
+                  </div>
+                </div>
+
+                {/* Review Content */}
+                <div className='flex-1 min-w-0'>
+                  <div>
+                    <div className='flex items-center gap-2'>
+                      <div className='font-medium text-lg'>{review.user.username}</div>
+                      <div className='flex items-center gap-1 bg-emerald-50 px-2 py-0.5 rounded-full text-xs text-emerald-600 font-medium'>
+                        <CheckCircle className='w-3 h-3' />
+                        Đã học
+                      </div>
+                    </div>
+                    <div className='flex items-center gap-2 mt-1 mb-4'>
+                      <StarRating rating={review.rating} />
+                    </div>
+
+                    {/* Plain Review Content */}
+                    <p className='text-gray-700 leading-relaxed mb-3'>{review.review}</p>
+
+                    {/* Timestamp at bottom right */}
+                    <div className='flex justify-end'>
+                      <div className='text-xs text-muted-foreground italic'>
+                        Đánh giá vào {review.createdAtFormatted}
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
-            <p className='text-gray-700'>{review.review}</p>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      )}
     </div>
   )
 }
