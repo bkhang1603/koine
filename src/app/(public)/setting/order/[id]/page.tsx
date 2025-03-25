@@ -4,25 +4,42 @@ import { use } from 'react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Separator } from '@/components/ui/separator'
-import { Package, ArrowLeft, Clock, BookOpen, AlertCircle, Package2 } from 'lucide-react'
+import { Package, ArrowLeft, Clock, BookOpen, AlertCircle, Package2, Tag, ShoppingCart } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
-import { useGetOrder } from '@/queries/useOrder'
+import { useGetOrder, useUpdatePaymentMethodMutation } from '@/queries/useOrder'
 import { format } from 'date-fns'
 import { vi } from 'date-fns/locale'
-import Loading from '@/components/loading'
+import { OrderDetailSkeleton } from '@/components/public/parent/setting/order/OrderDetailSkeleton'
+import { Badge } from '@/components/ui/badge'
+import { CancelOrderDialog } from '@/components/public/parent/setting/order/CancelOrderDialog'
+import { toast } from '@/components/ui/use-toast'
+import configRoute from '@/config/route'
+import { SettingBreadcrumb } from '@/components/public/parent/setting/SettingBreadcrumb'
+
+// Helper để lấy màu và văn bản cho trạng thái đơn hàng
+const getOrderStatusConfig = (status: string) => {
+  switch (status) {
+    case 'PROCESSING':
+      return { color: 'bg-blue-100 text-blue-800', label: 'Đang xử lý' }
+    case 'COMPLETED':
+      return { color: 'bg-green-100 text-green-800', label: 'Hoàn thành' }
+    case 'CANCELLED':
+      return { color: 'bg-red-100 text-red-800', label: 'Đã hủy' }
+    default:
+      return { color: 'bg-gray-100 text-gray-800', label: status }
+  }
+}
 
 export default function OrderDetailPage(props: { params: Promise<{ id: string }> }) {
   const params = use(props.params)
   const { isLoading, error, data } = useGetOrder({ id: params.id })
+  const updatePaymentMethodMutation = useUpdatePaymentMethodMutation({ id: params.id })
+
   const order = data?.payload.data
 
   if (isLoading) {
-    return (
-      <div className='flex items-center justify-center min-h-[400px]'>
-        <Loading />
-      </div>
-    )
+    return <OrderDetailSkeleton />
   }
 
   if (error || !order) {
@@ -53,31 +70,77 @@ export default function OrderDetailPage(props: { params: Promise<{ id: string }>
     (item) => item.comboId && item.combo
   ) as ((typeof order.orderDetails)[0] & { combo: NonNullable<(typeof order.orderDetails)[0]['combo']> })[]
 
+  const statusConfig = getOrderStatusConfig(order.status)
+  const canCancel = order.status === 'PROCESSING'
+
+  const handleUpdatePaymentMethod = async () => {
+    try {
+      if (updatePaymentMethodMutation.isPending) return
+
+      await updatePaymentMethodMutation.mutateAsync({
+        id: order.id,
+        body: { payMethod: order.payMethod === 'COD' ? 'BANKING' : 'COD' }
+      })
+
+      toast({
+        description: 'Phương thức thanh toán đã được cập nhật'
+      })
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
+  const orderBreadcrumbItems = [
+    { label: 'Đơn hàng', href: configRoute.setting.order },
+    { label: `Đơn hàng ${order.orderCode}`, isCurrent: true }
+  ]
+
   return (
     <div className='container max-w-7xl mx-auto py-6 space-y-8'>
       {/* Back button */}
-      <Button variant='ghost' asChild className='gap-2 hover:bg-gray-100'>
+      {/* <Button variant='ghost' asChild className='gap-2 hover:bg-gray-100'>
         <Link href='/setting/order'>
           <ArrowLeft className='h-4 w-4' />
           Quay lại danh sách đơn hàng
         </Link>
-      </Button>
+      </Button> */}
+      <SettingBreadcrumb
+        items={orderBreadcrumbItems}
+        isLoading={isLoading}
+        backButton={
+          <Link href={configRoute.setting.order}>
+            <Button variant='outline' size='sm' className='gap-2'>
+              <ArrowLeft className='h-4 w-4' />
+              Quay lại danh sách đơn hàng
+            </Button>
+          </Link>
+        }
+      />
 
       {/* Header */}
       <div>
         <div className='flex items-center justify-between mb-4'>
           <h1 className='text-2xl font-bold text-gray-900'>Chi tiết đơn hàng #{order.orderCode}</h1>
+          <Badge className={`px-2.5 py-1 ${statusConfig.color}`}>{statusConfig.label}</Badge>
         </div>
-        <div className='flex items-center gap-6 text-sm text-gray-500'>
+        <div className='flex flex-wrap items-center gap-6 text-sm text-gray-500'>
           <div className='flex items-center gap-2'>
             <Clock className='h-4 w-4' />
             {format(new Date(order.orderDate), 'HH:mm - dd/MM/yyyy', { locale: vi })}
           </div>
+          <div className='flex items-center gap-2'>
+            <ShoppingCart className='h-4 w-4' />
+            {order.orderDetails.length} sản phẩm
+          </div>
+          <div className='flex items-center gap-2'>
+            <Tag className='h-4 w-4' />
+            {order.totalAmount.toLocaleString()}đ
+          </div>
         </div>
       </div>
 
-      <div className='grid grid-cols-3 gap-6'>
-        <div className='col-span-2 space-y-6'>
+      <div className='grid grid-cols-1 lg:grid-cols-3 gap-6'>
+        <div className='lg:col-span-2 space-y-6'>
           {/* Products */}
           {productItems.length > 0 && (
             <Card>
@@ -212,6 +275,10 @@ export default function OrderDetailPage(props: { params: Promise<{ id: string }>
                   <span>{format(new Date(order.orderDate), 'dd/MM/yyyy HH:mm', { locale: vi })}</span>
                 </div>
                 <div className='flex justify-between'>
+                  <span className='text-muted-foreground'>Phương thức</span>
+                  <span className='font-medium'>{order.payMethod === 'COD' ? 'COD' : 'Banking'}</span>
+                </div>
+                <div className='flex justify-between'>
                   <span className='text-muted-foreground'>Ngày tạo</span>
                   <span>{order.createdAtFormatted}</span>
                 </div>
@@ -219,7 +286,91 @@ export default function OrderDetailPage(props: { params: Promise<{ id: string }>
                   <span className='text-muted-foreground'>Cập nhật lần cuối</span>
                   <span>{order.updatedAtFormatted}</span>
                 </div>
+                {/* {order.note && (
+                  <div className='flex flex-col gap-1 mt-2 pt-2 border-t'>
+                    <span className='text-muted-foreground'>Lý do hủy</span>
+                    <span className='text-red-600'>{order.note}</span>
+                  </div>
+                )} */}
               </div>
+
+              {order.status === 'CANCELLED' && order.note && (
+                <div className='mt-4 p-3 bg-red-50 border border-red-100 rounded-md'>
+                  <div className='flex items-start gap-2'>
+                    <AlertCircle className='h-5 w-5 text-red-500 flex-shrink-0 mt-0.5' />
+
+                    <div>
+                      <h4 className='text-sm font-medium text-red-800'>Lý do hủy đơn</h4>
+
+                      <p className='text-sm text-red-700 mt-1'>{order.note}</p>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {canCancel && (
+                <div className='pt-2 space-y-3'>
+                  {/* Thêm button đổi phương thức thanh toán */}
+                  <Button
+                    className='w-full border border-primary/30 bg-primary/5 hover:bg-primary/10 hover:text-primary/80 text-primary flex items-center justify-center gap-2'
+                    variant='outline'
+                    onClick={handleUpdatePaymentMethod}
+                    disabled={updatePaymentMethodMutation.isPending}
+                  >
+                    {updatePaymentMethodMutation.isPending ? (
+                      <>
+                        <span className='h-4 w-4 animate-spin rounded-full border-2 border-primary border-r-transparent'></span>
+                        <span>Đang cập nhật...</span>
+                      </>
+                    ) : (
+                      <>
+                        {order.payMethod === 'COD' ? (
+                          <>
+                            <svg
+                              xmlns='http://www.w3.org/2000/svg'
+                              width='16'
+                              height='16'
+                              viewBox='0 0 24 24'
+                              fill='none'
+                              stroke='currentColor'
+                              strokeWidth='2'
+                              strokeLinecap='round'
+                              strokeLinejoin='round'
+                              className='lucide lucide-credit-card'
+                            >
+                              <rect width='20' height='14' x='2' y='5' rx='2' />
+                              <line x1='2' x2='22' y1='10' y2='10' />
+                            </svg>
+                            <span>Đổi sang chuyển khoản</span>
+                          </>
+                        ) : (
+                          <>
+                            <svg
+                              xmlns='http://www.w3.org/2000/svg'
+                              width='16'
+                              height='16'
+                              viewBox='0 0 24 24'
+                              fill='none'
+                              stroke='currentColor'
+                              strokeWidth='2'
+                              strokeLinecap='round'
+                              strokeLinejoin='round'
+                              className='lucide lucide-wallet'
+                            >
+                              <path d='M21 12V7H5a2 2 0 0 1 0-4h14v4' />
+                              <path d='M3 5v14a2 2 0 0 0 2 2h16v-5' />
+                              <path d='M18 12a2 2 0 0 0 0 4h4v-4Z' />
+                            </svg>
+                            <span>Đổi sang thanh toán COD</span>
+                          </>
+                        )}
+                      </>
+                    )}
+                  </Button>
+
+                  <CancelOrderDialog orderId={order.id} orderCode={order.orderCode} onCancelSuccess={() => {}} />
+                </div>
+              )}
             </CardContent>
           </Card>
         </div>

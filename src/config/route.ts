@@ -19,7 +19,8 @@ const configRoute = {
     address: '/setting/address',
     payment: '/setting/payment',
     notifications: '/setting/notifications',
-    security: '/setting/security'
+    security: '/setting/security',
+    childAccount: '/setting/child-account'
   },
   profile: '/profile',
   contentCreator: {
@@ -36,7 +37,9 @@ const configRoute = {
     dashboard: '/kid',
     course: '/kid/course',
     knowledge: '/kid/knowledge',
-    bookmark: '/kid/bookmark'
+    bookmark: '/kid/bookmark',
+    game: '/kid/game',
+    achievement: '/kid/achievement'
   }
 }
 

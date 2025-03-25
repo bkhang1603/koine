@@ -23,4 +23,4 @@ export function AvatarGroup({ className, children, ...props }: AvatarGroupProps)
       )}
     </div>
   )
-} 
+}

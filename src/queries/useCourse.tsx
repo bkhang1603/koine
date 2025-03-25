@@ -63,7 +63,7 @@ export const useActiveCourseMutation = () => {
     mutationFn: courseApiRequest.activeCourse,
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: ['userCourses']
+        queryKey: ['userCourses', 'account-store', 'courseProgress']
       })
     }
   })
@@ -102,5 +102,13 @@ export const useGetAllCoursesForCustomQuery = () => {
   return useQuery({
     queryKey: ['allCoursesForCustom'],
     queryFn: courseApiRequest.getAllCoursesForCustom
+  })
+}
+
+export const useGetPreviewLessonsQuery = ({ id, limit, enabled }: { id: string; limit: number; enabled?: boolean }) => {
+  return useQuery({
+    queryKey: ['preview', id, limit],
+    queryFn: () => courseApiRequest.getPreviewLessons({ id, limit }),
+    enabled
   })
 }

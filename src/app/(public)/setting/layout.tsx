@@ -13,7 +13,8 @@ import {
   KeyRound,
   Receipt,
   RefreshCcw,
-  BellRing
+  BellRing,
+  Star
 } from 'lucide-react'
 
 const sidebarNavItems: NavItem[] = [
@@ -72,6 +73,11 @@ const sidebarNavItems: NavItem[] = [
         title: 'Danh sách đơn hàng',
         icon: <Receipt className='h-4 w-4' />,
         href: '/setting/order'
+      },
+      {
+        title: 'Danh sách đánh giá',
+        icon: <Star className='h-4 w-4' />,
+        href: '/setting/need-review'
       },
       {
         title: 'Hoàn tiền & Đổi trả',

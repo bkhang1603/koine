@@ -14,6 +14,7 @@ import { Badge } from '@/components/ui/badge'
 import { Separator } from '@/components/ui/separator'
 import Link from 'next/link'
 import configRoute from '@/config/route'
+import { toast } from '@/components/ui/use-toast'
 
 function BellNotification() {
   const user = useAppStore((state) => state.user)
@@ -40,15 +41,8 @@ function BellNotification() {
       refetch()
     }
 
-    function login() {
-      socket.emit('login', {
-        userId: user?.id
-      })
-    }
-
     socket.on('connect', onConnect)
 
-    socket.on('login', login)
     socket.on('notification', getNotifications)
 
     socket.on('disconnect', onDisconnect)
@@ -56,7 +50,6 @@ function BellNotification() {
     return () => {
       socket.off('connect', onConnect)
 
-      socket.off('login', login)
       socket.off('notification', getNotifications)
 
       socket.off('disconnect', onDisconnect)
@@ -68,7 +61,20 @@ function BellNotification() {
 
   const handleMarkAllAsRead = async () => {
     try {
+      if (updateNotificationsMutation.isPending) return
+
+      const hasUnread = notifications.some((n) => !n.isRead)
+      if (!hasUnread) {
+        toast({
+          description: 'Không có thông báo nào chưa đọc'
+        })
+        return
+      }
+
       await updateNotificationsMutation.mutateAsync()
+      toast({
+        description: 'Tất cả thông báo đã được đánh dấu là đã đọc'
+      })
     } catch (error) {
       console.log(error)
     }
@@ -104,7 +110,7 @@ function BellNotification() {
         </div>
 
         {/* Notification List */}
-        <ScrollArea className='max-h-[400px]'>
+        <ScrollArea className='h-[400px] overflow-hidden'>
           {isLoading ? (
             <div className='p-4 space-y-4'>
               {[...Array(3)].map((_, i) => (
@@ -131,48 +137,44 @@ function BellNotification() {
               </p>
             </div>
           ) : (
-            <div>
-              {notifications.map((notification) => (
-                <div
-                  key={notification.id}
-                  className={`relative hover:bg-gray-50 transition-colors ${!notification.isRead ? 'bg-blue-50/40' : ''}`}
-                >
-                  <div className='p-4 flex gap-3'>
-                    {/* Notification icon */}
-                    <div
-                      className={`w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 ${
-                        !notification.isRead ? 'bg-primary/10 text-primary' : 'bg-gray-100 text-gray-500'
-                      }`}
-                    >
-                      <Bell className='h-5 w-5' />
-                    </div>
+            notifications.map((notification) => (
+              <div
+                key={notification.id}
+                className={`relative hover:bg-gray-50 transition-colors ${!notification.isRead ? 'bg-blue-50/40' : ''}`}
+              >
+                <div className='p-4 flex gap-3'>
+                  {/* Notification icon */}
+                  <div
+                    className={`w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 ${
+                      !notification.isRead ? 'bg-primary/10 text-primary' : 'bg-gray-100 text-gray-500'
+                    }`}
+                  >
+                    <Bell className='h-5 w-5' />
+                  </div>
 
-                    {/* Notification content */}
-                    <div className='flex-1 min-w-0'>
-                      <div className='flex justify-between items-start gap-2'>
-                        <h4 className='font-medium text-sm line-clamp-1'>{notification.title}</h4>
-                        {!notification.isRead && (
-                          <span className='w-2 h-2 rounded-full bg-primary flex-shrink-0'></span>
-                        )}
-                      </div>
-                      <p className='text-sm text-muted-foreground line-clamp-2 mt-0.5'>{notification.description}</p>
-                      <div className='flex items-center justify-between mt-1'>
-                        <p className='text-xs text-muted-foreground'>
-                          {format(new Date(notification.createdAt), 'dd/MM/yyyy HH:mm', { locale: vi })}
-                        </p>
-                        {notification.isRead && (
-                          <span className='text-xs text-green-600 flex items-center'>
-                            <CheckCircle2 className='h-3 w-3 mr-1' />
-                            Đã đọc
-                          </span>
-                        )}
-                      </div>
+                  {/* Notification content */}
+                  <div className='flex-1 min-w-0'>
+                    <div className='flex justify-between items-start gap-2'>
+                      <h4 className='font-medium text-sm line-clamp-1'>{notification.title}</h4>
+                      {!notification.isRead && <span className='w-2 h-2 rounded-full bg-primary flex-shrink-0'></span>}
+                    </div>
+                    <p className='text-sm text-muted-foreground line-clamp-2 mt-0.5'>{notification.description}</p>
+                    <div className='flex items-center justify-between mt-1'>
+                      <p className='text-xs text-muted-foreground'>
+                        {format(new Date(notification.createdAt), 'dd/MM/yyyy HH:mm', { locale: vi })}
+                      </p>
+                      {notification.isRead && (
+                        <span className='text-xs text-green-600 flex items-center'>
+                          <CheckCircle2 className='h-3 w-3 mr-1' />
+                          Đã đọc
+                        </span>
+                      )}
                     </div>
                   </div>
-                  <Separator />
                 </div>
-              ))}
-            </div>
+                <Separator />
+              </div>
+            ))
           )}
         </ScrollArea>
 

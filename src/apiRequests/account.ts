@@ -10,13 +10,19 @@ import {
   AccountResType,
   AccountStoreResType,
   CourseByAccountResType,
+  CourseDetailForChildResType,
+  CreateOrderNeedReviewBodyType,
+  ListChildAccountNeedReviewResType,
   ListChildAccountResType,
   MyChildAccountByIdResType,
   MyChildAccountResType,
+  ProfileChildResType,
   RegisterChildAccountBodyType,
   RegisterChildAccountResType,
-  SuggestCoursesFreeResType
+  SuggestCoursesFreeResType,
+  UpdateVisibleCourseForChildBodyType
 } from '@/schemaValidations/account.schema'
+import { OnlyMessageResType } from '@/schemaValidations/special.schema'
 
 const accountApiRequest = {
   getAccount: () => http.get<AccountResType>('/users/profile'),
@@ -50,7 +56,15 @@ const accountApiRequest = {
   updateAccountNotifications: () => http.put<AccountNotificationsResType>(`/notification/read`, {}),
   getAccountStore: () => http.get<AccountStoreResType>('/courses/my-store'),
   stillLearningCourse: () => http.get(`/user-progresses/still-learning`),
-  getListChildAccount: () => http.get<ListChildAccountResType>(`/users/my-child`)
+  getListChildAccount: () => http.get<ListChildAccountResType>(`/users/my-child`),
+  getListOrderNeedReview: () => http.get<ListChildAccountNeedReviewResType>('/orders/purchased-not-reviewed'),
+  createOrderNeedReview: (body: CreateOrderNeedReviewBodyType) =>
+    http.post<OnlyMessageResType>(`/orders/purchased-not-reviewed`, body),
+  updateVisibleCourseForChild: (body: UpdateVisibleCourseForChildBodyType) =>
+    http.put<OnlyMessageResType>(`/course-visibilities`, body),
+  getCourseDetailForChild: ({ courseId, childId }: { courseId: string; childId: string }) =>
+    http.get<CourseDetailForChildResType>(`/users/my-child-course-progress/${childId}/course/${courseId}`),
+  getChildProfile: () => http.get<ProfileChildResType>('users/profile-child')
 }
 
 export default accountApiRequest

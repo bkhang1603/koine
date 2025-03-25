@@ -6,16 +6,22 @@ import { Button } from '@/components/ui/button'
 import { XCircle, Home, RotateCcw } from 'lucide-react'
 import Link from 'next/link'
 import configRoute from '@/config/route'
+import { useRePurchaseOrderMutation } from '@/queries/useOrder'
+import { useAppStore } from '@/components/app-provider'
 
 function CancelPurchasePage() {
+  const orderId = useAppStore((state) => state.orderId)
   const searchParams = useSearchParams()
   const router = useRouter()
+  console.log(orderId)
 
   const code = searchParams.get('code')
-  const id = searchParams.get('id')
+  const id = searchParams.get('id') ?? ''
   const status = searchParams.get('status')
   const orderCode = searchParams.get('orderCode')
   const isCancel = searchParams.get('cancel') === 'true'
+
+  const rePurchaseOrderMutation = useRePurchaseOrderMutation()
 
   useEffect(() => {
     // Validate required params
@@ -23,16 +29,18 @@ function CancelPurchasePage() {
       router.push('/404')
       return
     }
-
-    // Handle cancel payment logic here
-    console.log({
-      code,
-      id,
-      status,
-      orderCode,
-      isCancel
-    })
   }, [code, id, status, orderCode, router, isCancel])
+
+  const handleRePurchaseOrder = async () => {
+    if (!orderId) return
+    if (rePurchaseOrderMutation.isPending) return
+
+    try {
+      await rePurchaseOrderMutation.mutateAsync({ id: orderId })
+    } catch (error) {
+      console.error(error)
+    }
+  }
 
   return (
     <div className='min-h-[100vh] flex items-center justify-center py-32'>
@@ -55,7 +63,7 @@ function CancelPurchasePage() {
         </div>
 
         <div className='space-y-3'>
-          <Button variant='default' className='w-full gap-2'>
+          <Button variant='default' className='w-full gap-2' onClick={handleRePurchaseOrder}>
             <RotateCcw className='h-4 w-4' />
             Thử lại thanh toán
           </Button>

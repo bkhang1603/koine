@@ -11,6 +11,7 @@ import {
   CategoryBlogResType
 } from '@/schemaValidations/blog.schema'
 import { ReactDataResType, UpdateReactDataType } from '@/schemaValidations/course.schema'
+import { OnlyMessageResType } from '@/schemaValidations/special.schema'
 
 const blogApiRequest = {
   getBlogs: ({
@@ -35,12 +36,12 @@ const blogApiRequest = {
     page_index?: number | undefined
     page_size?: number | undefined
   }) => http.get<BlogCommentsResType>(`/blog-comments/${id}?page_index=${page_index}&page_size=${page_size}`),
-  createBlogComment: (data: BlogCommentCreateReqType) => http.post('/blog-comments', data),
+  createBlogComment: (data: BlogCommentCreateReqType) => http.post<OnlyMessageResType>('/blog-comments', data),
   getReactComment: (id: string) => http.get<ReactDataResType>(`/blog-reacts/check/${id}`),
-  updateReactComment: (data: UpdateReactDataType) => http.post('/blog-reacts', data),
-  deleteBlogComment: (id: string) => http.delete(`/blog-comments/${id}`),
+  updateReactComment: (data: UpdateReactDataType) => http.post<OnlyMessageResType>('/blog-reacts', data),
+  deleteBlogComment: (id: string) => http.delete<OnlyMessageResType>(`/blog-comments/${id}`),
   updateBlogComment: ({ id, data }: { id: string; data: BlogCommentUpdateResType }) =>
-    http.put(`/blog-comments/${id}`, data),
+    http.put<OnlyMessageResType>(`/blog-comments/${id}`, data),
   getCategoryBlog: () => http.get<CategoryBlogResType>('/category-blogs'),
   getCategoryBlogDetail: (id: string) => http.get<CategoryBlogDetailResType>(`/category-blogs/${id}`),
   createCategoryBlog: (data: { name: string; description: string }) =>

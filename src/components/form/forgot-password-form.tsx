@@ -1,17 +1,19 @@
 'use client'
 
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 
 import { Button } from '@/components/ui/button'
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
-import { cn } from '@/lib/utils'
+import { cn, handleErrorApi } from '@/lib/utils'
 import { ForgotPasswordBody, ForgotPasswordBodyType } from '@/schemaValidations/auth.schema'
+import { useRequestResetPasswordMutation } from '@/queries/useAuth'
+import { toast } from '@/components/ui/use-toast'
 
 export default function ForgotPasswordForm({ className }: { className?: string }) {
-  const [loading, setLoading] = useState(false)
+  const requestResetMutation = useRequestResetPasswordMutation()
+
   const form = useForm<ForgotPasswordBodyType>({
     resolver: zodResolver(ForgotPasswordBody),
     defaultValues: {
@@ -22,8 +24,25 @@ export default function ForgotPasswordForm({ className }: { className?: string }
   // 2. Define a submit handler.
   // eslint-disable-next-line no-unused-vars
   async function onSubmit(values: ForgotPasswordBodyType) {
-    if (loading) return
-    setLoading(true)
+    console.log('values', values)
+
+    try {
+      if (requestResetMutation.isPending) return
+
+      await requestResetMutation.mutateAsync(values.email)
+
+      toast({
+        title: 'Email đã được gửi',
+        description: 'Vui lòng kiểm tra email của bạn để đặt lại mật khẩu'
+      })
+
+      form.reset()
+    } catch (error) {
+      handleErrorApi({
+        error,
+        setError: form.setError
+      })
+    }
   }
 
   return (

@@ -198,6 +198,19 @@ export const removeCheckoutBuyNowFromLocalStorage = () => {
   isBrowser && localStorage.removeItem('checkoutBuyNow')
 }
 
+export const setOrderIdToLocalStorage = (orderId: string) => {
+  isBrowser && localStorage.setItem('orderId', JSON.stringify(orderId))
+}
+
+export const getOrderIdFromLocalStorage = () => {
+  const data = isBrowser && localStorage.getItem('orderId')
+  return data ? JSON.parse(data) : null
+}
+
+export const removeOrderIdFromLocalStorage = () => {
+  isBrowser && localStorage.removeItem('orderId')
+}
+
 export const checkAndSetTokenToCookieByLoginGoogle = async ({
   accessToken,
   refreshToken,
@@ -290,4 +303,22 @@ export const changeTime = (createdAt: string) => {
   }
 
   return 'Vừa xong'
+}
+
+export const formatCurrency = (value: number) => {
+  return new Intl.NumberFormat('vi-VN', {
+    style: 'currency',
+    currency: 'VND'
+  }).format(value)
+}
+
+export const formatCurrencyWithoutSymbol = (value: number) => {
+  return new Intl.NumberFormat('vi-VN', {
+    style: 'currency',
+    currency: 'VND'
+  }).format(value)
+}
+
+export const formatDate = (date: string) => {
+  return format(new Date(date), 'dd/MM/yyyy')
 }

@@ -38,7 +38,7 @@ export default async function ProductDetail(props: { params: Promise<{ id: strin
             {product.categories && changeCategoriesToString(product.categories.map((category) => category.name))}
           </p>
           <h2 className='text-4xl mb-4'>{product.name}</h2>
-          <p className='text-2xl mb-4'>{product.price.toLocaleString()}đ</p>
+          <p className='text-2xl mb-4'>{(product.price - product.price * product.discount).toLocaleString()}đ</p>
 
           <p className='mb-6 line-clamp-3'>{product.description}</p>
 

@@ -9,6 +9,7 @@ import {
   RegisterResType,
   ResendOTPResType
 } from '@/schemaValidations/auth.schema'
+import { OnlyMessageResType } from '@/schemaValidations/special.schema'
 
 const authApiRequest = {
   refreshTokenRequest: null as Promise<{
@@ -55,7 +56,8 @@ const authApiRequest = {
   sendOTP: ({ id, code }: { id: string; code: string }) =>
     http.post<LoginResType>('/api/auth/otp', { id, code }, { baseUrl: '' }),
   sSendOTP: ({ id, code }: { id: string; code: string }) => http.post<LoginResType>('/auth/active', { id, code }),
-  resendOTP: (id: string) => http.post<ResendOTPResType>(`/auth/retry-active/${id}`, null)
+  resendOTP: (id: string) => http.post<ResendOTPResType>(`/auth/retry-active/${id}`, null),
+  requestResetPassword: (email: string) => http.post<OnlyMessageResType>('/auth/forgot-password/request', { email })
 }
 
 export default authApiRequest

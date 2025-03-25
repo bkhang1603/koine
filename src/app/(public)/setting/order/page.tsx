@@ -26,15 +26,15 @@ import { Pagination } from '@/components/pagination'
 type OrderStatus = 'PROCESSING' | 'DELIVERING' | 'CANCELLED' | 'COMPLETED'
 
 const statusColorMap = {
-  DELIVERING: 'bg-yellow-100 text-yellow-800',
   PROCESSING: 'bg-blue-100 text-blue-800',
+  DELIVERING: 'bg-yellow-100 text-yellow-800',
   COMPLETED: 'bg-green-100 text-green-800',
   CANCELLED: 'bg-red-100 text-red-800'
 } as const
 
 const statusTextMap = {
-  DELIVERING: 'Chờ xử lý',
   PROCESSING: 'Đang xử lý',
+  DELIVERING: 'Đang giao hàng',
   COMPLETED: 'Hoàn thành',
   CANCELLED: 'Đã hủy'
 } as const
@@ -50,7 +50,7 @@ export default function OrderPage() {
     page_size: pageSize
   })
 
-  const orders = data?.payload.data || []
+  const orders = data?.payload.data.orders || []
   const totalPages = data?.payload.pagination.totalPage ?? 1
 
   const handlePageChange = (page: number) => {

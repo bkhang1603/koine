@@ -37,6 +37,16 @@ export default function NotificationsPage() {
   // Đánh dấu đã đọc tất cả
   const handleMarkAllAsRead = async () => {
     try {
+      if (updateNotificationsMutation.isPending) return
+      // Kiểm tra xem có thông báo nào chưa đọc không
+      const hasUnread = notifications.some((n) => !n.isRead)
+      if (!hasUnread) {
+        toast({
+          description: 'Không có thông báo nào chưa đọc'
+        })
+        return
+      }
+
       await updateNotificationsMutation.mutateAsync()
       toast({
         description: 'Đã đánh dấu tất cả thông báo là đã đọc'

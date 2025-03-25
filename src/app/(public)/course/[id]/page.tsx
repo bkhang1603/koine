@@ -50,6 +50,8 @@ export default async function CourseDetail(props: { params: Promise<{ id: string
   const data = await wrapServerApi(() => courseApiRequest.getCourse(id))
   const courseData = data?.payload?.data
 
+  const limit = 2
+
   if (!courseData) {
     return <p>Không tìm thấy khóa học</p>
   }
@@ -185,12 +187,11 @@ export default async function CourseDetail(props: { params: Promise<{ id: string
               </TabsList>
 
               <TabsContent value='content'>
-                {/* Course Content/Lessons part - keep this exactly as it is */}
+                {/* Course Content/Lessons part */}
                 <div className='space-y-4'>
                   <h2 className='text-xl font-semibold'>Nội dung bài học</h2>
-                  {/* Your existing course content component/structure */}
                   <div className='space-y-3 sm:space-y-4'>
-                    {courseData.chapters.map((chapter, index) => (
+                    {courseData.chapters.map((chapter, chapterIndex) => (
                       <Card
                         key={chapter.id}
                         className='overflow-hidden border-none shadow-md hover:shadow-lg transition-shadow'
@@ -201,7 +202,7 @@ export default async function CourseDetail(props: { params: Promise<{ id: string
                               className='w-10 h-10 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl bg-primary/5 flex items-center justify-center 
                                   font-bold text-lg sm:text-xl text-primary'
                             >
-                              {String(index + 1).padStart(2, '0')}
+                              {String(chapterIndex + 1).padStart(2, '0')}
                             </div>
                             <div>
                               <h3 className='font-bold text-base sm:text-lg'>{chapter.title}</h3>
@@ -220,7 +221,8 @@ export default async function CourseDetail(props: { params: Promise<{ id: string
                                 <span className='font-medium text-sm sm:text-base text-gray-700'>{lesson.title}</span>
                               </div>
 
-                              {lessonIndex === 0 && (
+                              {/* Chỉ hiển thị nút Học thử cho các bài học đầu của chapter đầu tiên, giới hạn bởi limit */}
+                              {chapterIndex === 0 && lessonIndex < limit && (
                                 <TooltipProvider>
                                   <Tooltip>
                                     <TooltipTrigger asChild>

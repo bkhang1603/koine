@@ -1,4 +1,4 @@
-import { DeliveryMethodValues, OrderTypeValues } from '@/constants/type'
+import { DeliveryMethodValues, OrderStatusValues, OrderTypeValues, PaymentMethodValues } from '@/constants/type'
 import z from 'zod'
 
 export const orderBody = z
@@ -13,13 +13,21 @@ export const orderBody = z
   .strict()
 
 export const orderBodyRes = z.object({
-  data: z.string(),
+  data: z.object({
+    orderId: z.string(),
+    paymentLink: z.string()
+  }),
   message: z.string()
 })
 
 export const orderDetail = z
   .object({
     id: z.string(),
+    status: z.enum(OrderStatusValues),
+    payMethod: z.enum(PaymentMethodValues),
+    deliMethod: z.enum(DeliveryMethodValues),
+    deliAmount: z.number(),
+    note: z.string().nullable(),
     orderCode: z.string(),
     userId: z.string(),
     orderDate: z.string(),
@@ -79,6 +87,9 @@ export const orderBuyNow = z
     totalPrice: z.number(),
     discount: z.number(),
     isDeleted: z.boolean(),
+    payMethod: z.enum(PaymentMethodValues),
+    note: z.string().nullable(),
+    status: z.enum(OrderStatusValues),
     product: z
       .object({
         name: z.string(),
@@ -111,6 +122,26 @@ export const orderBuyNowRes = z.object({
   message: z.string()
 })
 
+export const cancelOrderBody = z.object({
+  note: z.string()
+})
+
+export const cancelOrderBodyRes = z.object({
+  message: z.string()
+})
+
+export const updatePaymentMethodBody = z.object({
+  payMethod: z.enum(PaymentMethodValues)
+})
+
+export const updatePaymentMethodBodyRes = z.object({
+  message: z.string()
+})
+
+export const rePurchaseOrderRes = z.object({
+  message: z.string()
+})
+
 export type OrderBody = z.infer<typeof orderBody>
 
 export type OrderBodyResType = z.TypeOf<typeof orderBodyRes>
@@ -122,3 +153,13 @@ export type OrderDetailResType = z.TypeOf<typeof orderDetailRes>
 export type OrderBuyNow = z.TypeOf<typeof orderBuyNow>
 
 export type OrderBuyNowResType = z.TypeOf<typeof orderBuyNowRes>
+
+export type CancelOrderBody = z.TypeOf<typeof cancelOrderBody>
+
+export type CancelOrderBodyRes = z.TypeOf<typeof cancelOrderBodyRes>
+
+export type UpdatePaymentMethodBody = z.TypeOf<typeof updatePaymentMethodBody>
+
+export type UpdatePaymentMethodBodyRes = z.TypeOf<typeof updatePaymentMethodBodyRes>
+
+export type RePurchaseOrderRes = z.TypeOf<typeof rePurchaseOrderRes>

@@ -294,6 +294,48 @@ export const AllCoursesForCustomRes = z.object({
   })
 })
 
+export const previewLessons = z.object({
+  course: z.object({
+    id: z.string(),
+    title: z.string(),
+    description: z.string(),
+    durations: z.number(),
+    durationsDisplay: z.string(),
+    imageUrl: z.string(),
+    imageBanner: z.string(),
+    totalChapters: z.number(),
+    totalLessons: z.number(),
+    price: z.number(),
+    rating: z.number()
+  }),
+  previewChapter: z.object({
+    id: z.string(),
+    title: z.string(),
+    description: z.string(),
+    sequence: z.number()
+  }),
+  previewLessons: z.array(
+    z.object({
+      id: z.string(),
+      title: z.string(),
+      description: z.string(),
+      durations: z.number(),
+      durationsDisplay: z.string(),
+      sequence: z.number(),
+      type: z.enum(TypeResourceValues),
+      content: z.string(),
+      videoUrl: z.string(),
+      status: z.string()
+    })
+  )
+})
+
+export const previewLessonsRes = z.object({
+  data: previewLessons,
+  message: z.string(),
+  statusCode: z.number()
+})
+
 export type CourseResType = z.infer<typeof CourseRes>
 
 export type CoursesResType = z.infer<typeof CoursesRes>
@@ -317,3 +359,5 @@ export type LessonResType = z.infer<typeof LessonRes>
 export type CourseReviewResType = z.infer<typeof CourseReviewRes>
 
 export type AllCoursesForCustomResType = z.infer<typeof AllCoursesForCustomRes>
+
+export type PreviewLessonsResType = z.infer<typeof previewLessonsRes>

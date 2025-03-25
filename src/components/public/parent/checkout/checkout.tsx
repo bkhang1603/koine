@@ -14,11 +14,13 @@ import configRoute from '@/config/route'
 import { useGetAccountAddress } from '@/queries/useAccount'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { useCreateOrderMutation } from '@/queries/useOrder'
-import { DeliveryMethod } from '@/constants/type'
+import { DeliveryMethod, PaymentMethod } from '@/constants/type'
 import { useRouter } from 'next/navigation'
-import { getCheckoutBuyNowFromLocalStorage, getCheckoutDataFromLocalStorage } from '@/lib/utils'
+import { getCheckoutBuyNowFromLocalStorage, getCheckoutDataFromLocalStorage, handleErrorApi } from '@/lib/utils'
+import { toast } from '@/components/ui/use-toast'
 
 export default function Checkout() {
+  const setOrderId = useAppStore((state) => state.setOrderId)
   const checkoutData = useAppStore((state) => state.checkoutData)
   const checkoutBuyNow = useAppStore((state) => state.checkoutBuyNow)
   const pickAddress = useAppStore((state) => state.pickAddress)
@@ -45,6 +47,7 @@ export default function Checkout() {
   const [shippingMethod, setShippingMethod] = useState<(typeof DeliveryMethod)[keyof typeof DeliveryMethod]>(
     DeliveryMethod.STANDARD
   )
+  const [payMethod, setPayMethod] = useState<(typeof PaymentMethod)[keyof typeof PaymentMethod]>(PaymentMethod.COD)
 
   // Set selectedAddressId after addresses are loaded
   useEffect(() => {
@@ -72,17 +75,36 @@ export default function Checkout() {
           ? 'COURSE'
           : checkoutBuyNow?.combo !== null
             ? 'COMBO'
-            : null) as 'PRODUCT' | 'COURSE' | 'COMBO' | null
+            : null) as 'PRODUCT' | 'COURSE' | 'COMBO' | null,
+      payMethod
     }
 
     try {
       const res = await createOrderMutation.mutateAsync(orderData)
 
-      if (res) {
-        router.push(res.payload.data)
+      if (res && res.payload.data && typeof res.payload.data.paymentLink === 'string') {
+        // Xử lý trường hợp paymentLink có thể là null hoặc không phải string
+        if (res.payload.data.paymentLink) {
+          setOrderId(res.payload.data.orderId)
+
+          router.push(res.payload.data.paymentLink)
+        } else {
+          // Nếu không có link thanh toán, chuyển hướng đến trang lịch sử đơn hàng
+          router.push(configRoute.setting.order)
+        }
+      } else {
+        // Xử lý khi không có res hoặc data không đúng format
+        toast({
+          title: 'Đặt hàng thành công',
+          description: 'Đơn hàng của bạn đã được tạo',
+          variant: 'success'
+        })
+        router.push(configRoute.setting.order)
       }
     } catch (error) {
-      console.log(error)
+      handleErrorApi({
+        error
+      })
     }
   }
 
@@ -205,17 +227,18 @@ export default function Checkout() {
           <Card>
             <CardContent className='p-4'>
               <h2 className='font-medium mb-4'>Phương thức thanh toán</h2>
-              <RadioGroup defaultValue='qr'>
+              <RadioGroup
+                value={payMethod}
+                onValueChange={(value: (typeof PaymentMethod)[keyof typeof PaymentMethod]) => setPayMethod(value)}
+              >
                 <div className='flex items-center space-x-2 mb-2'>
-                  <RadioGroupItem value='qr' id='qr' />
-                  <Label htmlFor='qr'>Thanh toán qua mã QR</Label>
+                  <RadioGroupItem value='BANKING' id='BANKING' />
+                  <Label htmlFor='BANKING'>Thanh toán qua ngân hàng</Label>
                 </div>
 
                 <div className='flex items-center space-x-2 mb-2'>
-                  <RadioGroupItem value='cod' id='cod' disabled />
-                  <Label htmlFor='cod' className='text-gray-400'>
-                    Thanh toán khi nhận hàng (Hiện không hỗ trợ)
-                  </Label>
+                  <RadioGroupItem value='COD' id='COD' />
+                  <Label htmlFor='COD'>Thanh toán khi nhận hàng</Label>
                 </div>
               </RadioGroup>
             </CardContent>

@@ -3,7 +3,12 @@
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
-import { useGetCourseProgressQuery, useGetLessonQuery, useUpdateCourseProgressMutation } from '@/queries/useCourse'
+import {
+  useGetCourseProgressQuery,
+  useGetLessonQuery,
+  useGetPreviewLessonsQuery,
+  useUpdateCourseProgressMutation
+} from '@/queries/useCourse'
 import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { handleErrorApi } from '@/lib/utils'
@@ -17,6 +22,7 @@ import { NavigationButtons } from '@/components/learn/NavigationButtons'
 import { LoadingSkeleton } from '@/components/learn/LoadingSkeleton'
 import { AlertTriangle } from 'lucide-react'
 import { useGetStillLearningCourse } from '@/queries/useAccount'
+import { toast } from '@/components/ui/use-toast'
 
 type Lesson = UserCourseProgressResType['data']['chapters'][0]['lessons'][0]
 
@@ -72,40 +78,61 @@ function LearnPage(props: { params: Promise<{ id: string }> }) {
 
   const updateCourseMutation = useUpdateCourseProgressMutation()
   const { data, isLoading } = useGetCourseProgressQuery({ id })
-  const { data: lessonData, isLoading: lessonLoading } = useGetLessonQuery({ id: lessonId!, enabled: !!lessonId })
+
+  // Lesson data query chỉ gọi khi KHÔNG ở chế độ preview
+  const { data: lessonData, isLoading: lessonLoading } = useGetLessonQuery({
+    id: lessonId!,
+    enabled: !!lessonId && !isPreviewMode
+  })
+
+  // Preview lessons data query chỉ gọi khi ở chế độ preview
+  const { data: previewData, isLoading: previewLoading } = useGetPreviewLessonsQuery({
+    id,
+    limit: 3,
+    enabled: isPreviewMode
+  })
 
   const course = data?.payload.data || null
-  const lesson = lessonData?.payload.data || null
 
-  const { refetch: refetchStillLearning } = useGetStillLearningCourse()
+  // Nếu ở chế độ preview, lấy lesson từ previewData, ngược lại dùng lessonData
+  const lesson = isPreviewMode
+    ? previewData?.payload.data?.previewLessons?.find((lesson) => lesson.id === lessonId)
+    : lessonData?.payload.data || null
+
+  // Xác định trạng thái loading tổng hợp cho phần nội dung bài học
+  const isLessonLoading = isPreviewMode ? previewLoading : lessonLoading
+
+  const { refetch: refetchStillLearning, isError } = useGetStillLearningCourse({ enabled: !isPreviewMode })
   const refetchIntervalRef = useRef<NodeJS.Timeout | null>(null)
 
   useEffect(() => {
-    // Gọi refetch ngay lập tức khi component mount
-    refetchStillLearning()
-    console.log('Initial refetch at:', new Date().toLocaleTimeString())
-
-    // Clear previous interval if exists
-    if (refetchIntervalRef.current) {
-      clearInterval(refetchIntervalRef.current)
-    }
-
-    // Set new interval
-    const intervalTime = 300000 // 30 seconds for testing, change to 300000 (5 minutes) in production
-    refetchIntervalRef.current = setInterval(() => {
+    // Chỉ setup interval và gọi refetch khi không ở chế độ preview
+    if (!isPreviewMode) {
+      // Gọi refetch ngay lập tức khi component mount
       refetchStillLearning()
-      console.log('Interval refetch at:', new Date().toLocaleTimeString())
-    }, intervalTime)
+      console.log('Initial refetch at:', new Date().toLocaleTimeString())
+
+      // Clear previous interval if exists
+      if (refetchIntervalRef.current) {
+        clearInterval(refetchIntervalRef.current)
+      }
+
+      // Set new interval
+      const intervalTime = 300000
+      refetchIntervalRef.current = setInterval(() => {
+        refetchStillLearning()
+        console.log('Interval refetch at:', new Date().toLocaleTimeString())
+      }, intervalTime)
+    }
 
     // Cleanup on unmount
     return () => {
-      console.log('Cleaning up interval at:', new Date().toLocaleTimeString())
       if (refetchIntervalRef.current) {
         clearInterval(refetchIntervalRef.current)
         refetchIntervalRef.current = null
       }
     }
-  }, [refetchStillLearning])
+  }, [refetchStillLearning, isPreviewMode])
 
   // Auto-select first lesson when course data is loaded and no lessonId is provided
   useEffect(() => {
@@ -179,6 +206,16 @@ function LearnPage(props: { params: Promise<{ id: string }> }) {
     [id, router, course]
   )
 
+  // Xử lý khi có lỗi
+  useEffect(() => {
+    if (isError) {
+      toast({
+        title: 'Hiện đang có thiết bị khác đang học khóa học này',
+        variant: 'destructive'
+      })
+    }
+  }, [isError])
+
   // Render preview UI overlay when in preview mode
   if (isPreviewMode) {
     return (
@@ -204,7 +241,7 @@ function LearnPage(props: { params: Promise<{ id: string }> }) {
             <div className='flex-1 overflow-y-auto'>
               <div className='p-8'>
                 <div className='max-w-4xl mx-auto'>
-                  {lessonLoading ? (
+                  {isLessonLoading ? (
                     <div className='space-y-6'>
                       <Skeleton className='h-10 w-2/3' />
                       <Skeleton className='h-4 w-full' />
@@ -291,7 +328,7 @@ function LearnPage(props: { params: Promise<{ id: string }> }) {
           <div className='flex-1 overflow-y-auto'>
             <div className='p-8'>
               <div className='max-w-4xl mx-auto'>
-                {lessonLoading ? (
+                {isLessonLoading ? (
                   <div className='space-y-6'>
                     <Skeleton className='h-10 w-2/3' />
                     <Skeleton className='h-4 w-full' />
