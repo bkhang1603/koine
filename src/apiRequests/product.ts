@@ -2,6 +2,8 @@ import http from '@/lib/http'
 import { GetProductDetailAdminResType, GetProductListAdminResType } from '@/schemaValidations/admin.schema'
 import {
   CategoryProductsResType,
+  CreateProductBodyType,
+  CreateProductResType,
   ProductResType,
   ProductReviewsResType,
   ProductsResType
@@ -27,7 +29,7 @@ const productApiRequest = {
       `/products?page_index=${page_index}&page_size=${page_size}&keyword=${search}&range=${range}&category=${category}&sort=${sort}`
     ),
   getProduct: (id: string) => http.get<ProductResType>(`/products/${id}`),
-  createProduct: (data: any) => http.post('/products', data),
+  createProduct: (data: CreateProductBodyType) => http.post<CreateProductResType>('/products', data),
   updateProduct: (id: string, data: any) => http.put(`/products/${id}`, data),
   deleteProduct: (id: string) => http.delete(`/products/${id}`),
   getCategoryProducts: () => http.get<CategoryProductsResType>('/category-products'),

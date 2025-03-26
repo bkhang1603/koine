@@ -1,5 +1,6 @@
 import productApiRequest from '@/apiRequests/product'
-import { useQuery } from '@tanstack/react-query'
+import { useQuery, useMutation } from '@tanstack/react-query'
+import { CreateProductBodyType, CreateProductResType } from '@/schemaValidations/product.schema'
 
 export const useGetCategoryProductsQuery = () => {
   return useQuery({
@@ -56,5 +57,11 @@ export const useProductDetailAdminQuery = ({ productId }: { productId: string })
     queryKey: ['product-detail', productId],
     queryFn: () => productApiRequest.getProductDetailAdmin(productId),
     enabled: !!productId
+  })
+}
+
+export const useCreateProductMutation = () => {
+  return useMutation({
+    mutationFn: (data: CreateProductBodyType) => productApiRequest.createProduct(data)
   })
 }
