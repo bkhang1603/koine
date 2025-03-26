@@ -1,4 +1,5 @@
 import http from '@/lib/http'
+import { GetCourseDetailAdminResType, GetCoursesListAdminResType } from '@/schemaValidations/admin.schema'
 import {
   AllCoursesForCustomResType,
   CategoryCoursesResType,
@@ -49,7 +50,19 @@ const courseApiRequest = {
   getLessons: (id: string) => http.get<LessonsResType>(`/lessons/${id}`),
   getLesson: (id: string) => http.get<LessonResType>(`/lessons/detail/${id}`),
   getCourseReview: (id: string) => http.get<CourseReviewResType>(`/courses/${id}/reviews`),
-  getAllCoursesForCustom: () => http.get<AllCoursesForCustomResType>(`/courses/all-basic-course-info`)
+  getAllCoursesForCustom: () => http.get<AllCoursesForCustomResType>(`/courses/all-basic-course-info`),
+  getCoursesAdmin: ({
+    page_index,
+    page_size,
+    keyword
+  }: {
+    page_index?: number | undefined
+    page_size?: number | undefined
+    keyword?: string | string[] | undefined
+  }) =>
+    http.get<GetCoursesListAdminResType>(`/courses?page_index=${page_index}&page_size=${page_size}&keyword=${keyword}`),
+  getCourseDetailAdmin: ({ courseId }: { courseId: string }) =>
+    http.get<GetCourseDetailAdminResType>(`courses/${courseId}`)
 }
 
 export default courseApiRequest

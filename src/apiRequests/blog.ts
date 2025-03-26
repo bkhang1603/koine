@@ -1,4 +1,5 @@
 import http from '@/lib/http'
+import { GetBlogCommentsAdminResType, GetBlogDetailAdminResType, GetBlogsListAdminResType } from '@/schemaValidations/admin.schema'
 import {
   BlogBodyResType,
   BlogCommentCreateReqType,
@@ -47,7 +48,18 @@ const blogApiRequest = {
     http.post<CategoryBlogDetailResType>('/category-blogs', data),
   updateCategoryBlog: ({ id, data }: { id: string; data: { name: string; description: string } }) =>
     http.put<CategoryBlogDetailResType>(`/category-blogs/${id}`, data),
-  deleteCategoryBlog: (id: string) => http.delete<CategoryBlogDetailResType>(`/category-blogs/${id}`)
+  deleteCategoryBlog: (id: string) => http.delete<CategoryBlogDetailResType>(`/category-blogs/${id}`),
+  getBlogsListAdmin: ({
+    page_index,
+    page_size,
+    keyword
+  }: {
+    page_index?: number | undefined
+    page_size?: number | undefined
+    keyword?: string | string[] | undefined
+  }) => http.get<GetBlogsListAdminResType>(`/blogs?page_index=${page_index}&page_size=${page_size}&keyword=${keyword}`),
+  getBlogDetailAdmin: (id: string) => http.get<GetBlogDetailAdminResType>(`/blogs/${id}`),
+  getBlogCommentsAdmin: (id: string) => http.get<GetBlogCommentsAdminResType>(`/blog-comments/${id}`)
 }
 
 export default blogApiRequest

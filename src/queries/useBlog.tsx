@@ -191,3 +191,32 @@ export const useCategoryBlogDeleteMutation = () => {
     }
   })
 }
+
+export const useBlogListAdminQuery = ({
+  page_index,
+  page_size,
+  keyword
+}: {
+  page_index?: number | undefined
+  page_size?: number | undefined
+  keyword?: string | string[] | undefined
+}) => {
+  return useQuery({
+    queryKey: ['blogsAdmin', page_index, page_size, keyword],
+    queryFn: () => blogApiRequest.getBlogsListAdmin({ page_index, page_size, keyword })
+  })
+}
+
+export const useBlogDetailAdminQuery = ({ id }: { id: string }) => {
+  return useQuery({
+    queryKey: ['blogDetailAdmin', id],
+    queryFn: () => blogApiRequest.getBlogDetailAdmin(id)
+  })
+}
+
+export const useBlogCommentsAdminQuery = ({ id }: { id: string }) => {
+  return useQuery({
+    queryKey: ['blogCommentsAdmin', id],
+    queryFn: () => blogApiRequest.getBlogCommentsAdmin(id)
+  })
+}

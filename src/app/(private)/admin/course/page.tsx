@@ -1,8 +1,8 @@
 'use client'
 
-import { use, useEffect, useMemo, useState } from 'react'
+import { use, useEffect, useMemo } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { BookOpen, MessageSquare, BarChart, Calendar, ThumbsUp, User } from 'lucide-react'
+import { BookOpen, Users, Star, GraduationCap, User, ShieldCheck, Calendar } from 'lucide-react'
 import { TableCustom, dataListType } from '@/components/table-custom'
 import configRoute from '@/config/route'
 import { SearchParams } from '@/types/query'
@@ -11,24 +11,22 @@ import { Badge } from '@/components/ui/badge'
 import { format } from 'date-fns'
 import { vi } from 'date-fns/locale'
 import { Input } from '@/components/ui/input'
-import { MoreOptions } from '@/components/private/admin/blog/more-options'
-import { useBlogListAdminQuery } from '@/queries/useBlog'
+import { MoreOptions } from '@/components/private/admin/course/more-options'
+import { useCoursesAdminQuery } from '@/queries/useCourse'
 import { Skeleton } from '@/components/ui/skeleton'
 import Image from 'next/image'
 
-function AdminBlog(props: { searchParams: SearchParams }) {
+function AdminCourse(props: { searchParams: SearchParams }) {
   const searchParams = use(props.searchParams)
   const router = useRouter()
   const pathname = usePathname()
 
-  // Get values from searchParams or use default values
+  // Lấy giá trị từ searchParams hoặc sử dụng giá trị mặc định
   const currentKeyword = (searchParams.keyword as string) || ''
   const currentPageSize = Number(searchParams.page_size) || 5
   const currentPageIndex = Number(searchParams.page_index) || 1
 
-  const [showAllCategories, setShowAllCategories] = useState(false)
-
-  // Function to update URL when values change
+  // Hàm để cập nhật URL khi thay đổi các giá trị
   const updateSearchParams = (newParams: { keyword?: string; page_size?: number; page_index?: number }) => {
     const params = new URLSearchParams(searchParams as Record<string, string>)
 
@@ -51,12 +49,12 @@ function AdminBlog(props: { searchParams: SearchParams }) {
     router.push(`${pathname}?${params.toString()}`)
   }
 
-  // Call API with URL values
+  // Gọi API với giá trị từ URL
   const {
     data: responseData,
     isLoading,
     error
-  } = useBlogListAdminQuery({
+  } = useCoursesAdminQuery({
     keyword: currentKeyword,
     page_size: currentPageSize,
     page_index: currentPageIndex
@@ -64,10 +62,10 @@ function AdminBlog(props: { searchParams: SearchParams }) {
 
   useEffect(() => {
     if (responseData) {
-      console.log('Blog data from admin:', responseData)
+      console.log('Dữ liệu khóa học từ admin:', responseData)
     }
     if (error) {
-      console.error('Error loading blogs:', error)
+      console.error('Lỗi khi tải khóa học:', error)
     }
   }, [responseData, error])
 
@@ -80,12 +78,13 @@ function AdminBlog(props: { searchParams: SearchParams }) {
     maxPageSize: 0
   }
 
-  // Column configuration for the table
+  // Cấu hình cột cho bảng
   const headerColumn = [
-    { id: 1, name: 'Tiêu đề bài viết' },
-    { id: 2, name: 'Tác giả' },
-    { id: 4, name: 'Lượt thích' },
-    { id: 5, name: 'Bình luận' },
+    { id: 1, name: 'Tên khóa học' },
+    { id: 2, name: 'Người tạo' },
+    { id: 3, name: 'Người duyệt' },
+    { id: 4, name: 'Đánh giá' },
+    { id: 5, name: 'Số người học' },
     { id: 6, name: 'Trạng thái' },
     { id: 7, name: 'Ngày tạo' },
     { id: 8, name: '' }
@@ -95,12 +94,12 @@ function AdminBlog(props: { searchParams: SearchParams }) {
     () => [
       {
         id: 1,
-        render: (blog: any) => (
+        render: (course: any) => (
           <div className='flex items-center gap-3 min-w-[300px] max-w-[400px]'>
             <div className='relative h-12 w-12 flex-shrink-0'>
               <Image
-                src={blog.imageUrl}
-                alt={`Hình ảnh bài viết ${blog.title}`}
+                src={course.imageUrl}
+                alt={course.title}
                 fill
                 className='rounded-md object-cover'
                 sizes='48px'
@@ -108,62 +107,72 @@ function AdminBlog(props: { searchParams: SearchParams }) {
               />
             </div>
             <div className='space-y-0.5 overflow-hidden'>
-              <div className='font-medium truncate'>{blog.title}</div>
-              <div className='text-xs text-muted-foreground line-clamp-1'>{blog.description}</div>
+              <div className='font-medium truncate'>{course.title}</div>
+              <div className='text-xs text-muted-foreground line-clamp-1'>{course.description}</div>
             </div>
           </div>
         )
       },
       {
         id: 2,
-        render: (blog: any) => (
+        render: (course: any) => (
           <div className='min-w-[120px]'>
-            <div className='text-sm'>{blog.creatorInfo.firstName}</div>
+            <div className='text-sm'>{course.creator.username}</div>
+          </div>
+        )
+      },
+      {
+        id: 3,
+        render: (course: any) => (
+          <div className='min-w-[120px]'>
+            <div className='text-sm'>{course.censor?.username || 'Chưa được duyệt'}</div>
           </div>
         )
       },
       {
         id: 4,
-        render: (blog: any) => (
+        render: (course: any) => (
           <div className='flex items-center min-w-[80px]'>
-            <span className='text-sm font-medium'>{blog.totalReact}</span>
+            <span className='text-sm font-medium'>
+              {course.aveRating.toFixed(1) == 0 ? 5 : course.aveRating.toFixed(1)}
+            </span>
           </div>
         )
       },
       {
         id: 5,
-        render: (blog: any) => (
+        render: (course: any) => (
           <div className='flex items-center min-w-[100px]'>
-            <span className='text-sm font-medium'>{blog.totalComment}</span>
+            <span className='text-sm font-medium'>{course.totalEnrollment}</span>
           </div>
         )
       },
       {
         id: 6,
-        render: (blog: any) => (
+        render: (course: any) => (
           <div className='flex items-center min-w-[100px]'>
-            <Badge variant={blog.status === 'VISIBLE' ? 'green' : 'secondary'} className='w-fit'>
-              {blog.status === 'VISIBLE' ? 'Đã xuất bản' : 'Bản nháp'}
+            <Badge variant={course.isBanned ? 'destructive' : 'green'} className='w-fit'>
+              {course.isBanned ? 'Đã khóa' : 'Hoạt động'}
             </Badge>
           </div>
         )
       },
       {
         id: 7,
-        render: (blog: any) => (
+        render: (course: any) => (
           <div className='min-w-[120px]'>
-            <div className='text-sm'>{format(new Date(blog.createdAt), 'dd/MM/yyyy', { locale: vi })}</div>
+            <div className='text-sm'>{format(new Date(course.createdAt), 'dd/MM/yyyy', { locale: vi })}</div>
             <div className='text-xs text-muted-foreground'>
-              {format(new Date(blog.createdAt), 'HH:mm', { locale: vi })}
+              {format(new Date(course.createdAt), 'HH:mm', { locale: vi })}
             </div>
           </div>
         )
       },
       {
         id: 8,
-        render: (blog: any) => (
+        render: (course: any) => (
           <div className='flex justify-end min-w-[40px]'>
-            <MoreOptions type='blog' onView={() => router.push(`/admin/blog/${blog.id}`)} />
+            <MoreOptions type='course' onView={() => router.push(`/admin/course/${course.id}`)} />
           </div>
         )
       }
@@ -177,21 +186,24 @@ function AdminBlog(props: { searchParams: SearchParams }) {
     pagination
   }
 
-  // Calculate statistics
-  const totalBlogs = pagination.totalItem || 0
-  const totalReacts = data.reduce((sum: number, blog: any) => sum + blog.totalReact, 0)
-  const totalComments = data.reduce((sum: number, blog: any) => sum + blog.totalComment, 0)
-  const publishedBlogs = data.filter((blog: any) => blog.status === 'VISIBLE').length
+  // Tính toán thống kê
+  const totalCourses = pagination.totalItem || 0
+  const totalEnrollments = data.reduce((sum: number, course: any) => sum + course.totalEnrollment, 0)
+  const averageRating =
+    data.length > 0
+      ? (data.reduce((sum: number, course: any) => sum + course.aveRating, 0) / data.length).toFixed(1)
+      : 0
+  const bannedCourses = data.filter((course: any) => course.isBanned).length
 
   return (
     <div className='container mx-auto px-4 py-6 space-y-6'>
       {/* Header */}
       <div>
-        <h1 className='text-2xl font-bold'>Quản lý bài viết</h1>
-        <p className='text-muted-foreground mt-1'>Quản lý và theo dõi tất cả bài viết trong hệ thống</p>
+        <h1 className='text-2xl font-bold'>Quản lý khóa học</h1>
+        <p className='text-muted-foreground mt-1'>Quản lý và theo dõi tất cả khóa học trong hệ thống</p>
       </div>
 
-      {/* Stats Cards with Skeleton */}
+      {/* Stats Cards với Skeleton */}
       <div className='grid grid-cols-1 md:grid-cols-4 gap-4'>
         {isLoading ? (
           // Stats Cards Skeleton
@@ -212,42 +224,42 @@ function AdminBlog(props: { searchParams: SearchParams }) {
           <>
             <Card>
               <CardHeader className='flex flex-row items-center justify-between pb-2'>
-                <CardTitle className='text-sm font-medium'>Tổng bài viết</CardTitle>
+                <CardTitle className='text-sm font-medium'>Tổng khóa học</CardTitle>
                 <BookOpen className='h-4 w-4 text-muted-foreground' />
               </CardHeader>
               <CardContent>
-                <div className='text-2xl font-bold'>{totalBlogs}</div>
-                <p className='text-xs text-muted-foreground'>Số lượng bài viết trong hệ thống</p>
+                <div className='text-2xl font-bold'>{totalCourses}</div>
+                <p className='text-xs text-muted-foreground'>Số lượng khóa học trong hệ thống</p>
               </CardContent>
             </Card>
             <Card>
               <CardHeader className='flex flex-row items-center justify-between pb-2'>
-                <CardTitle className='text-sm font-medium'>Tổng lượt thích</CardTitle>
-                <ThumbsUp className='h-4 w-4 text-muted-foreground' />
+                <CardTitle className='text-sm font-medium'>Tổng lượt đăng ký</CardTitle>
+                <Users className='h-4 w-4 text-muted-foreground' />
               </CardHeader>
               <CardContent>
-                <div className='text-2xl font-bold'>{totalReacts}</div>
-                <p className='text-xs text-muted-foreground'>Số lượt thích của tất cả bài viết</p>
+                <div className='text-2xl font-bold'>{totalEnrollments}</div>
+                <p className='text-xs text-muted-foreground'>Số lượt đăng ký khóa học</p>
               </CardContent>
             </Card>
             <Card>
               <CardHeader className='flex flex-row items-center justify-between pb-2'>
-                <CardTitle className='text-sm font-medium'>Tổng bình luận</CardTitle>
-                <MessageSquare className='h-4 w-4 text-muted-foreground' />
+                <CardTitle className='text-sm font-medium'>Đánh giá trung bình</CardTitle>
+                <Star className='h-4 w-4 text-muted-foreground' />
               </CardHeader>
               <CardContent>
-                <div className='text-2xl font-bold'>{totalComments}</div>
-                <p className='text-xs text-muted-foreground'>Số bình luận của tất cả bài viết</p>
+                <div className='text-2xl font-bold'>{averageRating}</div>
+                <p className='text-xs text-muted-foreground'>Điểm đánh giá trung bình</p>
               </CardContent>
             </Card>
             <Card>
               <CardHeader className='flex flex-row items-center justify-between pb-2'>
-                <CardTitle className='text-sm font-medium'>Bài viết đã xuất bản</CardTitle>
-                <BarChart className='h-4 w-4 text-muted-foreground' />
+                <CardTitle className='text-sm font-medium'>Khóa học bị khóa</CardTitle>
+                <GraduationCap className='h-4 w-4 text-muted-foreground' />
               </CardHeader>
               <CardContent>
-                <div className='text-2xl font-bold'>{publishedBlogs}</div>
-                <p className='text-xs text-muted-foreground'>Số bài viết đã được xuất bản</p>
+                <div className='text-2xl font-bold'>{bannedCourses}</div>
+                <p className='text-xs text-muted-foreground'>Số khóa học đang bị khóa</p>
               </CardContent>
             </Card>
           </>
@@ -257,7 +269,7 @@ function AdminBlog(props: { searchParams: SearchParams }) {
       {/* Search */}
       <div className='flex flex-col sm:flex-row gap-4'>
         <Input
-          placeholder='Tìm kiếm bài viết...'
+          placeholder='Tìm kiếm khóa học...'
           className='w-full sm:w-[300px]'
           value={currentKeyword}
           onChange={(e) => updateSearchParams({ keyword: e.target.value, page_index: 1 })}
@@ -269,11 +281,11 @@ function AdminBlog(props: { searchParams: SearchParams }) {
         data={tableData}
         headerColumn={headerColumn}
         bodyColumn={bodyColumn}
-        href={configRoute.admin.blog}
+        href={configRoute.admin.course}
         loading={isLoading}
       />
     </div>
   )
 }
 
-export default AdminBlog
+export default AdminCourse

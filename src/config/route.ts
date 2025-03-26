@@ -37,6 +37,14 @@ const configRoute = {
     course: '/kid/course',
     knowledge: '/kid/knowledge',
     bookmark: '/kid/bookmark'
+  },
+  admin: {
+    dashboard: '/admin',
+    order: '/admin/order',
+    course: '/admin/course',
+    blog: '/admin/blog',
+    product: '/admin/product',
+    user: '/admin/user'
   }
 }
 

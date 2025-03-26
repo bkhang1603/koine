@@ -1,4 +1,5 @@
 import http from '@/lib/http'
+import { GetProductDetailAdminResType, GetProductListAdminResType } from '@/schemaValidations/admin.schema'
 import {
   CategoryProductsResType,
   ProductResType,
@@ -43,7 +44,20 @@ const productApiRequest = {
   }) =>
     http.get<ProductReviewsResType>(
       `/products/${id}/reviews?star=${star}&page_index=${page_index}&page_size=${page_size}`
-    )
+    ),
+  getProductListAdmin: ({
+    page_index,
+    page_size,
+    keyword
+  }: {
+    page_index?: number | undefined
+    page_size?: number | undefined
+    keyword?: string | string[] | undefined
+  }) =>
+    http.get<GetProductListAdminResType>(
+      `/products?page_index=${page_index}&page_size=${page_size}&keyword=${keyword}`
+    ),
+  getProductDetailAdmin: (id: string) => http.get<GetProductDetailAdminResType>(`/products/${id}`)
 }
 
 export default productApiRequest

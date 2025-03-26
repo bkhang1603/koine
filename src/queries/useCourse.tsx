@@ -104,3 +104,34 @@ export const useGetAllCoursesForCustomQuery = () => {
     queryFn: courseApiRequest.getAllCoursesForCustom
   })
 }
+
+export const useCoursesAdminQuery = ({
+  keyword,
+  page_size,
+  page_index
+}: {
+  keyword: string
+  page_size: number
+  page_index: number
+}) => {
+  return useQuery({
+    queryKey: ['courses', keyword, page_size, page_index],
+    queryFn: () =>
+      courseApiRequest.getCoursesAdmin({
+        keyword,
+        page_size,
+        page_index
+      })
+  })
+}
+
+export const useCourseDetailAdminQuery = ({ courseId }: { courseId: string }) => {
+  return useQuery({
+    queryKey: ['course-detail', courseId],
+    queryFn: () =>
+      courseApiRequest.getCourseDetailAdmin({
+        courseId
+      }),
+    enabled: !!courseId
+  })
+}
