@@ -13,7 +13,7 @@ function LoginPage() {
   return (
     <section className='min-h-screen flex flex-col'>
       {/* Logo header */}
-      <div className='container min-h-[80px] flex items-center relative z-10'>
+      <div className='container min-h-[100px] flex items-center relative z-10'>
         <Link href={configRoute.home}>
           <Image src={icons.logo} alt='Koine logo' width={100} height={100} />
         </Link>

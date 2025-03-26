@@ -1,7 +1,7 @@
 import icons from '@/assets/icons'
 import KidNavbar from '@/components/layout/kid-navbar'
 import MobileNavbar from '@/components/layout/mobile-navbar'
-import AvatarNotification from '@/components/notification/avatar-nofication'
+import ChildAvatarNotification from '@/components/notification/child-avatar-notification'
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet'
 import configRoute from '@/config/route'
 import { AlignJustify } from 'lucide-react'
@@ -26,7 +26,7 @@ function KidHeader() {
         <KidNavbar />
 
         <div className='ml-28'>
-          <AvatarNotification />
+          <ChildAvatarNotification />
         </div>
 
         <Sheet aria-describedby={undefined}>

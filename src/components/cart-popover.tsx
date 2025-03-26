@@ -4,13 +4,16 @@ import { ScrollArea } from '@/components/ui/scroll-area'
 import { Separator } from '@/components/ui/separator'
 import Image from 'next/image'
 import { CartDetailResType } from '@/schemaValidations/cart-detail.schema'
-import { useCartDetailDeleteMutation } from '@/queries/useCartDetail'
 import { Badge } from '@/components/ui/badge'
 import Link from 'next/link'
 import configRoute from '@/config/route'
+import { useCartDetailDeleteListMutation, useCartDetailDeleteMultipleMutation } from '@/queries/useCartDetail'
+import { handleErrorApi } from '@/lib/utils'
+import { toast } from '@/components/ui/use-toast'
 
 export default function CartPopover({ data }: { data: CartDetailResType['data'] }) {
-  const deleteMutation = useCartDetailDeleteMutation()
+  const deleteMutation = useCartDetailDeleteListMutation()
+  const deleteMultipleMutation = useCartDetailDeleteMultipleMutation()
 
   const handleDelete = async (id: string) => {
     if (deleteMutation.isPending) return
@@ -18,7 +21,25 @@ export default function CartPopover({ data }: { data: CartDetailResType['data'] 
     try {
       await deleteMutation.mutateAsync({ id })
     } catch (error) {
-      console.error(error)
+      handleErrorApi({
+        error
+      })
+    }
+  }
+
+  const handleDeleteMultiple = async (ids: string[]) => {
+    try {
+      if (deleteMultipleMutation.isPending) return
+
+      await deleteMultipleMutation.mutateAsync({ ids })
+
+      toast({
+        description: 'Đã xóa tất cả sản phẩm khỏi giỏ hàng'
+      })
+    } catch (error) {
+      handleErrorApi({
+        error
+      })
     }
   }
 
@@ -35,7 +56,12 @@ export default function CartPopover({ data }: { data: CartDetailResType['data'] 
           )}
         </h3>
         {data['cartDetails'].length > 0 && (
-          <Button variant='ghost' size='sm' className='text-xs h-8 hover:bg-gray-100'>
+          <Button
+            variant='ghost'
+            size='sm'
+            className='text-xs h-8 hover:bg-gray-100 focus-visible:ring-0'
+            onClick={() => handleDeleteMultiple(data['cartDetails'].map((item) => item.id))}
+          >
             Xóa tất cả
           </Button>
         )}
@@ -80,7 +106,7 @@ export default function CartPopover({ data }: { data: CartDetailResType['data'] 
                     </div>
                     <p className='text-xs text-muted-foreground'>Số lượng: {item.quantity}</p>
                     <p className='text-sm font-medium text-secondary'>
-                      {item.unitPrice === 0 ? 'Miễn phí' : `${item.unitPrice.toLocaleString()} đ`}
+                      {item.totalPrice === 0 ? 'Miễn phí' : `${item.totalPrice.toLocaleString()} đ`}
                     </p>
                   </div>
                 </div>

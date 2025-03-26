@@ -12,13 +12,16 @@ import {
   removeCheckoutDataFromLocalStorage,
   getCheckoutBuyNowFromLocalStorage,
   setCheckoutBuyNowToLocalStorage,
-  removeCheckoutBuyNowFromLocalStorage
+  removeCheckoutBuyNowFromLocalStorage,
+  setOrderIdToLocalStorage,
+  removeOrderIdFromLocalStorage,
+  getOrderIdFromLocalStorage
 } from '@/lib/utils'
 import { RoleType } from '@/types/jwt.types'
 import type { Socket } from 'socket.io-client'
 import { create } from 'zustand'
 import RefreshToken from '@/components/refresh-token'
-import { AccountOneAddressResType, AccountResType } from '@/schemaValidations/account.schema'
+import { AccountOneAddressResType, AccountResType, ProfileChildResType } from '@/schemaValidations/account.schema'
 import { CartDetailResType } from '@/schemaValidations/cart-detail.schema'
 import { OrderBuyNowResType } from '@/schemaValidations/order.schema'
 
@@ -72,6 +75,10 @@ type AppStoreType = {
   setCheckoutBuyNow: (data?: OrderBuyNowResType['data'] | undefined) => void
   customCourse: CustomCourse
   setCustomCourse: (customCourse: CustomCourse) => void
+  orderId: string | undefined
+  setOrderId: (orderId: string | undefined) => void
+  childProfile: ProfileChildResType['data'] | undefined
+  setChildProfile: (childProfile?: ProfileChildResType['data'] | undefined) => void
 }
 
 export const useAppStore = create<AppStoreType>((set) => ({
@@ -123,7 +130,20 @@ export const useAppStore = create<AppStoreType>((set) => ({
     }
   },
   customCourse: { chapters: [] },
-  setCustomCourse: (customCourse) => set({ customCourse })
+  setCustomCourse: (customCourse) => set({ customCourse }),
+  orderId: undefined,
+  setOrderId: (orderId: string | undefined) => {
+    set({ orderId })
+
+    if (orderId) {
+      removeOrderIdFromLocalStorage()
+      setOrderIdToLocalStorage(orderId)
+    } else {
+      removeOrderIdFromLocalStorage()
+    }
+  },
+  childProfile: undefined,
+  setChildProfile: (childProfile?: ProfileChildResType['data'] | undefined) => set({ childProfile })
 }))
 
 // export const useAppContext = () => {
@@ -133,6 +153,7 @@ export default function AppProvider({ children }: { children: React.ReactNode })
   const setRole = useAppStore((state) => state.setRole)
   const setCheckoutData = useAppStore((state) => state.setCheckoutData)
   const setCheckoutBuyNow = useAppStore((state) => state.setCheckoutBuyNow)
+  const setOrderId = useAppStore((state) => state.setOrderId)
 
   // const [socket, setSocket] = useState<Socket | undefined>()
   // const [role, setRoleState] = useState<RoleType | undefined>()
@@ -157,9 +178,14 @@ export default function AppProvider({ children }: { children: React.ReactNode })
         setCheckoutBuyNow(checkoutBuyNow)
       }
 
+      const orderId = getOrderIdFromLocalStorage()
+      if (orderId) {
+        setOrderId(orderId)
+      }
+
       count.current++
     }
-  }, [setRole, setCheckoutData, setCheckoutBuyNow])
+  }, [setRole, setCheckoutData, setCheckoutBuyNow, setOrderId])
 
   // useEffect(() => {
   //   const checkoutData = getCheckoutDataFromLocalStorage()

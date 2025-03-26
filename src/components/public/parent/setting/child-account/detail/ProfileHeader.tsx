@@ -1,7 +1,7 @@
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { Pencil, Search } from 'lucide-react'
+import { Pencil } from 'lucide-react'
 import { ReactNode } from 'react'
 
 interface ProfileHeaderProps {
@@ -62,18 +62,6 @@ export function ProfileHeader({ profile }: ProfileHeaderProps) {
                 </div>
               ))}
             </div>
-          </div>
-
-          {/* Actions */}
-          <div className='flex gap-2'>
-            <Button className='md:self-start' variant='outline' size='sm'>
-              <Pencil className='h-3.5 w-3.5 mr-1.5' />
-              Chỉnh sửa thông tin
-            </Button>
-            <Button className='md:self-start' variant='secondary' size='sm'>
-              <Search className='h-3.5 w-3.5 mr-1.5' />
-              Tìm khóa học
-            </Button>
           </div>
         </div>
       </CardContent>

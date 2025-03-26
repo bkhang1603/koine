@@ -19,6 +19,7 @@ import CourseReviews from '@/components/public/parent/course/course-reviews'
 import Link from 'next/link'
 import { wrapServerApi } from '@/lib/server-utils'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 
 const formatDuration = (minutes: number) => {
   const hours = Math.floor(minutes / 60)
@@ -48,6 +49,8 @@ export default async function CourseDetail(props: { params: Promise<{ id: string
 
   const data = await wrapServerApi(() => courseApiRequest.getCourse(id))
   const courseData = data?.payload?.data
+
+  const limit = 2
 
   if (!courseData) {
     return <p>Không tìm thấy khóa học</p>
@@ -176,68 +179,80 @@ export default async function CourseDetail(props: { params: Promise<{ id: string
               </Card>
             </div>
 
-            {/* Course Chapters */}
-            <div className='mt-8 sm:mt-10 lg:mt-12'>
-              <h2 className='text-xl sm:text-2xl font-bold mb-4 sm:mb-6 lg:mb-8'>Nội dung khóa học</h2>
-              <div className='space-y-3 sm:space-y-4'>
-                {courseData.chapters.map((chapter, index) => (
-                  <Card
-                    key={chapter.id}
-                    className='overflow-hidden border-none shadow-md hover:shadow-lg transition-shadow'
-                  >
-                    <div className='p-4 sm:p-6 bg-gray-50'>
-                      <div className='flex items-center gap-3 sm:gap-4'>
-                        <div
-                          className='w-10 h-10 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl bg-primary/5 flex items-center justify-center 
-                            font-bold text-lg sm:text-xl text-primary'
-                        >
-                          {String(index + 1).padStart(2, '0')}
-                        </div>
-                        <div>
-                          <h3 className='font-bold text-base sm:text-lg'>{chapter.title}</h3>
-                          <p className='text-xs sm:text-sm text-gray-500'>{chapter.lessons.length} bài học</p>
-                        </div>
-                      </div>
-                    </div>
-                    <div className='divide-y divide-gray-100'>
-                      {chapter.lessons.map((lesson, lessonIndex) => (
-                        <div
-                          key={lesson.id}
-                          className={`p-3 sm:p-4 flex items-center justify-between gap-2 sm:gap-3 hover:bg-gray-50 transition-colors`}
-                        >
-                          <div className='flex items-center gap-2 sm:gap-3'>
-                            {getLessonIcon(lesson.type)}
-                            <span className='font-medium text-sm sm:text-base text-gray-700'>{lesson.title}</span>
+            {/* Course content and lessons */}
+            <Tabs defaultValue='content' className='mt-10 pb-32'>
+              <TabsList className='w-full grid grid-cols-2 mb-6'>
+                <TabsTrigger value='content'>Nội dung khóa học</TabsTrigger>
+                <TabsTrigger value='reviews'>Đánh giá từ học viên</TabsTrigger>
+              </TabsList>
+
+              <TabsContent value='content'>
+                {/* Course Content/Lessons part */}
+                <div className='space-y-4'>
+                  <h2 className='text-xl font-semibold'>Nội dung bài học</h2>
+                  <div className='space-y-3 sm:space-y-4'>
+                    {courseData.chapters.map((chapter, chapterIndex) => (
+                      <Card
+                        key={chapter.id}
+                        className='overflow-hidden border-none shadow-md hover:shadow-lg transition-shadow'
+                      >
+                        <div className='p-4 sm:p-6 bg-gray-50'>
+                          <div className='flex items-center gap-3 sm:gap-4'>
+                            <div
+                              className='w-10 h-10 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl bg-primary/5 flex items-center justify-center 
+                                  font-bold text-lg sm:text-xl text-primary'
+                            >
+                              {String(chapterIndex + 1).padStart(2, '0')}
+                            </div>
+                            <div>
+                              <h3 className='font-bold text-base sm:text-lg'>{chapter.title}</h3>
+                              <p className='text-xs sm:text-sm text-gray-500'>{chapter.lessons.length} bài học</p>
+                            </div>
                           </div>
-
-                          {lessonIndex === 0 && (
-                            <TooltipProvider>
-                              <Tooltip>
-                                <TooltipTrigger asChild>
-                                  <Link
-                                    href={`/learn/${courseData.id}?lessonId=${lesson.id}&preview=true`}
-                                    className='flex items-center gap-1 px-2.5 py-1 bg-primary/10 text-primary rounded-full text-xs font-medium hover:bg-primary/20 transition-colors'
-                                  >
-                                    <Eye className='w-3.5 h-3.5' />
-                                    <span>Học thử</span>
-                                  </Link>
-                                </TooltipTrigger>
-                                <TooltipContent>
-                                  <p>Xem trước nội dung bài học</p>
-                                </TooltipContent>
-                              </Tooltip>
-                            </TooltipProvider>
-                          )}
                         </div>
-                      ))}
-                    </div>
-                  </Card>
-                ))}
-              </div>
+                        <div className='divide-y divide-gray-100'>
+                          {chapter.lessons.map((lesson, lessonIndex) => (
+                            <div
+                              key={lesson.id}
+                              className={`p-3 sm:p-4 flex items-center justify-between gap-2 sm:gap-3 hover:bg-gray-50 transition-colors`}
+                            >
+                              <div className='flex items-center gap-2 sm:gap-3'>
+                                {getLessonIcon(lesson.type)}
+                                <span className='font-medium text-sm sm:text-base text-gray-700'>{lesson.title}</span>
+                              </div>
 
-              {/* Course Reviews - Added here */}
-              <CourseReviews courseId={id} />
-            </div>
+                              {/* Chỉ hiển thị nút Học thử cho các bài học đầu của chapter đầu tiên, giới hạn bởi limit */}
+                              {chapterIndex === 0 && lessonIndex < limit && (
+                                <TooltipProvider>
+                                  <Tooltip>
+                                    <TooltipTrigger asChild>
+                                      <Link
+                                        href={`/learn/${courseData.id}?lessonId=${lesson.id}&preview=true`}
+                                        className='flex items-center gap-1 px-2.5 py-1 bg-primary/10 text-primary rounded-full text-xs font-medium hover:bg-primary/20 transition-colors'
+                                      >
+                                        <Eye className='w-3.5 h-3.5' />
+                                        <span>Học thử</span>
+                                      </Link>
+                                    </TooltipTrigger>
+                                    <TooltipContent>
+                                      <p>Xem trước nội dung bài học</p>
+                                    </TooltipContent>
+                                  </Tooltip>
+                                </TooltipProvider>
+                              )}
+                            </div>
+                          ))}
+                        </div>
+                      </Card>
+                    ))}
+                  </div>
+                </div>
+              </TabsContent>
+
+              <TabsContent value='reviews'>
+                <CourseReviews courseId={id} />
+              </TabsContent>
+            </Tabs>
           </div>
 
           {/* Price Card - Right Column */}

@@ -9,9 +9,11 @@ import {
   CoursesResType,
   LessonResType,
   LessonsResType,
+  PreviewLessonsResType,
   UserCourseProgressResType,
   UserCoursesResType
 } from '@/schemaValidations/course.schema'
+import { OnlyMessageResType } from '@/schemaValidations/special.schema'
 
 const courseApiRequest = {
   getCourses: ({
@@ -44,7 +46,7 @@ const courseApiRequest = {
   updateCourseProgress: (lessonId: string) => http.post('/user-progresses', { lessonId }),
   getCategoryCourses: () => http.get<CategoryCoursesResType>(`/category-courses`),
   activeCourse: (data: { childId?: string | null; courseId: string | null }) =>
-    http.post(`/courses/active-course-enroll`, data),
+    http.post<OnlyMessageResType>(`/courses/active-course-enroll`, data),
   getCourseProgress: (id: string) => http.get<UserCourseProgressResType>(`/user-progresses/status/${id}`),
   getChapters: (id: string) => http.get<ChaptersResType>(`/chapters/${id}`),
   getLessons: (id: string) => http.get<LessonsResType>(`/lessons/${id}`),
@@ -62,7 +64,9 @@ const courseApiRequest = {
   }) =>
     http.get<GetCoursesListAdminResType>(`/courses?page_index=${page_index}&page_size=${page_size}&keyword=${keyword}`),
   getCourseDetailAdmin: ({ courseId }: { courseId: string }) =>
-    http.get<GetCourseDetailAdminResType>(`courses/${courseId}`)
+    http.get<GetCourseDetailAdminResType>(`courses/${courseId}`),
+  getPreviewLessons: ({ id, limit }: { id: string; limit: number }) =>
+    http.get<PreviewLessonsResType>(`lessons/${id}/preview?limit=${limit}`)
 }
 
 export default courseApiRequest

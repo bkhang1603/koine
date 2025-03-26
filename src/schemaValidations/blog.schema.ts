@@ -13,6 +13,12 @@ export const BlogData = z
       firstName: z.string(),
       avatarUrl: z.string()
     }),
+    categories: z.array(
+      z.object({
+        id: z.number(),
+        name: z.string()
+      })
+    ),
     totalReact: z.number(),
     totalComment: z.number(),
     slug: z.string(),

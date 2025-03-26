@@ -7,13 +7,13 @@ import { useGetCourseProgressQuery, useGetLessonQuery, useUpdateCourseProgressMu
 import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { handleErrorApi } from '@/lib/utils'
-import { useCallback, use } from 'react'
+import { use, useCallback, useEffect } from 'react'
 import { UserCourseProgressResType } from '@/schemaValidations/course.schema'
-import { Breadcrumb } from '../../../../../../components/learn/Breadcrumb'
-import { Sidebar } from '../../../../../../components/learn/Sidebar'
-import { NavigationButtons } from '../../../../../../components/learn/NavigationButtons'
-import { LessonContent } from '../../../../../../components/learn/LessonContent'
-import { WelcomeScreen } from '../../../../../../components/learn/WelcomeScreen'
+import { Breadcrumb } from '@/components/learn/Breadcrumb'
+import { Sidebar } from '@/components/learn/Sidebar'
+import { NavigationButtons } from '@/components/learn/NavigationButtons'
+import { LessonContent } from '@/components/learn/LessonContent'
+import { WelcomeScreen } from '@/components/learn/WelcomeScreen'
 import { LoadingSkeletonForKid } from '@/components/learn/LoadingSkeletonForKid'
 
 type Lesson = UserCourseProgressResType['data']['chapters'][0]['lessons'][0]
@@ -44,17 +44,45 @@ function LearnPage(props: { params: Promise<{ courseId: string }> }) {
   const lessonId = searchParams.get('lessonId')
 
   const updateCourseMutation = useUpdateCourseProgressMutation()
-  const { data, isLoading } = useGetCourseProgressQuery({ id: courseId })
-  const { data: lessonData, isLoading: lessonLoading } = useGetLessonQuery({ id: lessonId!, enabled: !!lessonId })
+  const { data: courseData, isLoading: courseLoading } = useGetCourseProgressQuery({ id: courseId })
+  const { data: lessonData, isLoading: lessonLoading } = useGetLessonQuery({
+    id: lessonId!,
+    enabled: !!lessonId
+  })
 
-  const course = data?.payload.data || null
-  const lesson = lessonData?.payload.data || null
+  const course = courseData?.payload.data || null
+
+  // Get first accessible lesson
+  const getFirstAccessibleLesson = useCallback(() => {
+    if (!course) return null
+
+    for (const chapter of course.chapters) {
+      for (const lesson of chapter.lessons) {
+        if (canAccessLesson(lesson, course)) {
+          return lesson
+        }
+      }
+    }
+    return null
+  }, [course])
+
+  // Auto redirect to first lesson if no lessonId
+  useEffect(() => {
+    if (!lessonId && !courseLoading && course) {
+      const firstLesson = getFirstAccessibleLesson()
+      if (firstLesson) {
+        router.push(`/kid/course/${courseId}/learn?lessonId=${firstLesson.id}`)
+      }
+    }
+  }, [lessonId, courseLoading, course, courseId, router, getFirstAccessibleLesson])
 
   const getNextLesson = useCallback(() => {
-    if (!course || !lesson) return null
+    if (!course || !lessonData?.payload.data) return null
 
-    const currentChapter = course.chapters.find((chapter) => chapter.lessons.some((l) => l.id === lesson.id))
-    const currentLessonIndex = currentChapter?.lessons.findIndex((l) => l.id === lesson.id)
+    const currentChapter = course.chapters.find((chapter) =>
+      chapter.lessons.some((l) => l.id === lessonData.payload.data.id)
+    )
+    const currentLessonIndex = currentChapter?.lessons.findIndex((l) => l.id === lessonData.payload.data.id)
 
     if (currentChapter && currentLessonIndex !== undefined) {
       if (currentLessonIndex < currentChapter.lessons.length - 1) {
@@ -68,7 +96,7 @@ function LearnPage(props: { params: Promise<{ courseId: string }> }) {
       }
     }
     return null
-  }, [course, lesson])
+  }, [course, lessonData])
 
   const handleUpdate = useCallback(
     async ({ lessonId, status }: { lessonId: string; status: Lesson['status'] }) => {
@@ -90,10 +118,12 @@ function LearnPage(props: { params: Promise<{ courseId: string }> }) {
   )
 
   const getPreviousLesson = useCallback(() => {
-    if (!course || !lesson) return null
+    if (!course || !lessonData?.payload.data) return null
 
-    const currentChapter = course.chapters.find((chapter) => chapter.lessons.some((l) => l.id === lesson.id))
-    const currentLessonIndex = currentChapter?.lessons.findIndex((l) => l.id === lesson.id)
+    const currentChapter = course.chapters.find((chapter) =>
+      chapter.lessons.some((l) => l.id === lessonData.payload.data.id)
+    )
+    const currentLessonIndex = currentChapter?.lessons.findIndex((l) => l.id === lessonData.payload.data.id)
 
     if (currentChapter && currentLessonIndex !== undefined) {
       if (currentLessonIndex > 0) {
@@ -107,7 +137,7 @@ function LearnPage(props: { params: Promise<{ courseId: string }> }) {
       }
     }
     return null
-  }, [course, lesson])
+  }, [course, lessonData])
 
   const handleLessonClick = useCallback(
     (lesson: any) => {
@@ -118,7 +148,7 @@ function LearnPage(props: { params: Promise<{ courseId: string }> }) {
     [courseId, router, course]
   )
 
-  if (isLoading) return <LoadingSkeletonForKid />
+  if (courseLoading) return <LoadingSkeletonForKid />
 
   if (!course) {
     return (
@@ -161,8 +191,8 @@ function LearnPage(props: { params: Promise<{ courseId: string }> }) {
                       <Skeleton className='h-full w-full rounded-2xl' />
                     </div>
                   </div>
-                ) : lesson ? (
-                  <LessonContent lesson={lesson} />
+                ) : lessonData?.payload.data ? (
+                  <LessonContent lesson={lessonData.payload.data} />
                 ) : (
                   <WelcomeScreen />
                 )}
@@ -171,11 +201,11 @@ function LearnPage(props: { params: Promise<{ courseId: string }> }) {
           </div>
 
           {/* Navigation Footer - Fixed at bottom */}
-          {lesson && (
+          {lessonData?.payload.data && (
             <div className='flex-shrink-0 bg-white py-6'>
               <NavigationButtons
                 course={course}
-                lesson={lesson}
+                lesson={lessonData.payload.data}
                 prevLesson={getPreviousLesson()}
                 nextLesson={getNextLesson()}
                 canAccessNext={!!getNextLesson() && canAccessLesson(getNextLesson(), course)}
@@ -187,7 +217,9 @@ function LearnPage(props: { params: Promise<{ courseId: string }> }) {
                   const nextLesson = getNextLesson()
                   if (nextLesson) handleLessonClick(nextLesson)
                 }}
-                onComplete={() => handleUpdate({ lessonId: lesson.id, status: lesson.status })}
+                onComplete={() =>
+                  handleUpdate({ lessonId: lessonData.payload.data.id, status: lessonData.payload.data.status })
+                }
                 isUpdating={updateCourseMutation.isPending}
                 canAccessLesson={canAccessLesson}
               />

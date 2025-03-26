@@ -124,6 +124,13 @@ export const useBlogQuery = ({
   })
 }
 
+export const useBlogDetailQuery = ({ id }: { id: string }) => {
+  return useQuery({
+    queryKey: ['blogs', id],
+    queryFn: () => blogApiRequest.getBlog(id)
+  })
+}
+
 // Content Creator
 export const useBlogCreateMutation = () => {
   const queryClient = useQueryClient()

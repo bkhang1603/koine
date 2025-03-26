@@ -1,4 +1,4 @@
-import { RoleValues, GenderValues } from '@/constants/type'
+import { RoleValues, GenderValues, OrderTypeValues } from '@/constants/type'
 import z from 'zod'
 
 export const accountRes = z.object({
@@ -205,7 +205,9 @@ export const accountOrder = z
   .strict()
 
 export const accountOrderRes = z.object({
-  data: z.array(accountOrder),
+  data: z.object({
+    orders: z.array(accountOrder)
+  }),
   message: z.string(),
   pagination: z.object({
     pageSize: z.number(),
@@ -238,6 +240,7 @@ export const myChildAccountById = z
     avatarUrl: z.string(),
     gender: z.string(),
     dob: z.string(),
+    isVisible: z.boolean(),
     courses: z.array(
       z.object({
         id: z.string(),
@@ -281,7 +284,9 @@ export const suggestCoursesFree = z.object({
       id: z.string(),
       name: z.string()
     })
-  )
+  ),
+  totalChapter: z.number(),
+  totalLesson: z.number()
 })
 
 export const suggestCoursesFreeRes = z.object({
@@ -415,6 +420,118 @@ export const accountNotificationsRes = z.object({
   message: z.string()
 })
 
+export const listChildAccount = z.object({
+  id: z.string(),
+  role: z.enum(RoleValues),
+  parentId: z.string(),
+  createAt: z.string(),
+  createAtFormatted: z.string(),
+  userDetail: z.object({
+    firstName: z.string(),
+    lastName: z.string(),
+    dob: z.string(),
+    address: z.string(),
+    gender: z.string(),
+    avatarUrl: z.string()
+  })
+})
+
+export const listChildAccountRes = z.object({
+  data: z.array(listChildAccount),
+  message: z.string()
+})
+
+export const listChildAccountNeedReview = z.object({
+  itemId: z.string(),
+  itemTitle: z.string(),
+  itemType: z.enum(OrderTypeValues),
+  imageUrl: z.string().nullable(),
+  description: z.string(),
+  orderDetailId: z.string(),
+  orderId: z.string(),
+  orderCode: z.string(),
+  orderDate: z.string(),
+  unitPrice: z.number(),
+  quantity: z.number(),
+  discount: z.number(),
+  totalPrice: z.number()
+})
+
+export const listChildAccountNeedReviewRes = z.object({
+  data: z.array(listChildAccountNeedReview),
+  message: z.string()
+})
+
+export const updateVisibleCourseForChildBody = z.object({
+  childId: z.string(),
+  courseId: z.string(),
+  isVisible: z.boolean()
+})
+
+export const courseDetailForChild = z.object({
+  courseId: z.string(),
+  courseTitle: z.string(),
+  courseImageUrl: z.string(),
+  isAccessibleByChild: z.boolean(),
+  courseCompletionRate: z.number(),
+  totalLesson: z.number(),
+  totalLessonFinished: z.number(),
+  totalLearningTime: z.string(),
+  enrollmentDate: z.string(),
+  chapters: z.array(
+    z.object({
+      chapterId: z.string(),
+      chapterTitle: z.string(),
+      chapterDescription: z.string(),
+      chapterSequence: z.number(),
+      chapterStatus: z.string(),
+      chapterCompletionRate: z.number(),
+      lessons: z.array(
+        z.object({
+          lessonId: z.string(),
+          lessonTitle: z.string(),
+          lessonType: z.string(),
+          lessonDurationDisplay: z.string(),
+          lessonSequence: z.number(),
+          lessonStatus: z.string()
+        })
+      )
+    })
+  )
+})
+
+export const courseDetailForChildRes = z.object({
+  data: courseDetailForChild,
+  message: z.string(),
+  statusCode: z.number()
+})
+
+export const createOrderNeedReviewBody = z.object({
+  itemId: z.string(),
+  itemType: z.enum(OrderTypeValues),
+  rating: z.number(),
+  review: z.string()
+})
+
+export const profileChild = z.object({
+  id: z.string(),
+  avatarUrl: z.string(),
+  firstName: z.string(),
+  lastName: z.string(),
+  dob: z.string(),
+  gender: z.string(),
+  level: z.string(),
+  totalCourses: z.number(),
+  totalLearningTimes: z.number(),
+  totalPoints: z.number()
+})
+
+export const profileChildRes = z.object({
+  data: profileChild,
+  message: z.string(),
+  statusCode: z.number()
+})
+
 export type AccountResType = z.TypeOf<typeof accountRes>
 
 export type CourseByAccountResType = z.TypeOf<typeof courseByAccountRes>
@@ -444,3 +561,15 @@ export type RegisterChildAccountResType = z.TypeOf<typeof registerChildAccountRe
 export type AccountStoreResType = z.TypeOf<typeof accountStoreRes>
 
 export type AccountNotificationsResType = z.TypeOf<typeof accountNotificationsRes>
+
+export type ListChildAccountResType = z.TypeOf<typeof listChildAccountRes>
+
+export type ListChildAccountNeedReviewResType = z.TypeOf<typeof listChildAccountNeedReviewRes>
+
+export type UpdateVisibleCourseForChildBodyType = z.TypeOf<typeof updateVisibleCourseForChildBody>
+
+export type CourseDetailForChildResType = z.TypeOf<typeof courseDetailForChildRes>
+
+export type CreateOrderNeedReviewBodyType = z.TypeOf<typeof createOrderNeedReviewBody>
+
+export type ProfileChildResType = z.TypeOf<typeof profileChildRes>

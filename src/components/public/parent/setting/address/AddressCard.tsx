@@ -1,157 +1,107 @@
-import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
-import { Building2, CheckCircle2, MapPin, PenLine, Star, Trash2 } from 'lucide-react'
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger
-} from '@/components/ui/alert-dialog'
+import { Card } from '@/components/ui/card'
+import { AccountAddressBodyType } from '@/schemaValidations/account.schema'
+import { MapPin, Star, PenSquare, Trash2, Home, Building2 } from 'lucide-react'
+import { cn } from '@/lib/utils'
 
 interface AddressCardProps {
-  address: {
-    id: string
-    name: string
-    phone: string
-    address: string
-    tag: string
-    isDefault: boolean
-  }
-  onSetDefault: () => void
+  address: AccountAddressBodyType & { id: string }
   onEdit: () => void
   onDelete: () => void
+  onSetDefault: () => void
 }
 
-export function AddressCard({ address, onSetDefault, onEdit, onDelete }: AddressCardProps) {
+export function AddressCard({ address, onEdit, onDelete, onSetDefault }: AddressCardProps) {
   return (
     <Card
-      className={`relative overflow-hidden transition-all duration-200 hover:shadow-md group ${
-        address.isDefault ? 'border-primary/20 bg-primary/5' : 'border-gray-100 hover:border-gray-200'
-      }`}
-    >
-      {address.isDefault && (
-        <div className='absolute top-0 right-0'>
-          <Star className='absolute top-4 right-4 h-3.5 w-3.5 text-primary' fill='currentColor' />
-        </div>
+      className={cn(
+        'relative overflow-hidden bg-white border-2 transition-all duration-200',
+        address.isDefault ? 'border-primary/30 shadow' : 'border-gray-200 hover:border-gray-300/80'
       )}
-
-      <CardContent className='p-0 flex flex-col h-full'>
-        {/* Tag badge */}
-        <div className='pt-4 px-4 flex'>
-          <Badge
-            variant='outline'
-            className={`px-2.5 py-0.5 text-xs font-normal ${
-              address.tag === 'Nhà riêng'
-                ? 'bg-blue-50 text-blue-600 border-blue-100'
-                : address.tag === 'Văn phòng'
-                  ? 'bg-emerald-50 text-emerald-600 border-emerald-100'
-                  : 'bg-purple-50 text-purple-600 border-purple-100'
-            }`}
-          >
-            {address.tag}
-          </Badge>
-
-          {address.isDefault && (
-            <Badge
-              variant='outline'
-              className='ml-2 px-2.5 py-0.5 text-xs font-normal bg-amber-50 text-amber-600 border-amber-100'
-            >
-              Mặc định
-            </Badge>
-          )}
-        </div>
-
-        {/* Main content - set min-height to ensure uniform card height */}
-        <div className='p-4 pb-3 flex-grow flex flex-col min-h-[140px]'>
-          <div className='flex items-start gap-3 h-full'>
+    >
+      {/* Card Content */}
+      <div className='grid grid-cols-1 h-full'>
+        {/* Header with Name, Phone and Badges */}
+        <div className='p-4 pb-2 flex flex-wrap justify-between gap-2'>
+          <div className='flex items-center gap-2 min-w-0'>
             <div
-              className={`mt-1 flex-shrink-0 p-2 rounded-full ${address.isDefault ? 'bg-primary/10' : 'bg-gray-100'}`}
+              className={cn(
+                'w-8 h-8 flex-shrink-0 rounded-md flex items-center justify-center',
+                address.isDefault ? 'bg-primary/10' : 'bg-gray-100'
+              )}
             >
-              {address.isDefault ? (
-                <MapPin className='h-4 w-4 text-primary' />
+              {address.tag === 'Nhà riêng' ? (
+                <Home className={cn('w-4 h-4', address.isDefault ? 'text-primary' : 'text-gray-600')} />
               ) : (
-                <Building2 className='h-4 w-4 text-gray-500' />
+                <Building2 className={cn('w-4 h-4', address.isDefault ? 'text-primary' : 'text-gray-600')} />
               )}
             </div>
-
-            <div className='flex-1 space-y-3 flex flex-col'>
-              <div>
-                <h3 className='font-medium text-gray-900 leading-tight'>{address.name}</h3>
-                <p className='text-sm text-gray-600'>{address.phone}</p>
-              </div>
-
-              {/* Use line-clamp for long addresses */}
-              <p className='text-sm text-gray-500 leading-relaxed line-clamp-3 overflow-hidden'>{address.address}</p>
-
-              {/* Push actions to bottom with flex layout */}
-              <div className='flex-grow'></div>
+            <div className='truncate min-w-0'>
+              <h3 className='font-semibold text-gray-900 truncate'>{address.name}</h3>
+              <p className='text-xs text-gray-500 truncate'>{address.phone}</p>
             </div>
+          </div>
+
+          <div className='flex flex-wrap items-center gap-2'>
+            <span
+              className={cn(
+                'inline-flex items-center px-2 py-0.5 text-xs font-medium rounded-md',
+                address.tag === 'Nhà riêng' ? 'bg-blue-50 text-blue-700' : 'bg-purple-50 text-purple-700'
+              )}
+            >
+              {address.tag}
+            </span>
+
+            {address.isDefault && (
+              <span className='inline-flex items-center gap-1 px-2 py-0.5 bg-primary/10 text-primary text-xs font-medium rounded-md'>
+                <Star className='w-3 h-3' />
+                Mặc định
+              </span>
+            )}
           </div>
         </div>
 
-        {/* Actions */}
-        <div className='flex border-t border-gray-100 mt-auto'>
-          <Button
-            variant='ghost'
-            size='sm'
-            onClick={onEdit}
-            className='flex-1 h-10 rounded-none text-xs font-normal text-gray-600 hover:text-primary hover:bg-gray-50'
-          >
-            <PenLine className='h-3.5 w-3.5 mr-1.5' />
-            Chỉnh sửa
-          </Button>
+        {/* Address with overflow handling */}
+        <div className='px-4 pb-3'>
+          <div className='flex items-start gap-2'>
+            <MapPin className='w-4 h-4 text-gray-400 mt-0.5 flex-shrink-0' />
+            <p className='text-sm text-gray-600 break-words'>{address.address}</p>
+          </div>
+        </div>
 
-          {!address.isDefault ? (
+        {/* Action Footer */}
+        <div className='mt-auto border-t border-gray-100 px-4 py-3 bg-gray-50/50 flex justify-end gap-1'>
+          {!address.isDefault && (
             <Button
-              variant='ghost'
+              variant='outline'
               size='sm'
               onClick={onSetDefault}
-              className='flex-1 px-4 h-10 rounded-none text-xs font-normal text-gray-600 hover:text-primary hover:bg-gray-50 border-l border-gray-100'
+              className='h-8 border-primary/20 text-primary hover:bg-primary/5'
             >
-              <CheckCircle2 className='h-3.5 w-3.5 mr-1.5' />
-              Đặt mặc định
+              <Star className='h-3.5 w-3.5 mr-1.5' />
+              <span className='text-xs'>Mặc định</span>
             </Button>
-          ) : (
-            <div className='h-10 px-4 flex-1 flex items-center justify-center text-xs text-gray-400 border-l border-gray-100 bg-gray-50'>
-              <CheckCircle2 className='h-3.5 w-3.5 mr-1.5 text-primary' />
-              Địa chỉ mặc định
-            </div>
           )}
 
-          <AlertDialog>
-            <AlertDialogTrigger asChild>
-              <Button
-                variant='ghost'
-                size='sm'
-                className='h-10 px-4 rounded-none text-xs font-normal text-gray-600 hover:text-red-500 hover:bg-red-50 border-l border-gray-100'
-              >
-                <Trash2 className='h-3.5 w-3.5' />
-                <span className='sr-only'>Xóa</span>
-              </Button>
-            </AlertDialogTrigger>
-            <AlertDialogContent>
-              <AlertDialogHeader>
-                <AlertDialogTitle>Xóa địa chỉ</AlertDialogTitle>
-                <AlertDialogDescription>
-                  Bạn có chắc chắn muốn xóa địa chỉ này? Hành động này không thể hoàn tác.
-                </AlertDialogDescription>
-              </AlertDialogHeader>
-              <AlertDialogFooter>
-                <AlertDialogCancel>Hủy</AlertDialogCancel>
-                <AlertDialogAction onClick={onDelete} className='bg-red-500 hover:bg-red-600'>
-                  Xóa
-                </AlertDialogAction>
-              </AlertDialogFooter>
-            </AlertDialogContent>
-          </AlertDialog>
+          <Button variant='outline' size='sm' onClick={onEdit} className='h-8'>
+            <PenSquare className='h-3.5 w-3.5 mr-1.5' />
+            <span className='text-xs'>Sửa</span>
+          </Button>
+
+          <Button
+            variant='outline'
+            size='sm'
+            onClick={onDelete}
+            className='h-8 hover:bg-destructive/5 hover:text-destructive hover:border-destructive/30'
+          >
+            <Trash2 className='h-3.5 w-3.5 mr-1.5' />
+            <span className='text-xs'>Xóa</span>
+          </Button>
         </div>
-      </CardContent>
+      </div>
+
+      {/* Left Border Indicator */}
+      {address.isDefault && <div className='absolute left-0 top-0 w-1 h-full bg-primary' />}
     </Card>
   )
 }

@@ -41,7 +41,7 @@ function AvatarNotification() {
 
   // Tôi muốn chỉ gọi api account profile khi role có giá trị
   const { data } = useAccountProfile({
-    enabled: !!role
+    enabled: !!role && role !== 'CHILD'
   })
   const account = data?.payload.data
 

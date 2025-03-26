@@ -4,29 +4,19 @@ import { use } from 'react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Separator } from '@/components/ui/separator'
-import { ArrowLeft, Package, AlertCircle, Star, DollarSign, ShoppingCart } from 'lucide-react'
+import { ArrowLeft, User, AlertCircle, Mail, Phone, Calendar, MapPin } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { Badge } from '@/components/ui/badge'
-import { useProductDetailAdminQuery } from '@/queries/useProduct'
+import { useUserDetailAdminQuery } from '@/queries/useUser'
 import { Skeleton } from '@/components/ui/skeleton'
-import { useState } from 'react'
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog'
-import { vi } from 'date-fns/locale'
 import { format } from 'date-fns'
+import { vi } from 'date-fns/locale'
 
-export default function AdminProductDetail(props: { params: Promise<{ id: string }> }) {
+export default function AdminUserDetail(props: { params: Promise<{ id: string }> }) {
   const params = use(props.params)
-  const { isLoading, error, data } = useProductDetailAdminQuery({ productId: params.id })
-  const product = data?.payload.data
-
-  // State for selected image
-  const [selectedImage, setSelectedImage] = useState<string | null>(null)
-
-  // Handle image click
-  const openImageDialog = (imageUrl: string) => {
-    setSelectedImage(imageUrl)
-  }
+  const { isLoading, error, data } = useUserDetailAdminQuery({ userId: params.id })
+  const user = data?.payload.data
 
   if (isLoading) {
     return (
@@ -42,73 +32,40 @@ export default function AdminProductDetail(props: { params: Promise<{ id: string
           </div>
           <div className='flex items-center gap-6'>
             <Skeleton className='w-[100px] h-5' />
-            <Skeleton className='w-[80px] h-5' />
             <Skeleton className='w-[120px] h-5' />
           </div>
         </div>
 
         <div className='grid grid-cols-3 gap-6'>
           <div className='col-span-2 space-y-6'>
-            {/* Product images skeleton */}
+            {/* Profile Info skeleton */}
             <Card>
               <CardHeader>
                 <Skeleton className='w-[150px] h-6' />
               </CardHeader>
               <CardContent className='space-y-6'>
-                {/* Main image skeleton */}
-                <div>
-                  <div className='text-sm text-gray-500 mb-2'>
-                    <Skeleton className='w-[80px] h-4' />
-                  </div>
-                  <Skeleton className='w-full h-[300px] rounded-lg' />
-                </div>
-
-                {/* Thumbnails skeleton */}
-                <div>
-                  <div className='text-sm text-gray-500 mb-2'>
-                    <Skeleton className='w-[120px] h-4' />
-                  </div>
-                  <div className='flex gap-2 flex-wrap'>
-                    {[1, 2, 3, 4].map((i) => (
-                      <Skeleton key={i} className='w-24 h-24 rounded-lg' />
-                    ))}
+                <div className='flex gap-6'>
+                  <Skeleton className='w-48 h-48 rounded-full' />
+                  <div className='space-y-4 flex-1'>
+                    <Skeleton className='w-full h-20' />
+                    <Skeleton className='w-full h-20' />
                   </div>
                 </div>
               </CardContent>
             </Card>
 
-            {/* Description skeleton */}
+            {/* Contact Info skeleton */}
             <Card>
               <CardHeader>
                 <Skeleton className='w-[150px] h-6' />
               </CardHeader>
               <CardContent>
-                <Skeleton className='w-full h-20' />
-              </CardContent>
-            </Card>
-
-            {/* Detail skeleton */}
-            <Card>
-              <CardHeader>
-                <Skeleton className='w-[150px] h-6' />
-              </CardHeader>
-              <CardContent>
-                <Skeleton className='w-full h-[200px]' />
-              </CardContent>
-            </Card>
-
-            {/* Guide skeleton */}
-            <Card>
-              <CardHeader>
-                <Skeleton className='w-[200px] h-6' />
-              </CardHeader>
-              <CardContent>
-                <Skeleton className='w-full h-[150px]' />
+                <Skeleton className='w-full h-[100px]' />
               </CardContent>
             </Card>
           </div>
 
-          {/* Product info skeleton */}
+          {/* User Info skeleton */}
           <div className='space-y-6'>
             <Card>
               <CardHeader>
@@ -116,36 +73,12 @@ export default function AdminProductDetail(props: { params: Promise<{ id: string
               </CardHeader>
               <CardContent className='space-y-6'>
                 <div className='space-y-3'>
-                  <div className='flex justify-between'>
-                    <Skeleton className='w-[100px] h-5' />
-                    <Skeleton className='w-[80px] h-5' />
-                  </div>
-                  <div className='flex justify-between'>
-                    <Skeleton className='w-[100px] h-5' />
-                    <Skeleton className='w-[60px] h-5' />
-                  </div>
-                </div>
-
-                <Skeleton className='w-full h-px' />
-
-                <div className='space-y-3'>
-                  {[1, 2, 3].map((item) => (
+                  {[1, 2, 3, 4].map((item) => (
                     <div key={item} className='flex justify-between'>
                       <Skeleton className='w-[120px] h-5' />
                       <Skeleton className='w-[100px] h-5' />
                     </div>
                   ))}
-                </div>
-
-                <Skeleton className='w-full h-px' />
-
-                <div className='space-y-3'>
-                  <Skeleton className='w-[100px] h-5' />
-                  <div className='flex flex-wrap gap-2'>
-                    <Skeleton className='w-[80px] h-6 rounded-full' />
-                    <Skeleton className='w-[60px] h-6 rounded-full' />
-                    <Skeleton className='w-[70px] h-6 rounded-full' />
-                  </div>
                 </div>
               </CardContent>
             </Card>
@@ -161,193 +94,166 @@ export default function AdminProductDetail(props: { params: Promise<{ id: string
     )
   }
 
-  if (error || !product) {
+  if (error || !user) {
     return (
       <div className='flex flex-col items-center justify-center min-h-[400px] gap-4'>
         <AlertCircle className='w-12 h-12 text-red-500' />
         <div className='text-center'>
-          <h3 className='text-lg font-medium text-gray-900 mb-1'>Không tìm thấy sản phẩm</h3>
-          <p className='text-gray-500'>Sản phẩm không tồn tại hoặc đã bị xóa</p>
+          <h3 className='text-lg font-medium text-gray-900 mb-1'>Không tìm thấy người dùng</h3>
+          <p className='text-gray-500'>Người dùng không tồn tại hoặc đã bị xóa</p>
         </div>
         <Button variant='outline' asChild>
-          <Link href='/admin/product'>Quay lại danh sách sản phẩm</Link>
+          <Link href='/admin/user'>Quay lại danh sách người dùng</Link>
         </Button>
       </div>
     )
   }
 
-  // Calculate final price after discount
-  const finalPrice = product.price * (1 - product.discount / 100)
-
   return (
     <div className='container max-w-7xl mx-auto py-6 space-y-8'>
       {/* Back button */}
       <Button variant='ghost' asChild className='gap-2 hover:bg-gray-100'>
-        <Link href='/admin/product'>
+        <Link href='/admin/user'>
           <ArrowLeft className='h-4 w-4' />
-          Quay lại danh sách sản phẩm
+          Quay lại danh sách người dùng
         </Link>
       </Button>
 
       {/* Header */}
       <div>
         <div className='flex items-center justify-between mb-4'>
-          <h1 className='text-2xl font-bold text-gray-900'>{product.name}</h1>
-          <Badge variant={product.stockQuantity > 0 ? 'secondary' : 'destructive'}>
-            {product.stockQuantity > 0 ? 'Còn hàng' : 'Hết hàng'}
+          <h1 className='text-2xl font-bold text-gray-900'>{user.username}</h1>
+          <Badge variant={user.isActive ? 'green' : 'red'}>
+            {user.isActive ? 'Đang hoạt động' : 'Không hoạt động'}
           </Badge>
         </div>
         <div className='flex items-center gap-6 text-sm text-gray-500'>
           <div className='flex items-center gap-2'>
-            <Star className='h-4 w-4' />
-            {product.averageRating} ({product.totalRating} đánh giá)
+            <User className='h-4 w-4' />
+            {user.role}
           </div>
           <div className='flex items-center gap-2'>
-            <ShoppingCart className='h-4 w-4' />
-            {product.stockQuantity} sản phẩm còn lại
+            <Mail className='h-4 w-4' />
+            {user.email || 'Chưa cập nhật email'}
           </div>
         </div>
       </div>
 
       <div className='grid grid-cols-3 gap-6'>
         <div className='col-span-2 space-y-6'>
-          {/* Product Images */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Hình ảnh sản phẩm</CardTitle>
-            </CardHeader>
-            <CardContent className='space-y-6'>
-              {/* Main Image */}
-              <div>
-                <p className='text-sm text-gray-500 mb-2 font-medium'>Ảnh hiển thị chính</p>
-                <div className='relative w-full h-[400px]'>
-                  <Image
-                    src={product.images[0]?.imageUrl || '/placeholder-image.jpg'}
-                    alt={product.name}
-                    fill
-                    className='object-contain rounded-lg'
-                  />
-                </div>
-              </div>
-
-              {/* All Images */}
-              <div>
-                <p className='text-sm text-gray-500 mb-2 font-medium'>Tất cả hình ảnh</p>
-                <div className='grid grid-cols-5 gap-4'>
-                  {product.images.map((image, index) => (
-                    <div
-                      key={index}
-                      className='relative w-full h-24 cursor-pointer border rounded-lg overflow-hidden'
-                      onClick={() => openImageDialog(image.imageUrl)}
-                    >
-                      <Image
-                        src={image.imageUrl}
-                        alt={`${product.name} - ${index + 1}`}
-                        fill
-                        className='object-cover hover:scale-105 transition-transform'
-                      />
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Product Description */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Mô tả sản phẩm</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className='text-gray-600'>{product.description}</p>
-            </CardContent>
-          </Card>
-
-          {/* Product Details */}
+          {/* Profile Information */}
           <Card>
             <CardHeader>
               <CardTitle className='flex items-center gap-2'>
-                <Package className='w-5 h-5' />
-                Chi tiết sản phẩm
+                <User className='w-5 h-5' />
+                Thông tin cá nhân
               </CardTitle>
             </CardHeader>
-            <CardContent>
-              <div className='prose max-w-none' dangerouslySetInnerHTML={{ __html: product.detail }} />
+            <CardContent className='space-y-6'>
+              <div className='flex gap-6'>
+                <div className='relative w-48 h-48'>
+                  <Image
+                    src={user.userDetail.avatarUrl || '/images/placeholder.jpg'}
+                    alt={`Avatar của ${user.username}`}
+                    fill
+                    className='rounded-full object-cover'
+                  />
+                </div>
+                <div className='flex-1'>
+                  <div className='grid grid-cols-2 gap-4'>
+                    <div>
+                      <label className='text-sm text-gray-500'>Họ</label>
+                      <p className='font-medium'>{user.userDetail.lastName || 'Chưa cập nhật'}</p>
+                    </div>
+                    <div>
+                      <label className='text-sm text-gray-500'>Tên</label>
+                      <p className='font-medium'>{user.userDetail.firstName || 'Chưa cập nhật'}</p>
+                    </div>
+                    <div>
+                      <label className='text-sm text-gray-500'>Giới tính</label>
+                      <p className='font-medium'>
+                        {user.userDetail.gender === 'MALE'
+                          ? 'Nam'
+                          : user.userDetail.gender === 'FEMALE'
+                            ? 'Nữ'
+                            : 'Khác'}
+                      </p>
+                    </div>
+                    <div>
+                      <label className='text-sm text-gray-500'>Ngày sinh</label>
+                      <p className='font-medium'>
+                        {user.userDetail.dob
+                          ? format(new Date(user.userDetail.dob), 'dd/MM/yyyy', { locale: vi })
+                          : 'Chưa cập nhật'}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </CardContent>
           </Card>
 
-          {/* Usage Guide */}
+          {/* Contact Information */}
           <Card>
             <CardHeader>
-              <CardTitle>Hướng dẫn sử dụng</CardTitle>
+              <CardTitle className='flex items-center gap-2'>
+                <Phone className='w-5 h-5' />
+                Thông tin liên hệ
+              </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className='prose max-w-none' dangerouslySetInnerHTML={{ __html: product.guide }} />
+              <div className='space-y-4'>
+                <div>
+                  <label className='text-sm text-gray-500'>Số điện thoại</label>
+                  <p className='font-medium'>{user.userDetail.phone || 'Chưa cập nhật'}</p>
+                </div>
+                <div>
+                  <label className='text-sm text-gray-500'>Địa chỉ</label>
+                  <p className='font-medium'>{user.userDetail.address || 'Chưa cập nhật'}</p>
+                </div>
+              </div>
             </CardContent>
           </Card>
         </div>
 
-        {/* Product Info */}
+        {/* User Info */}
         <div className='space-y-6'>
           <Card>
             <CardHeader>
-              <CardTitle>Thông tin sản phẩm</CardTitle>
+              <CardTitle>Thông tin tài khoản</CardTitle>
             </CardHeader>
             <CardContent className='space-y-4'>
-              <div className='space-y-2'>
-                <div className='flex justify-between text-sm'>
-                  <span className='text-muted-foreground'>Giá gốc</span>
-                  <span>{product.price.toLocaleString()}đ</span>
+              <div className='space-y-2 text-sm'>
+                <div className='flex justify-between'>
+                  <span className='text-muted-foreground'>ID</span>
+                  <span className='font-medium'>{user.id}</span>
                 </div>
-                {product.discount > 0 && (
-                  <div className='flex justify-between text-sm'>
-                    <span className='text-muted-foreground'>Giảm giá</span>
-                    <span className='text-red-500'>{product.discount}%</span>
-                  </div>
-                )}
-                {product.discount > 0 && (
-                  <div className='flex justify-between text-sm font-medium'>
-                    <span className='text-muted-foreground'>Giá sau giảm</span>
-                    <span className='text-green-600'>{finalPrice.toLocaleString()}đ</span>
-                  </div>
-                )}
+                <div className='flex justify-between'>
+                  <span className='text-muted-foreground'>Loại tài khoản</span>
+                  <span className='font-medium'>{user.accountType}</span>
+                </div>
+                <div className='flex justify-between'>
+                  <span className='text-muted-foreground'>Vai trò</span>
+                  <Badge variant={user.role === 'ADMIN' ? 'destructive' : 'default'}>{user.role}</Badge>
+                </div>
+                <div className='flex justify-between'>
+                  <span className='text-muted-foreground'>Trạng thái</span>
+                  <Badge variant={user.isActive ? 'green' : 'red'}>
+                    {user.isActive ? 'Hoạt động' : 'Không hoạt động'}
+                  </Badge>
+                </div>
               </div>
 
               <Separator />
 
               <div className='space-y-2 text-sm'>
                 <div className='flex justify-between'>
-                  <span className='text-muted-foreground'>Số lượng tồn kho</span>
-                  <span>{product.stockQuantity} sản phẩm</span>
-                </div>
-                <div className='flex justify-between'>
-                  <span className='text-muted-foreground'>Đánh giá trung bình</span>
-                  <span>{product.averageRating} / 5 ⭐</span>
-                </div>
-                <div className='flex justify-between'>
-                  <span className='text-muted-foreground'>Lượt đánh giá</span>
-                  <span>{product.totalRating} đánh giá</span>
-                </div>
-                <div className='flex justify-between'>
                   <span className='text-muted-foreground'>Ngày tạo</span>
-                  <span>{format(new Date(product.createdAt), 'dd/MM/yyyy', { locale: vi })}</span>
+                  <span>{format(new Date(user.createdAt), 'dd/MM/yyyy', { locale: vi })}</span>
                 </div>
                 <div className='flex justify-between'>
                   <span className='text-muted-foreground'>Cập nhật lần cuối</span>
-                  <span>{format(new Date(product.updatedAt), 'dd/MM/yyyy', { locale: vi })}</span>
-                </div>
-              </div>
-
-              <Separator />
-
-              <div>
-                <h3 className='text-sm font-medium mb-2'>Danh mục</h3>
-                <div className='flex flex-wrap gap-2'>
-                  {product.categories.map((category) => (
-                    <Badge key={category.id} variant='outline'>
-                      {category.name}
-                    </Badge>
-                  ))}
+                  <span>{format(new Date(user.updatedAt), 'dd/MM/yyyy', { locale: vi })}</span>
                 </div>
               </div>
             </CardContent>
@@ -356,28 +262,14 @@ export default function AdminProductDetail(props: { params: Promise<{ id: string
           {/* Action buttons */}
           <div className='space-y-3'>
             <Button className='w-full' variant='default'>
-              Chỉnh sửa sản phẩm
+              Chỉnh sửa thông tin
             </Button>
             <Button className='w-full' variant='outline'>
-              {product.stockQuantity > 0 ? 'Đánh dấu hết hàng' : 'Đánh dấu còn hàng'}
+              {user.isActive ? 'Vô hiệu hóa tài khoản' : 'Kích hoạt tài khoản'}
             </Button>
           </div>
         </div>
       </div>
-
-      {/* Image Dialog */}
-      <Dialog open={!!selectedImage} onOpenChange={() => setSelectedImage(null)}>
-        <DialogContent className='max-w-3xl max-h-[80vh]'>
-          <DialogHeader>
-            <DialogTitle>Hình ảnh sản phẩm</DialogTitle>
-            <DialogDescription>{product.name}</DialogDescription>
-          </DialogHeader>
-
-          <div className='relative w-full h-[500px]'>
-            {selectedImage && <Image src={selectedImage} alt={product.name} fill className='object-contain' />}
-          </div>
-        </DialogContent>
-      </Dialog>
     </div>
   )
 }

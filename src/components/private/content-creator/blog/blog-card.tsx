@@ -23,12 +23,10 @@ type Post = {
   totalComment: number
   createdAt: string
   updatedAt: string
-  categories?: [
-    {
-      id: string
-      name: string
-    }
-  ]
+  categories?: {
+    id: string
+    name: string
+  }[]
   status?: string
 }
 

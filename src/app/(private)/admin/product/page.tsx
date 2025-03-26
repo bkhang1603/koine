@@ -4,7 +4,7 @@ import { use, useEffect, useMemo } from 'react'
 import { useGetProductListAdminQuery } from '@/queries/useProduct'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Package, DollarSign } from 'lucide-react'
+import { Package, DollarSign, Plus } from 'lucide-react'
 import { TableCustom, dataListType } from '@/components/table-custom'
 import configRoute from '@/config/route'
 import { SearchParams } from '@/types/query'
@@ -16,6 +16,8 @@ import { MoreOptions } from '@/components/private/admin/product/more-options'
 import { Skeleton } from '@/components/ui/skeleton'
 import Image from 'next/image'
 import { Input } from '@/components/ui/input'
+import { Button } from '@/components/ui/button'
+import Link from 'next/link'
 
 function AdminProduct(props: { searchParams: SearchParams }) {
   const searchParams = use(props.searchParams)
@@ -149,7 +151,11 @@ function AdminProduct(props: { searchParams: SearchParams }) {
       {
         id: 7,
         render: (product: any) => (
-          <MoreOptions type='product' onView={() => router.push(`/admin/product/${product.id}`)} />
+          <MoreOptions
+            type='product'
+            onView={() => router.push(`${configRoute.admin.product}/${product.id}`)}
+            productId={product.id}
+          />
         )
       }
     ],
@@ -165,9 +171,17 @@ function AdminProduct(props: { searchParams: SearchParams }) {
   return (
     <div className='container mx-auto px-4 py-6 space-y-6'>
       {/* Header */}
-      <div>
-        <h1 className='text-2xl font-bold'>Quản lý sản phẩm</h1>
-        <p className='text-muted-foreground mt-1'>Quản lý danh sách sản phẩm trong hệ thống</p>
+      <div className='flex items-center justify-between'>
+        <div>
+          <h1 className='text-2xl font-bold'>Quản lý sản phẩm</h1>
+          <p className='text-muted-foreground mt-1'>Quản lý danh sách sản phẩm trong hệ thống</p>
+        </div>
+        <Button asChild>
+          <Link href={configRoute.admin.productNew} className='flex items-center gap-2'>
+            <Plus className='h-4 w-4' />
+            Thêm sản phẩm mới
+          </Link>
+        </Button>
       </div>
 
       {/* Stats Cards */}

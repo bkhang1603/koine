@@ -71,7 +71,7 @@ function AddToCartButton({ product }: { product: ProductResType['data'] }) {
       productId: product.id,
       quantity: quantity,
       unitPrice: product.price,
-      totalPrice: quantity * product.price,
+      totalPrice: quantity * (product.price - product.price * product.discount),
       discount: 0,
       isDeleted: false,
       product: {
@@ -85,7 +85,10 @@ function AddToCartButton({ product }: { product: ProductResType['data'] }) {
       comboId: null,
       courseId: null,
       course: null,
-      combo: null
+      combo: null,
+      status: 'PROCESSING',
+      payMethod: 'COD',
+      note: null
     })
 
     router.push(configRoute.checkout)

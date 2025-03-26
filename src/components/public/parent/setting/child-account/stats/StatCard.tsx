@@ -9,7 +9,7 @@ interface StatCardProps {
 }
 
 export const StatCard: React.FC<StatCardProps> = ({ icon: Icon, label, value, color }) => (
-  <Card className='overflow-hidden border-none shadow-sm hover:shadow-md transition-all'>
+  <Card className='overflow-hidden border-none shadow-md hover:shadow-lg transition-all'>
     <CardContent className='p-6'>
       <div className='flex justify-between items-center'>
         <div>

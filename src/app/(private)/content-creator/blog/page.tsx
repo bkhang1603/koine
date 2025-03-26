@@ -182,7 +182,7 @@ export default function BlogPage() {
       )}
 
       {/* Blog List - Hiển thị skeleton khi đang loading */}
-      <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'>
+      {/* <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'>
         {isLoading ? (
           // Hiển thị skeleton cards khi đang tải
           Array(6)
@@ -199,7 +199,7 @@ export default function BlogPage() {
             <EmptyBlogs />
           </div>
         )}
-      </div>
+      </div> */}
 
       {/* Pagination - Luôn hiển thị khi có nhiều trang */}
       {totalPages > 1 && (

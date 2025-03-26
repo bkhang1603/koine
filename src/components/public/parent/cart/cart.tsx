@@ -12,7 +12,7 @@ import { Checkbox } from '@/components/ui/checkbox'
 import { Card, CardContent } from '@/components/ui/card'
 import {
   useCartDetailDeleteListMutation,
-  useCartDetailDeleteMutation,
+  useCartDetailDeleteMultipleMutation,
   useCartDetailQuery,
   useCartDetailUpdateMutation
 } from '@/queries/useCartDetail'
@@ -33,6 +33,7 @@ import { useRouter } from 'next/navigation'
 import { useGetAccountAddress } from '@/queries/useAccount'
 import CartSkeleton from '@/components/public/parent/cart/cart-skeleton'
 import CartEmpty from '@/components/public/parent/cart/cart-empty'
+import { toast } from '@/components/ui/use-toast'
 
 export default function Cart() {
   const pickAddress = useAppStore((state) => state.pickAddress)
@@ -40,8 +41,9 @@ export default function Cart() {
 
   const { data, isLoading } = useCartDetailQuery()
   const updateMutation = useCartDetailUpdateMutation()
-  const deleteMutation = useCartDetailDeleteMutation()
-  const deleteListMutation = useCartDetailDeleteListMutation()
+  const deleteCartDetailMutation = useCartDetailDeleteListMutation()
+  const deleteMultipleCartMutation = useCartDetailDeleteMultipleMutation()
+
   const [selectedItems, setSelectedItems] = useState<Set<string>>(new Set())
 
   const [quantities, setQuantities] = useState<{ [key: string]: number }>({})
@@ -142,34 +144,36 @@ export default function Cart() {
 
   const removeItem = useCallback(
     async (id: string) => {
-      if (deleteMutation.isPending) return
+      if (deleteCartDetailMutation.isPending) return
 
       try {
-        await deleteMutation.mutateAsync({ id })
+        await deleteCartDetailMutation.mutateAsync({ id })
       } catch (error) {
         handleErrorApi({
           error
         })
       }
     },
-    [deleteMutation]
+    [deleteCartDetailMutation]
   )
 
   const removeSelectedItems = useCallback(async () => {
-    if (deleteListMutation.isPending) return
+    if (deleteMultipleCartMutation.isPending) return
 
     try {
-      await deleteListMutation.mutateAsync({
-        data: {
-          cartDetailIds: Array.from(selectedItems)
-        }
+      await deleteMultipleCartMutation.mutateAsync({
+        ids: Array.from(selectedItems)
+      })
+
+      toast({
+        description: 'Đã xóa tất cả sản phẩm đã chọn khỏi giỏ hàng'
       })
     } catch (error) {
       handleErrorApi({
         error
       })
     }
-  }, [deleteListMutation, selectedItems])
+  }, [selectedItems, deleteMultipleCartMutation])
 
   const cartDetails = data?.payload.data.cartDetails || []
   const isCartEmpty = !isLoading && cartDetails.length === 0
@@ -277,7 +281,7 @@ export default function Cart() {
                           </div>
                         </div>
                         <div className='grid grid-cols-4 gap-4 w-1/2 items-center'>
-                          <span className='text-center text-sm'>{item.unitPrice.toLocaleString()}đ</span>
+                          <span className='text-center text-sm'>{item.totalPrice.toLocaleString()}đ</span>
                           <div className='flex items-center justify-center'>
                             {item.product?.stockQuantity! > 0 ? (
                               <>

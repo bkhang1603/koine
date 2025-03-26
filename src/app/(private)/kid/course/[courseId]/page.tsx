@@ -1,22 +1,26 @@
 'use client'
-import { use } from 'react'
+import { use, useCallback } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
 
 import { Button } from '@/components/ui/button'
 import Image from 'next/image'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Progress } from '@/components/ui/progress'
 import { Card } from '@/components/ui/card'
-import { useGetCourseProgressQuery } from '@/queries/useCourse'
+import { useActiveCourseMutation, useGetCourseProgressQuery } from '@/queries/useCourse'
 import { BookOpen, Clock, CheckCircle2, LockKeyhole, ChevronRight, Home } from 'lucide-react'
 import { Skeleton } from '@/components/ui/skeleton'
 import Link from 'next/link'
-import { cn } from '@/lib/utils'
+import { cn, handleErrorApi } from '@/lib/utils'
 
 function CourseDetailPage(props: { params: Promise<{ courseId: string }> }) {
   const params = use(props.params)
+  const searchParams = useSearchParams()
+  const isEnrolled = searchParams.get('isEnrolled') === 'true'
   const { courseId } = params
+  const enrollMutation = useActiveCourseMutation()
   const { data, isLoading } = useGetCourseProgressQuery({ id: courseId })
   const course = data?.payload.data || null
+  const router = useRouter()
 
   // Breadcrumb component
   const Breadcrumb = () => (
@@ -37,6 +41,61 @@ function CourseDetailPage(props: { params: Promise<{ courseId: string }> }) {
       )}
     </div>
   )
+
+  const EmptyChapter = () => (
+    <Card className='p-8 text-center'>
+      <div className='mb-4'>
+        <BookOpen className='w-12 h-12 text-slate-300 mx-auto' />
+      </div>
+      <h3 className='text-xl font-bold text-slate-800 mb-2'>Chưa có bài học nào</h3>
+      <p className='text-slate-600 mb-4'>Khóa học này đang được cập nhật thêm nội dung</p>
+      <Button variant='outline' asChild>
+        <Link href='/kid/course'>Khám phá khóa học khác</Link>
+      </Button>
+    </Card>
+  )
+
+  // Helper function to check if lesson is first NOTYET lesson
+  const isFirstNotyetLesson = useCallback(
+    (lesson: any) => {
+      if (!course) return false
+
+      // Tìm bài NOTYET đầu tiên trong tất cả các chương
+      for (const chapter of course.chapters) {
+        const firstNotyetLesson = chapter.lessons.find((l: any) => l.status === 'NOTYET')
+        if (firstNotyetLesson) {
+          return lesson.id === firstNotyetLesson.id
+        }
+      }
+      return false
+    },
+    [course]
+  )
+
+  // Helper function to check if lesson is accessible
+  const canAccessLesson = useCallback(
+    (lesson: any) => {
+      return lesson.status === 'YET' || isFirstNotyetLesson(lesson)
+    },
+    [isFirstNotyetLesson]
+  )
+
+  const handleEnrollCourse = async () => {
+    try {
+      if (enrollMutation.isPending) return
+
+      await enrollMutation.mutateAsync({
+        courseId,
+        childId: null
+      })
+
+      router.push(`/kid/course/${courseId}?isEnrolled=true`)
+    } catch (error) {
+      handleErrorApi({
+        error
+      })
+    }
+  }
 
   // Render skeleton while loading
   if (isLoading) {
@@ -168,6 +227,7 @@ function CourseDetailPage(props: { params: Promise<{ courseId: string }> }) {
               {course.totalCompletedLessonsInCourse}/{course.totalLessonsInCourse} bài học đã hoàn thành
             </p>
           </div>
+
           <div className='grid grid-cols-2 gap-4 mb-6'>
             <div className='bg-primary/10 rounded-xl p-4'>
               <div className='flex items-center gap-2'>
@@ -184,33 +244,42 @@ function CourseDetailPage(props: { params: Promise<{ courseId: string }> }) {
               <p className='text-2xl font-bold text-green-600 mt-2'>{course.totalCompletedLessonsInCourse}</p>
             </div>
           </div>
-          <Button size='lg' className='w-full rounded-full' asChild>
-            <Link href={`/kid/course/${courseId}/learn`}>Tiếp tục học 🚀</Link>
-          </Button>
+
+          {isEnrolled ? (
+            <Button size='lg' className='w-full rounded-full' asChild>
+              <Link href={`/kid/course/${courseId}/learn`}>Tiếp tục học 🚀</Link>
+            </Button>
+          ) : (
+            <Button
+              size='lg'
+              className='w-full rounded-full'
+              onClick={handleEnrollCourse}
+              disabled={enrollMutation.isPending}
+            >
+              {enrollMutation.isPending ? 'Đang đăng ký...' : 'Đăng ký ngay 🎉'}
+            </Button>
+          )}
         </div>
       </div>
 
       {/* Course Content */}
-      <Tabs defaultValue='chapters' className='space-y-6'>
-        <TabsList className='grid w-full grid-cols-2 gap-4 bg-transparent h-12'>
-          <TabsTrigger
-            value='chapters'
-            className='data-[state=active]:bg-primary data-[state=active]:text-white rounded-full bg-slate-100 h-full'
-          >
-            Chương học 📚
-          </TabsTrigger>
-          <TabsTrigger
-            value='progress'
-            className='data-[state=active]:bg-primary data-[state=active]:text-white rounded-full bg-slate-100 h-full'
-          >
-            Tiến độ 📊
-          </TabsTrigger>
-        </TabsList>
+      <div className='space-y-6'>
+        <div className='flex items-center gap-3'>
+          <div className='w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center'>
+            <BookOpen className='h-5 w-5 text-primary' />
+          </div>
+          <h2 className='text-xl font-bold text-slate-800'>Nội dung khóa học</h2>
+        </div>
 
-        {/* Content unchanged */}
-        <TabsContent value='chapters' className='space-y-6'>
-          {course.chapters.map((chapter) => (
-            <Card key={chapter.id} className='p-6'>
+        {!isEnrolled && (
+          <div className='bg-amber-50 border border-amber-200 rounded-lg p-4 text-amber-700'>
+            <p>Đăng ký khóa học để truy cập toàn bộ nội dung bài học</p>
+          </div>
+        )}
+
+        {course.chapters.length > 0 ? (
+          course.chapters.map((chapter) => (
+            <Card key={chapter.id} className={cn('p-6', !isEnrolled && 'opacity-60')}>
               <div className='mb-4'>
                 <h3 className='text-xl font-bold mb-2'>
                   Chương {chapter.sequence}: {chapter.title}
@@ -228,155 +297,47 @@ function CourseDetailPage(props: { params: Promise<{ courseId: string }> }) {
               </div>
 
               <div className='space-y-4'>
-                {chapter.lessons.map((lesson) => (
-                  <div
-                    key={lesson.id}
-                    className={cn(
-                      'flex items-center gap-4 p-4 rounded-lg transition-colors',
-                      lesson.status === 'YET' ? 'hover:bg-gray-50 cursor-pointer' : 'opacity-70'
-                    )}
-                    onClick={() => {
-                      if (lesson.status === 'YET') {
-                        // Navigate to lesson
-                        window.location.href = `/kid/course/${courseId}/lesson/${lesson.id}`
-                      }
-                    }}
-                  >
-                    <div className='flex-shrink-0'>
-                      {lesson.status === 'YET' ? (
-                        <CheckCircle2 className='h-6 w-6 text-green-500' />
-                      ) : (
+                {chapter.lessons.length > 0 ? (
+                  chapter.lessons.map((lesson) => (
+                    <div
+                      key={lesson.id}
+                      className={cn(
+                        'flex items-center gap-4 p-4 rounded-lg',
+                        isEnrolled && canAccessLesson(lesson) ? 'hover:bg-gray-50 cursor-pointer' : 'opacity-70'
+                      )}
+                      onClick={() => {
+                        if (isEnrolled && canAccessLesson(lesson)) {
+                          router.push(`/kid/course/${courseId}/learn?lessonId=${lesson.id}`)
+                        }
+                      }}
+                    >
+                      <div className='flex-shrink-0'>
                         <LockKeyhole className='h-6 w-6 text-gray-400' />
-                      )}
-                    </div>
-                    <div className='flex-1 min-w-0'>
-                      <h4 className='font-medium text-gray-900'>
-                        Bài {lesson.sequence}: {lesson.title}
-                      </h4>
-                      <p className='text-sm text-gray-500'>{lesson.description}</p>
-                    </div>
-                    <div className='flex items-center gap-2 text-sm text-gray-500'>
-                      <Clock className='h-4 w-4' />
-                      <span>{lesson.durationsDisplay}</span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </Card>
-          ))}
-        </TabsContent>
-
-        <TabsContent value='progress' className='grid gap-6'>
-          {/* Overview Card */}
-          <Card className='p-6'>
-            <div className='grid md:grid-cols-3 gap-6'>
-              <div className='bg-primary/5 rounded-2xl p-6 text-center'>
-                <div className='inline-flex items-center justify-center w-12 h-12 rounded-full bg-primary/10 text-primary mb-4'>
-                  <BookOpen className='w-6 h-6' />
-                </div>
-                <h4 className='text-3xl font-bold mb-1'>{course.totalLessonsInCourse}</h4>
-                <p className='text-gray-600'>Tổng số bài học</p>
-              </div>
-
-              <div className='bg-green-50 rounded-2xl p-6 text-center'>
-                <div className='inline-flex items-center justify-center w-12 h-12 rounded-full bg-green-100 text-green-600 mb-4'>
-                  <CheckCircle2 className='w-6 h-6' />
-                </div>
-                <h4 className='text-3xl font-bold text-green-600 mb-1'>{course.totalCompletedLessonsInCourse}</h4>
-                <p className='text-gray-600'>Bài học đã hoàn thành</p>
-              </div>
-
-              <div className='bg-blue-50 rounded-2xl p-6 text-center'>
-                <div className='inline-flex items-center justify-center w-12 h-12 rounded-full bg-blue-100 text-blue-600 mb-4'>
-                  <Clock className='w-6 h-6' />
-                </div>
-                <h4 className='text-3xl font-bold text-blue-600 mb-1'>{course.courseCompletionPercentage}</h4>
-                <p className='text-gray-600'>Tổng thời gian học</p>
-              </div>
-            </div>
-          </Card>
-
-          {/* Progress by Chapter */}
-          {course.chapters.map((chapter) => (
-            <Card key={chapter.id} className='p-6'>
-              <div className='flex items-center justify-between mb-6'>
-                <div>
-                  <h3 className='text-lg font-bold mb-1'>
-                    Chương {chapter.sequence}: {chapter.title}
-                  </h3>
-                  <div className='flex items-center gap-4 text-sm text-gray-600'>
-                    <div className='flex items-center gap-1.5'>
-                      <BookOpen className='h-4 w-4' />
-                      <span>{chapter.lessons.length} bài học</span>
-                    </div>
-                    <div className='flex items-center gap-1.5'>
-                      <Clock className='h-4 w-4' />
-                      <span>{chapter.durationsDisplay}</span>
-                    </div>
-                  </div>
-                </div>
-                <div className='text-right'>
-                  <p className='text-2xl font-bold text-primary mb-1'>
-                    {chapter.lessons.filter((lesson) => lesson.status === 'YET').length}/{chapter.lessons.length}
-                  </p>
-                  <p className='text-sm text-gray-600'>bài học hoàn thành</p>
-                </div>
-              </div>
-
-              {/* Progress Bar */}
-              <div className='space-y-2 mb-6'>
-                <div className='w-full bg-gray-100 rounded-full h-3 overflow-hidden'>
-                  <div
-                    className='bg-primary h-full rounded-full transition-all duration-300'
-                    style={{
-                      width: `${(chapter.lessons.filter((lesson) => lesson.status === 'YET').length / chapter.lessons.length) * 100}%`
-                    }}
-                  />
-                </div>
-              </div>
-
-              {/* Lesson List */}
-              <div className='space-y-3'>
-                {chapter.lessons.map((lesson) => (
-                  <div
-                    key={lesson.id}
-                    className='flex items-center gap-4 p-4 rounded-xl bg-gray-50 hover:bg-gray-100 transition-colors'
-                  >
-                    <div className='flex-shrink-0'>
-                      {lesson.status === 'YET' ? (
-                        <div className='w-8 h-8 rounded-full bg-green-100 flex items-center justify-center'>
-                          <CheckCircle2 className='w-5 h-5 text-green-600' />
-                        </div>
-                      ) : (
-                        <div className='w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center'>
-                          <LockKeyhole className='w-5 h-5 text-gray-400' />
-                        </div>
-                      )}
-                    </div>
-                    <div className='flex-1 min-w-0'>
-                      <h4 className='font-medium text-gray-900 truncate'>
-                        Bài {lesson.sequence}: {lesson.title}
-                      </h4>
-                      <p className='text-sm text-gray-500 truncate'>{lesson.description}</p>
-                    </div>
-                    <div className='flex items-center gap-4'>
-                      <div className='flex items-center gap-1.5 text-sm text-gray-500'>
-                        <Clock className='h-4 w-4' />
-                        <span>{lesson.durationsDisplay}</span>
                       </div>
-                      {lesson.status === 'YET' && (
-                        <Button variant='ghost' size='sm' className='rounded-full'>
-                          Xem lại <ChevronRight className='w-4 h-4 ml-1' />
-                        </Button>
-                      )}
+                      <div className='flex-1 min-w-0'>
+                        <h4 className='font-medium text-gray-900'>
+                          Bài {lesson.sequence}: {lesson.title}
+                        </h4>
+                        <p className='text-sm text-gray-500'>{lesson.description}</p>
+                      </div>
+                      <div className='flex items-center gap-2'>
+                        <div className='flex items-center gap-2 text-sm text-gray-500'>
+                          <Clock className='h-4 w-4' />
+                          <span>{lesson.durationsDisplay}</span>
+                        </div>
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  ))
+                ) : (
+                  <div className='text-center py-4 text-gray-500'>Chương này chưa có bài học nào</div>
+                )}
               </div>
             </Card>
-          ))}
-        </TabsContent>
-      </Tabs>
+          ))
+        ) : (
+          <EmptyChapter />
+        )}
+      </div>
     </div>
   )
 }

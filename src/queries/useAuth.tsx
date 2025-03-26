@@ -36,3 +36,9 @@ export const useResendOTPMutation = () => {
     mutationFn: authApiRequest.resendOTP
   })
 }
+
+export const useRequestResetPasswordMutation = () => {
+  return useMutation({
+    mutationFn: authApiRequest.requestResetPassword
+  })
+}

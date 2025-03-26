@@ -18,8 +18,9 @@ const configRoute = {
     order: '/setting/order',
     address: '/setting/address',
     payment: '/setting/payment',
-    notification: '/setting/notification',
-    security: '/setting/security'
+    notifications: '/setting/notifications',
+    security: '/setting/security',
+    childAccount: '/setting/child-account'
   },
   profile: '/profile',
   contentCreator: {
@@ -36,7 +37,9 @@ const configRoute = {
     dashboard: '/kid',
     course: '/kid/course',
     knowledge: '/kid/knowledge',
-    bookmark: '/kid/bookmark'
+    bookmark: '/kid/bookmark',
+    game: '/kid/game',
+    achievement: '/kid/achievement'
   },
   admin: {
     dashboard: '/admin',
@@ -44,6 +47,8 @@ const configRoute = {
     course: '/admin/course',
     blog: '/admin/blog',
     product: '/admin/product',
+    productNew: '/admin/product/new',
+    productEdit: '/admin/product/edit',
     user: '/admin/user'
   }
 }

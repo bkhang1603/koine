@@ -1,7 +1,7 @@
 'use client'
 
 import configRoute from '@/config/route'
-import { Brain, Home, LibraryBig } from 'lucide-react'
+import { Brain, Gamepad, Home, LibraryBig } from 'lucide-react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 
@@ -14,7 +14,12 @@ function KidNavbar() {
       href: configRoute.kid.course,
       icon: <LibraryBig className='w-5 h-5' />
     },
-    { name: 'Kiến thức', href: configRoute.kid.knowledge, icon: <Brain className='w-5 h-5' /> }
+    { name: 'Kiến thức', href: configRoute.kid.knowledge, icon: <Brain className='w-5 h-5' /> },
+    {
+      name: 'Trò chơi',
+      href: configRoute.kid.game,
+      icon: <Gamepad className='w-5 h-5' />
+    }
   ]
 
   return (

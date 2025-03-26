@@ -1,259 +1,468 @@
 'use client'
 
-import { Button } from '@/components/ui/button'
-import { Skeleton } from '@/components/ui/skeleton'
-import Image from 'next/image'
-import { Card } from '@/components/ui/card'
-import Link from 'next/link'
 import { useCourseByAccount, useSuggestCoursesFree } from '@/queries/useAccount'
-import { Clock, BookOpen, ChevronRight, Sparkles, GraduationCap, Target } from 'lucide-react'
+import React from 'react'
+import Image from 'next/image'
+import Link from 'next/link'
+import { Card } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
+import { Progress } from '@/components/ui/progress'
+import { BookOpen, Target, Brain, Gamepad2 } from 'lucide-react'
+import images from '@/assets/images'
+import { motion } from 'framer-motion'
+import { Clock, Medal } from 'lucide-react'
+import { Skeleton } from '@/components/ui/skeleton'
 
-function KidCoursesPage() {
-  const { data, isLoading } = useCourseByAccount({ page_size: 10, page_index: 1 })
-  const courses = data?.payload.data ?? []
+// Thêm component Overview
+const CourseOverview = ({ courses }: { courses: any[] }) => {
+  // Tính toán các thống kê từ data thực
+  const totalActiveCourses = courses.length
+  const completedCourses = courses.filter((c) => c.completionRate === 100).length
+  const totalCompletionRate =
+    courses.length > 0 ? Math.round(courses.reduce((acc, c) => acc + (c.completionRate || 0), 0) / courses.length) : 0
 
-  const { data: suggestCoursesData } = useSuggestCoursesFree()
+  // Tính tổng thời gian học (giả sử mỗi bài học mất 30 phút)
+  const totalLessonsCompleted = courses.reduce((acc, c) => acc + (c.totalLessonFinished || 0), 0)
+  const totalHours = Math.round(totalLessonsCompleted * 0.5)
+
+  return (
+    <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6'>
+      <Card className='p-4 bg-gradient-to-br from-sky-50 to-blue-50'>
+        <div className='flex items-start gap-3'>
+          <div className='p-2 rounded-lg bg-blue-100'>
+            <BookOpen className='w-5 h-5 text-blue-600' />
+          </div>
+          <div>
+            <div className='text-2xl font-bold text-slate-800'>{totalActiveCourses}</div>
+            <div className='text-sm text-slate-600'>Khóa học đang học</div>
+          </div>
+        </div>
+      </Card>
+
+      <Card className='p-4 bg-gradient-to-br from-emerald-50 to-green-50'>
+        <div className='flex items-start gap-3'>
+          <div className='p-2 rounded-lg bg-emerald-100'>
+            <Target className='w-5 h-5 text-emerald-600' />
+          </div>
+          <div>
+            <div className='text-2xl font-bold text-slate-800'>{totalCompletionRate}%</div>
+            <div className='text-sm text-slate-600'>Tỷ lệ hoàn thành</div>
+          </div>
+        </div>
+      </Card>
+
+      <Card className='p-4 bg-gradient-to-br from-amber-50 to-orange-50'>
+        <div className='flex items-start gap-3'>
+          <div className='p-2 rounded-lg bg-amber-100'>
+            <Clock className='w-5 h-5 text-amber-600' />
+          </div>
+          <div>
+            <div className='text-2xl font-bold text-slate-800'>{totalHours}h</div>
+            <div className='text-sm text-slate-600'>Thời gian học</div>
+          </div>
+        </div>
+      </Card>
+
+      <Card className='p-4 bg-gradient-to-br from-purple-50 to-pink-50'>
+        <div className='flex items-start gap-3'>
+          <div className='p-2 rounded-lg bg-purple-100'>
+            <Medal className='w-5 h-5 text-purple-600' />
+          </div>
+          <div>
+            <div className='text-2xl font-bold text-slate-800'>{completedCourses}</div>
+            <div className='text-sm text-slate-600'>Khóa học hoàn thành</div>
+          </div>
+        </div>
+      </Card>
+    </div>
+  )
+}
+
+const OverviewCardSkeleton = () => (
+  <Card className='p-4'>
+    <div className='flex items-start gap-3'>
+      <Skeleton className='w-9 h-9 rounded-lg' />
+      <div>
+        <Skeleton className='h-7 w-16 mb-1' />
+        <Skeleton className='h-4 w-32' />
+      </div>
+    </div>
+  </Card>
+)
+
+const ProgressCardSkeleton = () => (
+  <Card className='p-6'>
+    <div className='flex items-center justify-between mb-4'>
+      <div className='flex items-center gap-2'>
+        <Skeleton className='w-5 h-5 rounded-full' />
+        <Skeleton className='h-6 w-32' />
+      </div>
+      <Skeleton className='h-8 w-16' />
+    </div>
+    <Skeleton className='h-4 w-full mb-3' />
+    <Skeleton className='h-2 w-full mb-2' />
+    <div className='flex justify-end'>
+      <Skeleton className='h-4 w-24' />
+    </div>
+  </Card>
+)
+
+const CourseCardSkeleton = () => (
+  <Card className='overflow-hidden border-none bg-white/80 backdrop-blur'>
+    <div className='relative h-48'>
+      <Skeleton className='h-full w-full' />
+    </div>
+    <div className='p-6'>
+      <div className='flex items-center gap-2 mb-4'>
+        <Skeleton className='h-8 w-8 rounded-full' />
+        <Skeleton className='h-6 w-32' />
+      </div>
+      <Skeleton className='h-6 w-3/4 mb-2' />
+      <Skeleton className='h-4 w-full mb-2' />
+      <Skeleton className='h-4 w-2/3 mb-4' />
+      <div className='flex items-center justify-between'>
+        <Skeleton className='h-6 w-24 rounded-lg' />
+        <Skeleton className='h-8 w-20 rounded-xl' />
+      </div>
+    </div>
+  </Card>
+)
+
+function CoursePage() {
+  const { data: courseData, isLoading: coursesLoading } = useCourseByAccount({ page_size: 10, page_index: 1 })
+  const courses = courseData?.payload.data ?? []
+
+  const { data: suggestCoursesData, isLoading: suggestionsLoading } = useSuggestCoursesFree()
   const suggestCourses = suggestCoursesData?.payload.data ?? []
 
   return (
-    <div className='min-h-screen bg-gray-50/50'>
-      {/* Hero Section */}
-      <div className='relative bg-gradient-to-b from-primary/5 to-background mb-12'>
-        <div className='container mx-auto px-4 py-12'>
-          <div className='max-w-2xl mx-auto text-center'>
-            <div className='inline-flex items-center gap-2 bg-primary/10 text-primary rounded-full px-4 py-1.5 text-sm font-medium mb-6'>
-              <Sparkles className='w-4 h-4' />
-              <span>Khám phá khóa học mới</span>
-            </div>
-            <h1 className='text-3xl md:text-4xl font-bold mb-4'>Bắt đầu hành trình học tập của bạn 🚀</h1>
-            <p className='text-gray-600 mb-8 max-w-xl mx-auto'>
-              Khám phá các khóa học được thiết kế riêng cho lứa tuổi của bạn, giúp phát triển toàn diện
-            </p>
+    <div className='py-8'>
+      {/* Pastel Banner */}
+      <div className='relative overflow-hidden rounded-3xl mb-12'>
+        <div className='absolute inset-0 bg-gradient-to-r from-amber-100 via-orange-100 to-rose-100'></div>
+
+        {/* Soft Decorative Elements */}
+        <div className='absolute inset-0'>
+          <div className='absolute top-0 left-0 w-full h-full bg-white/40'></div>
+          <div className='absolute -top-20 -left-20 w-72 h-72 bg-amber-200/50 rounded-full mix-blend-multiply filter blur-3xl'></div>
+          <div className='absolute -bottom-20 -right-20 w-72 h-72 bg-rose-200/50 rounded-full mix-blend-multiply filter blur-3xl'></div>
+        </div>
+
+        <div className='relative px-8 py-20'>
+          <div className='max-w-4xl mx-auto text-center'>
+            <motion.div
+              initial={{ y: -20, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              className='inline-flex items-center bg-white/70 rounded-full px-4 py-2 mb-6 backdrop-blur-sm shadow-sm'
+            >
+              <BookOpen className='w-5 h-5 text-amber-400 mr-2' />
+              <span className='text-slate-700 font-medium'>Hành trình học tập của bạn</span>
+            </motion.div>
+
+            <motion.h1
+              initial={{ y: 20, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ delay: 0.2 }}
+              className='text-4xl md:text-5xl font-bold text-slate-800 mb-6'
+            >
+              Khám Phá và Học Hỏi
+              <br />
+              <span className='text-amber-500'>Cùng Những Khóa Học Thú Vị</span>
+            </motion.h1>
+
+            <motion.p
+              initial={{ y: 20, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ delay: 0.3 }}
+              className='text-lg text-slate-600 max-w-2xl mx-auto'
+            >
+              Bắt đầu hành trình chinh phục tri thức với những khóa học được thiết kế đặc biệt dành cho bạn
+            </motion.p>
           </div>
         </div>
       </div>
 
-      {/* Categories Section */}
-      <div className='container mx-auto px-4 mb-12'>
-        <div className='bg-white rounded-2xl p-6 shadow-sm'>
+      {/* Overview Section */}
+      {coursesLoading ? (
+        <motion.section initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} className='mb-8'>
           <div className='flex items-center gap-3 mb-6'>
-            <Target className='w-5 h-5 text-primary' />
-            <h2 className='text-lg font-semibold'>Chọn chủ đề yêu thích</h2>
+            <Skeleton className='w-12 h-12 rounded-2xl' />
+            <div>
+              <Skeleton className='h-8 w-48 mb-1' />
+              <Skeleton className='h-5 w-64' />
+            </div>
           </div>
 
-          {isLoading ? (
-            <div className='flex gap-3 overflow-x-auto pb-2'>
-              {[1, 2, 3, 4, 5].map((i) => (
-                <Skeleton key={i} className='w-32 h-10 rounded-full flex-shrink-0' />
+          <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6'>
+            {Array(2)
+              .fill(0)
+              .map((_, i) => (
+                <OverviewCardSkeleton key={`overview-${i}`} />
               ))}
-            </div>
-          ) : (
-            <div className='flex gap-3 overflow-x-auto pb-2'>
-              <Button variant='default' className='rounded-full gap-2 flex-shrink-0'>
-                <Sparkles className='h-4 w-4' /> Tất cả
-              </Button>
-              {['Toán học', 'Ngoại ngữ', 'Khoa học', 'Nghệ thuật', 'Kỹ năng sống'].map((category) => (
-                <Button
-                  key={category}
-                  variant='outline'
-                  className='rounded-full flex-shrink-0 hover:bg-primary hover:text-white transition-colors'
-                >
-                  {category}
-                </Button>
+            {Array(2)
+              .fill(0)
+              .map((_, i) => (
+                <ProgressCardSkeleton key={`progress-${i}`} />
               ))}
-            </div>
-          )}
-        </div>
-      </div>
-
-      {/* My Courses Section */}
-      <div className='container mx-auto px-4 mb-16'>
-        <div className='flex items-center justify-between mb-8'>
-          <div>
-            <div className='flex items-center gap-2 mb-2'>
-              <GraduationCap className='w-5 h-5 text-primary' />
-              <h2 className='text-xl font-bold'>Khóa học của tôi</h2>
-            </div>
-            <p className='text-gray-500 text-sm'>Tiếp tục hành trình học tập của bạn</p>
           </div>
-          <Button variant='outline' className='rounded-full gap-2'>
-            Xem tất cả <ChevronRight className='h-4 w-4' />
-          </Button>
-        </div>
-
-        <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'>
-          {courses.map((course) => (
-            <Link href={`/kid/course/${course.id}`} key={course.id}>
-              <Card className='group h-full hover:shadow-lg transition-all duration-300 overflow-hidden bg-white'>
-                <div className='relative h-48'>
-                  <Image src={course.imageUrl} alt={course.title} fill className='object-cover' />
-                  <div className='absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300' />
-                  <div className='absolute top-4 right-4 bg-white/95 shadow-sm backdrop-blur-sm px-3 py-1 rounded-full text-sm font-medium'>
-                    {course.level === 'ALL' ? (
-                      <span className='text-yellow-500 flex items-center gap-1'>
-                        <Sparkles className='h-4 w-4' /> Tất cả
-                      </span>
-                    ) : course.level === 'EASY' ? (
-                      <span className='text-green-500 flex items-center gap-1'>
-                        <span className='w-2 h-2 rounded-full bg-green-500' /> Dễ
-                      </span>
-                    ) : (
-                      <span className='text-red-500 flex items-center gap-1'>
-                        <span className='w-2 h-2 rounded-full bg-red-500' /> Khó
-                      </span>
-                    )}
-                  </div>
-                </div>
-                <div className='p-6'>
-                  <div className='flex flex-wrap items-center gap-2 mb-3'>
-                    {course.categories.map((category) => (
-                      <span
-                        key={category.id}
-                        className='bg-primary/5 text-primary text-sm px-3 py-1 rounded-full font-medium'
-                      >
-                        {category.name}
-                      </span>
-                    ))}
-                  </div>
-                  <h3 className='text-xl font-bold mb-2 line-clamp-1 group-hover:text-primary transition-colors'>
-                    {course.title}
-                  </h3>
-                  <p className='text-gray-600 mb-4 line-clamp-2'>{course.description}</p>
-
-                  {/* Progress Section */}
-                  <div className='space-y-2 mb-4'>
-                    <div className='w-full bg-gray-100 rounded-full h-2.5 overflow-hidden'>
-                      <div
-                        className='bg-primary h-full rounded-full transition-all duration-300'
-                        style={{ width: `${course.completionRate}%` }}
-                      />
-                    </div>
-                    <div className='flex justify-between text-sm text-gray-600'>
-                      <span>
-                        {course.totalLessonFinished}/{course.totalLesson} bài học
-                      </span>
-                      <span>{course.completionRate}% hoàn thành</span>
-                    </div>
-                  </div>
-
-                  {/* Stats */}
-                  <div className='flex items-center justify-between pt-4 border-t'>
-                    <div className='flex items-center gap-4 text-sm text-gray-600'>
-                      <div className='flex items-center gap-1.5'>
-                        <Clock className='h-4 w-4 text-primary' />
-                        <span>{course.durationDisplay}</span>
-                      </div>
-                      <div className='flex items-center gap-1.5'>
-                        <BookOpen className='h-4 w-4 text-primary' />
-                        <span>{course.totalLesson} bài học</span>
-                      </div>
-                    </div>
-                    <Button
-                      variant='ghost'
-                      size='sm'
-                      className='rounded-full opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300'
-                    >
-                      Tiếp tục <ChevronRight className='h-4 w-4 ml-1' />
-                    </Button>
-                  </div>
-                </div>
-              </Card>
-            </Link>
-          ))}
-        </div>
-      </div>
-
-      {/* Suggested Courses */}
-      <div className='container mx-auto px-4 mb-16'>
-        <div className='flex items-center justify-between mb-8'>
-          <div>
-            <div className='flex items-center gap-2 mb-2'>
-              <Sparkles className='w-5 h-5 text-primary' />
-              <h2 className='text-xl font-bold'>Khóa học gợi ý</h2>
+        </motion.section>
+      ) : (
+        <motion.section initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} className='mb-8'>
+          <div className='flex items-center mb-6'>
+            <div className='w-12 h-12 rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-500 flex items-center justify-center shadow-lg transform hover:scale-110 transition-transform'>
+              <Brain className='h-6 w-6 text-white' />
             </div>
-            <p className='text-gray-500 text-sm'>Được chọn lọc phù hợp với trình độ của bạn</p>
+            <h2 className='text-2xl font-bold ml-4 text-slate-700 bg-gradient-to-r from-blue-500 to-indigo-500 bg-clip-text text-transparent'>
+              Tổng quan học tập
+            </h2>
           </div>
+          <CourseOverview courses={courses} />
+        </motion.section>
+      )}
+
+      <div className='min-h-screen'>
+        {/* Background effect */}
+        <div className='fixed inset-0 -z-10 overflow-hidden pointer-events-none'>
+          <div className='absolute top-0 -left-10 w-72 h-72 bg-pink-100 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob'></div>
+          <div className='absolute top-0 -right-10 w-72 h-72 bg-yellow-100 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-2000'></div>
+          <div className='absolute -bottom-8 left-20 w-72 h-72 bg-blue-100 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-4000'></div>
         </div>
 
-        <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'>
-          {suggestCourses.map((course) => (
-            <Link href={`/kid/course/${course.id}`} key={course.id}>
-              <Card className='group h-full hover:shadow-lg transition-all duration-300 overflow-hidden bg-white'>
-                <div className='relative h-48'>
-                  <Image src={course.imageUrl} alt={course.title} fill className='object-cover' />
-                  <div className='absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300' />
-                  <div className='absolute top-4 right-4 bg-white/95 shadow-sm backdrop-blur-sm px-3 py-1 rounded-full text-sm font-medium'>
-                    {course.level === 'ALL' ? (
-                      <span className='text-yellow-500 flex items-center gap-1'>
-                        <Sparkles className='h-4 w-4' /> Tất cả
-                      </span>
-                    ) : course.level === 'EASY' ? (
-                      <span className='text-green-500 flex items-center gap-1'>
-                        <span className='w-2 h-2 rounded-full bg-green-500' /> Dễ
-                      </span>
-                    ) : (
-                      <span className='text-red-500 flex items-center gap-1'>
-                        <span className='w-2 h-2 rounded-full bg-red-500' /> Khó
-                      </span>
-                    )}
-                  </div>
-                </div>
+        <div className='min-h-screen pt-4 pb-16'>
+          {/* Quest Journal - Khóa học đang học */}
+          <section className='mb-12 relative'>
+            <div className='absolute -left-4 -top-4 w-20 h-20 bg-amber-100 rounded-full opacity-20 blur-xl'></div>
+            <div className='flex items-center mb-6'>
+              <div className='w-12 h-12 rounded-2xl bg-gradient-to-br from-amber-400 to-orange-400 flex items-center justify-center shadow-lg transform hover:scale-110 transition-transform'>
+                <BookOpen className='h-6 w-6 text-white' />
+              </div>
+              <h2 className='text-2xl font-bold ml-4 text-slate-700 bg-gradient-to-r from-amber-500 to-orange-500 bg-clip-text text-transparent'>
+                Nhiệm vụ đang thực hiện
+              </h2>
+            </div>
 
-                <div className='p-6'>
-                  <div className='flex flex-wrap items-center gap-2 mb-3'>
-                    {course.categories.map((category) => (
-                      <span
-                        key={category.id}
-                        className='bg-primary/5 text-primary text-sm px-3 py-1 rounded-full font-medium'
-                      >
-                        {category.name}
-                      </span>
-                    ))}
-                  </div>
+            {coursesLoading ? (
+              <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'>
+                {Array(3)
+                  .fill(0)
+                  .map((_, i) => (
+                    <CourseCardSkeleton key={`current-${i}`} />
+                  ))}
+              </div>
+            ) : courses.length > 0 ? (
+              <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'>
+                {courses.map((course) => (
+                  <Link href={`/kid/course/${course.id}?isEnrolled=true`} key={course.id}>
+                    <Card className='border-0 overflow-hidden bg-white/80 backdrop-blur-sm hover:bg-white transition-all shadow-md hover:shadow-lg group'>
+                      <div className='relative p-5'>
+                        {/* Quest decorator */}
+                        <div className='absolute top-0 left-5 w-0.5 h-full bg-amber-200'></div>
+                        <div className='absolute top-5 left-5 w-4 h-4 rounded-full bg-amber-400 border-4 border-amber-50 -ml-2 shadow-sm'></div>
 
-                  <h3 className='text-xl font-bold mb-2 line-clamp-1 group-hover:text-primary transition-colors'>
-                    {course.title}
-                  </h3>
-                  <p className='text-gray-600 mb-4 line-clamp-2'>{course.description}</p>
+                        <div className='ml-6 pl-4'>
+                          <div className='flex items-start justify-between'>
+                            <div>
+                              <div className='flex flex-wrap gap-2 mb-2'>
+                                {course.categories?.slice(0, 1).map((category) => (
+                                  <span
+                                    key={category.id}
+                                    className='px-2 py-1 bg-indigo-50 text-indigo-600 text-xs rounded-lg font-medium'
+                                  >
+                                    {category.name}
+                                  </span>
+                                ))}
+                                <span className='px-2 py-1 bg-amber-50 text-amber-600 text-xs rounded-lg font-medium'>
+                                  {course.level}
+                                </span>
+                              </div>
 
-                  {/* Thay thế phần progress bằng nút đăng ký */}
-                  {/* <div className='mb-4'>
-                    <Button
-                      className='w-full rounded-full bg-primary/10 hover:bg-primary hover:text-white text-primary transition-colors'
-                      variant='ghost'
-                    >
-                      Đăng ký học ngay
-                    </Button>
-                  </div> */}
+                              <h3 className='text-xl font-bold text-slate-700 group-hover:text-amber-500 transition-colors mb-2 line-clamp-1'>
+                                {course.title}
+                              </h3>
 
-                  {/* Stats */}
-                  <div className='flex items-center justify-between pt-4 border-t'>
-                    <div className='flex items-center gap-4 text-sm text-gray-600'>
-                      <div className='flex items-center gap-1.5'>
-                        <Clock className='h-4 w-4 text-primary' />
-                        <span>{course.durationsDisplay}</span>
+                              <p className='text-slate-600 text-sm mb-4 line-clamp-2'>{course.description}</p>
+                            </div>
+
+                            <div className='w-16 h-16 shrink-0 ml-4'>
+                              <div className='w-full h-full rounded-xl overflow-hidden shadow-md'>
+                                <Image
+                                  src={course.imageUrl || images.toy}
+                                  alt={course.title}
+                                  width={64}
+                                  height={64}
+                                  className='w-full h-full object-cover'
+                                />
+                              </div>
+                            </div>
+                          </div>
+
+                          <div className='mb-3'>
+                            <Progress value={course.completionRate} className='h-3 bg-slate-200' />
+                          </div>
+
+                          <div className='flex justify-between text-xs text-slate-600'>
+                            <span>
+                              {course.totalLessonFinished}/{course.totalLesson} bài học
+                            </span>
+                            <span>{course.completionRate}% hoàn thành</span>
+                          </div>
+                        </div>
                       </div>
-                      <div className='flex items-center gap-1.5'>
-                        <BookOpen className='h-4 w-4 text-primary' />
-                        <span>10 bài học</span>
-                      </div>
-                    </div>
-                    <Button
-                      variant='ghost'
-                      size='sm'
-                      className='rounded-full opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300'
-                    >
-                      Xem chi tiết <ChevronRight className='h-4 w-4 ml-1' />
-                    </Button>
-                  </div>
-                </div>
+                    </Card>
+                  </Link>
+                ))}
+              </div>
+            ) : (
+              <Card className='p-8 text-center bg-white/80 backdrop-blur'>
+                <BookOpen className='w-12 h-12 text-slate-300 mx-auto mb-4' />
+                <h3 className='text-xl font-bold text-slate-800 mb-2'>Chưa có khóa học nào</h3>
+                <p className='text-slate-600 mb-4'>Hãy bắt đầu với các khóa học miễn phí của chúng tôi</p>
+                <Button variant='outline'>Khám phá ngay</Button>
               </Card>
-            </Link>
-          ))}
+            )}
+          </section>
+
+          {/* New Adventures - Khóa học đề xuất */}
+          <section className='mb-12'>
+            <div className='flex items-center mb-6'>
+              <div className='w-12 h-12 rounded-2xl bg-gradient-to-br from-purple-400 to-indigo-400 flex items-center justify-center shadow-lg transform hover:scale-110 transition-transform'>
+                <Target className='h-6 w-6 text-white' />
+              </div>
+              <h2 className='text-2xl font-bold ml-4 text-slate-700 bg-gradient-to-r from-purple-400 to-indigo-400 bg-clip-text text-transparent'>
+                Cuộc phiêu lưu mới
+              </h2>
+            </div>
+
+            {suggestionsLoading ? (
+              <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'>
+                {Array(3)
+                  .fill(0)
+                  .map((_, i) => (
+                    <CourseCardSkeleton key={`suggest-${i}`} />
+                  ))}
+              </div>
+            ) : (
+              <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'>
+                {suggestCourses.map((course) => (
+                  <Link href={`/kid/course/${course.id}?isEnrolled=false`} key={course.id}>
+                    <Card className='border-0 overflow-hidden h-full bg-gradient-to-b from-white to-slate-50/90 backdrop-blur-sm hover:shadow-lg transition-all shadow-md group'>
+                      <div className='relative w-full h-40 overflow-hidden'>
+                        <Image
+                          src={course.imageUrl || images.toy}
+                          alt={course.title}
+                          fill
+                          className='object-cover group-hover:scale-105 transition-all duration-500'
+                        />
+                        <div className='absolute inset-0 bg-gradient-to-t from-slate-800/60 via-slate-800/30 to-transparent'></div>
+
+                        <div className='absolute bottom-3 left-3 flex flex-wrap gap-2'>
+                          {course.categories?.slice(0, 1).map((category) => (
+                            <span
+                              key={category.id}
+                              className='px-2 py-1 bg-purple-400/80 text-white text-xs rounded-lg backdrop-blur-sm font-medium'
+                            >
+                              {category.name}
+                            </span>
+                          ))}
+                        </div>
+
+                        <div className='absolute top-3 right-3'>
+                          <span className='px-2 py-1 bg-white/80 text-slate-700 text-xs rounded-lg backdrop-blur-sm font-medium'>
+                            {course.level}
+                          </span>
+                        </div>
+                      </div>
+
+                      <div className='p-5'>
+                        <h3 className='text-lg font-bold text-slate-700 group-hover:text-purple-500 transition-colors mb-2 line-clamp-1'>
+                          {course.title}
+                        </h3>
+
+                        <p className='text-slate-600 text-sm mb-5 line-clamp-2 min-h-[40px]'>{course.description}</p>
+
+                        <div className='flex items-center justify-between'>
+                          <div className='flex items-center gap-2 text-slate-500 text-xs'>
+                            <div className='px-2 py-1 rounded-lg bg-slate-100 flex items-center gap-1'>
+                              <BookOpen className='h-3.5 w-3.5' />
+                              <span>{course.totalLesson} bài học</span>
+                            </div>
+                          </div>
+
+                          <Button
+                            size='sm'
+                            className='bg-purple-400 hover:bg-purple-500 text-white rounded-xl px-3 py-1 h-8'
+                          >
+                            Bắt đầu
+                          </Button>
+                        </div>
+                      </div>
+                    </Card>
+                  </Link>
+                ))}
+              </div>
+            )}
+          </section>
+
+          {/* Entertainment Section */}
+          <section className='mb-12'>
+            <div className='flex items-center mb-6'>
+              <div className='w-12 h-12 rounded-2xl bg-gradient-to-br from-pink-400 to-rose-400 flex items-center justify-center shadow-lg transform hover:scale-110 transition-transform'>
+                <Gamepad2 className='h-6 w-6 text-white' />
+              </div>
+              <h2 className='text-2xl font-bold ml-4 text-slate-700 bg-gradient-to-r from-pink-400 to-rose-400 bg-clip-text text-transparent'>
+                Khu vực giải trí
+              </h2>
+            </div>
+
+            {/* Entertainment content */}
+            <div className='grid grid-cols-1 md:grid-cols-3 gap-6'>
+              <Link href='/kid/game/memory'>
+                <Card className='p-6 bg-gradient-to-r from-primary/10 to-secondary/10 hover:shadow-lg transition-all duration-300'>
+                  <div className='flex items-center gap-4'>
+                    <div className='w-12 h-12 bg-white rounded-full flex items-center justify-center'>
+                      <span className='text-2xl'>🧩</span>
+                    </div>
+                    <div>
+                      <h3 className='font-bold mb-1'>Memory Game</h3>
+                      <p className='text-sm text-gray-600'>Rèn luyện trí nhớ</p>
+                    </div>
+                  </div>
+                </Card>
+              </Link>
+
+              <Link href='/kid/game/tictactoe'>
+                <Card className='p-6 bg-gradient-to-r from-green-100 to-blue-100 hover:shadow-lg transition-all duration-300'>
+                  <div className='flex items-center gap-4'>
+                    <div className='w-12 h-12 bg-white rounded-full flex items-center justify-center'>
+                      <span className='text-2xl'>⭕</span>
+                    </div>
+                    <div>
+                      <h3 className='font-bold mb-1'>Tic Tac Toe</h3>
+                      <p className='text-sm text-gray-600'>Trò chơi cờ ca rô</p>
+                    </div>
+                  </div>
+                </Card>
+              </Link>
+
+              <Link href='/kid/game/rocket'>
+                <Card className='p-6 bg-gradient-to-r from-yellow-100 to-red-100 hover:shadow-lg transition-all duration-300'>
+                  <div className='flex items-center gap-4'>
+                    <div className='w-12 h-12 bg-white rounded-full flex items-center justify-center'>
+                      <span className='text-2xl'>🚀</span>
+                    </div>
+                    <div>
+                      <h3 className='font-bold mb-1'>Rocket Game</h3>
+                      <p className='text-sm text-gray-600'>Phiêu lưu trong không gian</p>
+                    </div>
+                  </div>
+                </Card>
+              </Link>
+            </div>
+          </section>
         </div>
       </div>
     </div>
   )
 }
 
-export default KidCoursesPage
+export default CoursePage

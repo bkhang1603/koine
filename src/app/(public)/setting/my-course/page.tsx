@@ -10,8 +10,7 @@ import { CourseStatsHeader } from '@/components/public/parent/setting/courses/Co
 import { CoursesList } from '@/components/public/parent/setting/courses/CoursesList'
 import { EmptyCourses } from '@/components/public/parent/setting/courses/EmptyCourses'
 import { CoursesSkeleton } from '@/components/public/parent/setting/courses/CoursesSkeleton'
-import { StatsHeaderSkeleton } from '@/components/public/parent/setting/courses/StatsHeaderSkeleton'
-import { Skeleton } from '@/components/ui/skeleton'
+import { CourseStatsHeaderSkeleton } from '@/components/public/parent/setting/courses/CourseStatsHeaderSkeleton'
 
 // Tạo constant cho tabs
 const courseTabs = [
@@ -93,49 +92,33 @@ export default function MyCoursesPage() {
 
   return (
     <div className='space-y-8'>
-      {/* Header với tiêu đề */}
       {isLoading ? (
         <>
-          <div className='space-y-6'>
-            <div>
-              <div className='flex items-center gap-2'>
-                <Skeleton className='h-5 w-5' />
-                <Skeleton className='h-5 w-20' />
-              </div>
-              <Skeleton className='h-4 w-40 mt-1' />
+          {/* Header */}
+          <div>
+            <div className='flex items-center gap-2'>
+              <GraduationCap className='h-5 w-5 text-primary' />
+              <h2 className='text-xl font-medium text-gray-900'>Khóa học của tôi</h2>
             </div>
-
-            {/* Skeleton cho Stats */}
-            <StatsHeaderSkeleton />
+            <p className='text-sm text-gray-500 mt-1 md:ml-7'>Quản lý và theo dõi tiến độ học tập của bạn</p>
           </div>
 
-          {/* Skeleton cho tabs và filters */}
-          <div className='mt-8'>
-            <div className='flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6'>
-              <Skeleton className='h-10 w-64' />
-              <div className='flex flex-col sm:flex-row gap-3'>
-                <Skeleton className='h-10 w-64' />
-                <Skeleton className='h-10 w-48' />
-              </div>
-            </div>
-
-            <CoursesSkeleton />
-          </div>
+          <CourseStatsHeaderSkeleton />
+          <CoursesSkeleton />
         </>
       ) : (
         <>
-          <div className='space-y-6'>
-            <div>
-              <div className='flex items-center gap-2'>
-                <GraduationCap className='h-5 w-5 text-primary' />
-                <h2 className='text-xl font-medium text-gray-900'>Khóa học của tôi</h2>
-              </div>
-              <p className='text-sm text-gray-500 mt-1 md:ml-7'>Quản lý và theo dõi tiến độ học tập của bạn</p>
+          {/* Header */}
+          <div>
+            <div className='flex items-center gap-2'>
+              <GraduationCap className='h-5 w-5 text-primary' />
+              <h2 className='text-xl font-medium text-gray-900'>Khóa học của tôi</h2>
             </div>
-
-            {/* Stats Cards */}
-            <CourseStatsHeader stats={stats} />
+            <p className='text-sm text-gray-500 mt-1 md:ml-7'>Quản lý và theo dõi tiến độ học tập của bạn</p>
           </div>
+
+          {/* Stats Cards */}
+          <CourseStatsHeader stats={stats} />
 
           {/* Tabs & Filters */}
           <Tabs value={activeTab} onValueChange={setActiveTab} className='w-full'>

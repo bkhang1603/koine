@@ -1,120 +1,164 @@
 'use client'
 
 import { useState, useMemo } from 'react'
-import { useGetAccountStore } from '@/queries/useAccount'
-import { PurchasedCoursesHeader } from '@/components/public/parent/setting/courses/purchased/PurchasedCoursesHeader'
-import { PurchasedCoursesFilter } from '@/components/public/parent/setting/courses/purchased/PurchasedCoursesFilter'
-import { PurchasedCourseCard } from '@/components/public/parent/setting/courses/purchased/PurchasedCourseCard'
-import { PurchasedCoursesSkeleton } from '@/components/public/parent/setting/courses/purchased/PurchasedCoursesSkeleton'
-import { EmptyPurchasedCourses } from '@/components/public/parent/setting/courses/purchased/EmptyPurchasedCourses'
-import { StatsHeaderSkeleton } from '@/components/public/parent/setting/courses/StatsHeaderSkeleton'
-import { Skeleton } from '@/components/ui/skeleton'
+import { useGetAccountStore, useGetListChildAccount } from '@/queries/useAccount'
+import { Input } from '@/components/ui/input'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { ShoppingBag, Search } from 'lucide-react'
+import { PurchasedCourseCard } from '@/components/public/parent/setting/courses/PurchasedCourseCard'
+import { CoursesSkeleton } from '@/components/public/parent/setting/courses/CoursesSkeleton'
+import { EmptyCourses } from '@/components/public/parent/setting/courses/EmptyCourses'
+import { PurchasedCourseStatsHeader } from '@/components/public/parent/setting/courses/PurchasedCourseStatsHeader'
+import { PurchasedCourseStatsHeaderSkeleton } from '@/components/public/parent/setting/courses/PurchasedCourseStatsHeaderSkeleton'
+import { useActiveCourseMutation } from '@/queries/useCourse'
+
+// Tabs constant
+const courseTabs = [
+  { value: 'all', label: 'Tất cả' },
+  { value: 'available', label: 'Còn chỗ' },
+  { value: 'full', label: 'Đã gán hết' }
+]
 
 export default function PurchasedCoursesPage() {
   const [searchQuery, setSearchQuery] = useState('')
-  const [viewMode, setViewMode] = useState('all')
+  const [category, setCategory] = useState('all')
+  const [activeTab, setActiveTab] = useState('all')
 
-  const { data: coursesData, isLoading } = useGetAccountStore()
+  // Fetch data
+  const { data, isLoading } = useGetAccountStore()
+  const { data: listChildAccount } = useGetListChildAccount()
+  const activeAccountMutation = useActiveCourseMutation()
 
-  // Dữ liệu khóa học theo schema
-  const courseItems = useMemo(() => coursesData?.payload.data.details || [], [coursesData])
-  const totalItems = useMemo(() => coursesData?.payload.data.totalItem || 0, [coursesData])
-  const mockChildAccounts = useMemo(
-    () => [
-      { id: 'child1', name: 'Nguyễn Minh An' },
-      { id: 'child2', name: 'Nguyễn Thảo Vy' }
-    ],
-    []
-  )
+  // Memoize purchasedCourses
+  const purchasedCourses = useMemo(() => data?.payload.data?.details || [], [data])
 
-  // Tính toán các thông số thống kê
-  const totalValue = courseItems.reduce((sum, item) => sum + item.course.price, 0)
-  const activatedCount = courseItems.filter((item) => item.assignedTo.length > 0).length
-  const nonActivatedCount = courseItems.filter((item) => item.unusedQuantity > 0).length
-
-  // Lọc khóa học theo điều kiện
+  // Lọc courses theo tab
   const filteredCourses = useMemo(() => {
-    let filtered = [...courseItems]
+    let filtered = [...purchasedCourses]
 
-    // Lọc theo tab hiện tại
-    if (viewMode === 'activated') {
-      filtered = filtered.filter((item) => item.assignedTo.length > 0)
-    } else if (viewMode === 'not_activated') {
+    // Filter by tab (all, available, full)
+    if (activeTab === 'available') {
       filtered = filtered.filter((item) => item.unusedQuantity > 0)
+    } else if (activeTab === 'full') {
+      filtered = filtered.filter((item) => item.unusedQuantity === 0)
     }
 
-    // Lọc theo từ khóa tìm kiếm
+    // Filter by search query
     if (searchQuery.trim()) {
-      const search = searchQuery.toLowerCase()
-      filtered = filtered.filter(
-        (item) =>
-          item.course.title.toLowerCase().includes(search) ||
-          item.course.categories.some((cat) => cat.name.toLowerCase().includes(search))
-      )
+      const query = searchQuery.toLowerCase()
+      filtered = filtered.filter((item) => item.course.title.toLowerCase().includes(query))
+    }
+
+    // Filter by category
+    if (category !== 'all') {
+      filtered = filtered.filter((item) => item.course.categories.some((c) => c.id === category))
     }
 
     return filtered
-  }, [courseItems, viewMode, searchQuery])
+  }, [purchasedCourses, activeTab, searchQuery, category])
+
+  // Calculate stats
+  const stats = useMemo(() => {
+    const totalCourses = purchasedCourses.length
+    const totalQuantity = purchasedCourses.reduce((sum, item) => sum + item.quantityAtPurchase, 0)
+    const totalAssigned = purchasedCourses.reduce(
+      (sum, item) => sum + (item.quantityAtPurchase - item.unusedQuantity),
+      0
+    )
+    const totalUnused = purchasedCourses.reduce((sum, item) => sum + item.unusedQuantity, 0)
+
+    return {
+      totalCourses,
+      totalQuantity,
+      totalAssigned,
+      totalUnused
+    }
+  }, [purchasedCourses])
+
+  const handleActivateCourse = (courseId: string, childId: string | null) => {
+    activeAccountMutation.mutate({ courseId, childId })
+  }
 
   return (
-    <div className='space-y-6'>
-      {/* Header thống kê */}
-      {isLoading ? (
-        <div className='space-y-6'>
-          <div>
-            <div className='flex items-center gap-2'>
-              <Skeleton className='h-5 w-5' />
-              <Skeleton className='h-5 w-20' />
-            </div>
-            <Skeleton className='h-4 w-40 mt-1' />
-          </div>
-
-          {/* Skeleton cho Stats */}
-          <StatsHeaderSkeleton />
+    <div className='space-y-8'>
+      {/* Header */}
+      <div>
+        <div className='flex items-center gap-2'>
+          <ShoppingBag className='h-5 w-5 text-primary' />
+          <h2 className='text-xl font-medium text-gray-900'>Khóa học đã mua</h2>
         </div>
-      ) : (
-        <PurchasedCoursesHeader
-          totalItems={totalItems}
-          totalValue={totalValue}
-          activatedCount={activatedCount}
-          nonActivatedCount={nonActivatedCount}
-        />
-      )}
-
-      {/* Bộ lọc và tìm kiếm */}
-      {isLoading ? (
-        <div className='flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6'>
-          <Skeleton className='h-10 w-64' />
-          <div className='flex flex-col sm:flex-row gap-3'>
-            <Skeleton className='h-10 w-64' />
-            <Skeleton className='h-10 w-48' />
-          </div>
-        </div>
-      ) : (
-        <PurchasedCoursesFilter
-          searchQuery={searchQuery}
-          onSearchChange={setSearchQuery}
-          viewMode={viewMode}
-          onViewModeChange={setViewMode}
-        />
-      )}
-
-      {/* Danh sách khóa học */}
-      <div className='space-y-4'>
-        {isLoading ? (
-          <PurchasedCoursesSkeleton />
-        ) : filteredCourses.length === 0 ? (
-          <EmptyPurchasedCourses isEmpty={courseItems.length === 0} searchTerm={searchQuery} filterMode={viewMode} />
-        ) : (
-          filteredCourses.map((item) => (
-            <PurchasedCourseCard
-              key={`${item.course.id}_${item.quantityAtPurchase}`}
-              courseItem={item}
-              childAccounts={mockChildAccounts}
-            />
-          ))
-        )}
+        <p className='text-sm text-gray-500 mt-1 md:ml-7'>Quản lý các khóa học bạn đã mua và phân công học viên</p>
       </div>
+
+      {isLoading ? (
+        <>
+          <PurchasedCourseStatsHeaderSkeleton />
+          <CoursesSkeleton />
+        </>
+      ) : (
+        <>
+          <PurchasedCourseStatsHeader stats={stats} />
+          <Tabs value={activeTab} onValueChange={setActiveTab} className='w-full'>
+            <div className='flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6'>
+              <TabsList className='bg-gray-100/80'>
+                {courseTabs.map((tab) => (
+                  <TabsTrigger key={tab.value} value={tab.value} className='data-[state=active]:bg-white'>
+                    {tab.label}
+                  </TabsTrigger>
+                ))}
+              </TabsList>
+
+              <div className='flex flex-col sm:flex-row gap-3'>
+                <div className='relative w-full sm:w-64'>
+                  <Search className='absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400' />
+                  <Input
+                    placeholder='Tìm kiếm khóa học...'
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className='pl-9 border-gray-200'
+                  />
+                </div>
+
+                <Select value={category} onValueChange={setCategory}>
+                  <SelectTrigger className='w-full sm:w-48 border-gray-200'>
+                    <SelectValue placeholder='Tất cả danh mục' />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value='all'>Tất cả danh mục</SelectItem>
+                    {/* Populate with your categories */}
+                    <SelectItem value='1'>Ngoại ngữ</SelectItem>
+                    <SelectItem value='2'>Khoa học</SelectItem>
+                    <SelectItem value='3'>Kỹ năng mềm</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+
+            {filteredCourses.length > 0 ? (
+              <div className='grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3'>
+                {filteredCourses.map((item) => (
+                  <PurchasedCourseCard
+                    key={item.course.id}
+                    courseData={item}
+                    listChildAccount={listChildAccount?.payload.data?.map((account) => ({
+                      id: account.id,
+                      name: account.userDetail.firstName,
+                      imageUrl: account.userDetail.avatarUrl
+                    }))}
+                    onActivate={handleActivateCourse}
+                  />
+                ))}
+              </div>
+            ) : (
+              <EmptyCourses
+                title={`Không tìm thấy khóa học nào ${searchQuery ? 'phù hợp với tìm kiếm' : 'trong danh mục này'}`}
+                description='Hãy thử tìm kiếm với từ khóa khác hoặc khám phá thêm các khóa học mới.'
+              />
+            )}
+          </Tabs>
+        </>
+      )}
     </div>
   )
 }

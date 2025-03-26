@@ -144,3 +144,85 @@ export const useGetAccountNotifications = ({ page_index, page_size }: { page_ind
     queryFn: () => accountApiRequest.getAccountNotifications({ page_index, page_size })
   })
 }
+
+export const useUpdateAccountNotificationMutation = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: accountApiRequest.updateAccountNotification,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['account-notifications'] })
+    }
+  })
+}
+
+export const useUpdateAccountNotificationsMutation = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: accountApiRequest.updateAccountNotifications,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['account-notifications'] })
+    }
+  })
+}
+
+// Still learning course
+export const useGetStillLearningCourse = ({ enabled }: { enabled: boolean }) => {
+  return useQuery({
+    queryKey: ['still-learning-course'],
+    queryFn: accountApiRequest.stillLearningCourse,
+    enabled
+  })
+}
+
+// List child account
+export const useGetListChildAccount = () => {
+  return useQuery({
+    queryKey: ['list-child-account'],
+    queryFn: accountApiRequest.getListChildAccount
+  })
+}
+
+// List child account need review
+export const useGetListOrderNeedReview = () => {
+  return useQuery({
+    queryKey: ['list-order-need-review'],
+    queryFn: accountApiRequest.getListOrderNeedReview
+  })
+}
+
+export const useUpdateVisibleCourseForChildMutation = ({ id }: { id: string }) => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: accountApiRequest.updateVisibleCourseForChild,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['child-account-by-id', id] })
+    }
+  })
+}
+
+export const useGetCourseDetailForChild = ({ courseId, childId }: { courseId: string; childId: string }) => {
+  return useQuery({
+    queryKey: ['course-detail-for-child', courseId, childId],
+    queryFn: () => accountApiRequest.getCourseDetailForChild({ courseId, childId })
+  })
+}
+
+export const useCreateOrderNeedReviewMutation = () => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: accountApiRequest.createOrderNeedReview,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['list-order-need-review'] })
+    }
+  })
+}
+
+export const useGetChildProfileQuery = ({ enabled }: { enabled?: boolean }) => {
+  return useQuery({
+    queryKey: ['account-profile-child'],
+    queryFn: accountApiRequest.getChildProfile,
+    enabled
+  })
+}

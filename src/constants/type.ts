@@ -59,3 +59,24 @@ export const OrderType = {
 } as const
 
 export const OrderTypeValues = [OrderType.COURSE, OrderType.PRODUCT, OrderType.COMBO] as const
+
+export const OrderStatus = {
+  PROCESSING: 'PROCESSING',
+  DELIVERING: 'DELIVERING',
+  COMPLETED: 'COMPLETED',
+  CANCELLED: 'CANCELLED'
+} as const
+
+export const OrderStatusValues = [
+  OrderStatus.PROCESSING,
+  OrderStatus.DELIVERING,
+  OrderStatus.COMPLETED,
+  OrderStatus.CANCELLED
+] as const
+
+export const PaymentMethod = {
+  COD: 'COD',
+  BANKING: 'BANKING'
+} as const
+
+export const PaymentMethodValues = [PaymentMethod.COD, PaymentMethod.BANKING] as const

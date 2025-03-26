@@ -1,7 +1,6 @@
 'use client'
 
-import { useState } from 'react'
-import { useParams } from 'next/navigation'
+import { use, useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
@@ -14,9 +13,11 @@ import { DashboardStats } from '@/components/public/parent/setting/child-account
 import { CourseCardList } from '@/components/public/parent/setting/child-account/detail/CourseCardList'
 import { EmptyCourses } from '@/components/public/parent/setting/child-account/detail/EmptyCourses'
 import { ProfileSkeleton } from '@/components/public/parent/setting/child-account/detail/ProfileSkeleton'
+import { SettingBreadcrumb } from '@/components/public/parent/setting/SettingBreadcrumb'
+import configRoute from '@/config/route'
 
-export default function ChildAccountDetailPage() {
-  const params = useParams()
+export default function ChildAccountDetailPage(props: { params: Promise<{ id: string }> }) {
+  const params = use(props.params)
   const childId = params.id as string
   const [activeTab, setActiveTab] = useState('all')
 
@@ -73,27 +74,36 @@ export default function ChildAccountDetailPage() {
     }
   }
 
+  const childAccountBreadcrumbItems = [
+    { label: 'Tài khoản con', href: configRoute.setting.childAccount },
+    { label: childAccount?.firstName + ' ' + childAccount?.lastName, isCurrent: true }
+  ]
+
   return (
     <div className='space-y-8'>
       {/* Back Button và Page Header */}
-      <div className='flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4'>
+      {/* <div className='flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4'>
         <Link href='/setting/child-account'>
-          <Button variant='outline' size='sm' className='mb-4 sm:mb-0 gap-1'>
+          <Button variant='outline' size='sm' className='gap-2'>
             <ArrowLeft className='h-4 w-4' />
-            Quay lại
+            Quay lại danh sách
           </Button>
         </Link>
-        <h2 className='text-2xl font-semibold'>Quản lý tài khoản con</h2>
-      </div>
+      </div> */}
+      <SettingBreadcrumb
+        isLoading={isLoading}
+        items={childAccountBreadcrumbItems}
+        backButton={
+          <Link href={configRoute.setting.childAccount}>
+            <Button variant='outline' size='sm' className='gap-2'>
+              <ArrowLeft className='h-4 w-4' />
+              Quay lại danh sách
+            </Button>
+          </Link>
+        }
+      />
 
-      {/* Thông báo hướng dẫn */}
-      <div className='bg-blue-50 p-4 rounded-lg border border-blue-100'>
-        <p className='text-blue-800 text-sm'>
-          Trang này giúp bạn theo dõi quá trình học tập của con. Bạn có thể quản lý danh sách khóa học, xem tiến độ học
-          tập và ẩn/hiện khóa học cho tài khoản của con.
-        </p>
-      </div>
-
+      {/* Loading State */}
       {isLoading ? (
         <ProfileSkeleton />
       ) : childAccount ? (
