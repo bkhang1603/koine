@@ -7,6 +7,7 @@ import {
   BlogDataResType,
   BlogResType,
   BlogsResType,
+  BlogUpdateBodyType,
   CategoryBlogDetailResType,
   CategoryBlogResType
 } from '@/schemaValidations/blog.schema'
@@ -25,8 +26,8 @@ const blogApiRequest = {
   }) => http.get<BlogsResType>(`/blogs?page_index=${page_index}&keyword=${search}&page_size=${page_size}`),
   getBlog: (id: string) => http.get<BlogResType>(`/blogs/${id}`),
   createBlog: (data: BlogDataResType) => http.post<BlogBodyResType>('/blogs', data),
-  updateBlog: (id: string, data: any) => http.put(`/blogs/${id}`, data),
-  deleteBlog: (id: string) => http.delete(`/blogs/${id}`),
+  updateBlog: (id: string, data: BlogUpdateBodyType) => http.put<OnlyMessageResType>(`/blogs/${id}`, data),
+  deleteBlog: (id: string) => http.delete<OnlyMessageResType>(`/blogs/${id}`),
   getBlogComments: ({
     id,
     page_index,

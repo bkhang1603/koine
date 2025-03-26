@@ -15,7 +15,7 @@ export const BlogData = z
     }),
     categories: z.array(
       z.object({
-        id: z.number(),
+        id: z.string(),
         name: z.string()
       })
     ),
@@ -164,6 +164,14 @@ export const CategoryBlogCreateReq = z.object({
   description: z.string()
 })
 
+export const blogUpdateBody = z.object({
+  title: z.string(),
+  description: z.string(),
+  content: z.string(),
+  imageUrl: z.string(),
+  categoryIds: z.array(z.string()).default([])
+})
+
 export type BlogsResType = z.TypeOf<typeof BlogsRes>
 
 export type BlogResType = z.TypeOf<typeof BlogRes>
@@ -185,3 +193,5 @@ export type CategoryBlogResType = z.TypeOf<typeof CategoryBlogRes>
 export type CategoryBlogDetailResType = z.TypeOf<typeof CategoryBlogDetailRes>
 
 export type CategoryBlogCreateReqType = z.TypeOf<typeof CategoryBlogCreateReq>
+
+export type BlogUpdateBodyType = z.TypeOf<typeof blogUpdateBody>

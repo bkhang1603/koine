@@ -1,7 +1,7 @@
 /* eslint-disable no-unused-vars */
-import { blogCategories } from '@/app/(private)/content-creator/_mock/data'
 import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { useCategoryBlogQuery } from '@/queries/useBlog'
 import { Search } from 'lucide-react'
 
 interface BlogFiltersProps {
@@ -21,6 +21,9 @@ export function BlogFilters({
   onCategoryChange,
   onStatusFilterChange
 }: BlogFiltersProps) {
+  const { data: categoriesResponse } = useCategoryBlogQuery()
+  const categories = categoriesResponse?.payload?.data || []
+
   return (
     <div className='grid grid-cols-4 gap-4'>
       <div className='relative flex-1 col-span-2'>
@@ -39,7 +42,7 @@ export function BlogFilters({
         </SelectTrigger>
         <SelectContent>
           <SelectItem value='all'>Tất cả danh mục</SelectItem>
-          {blogCategories.map((category: any) => (
+          {categories.map((category: any) => (
             <SelectItem key={category.id} value={category.id}>
               {category.name}
             </SelectItem>

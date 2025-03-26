@@ -1,12 +1,6 @@
 import courseApiRequest from '@/apiRequests/course'
+import { CreateCourseBodyType } from '@/schemaValidations/course.schema'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-
-export const useGetCourseQuery = ({ id }: { id: string }) => {
-  return useQuery({
-    queryKey: ['course', id],
-    queryFn: () => courseApiRequest.getCourse(id)
-  })
-}
 
 export const useEnrollCourseMutation = () => {
   const queryClient = useQueryClient()
@@ -110,5 +104,72 @@ export const useGetPreviewLessonsQuery = ({ id, limit, enabled }: { id: string; 
     queryKey: ['preview', id, limit],
     queryFn: () => courseApiRequest.getPreviewLessons({ id, limit }),
     enabled
+  })
+}
+
+export const useGetCoursesQuery = ({
+  page_index,
+  page_size,
+  category,
+  range,
+  sort,
+  keyword
+}: {
+  page_index?: number
+  page_size?: number
+  category?: string
+  range?: number
+  sort?: string
+  keyword?: string
+}) => {
+  return useQuery({
+    queryKey: ['courses', page_index, page_size, category, range, sort, keyword],
+    queryFn: () => courseApiRequest.getCourses({ page_index, page_size, category, range, sort, keyword })
+  })
+}
+
+export const useGetCourseQuery = ({ id }: { id: string }) => {
+  return useQuery({
+    queryKey: ['course', id],
+    queryFn: () => courseApiRequest.getCourse(id)
+  })
+}
+
+export const useAddCourseMutation = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: courseApiRequest.addCourse,
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ['course']
+      })
+    }
+  })
+}
+
+export const useUpdateCourseMutation = ({ id }: { id: string }) => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: (data: CreateCourseBodyType) => courseApiRequest.updateCourse(id, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ['course']
+      })
+    }
+  })
+}
+
+export const useDeleteCourseMutation = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: courseApiRequest.deleteCourse,
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ['course']
+      })
+    }
   })
 }

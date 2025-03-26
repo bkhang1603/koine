@@ -3,7 +3,6 @@ import { Textarea } from '@/components/ui/textarea'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { courseCategories } from '../../../../app/(private)/content-creator/_mock/data'
 
 interface CourseBasicInfoProps {
   title: string
@@ -15,14 +14,7 @@ interface CourseBasicInfoProps {
   onFieldChange: (field: 'title' | 'description' | 'categories' | 'level' | 'ageGroup', value: any) => void
 }
 
-export function CourseBasicInfo({
-  title,
-  description,
-  categories,
-  level,
-  ageGroup,
-  onFieldChange
-}: CourseBasicInfoProps) {
+export function CourseBasicInfo({ title, description, level, ageGroup, onFieldChange }: CourseBasicInfoProps) {
   return (
     <Card>
       <CardHeader>
@@ -52,7 +44,7 @@ export function CourseBasicInfo({
           <div className='grid grid-cols-2 gap-4'>
             <div className='space-y-2'>
               <Label>Danh mục</Label>
-              <Select value={categories[0]} onValueChange={(value) => onFieldChange('categories', [value])}>
+              {/* <Select value={categories[0]} onValueChange={(value) => onFieldChange('categories', [value])}>
                 <SelectTrigger>
                   <SelectValue placeholder='Chọn danh mục' />
                 </SelectTrigger>
@@ -63,7 +55,7 @@ export function CourseBasicInfo({
                     </SelectItem>
                   ))}
                 </SelectContent>
-              </Select>
+              </Select> */}
             </div>
 
             <div className='space-y-2'>

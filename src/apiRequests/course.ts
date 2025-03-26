@@ -6,6 +6,8 @@ import {
   CourseResType,
   CourseReviewResType,
   CoursesResType,
+  CreateCourseBodyResType,
+  CreateCourseBodyType,
   LessonResType,
   LessonsResType,
   PreviewLessonsResType,
@@ -31,18 +33,17 @@ const courseApiRequest = {
     keyword?: string | string[] | undefined
   }) =>
     http.get<CoursesResType>(
-      `/courses?page_index=${page_index}&page_size=${page_size}&keyword=${keyword}&category=${category}&range=${range}&sort=${sort}`
+      `/courses?page_index=${page_index}&page_size=${page_size}${
+        keyword ? `&keyword=${keyword}` : ''
+      }${category ? `&category=${category}` : ''}${range ? `&range=${range}` : ''}${sort ? `&sort=${sort}` : ''}`
     ),
-  getCourse: (id: string) =>
-    http.get<CourseResType>(`/courses/${id}`, {
-      cache: 'no-cache'
-    }),
-  addCourse: (data: any) => http.post('/courses', data),
-  updateCourse: (data: any) => http.put('/courses', data),
-  deleteCourse: (id: string) => http.delete(`/courses/${id}`),
-  enrollCourse: (id: string) => http.post(`/courses/enroll/${id}`, {}),
+  getCourse: (id: string) => http.get<CourseResType>(`/courses/${id}`),
+  addCourse: (data: CreateCourseBodyType) => http.post<CreateCourseBodyResType>('/courses', data),
+  updateCourse: (id: string, data: CreateCourseBodyType) => http.put<CreateCourseBodyResType>(`/courses/${id}`, data),
+  deleteCourse: (id: string) => http.delete<OnlyMessageResType>(`/courses/${id}`),
+  enrollCourse: (id: string) => http.post<OnlyMessageResType>(`/courses/enroll/${id}`, {}),
   getUserCourses: () => http.get<UserCoursesResType>('/course-enrollment/enrolled'),
-  updateCourseProgress: (lessonId: string) => http.post('/user-progresses', { lessonId }),
+  updateCourseProgress: (lessonId: string) => http.post<OnlyMessageResType>('/user-progresses', { lessonId }),
   getCategoryCourses: () => http.get<CategoryCoursesResType>(`/category-courses`),
   activeCourse: (data: { childId?: string | null; courseId: string | null }) =>
     http.post<OnlyMessageResType>(`/courses/active-course-enroll`, data),

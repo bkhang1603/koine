@@ -4,6 +4,8 @@ import Loading from '@/components/loading'
 import NewBlogPage from '@/components/private/content-creator/blog/blog-new'
 import { BlogDataResType } from '@/schemaValidations/blog.schema'
 import { useEffect, useState } from 'react'
+import { ChevronRight } from 'lucide-react'
+import Link from 'next/link'
 
 const BLOG_DRAFT_KEY = 'blog_draft_data'
 
@@ -36,8 +38,20 @@ function Page() {
       </div>
     )
   }
+  return (
+    <div className='container max-w-4xl mx-auto px-4 py-6'>
+      {/* Breadcrumb */}
+      <nav className='flex items-center space-x-1 text-sm text-muted-foreground mb-6'>
+        <Link href='/content-creator/blog' className='hover:text-primary transition-colors'>
+          Blog
+        </Link>
+        <ChevronRight className='h-4 w-4' />
+        <span className='font-medium text-foreground'>Tạo mới</span>
+      </nav>
 
-  return <div>{<NewBlogPage localDraft={localDraft} />}</div>
+      <div>{<NewBlogPage localDraft={localDraft} />}</div>
+    </div>
+  )
 }
 
 export default Page

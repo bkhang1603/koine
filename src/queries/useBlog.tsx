@@ -1,4 +1,5 @@
 import blogApiRequest from '@/apiRequests/blog'
+import { BlogUpdateBodyType } from '@/schemaValidations/blog.schema'
 import { useMutation, useQuery, useQueryClient, useInfiniteQuery } from '@tanstack/react-query'
 
 export const useBlogCommentsQuery = ({
@@ -194,6 +195,32 @@ export const useCategoryBlogDeleteMutation = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: ['categoryBlog']
+      })
+    }
+  })
+}
+
+export const useBlogUpdateMutation = ({ id }: { id: string }) => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: (data: BlogUpdateBodyType) => blogApiRequest.updateBlog(id, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ['blogs']
+      })
+    }
+  })
+}
+
+export const useBlogDeleteMutation = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: blogApiRequest.deleteBlog,
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ['blogs']
       })
     }
   })

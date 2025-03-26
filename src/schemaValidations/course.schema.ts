@@ -16,6 +16,8 @@ export const CourseData = z
     durations: z.number(),
     durationsDisplay: z.string(),
     aveRating: z.number(),
+    isBanned: z.boolean(),
+    isCustom: z.boolean(),
     totalEnrollment: z.number(),
     creator: z.object({
       id: z.string(),
@@ -336,6 +338,23 @@ export const previewLessonsRes = z.object({
   statusCode: z.number()
 })
 
+export const createCourseBody = z.object({
+  categoryIds: z.array(z.string()),
+  title: z.string(),
+  description: z.string(),
+  imageUrl: z.string(),
+  imageBanner: z.string(),
+  price: z.number(),
+  discount: z.number(),
+  level: z.string()
+})
+
+export const createCourseBodyRes = z.object({
+  data: createCourseBody,
+  message: z.string(),
+  statusCode: z.number()
+})
+
 export type CourseResType = z.infer<typeof CourseRes>
 
 export type CoursesResType = z.infer<typeof CoursesRes>
@@ -361,3 +380,7 @@ export type CourseReviewResType = z.infer<typeof CourseReviewRes>
 export type AllCoursesForCustomResType = z.infer<typeof AllCoursesForCustomRes>
 
 export type PreviewLessonsResType = z.infer<typeof previewLessonsRes>
+
+export type CreateCourseBodyType = z.infer<typeof createCourseBody>
+
+export type CreateCourseBodyResType = z.infer<typeof createCourseBodyRes>

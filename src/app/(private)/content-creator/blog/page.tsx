@@ -1,6 +1,7 @@
 'use client'
 
 import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Plus, Settings } from 'lucide-react'
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
@@ -9,9 +10,10 @@ import { BlogCard } from '@/components/private/content-creator/blog/blog-card'
 import { BlogFilters } from '@/components/private/content-creator/blog/blog-filters'
 import { EmptyBlogs } from '@/components/private/content-creator/blog/empty-blogs'
 import { DeleteBlogDialog } from '@/components/private/content-creator/blog/delete-blog-dialog'
-import { useBlogQuery } from '@/queries/useBlog'
-import { useToast } from '@/components/ui/use-toast'
+import { useBlogDeleteMutation, useBlogQuery } from '@/queries/useBlog'
 import { Skeleton } from '@/components/ui/skeleton'
+import { toast } from '@/components/ui/use-toast'
+import { handleErrorApi } from '@/lib/utils'
 
 // Tạo component BlogCardSkeleton
 const BlogCardSkeleton = () => (
@@ -72,11 +74,10 @@ export default function BlogPage() {
   const [searchQuery, setSearchQuery] = useState('')
   const [statusFilter, setStatusFilter] = useState('all')
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
-  const [selectedBlog, setSelectedBlog] = useState<string | null>(null)
+  const [selectedBlog, setSelectedBlog] = useState<string | undefined>(undefined)
   const [pageIndex, setPageIndex] = useState(1)
   const [pageSize] = useState(10)
   const router = useRouter()
-  const { toast } = useToast()
 
   // Áp dụng debounce cho searchQuery
   const debouncedSearchQuery = useDebounce(searchQuery, 500)
@@ -88,12 +89,7 @@ export default function BlogPage() {
     page_size: pageSize
   })
 
-  // Lấy danh sách danh mục để hiển thị trong filter
-  // const { data: categoriesResponse } = useCategoryBlogQuery()
-  // const categories = categoriesResponse?.payload?.data || []
-
-  // Mutation xóa blog
-  // const deleteBlogMutation = useBlogDeleteMutation()
+  const deleteBlogMutation = useBlogDeleteMutation()
 
   // Dữ liệu blog từ API
   const blogs = blogsResponse?.payload?.data || []
@@ -103,7 +99,7 @@ export default function BlogPage() {
   // Xử lý xóa blog
   const handleDelete = (blogId: string) => {
     setSelectedBlog(blogId)
-    setDeleteDialogOpen(true)
+    setTimeout(() => setDeleteDialogOpen(true), 100)
   }
 
   // Xác nhận xóa blog
@@ -111,21 +107,18 @@ export default function BlogPage() {
     if (!selectedBlog) return
 
     try {
-      // await deleteBlogMutation.mutateAsync(selectedBlog)
+      await deleteBlogMutation.mutateAsync(selectedBlog)
       toast({
-        title: 'Thành công',
         description: 'Xóa bài viết thành công'
       })
       // Refresh danh sách sau khi xóa
     } catch (error) {
-      toast({
-        variant: 'destructive',
-        title: 'Có lỗi xảy ra',
-        description: 'Không thể xóa bài viết. Vui lòng thử lại sau'
+      handleErrorApi({
+        error
       })
     } finally {
       setDeleteDialogOpen(false)
-      setSelectedBlog(null)
+      setTimeout(() => setSelectedBlog(undefined), 300)
     }
   }
 
@@ -142,7 +135,7 @@ export default function BlogPage() {
 
   return (
     <div className='container mx-auto px-4 py-6'>
-      {/* Header luôn hiển thị */}
+      {/* Header */}
       <div className='flex items-center justify-between mb-8'>
         <div>
           <h1 className='text-2xl font-bold'>Bài viết của bạn</h1>
@@ -164,44 +157,51 @@ export default function BlogPage() {
         </div>
       </div>
 
-      {/* Filters luôn hiển thị */}
-      <div className='mb-6'>
-        <BlogFilters
-          searchQuery={searchQuery} // Vẫn giữ giá trị gốc cho input
-          selectedCategory={selectedCategory}
-          statusFilter={statusFilter}
-          onSearchChange={setSearchQuery} // Cập nhật giá trị gốc khi người dùng gõ
-          onCategoryChange={setSelectedCategory}
-          onStatusFilterChange={setStatusFilter}
-        />
-      </div>
+      {/* Filters trong Card */}
+      <Card className='mb-6'>
+        <CardHeader>
+          <CardTitle>Tìm kiếm và lọc</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <BlogFilters
+            searchQuery={searchQuery}
+            selectedCategory={selectedCategory}
+            statusFilter={statusFilter}
+            onSearchChange={setSearchQuery}
+            onCategoryChange={setSelectedCategory}
+            onStatusFilterChange={setStatusFilter}
+          />
+        </CardContent>
+      </Card>
 
-      {/* Hiển thị thông báo đang tìm kiếm */}
-      {searchQuery !== debouncedSearchQuery && (
-        <div className='text-sm text-muted-foreground mb-4 text-center animate-pulse'>Đang tìm kiếm...</div>
-      )}
-
-      {/* Blog List - Hiển thị skeleton khi đang loading */}
-      {/* <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'>
-        {isLoading ? (
-          // Hiển thị skeleton cards khi đang tải
-          Array(6)
-            .fill(0)
-            .map((_, index) => <BlogCardSkeleton key={index} />)
-        ) : blogs.length > 0 ? (
-          // Hiển thị blog cards khi có dữ liệu
-          blogs.map((post) => (
-            <BlogCard key={post.id} post={post} onDelete={handleDelete} onNavigate={(url) => router.push(url)} />
-          ))
-        ) : (
-          // Hiển thị trạng thái trống khi không có dữ liệu
-          <div className='col-span-full'>
-            <EmptyBlogs />
+      {/* Blog List - Trong Card */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Danh sách bài viết</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'>
+            {isLoading ? (
+              // Hiển thị skeleton cards khi đang tải
+              Array(6)
+                .fill(0)
+                .map((_, index) => <BlogCardSkeleton key={index} />)
+            ) : blogs.length > 0 ? (
+              // Hiển thị blog cards khi có dữ liệu
+              blogs.map((post) => (
+                <BlogCard key={post.id} post={post} onDelete={handleDelete} onNavigate={(url) => router.push(url)} />
+              ))
+            ) : (
+              // Hiển thị trạng thái trống khi không có dữ liệu
+              <div className='col-span-full'>
+                <EmptyBlogs />
+              </div>
+            )}
           </div>
-        )}
-      </div> */}
+        </CardContent>
+      </Card>
 
-      {/* Pagination - Luôn hiển thị khi có nhiều trang */}
+      {/* Pagination - Đưa vào card footer hoặc phần dưới */}
       {totalPages > 1 && (
         <div className='flex justify-center mt-8'>
           <div className='flex space-x-2'>

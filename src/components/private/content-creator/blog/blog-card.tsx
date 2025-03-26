@@ -1,119 +1,127 @@
 /* eslint-disable no-unused-vars */
-import { Card, CardContent, CardFooter } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
-import { MoreVertical, Eye, Edit, Trash2, ThumbsUp, MessageSquare, Clock, Tags } from 'lucide-react'
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
+import { MoreHorizontal, ThumbsUp, MessageSquare, Edit, Trash } from 'lucide-react'
 import Image from 'next/image'
+import { formatDate } from '@/lib/utils'
+import { Card, CardFooter } from '@/components/ui/card'
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
-import { formatDistanceToNow } from 'date-fns'
-import { vi } from 'date-fns/locale'
+import Link from 'next/link'
 
-type Post = {
-  id: string
-  title: string
-  description: string
-  imageUrl: string
-  creatorInfo: {
-    id: string
-    firstName: string
-    avatarUrl: string
-  }
-  totalReact: number
-  totalComment: number
-  createdAt: string
-  updatedAt: string
-  categories?: {
-    id: string
-    name: string
-  }[]
-  status?: string
-}
-
-export interface BlogCardProps {
-  post: Post
+interface BlogCardProps {
+  post: any
   onDelete: (id: string) => void
   onNavigate: (url: string) => void
 }
 
-export const BlogCard: React.FC<BlogCardProps> = ({ post, onDelete, onNavigate }) => {
+export function BlogCard({ post, onDelete, onNavigate }: BlogCardProps) {
   return (
-    <Card className='group overflow-hidden transition-all hover:shadow-md'>
-      <div className='relative aspect-video'>
-        <Image src={post.imageUrl} alt={post.title} fill className='object-cover' />
-        <Badge className='absolute top-4 right-4' variant={post.status === 'VISIBLE' ? 'default' : 'secondary'}>
-          {post.status === 'VISIBLE' ? 'Đã xuất bản' : 'Bản nháp'}
-        </Badge>
-      </div>
+    <Link href={`/content-creator/blog/${post.id}`}>
+      <Card className='overflow-hidden flex flex-col h-full hover:shadow-md transition-shadow duration-200 cursor-pointer'>
+        {/* Card Image */}
+        <div className='relative h-48 w-full overflow-hidden'>
+          <div className='absolute inset-0 bg-gradient-to-t from-black/30 to-transparent z-10' />
+          <Image
+            src={post.imageUrl || '/images/placeholder-image.jpg'}
+            alt={post.title}
+            fill
+            className='object-cover transition-transform duration-300 hover:scale-105'
+            sizes='(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw'
+          />
+          {post.status === 'published' && (
+            <Badge className='absolute top-3 left-3 z-20 bg-green-500 border-0'>Đã xuất bản</Badge>
+          )}
+          {post.status === 'draft' && (
+            <Badge variant='outline' className='absolute top-3 left-3 z-20 bg-background'>
+              Bản nháp
+            </Badge>
+          )}
+        </div>
 
-      <CardContent className='p-6'>
-        <div className='flex items-center gap-2 mb-4'>
-          <Tags className='w-4 h-4 text-muted-foreground' />
-          <div className='flex flex-wrap gap-1.5'>
-            {post.categories?.map((cat, index) => (
-              <Badge key={index} variant='outline' className='px-2 py-0.5 text-xs font-normal'>
-                {cat.name}
+        <div className='flex flex-col flex-grow p-4'>
+          {/* Categories */}
+          <div className='flex flex-wrap gap-1.5 mb-3 min-h-[24px]'>
+            {post.categories?.slice(0, 3).map((category: any) => (
+              <Badge variant='secondary' key={category.id} className='font-normal text-xs'>
+                {category.name}
               </Badge>
             ))}
+            {post.categories?.length > 3 && (
+              <Badge variant='outline' className='font-normal text-xs'>
+                +{post.categories.length - 3}
+              </Badge>
+            )}
           </div>
-        </div>
 
-        <h3 className='font-semibold text-lg line-clamp-2 group-hover:text-primary transition-colors mb-4'>
-          {post.title}
-        </h3>
+          {/* Title - fixed height */}
+          <h3 className='font-bold text-lg line-clamp-2 min-h-[56px] mb-2'>{post.title}</h3>
 
-        <p className='text-sm text-muted-foreground line-clamp-2 mb-6'>{post.description}</p>
+          {/* Description - fixed height */}
+          <p className='text-muted-foreground text-sm line-clamp-2 min-h-[40px] mb-auto'>{post.description}</p>
 
-        <div className='flex items-center gap-3'>
-          <Avatar className='h-9 w-9 border-2 border-muted'>
-            <AvatarImage src={post.creatorInfo.avatarUrl} />
-            <AvatarFallback>{post.creatorInfo.firstName[0]}</AvatarFallback>
-          </Avatar>
-          <div className='flex flex-col'>
-            <span className='text-sm font-medium'>{post.creatorInfo.firstName}</span>
-            <span className='text-xs text-muted-foreground'>
-              {formatDistanceToNow(new Date(post.createdAt), { addSuffix: true, locale: vi })}
-            </span>
-          </div>
-        </div>
-      </CardContent>
-
-      <CardFooter className='px-6 py-4 border-t bg-muted/50'>
-        <div className='flex items-center justify-between w-full text-sm text-muted-foreground'>
-          <div className='flex items-center gap-4'>
-            <div className='flex items-center gap-1.5'>
-              <ThumbsUp className='w-4 h-4' />
-              <span>{post.totalReact}</span>
+          {/* Author info */}
+          <div className='flex items-center mt-4 gap-2'>
+            <Avatar className='h-8 w-8'>
+              <AvatarImage src={post.creatorInfo?.avatarUrl} alt={post.creatorInfo?.firstName} />
+              <AvatarFallback>{post.creatorInfo?.firstName?.charAt(0) || 'U'}</AvatarFallback>
+            </Avatar>
+            <div className='text-sm'>
+              <p className='font-medium'>{post.creatorInfo?.firstName || 'Người dùng'}</p>
+              <p className='text-xs text-muted-foreground'>{formatDate(post.createdAt)}</p>
             </div>
-            <div className='flex items-center gap-1.5'>
-              <MessageSquare className='w-4 h-4' />
-              <span>{post.totalComment}</span>
+          </div>
+        </div>
+
+        <CardFooter className='p-4 border-t flex justify-between items-center bg-muted/10'>
+          {/* Chỉ hiển thị dữ liệu thực có trong API */}
+          <div className='flex items-center gap-4 text-xs text-muted-foreground'>
+            <div className='flex items-center'>
+              <ThumbsUp className='mr-1 h-3.5 w-3.5' />
+              <span>{post.totalReact || 0}</span>
+            </div>
+            <div className='flex items-center'>
+              <MessageSquare className='mr-1 h-3.5 w-3.5' />
+              <span>{post.totalComment || 0}</span>
             </div>
           </div>
 
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant='ghost' size='icon' className='h-8 w-8'>
-                <MoreVertical className='w-4 h-4' />
+              <Button
+                variant='ghost'
+                size='icon'
+                className='h-8 w-8 rounded-full dropdown-trigger focus-visible:ring-0'
+                onClick={(e) => e.stopPropagation()}
+              >
+                <MoreHorizontal className='h-4 w-4' />
+                <span className='sr-only'>Mở menu</span>
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align='end' className='w-48'>
-              <DropdownMenuItem onClick={() => onNavigate(`/content-creator/blog/${post.id}`)}>
-                <Eye className='w-4 h-4 mr-2' />
-                Xem bài viết
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => onNavigate(`/content-creator/blog/${post.id}/edit`)}>
-                <Edit className='w-4 h-4 mr-2' />
+            <DropdownMenuContent align='end'>
+              <DropdownMenuItem
+                onClick={(e) => {
+                  e.stopPropagation()
+                  onNavigate(`/content-creator/blog/${post.id}/edit`)
+                }}
+              >
+                <Edit className='h-4 w-4 mr-2' />
                 Chỉnh sửa
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => onDelete(post.id)} className='text-destructive focus:text-destructive'>
-                <Trash2 className='w-4 h-4 mr-2' />
-                Xóa
+              <DropdownMenuItem
+                className='text-destructive focus:text-destructive'
+                onClick={(e) => {
+                  e.stopPropagation()
+                  onDelete(post.id)
+                }}
+              >
+                <Trash className='h-4 w-4 mr-2' />
+                Xóa bài viết
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
-        </div>
-      </CardFooter>
-    </Card>
+        </CardFooter>
+      </Card>
+    </Link>
   )
 }

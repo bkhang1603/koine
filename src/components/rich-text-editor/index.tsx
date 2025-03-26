@@ -1,60 +1,75 @@
 'use client'
+
 import { useEditor, EditorContent, BubbleMenu } from '@tiptap/react'
 import StarterKit from '@tiptap/starter-kit'
-import TextAlign from '@tiptap/extension-text-align'
-import Heading from '@tiptap/extension-heading'
-import Highlight from '@tiptap/extension-highlight'
-import Image from '@tiptap/extension-image'
-import BulletList from '@tiptap/extension-bullet-list'
-import OrderedList from '@tiptap/extension-ordered-list'
-import ImageResize from 'tiptap-extension-resize-image'
-import ToolBar from '@/components/rich-text-editor/toolbar'
-import FileHandler from '@tiptap-pro/extension-file-handler'
-import HardBreak from '@tiptap/extension-hard-break'
+import Underline from '@tiptap/extension-underline'
 import Link from '@tiptap/extension-link'
+import Image from '@tiptap/extension-image'
+import TextAlign from '@tiptap/extension-text-align'
+import Placeholder from '@tiptap/extension-placeholder'
+import Highlight from '@tiptap/extension-highlight'
+import HardBreak from '@tiptap/extension-hard-break'
+import { Color } from '@tiptap/extension-color'
+import TextStyle from '@tiptap/extension-text-style'
+import ImageResize from 'tiptap-extension-resize-image'
+import ColumnMenu from './column-menu'
+import Toolbar from './toolbar'
+import TextBubbleMenu from './text-bubble-menu'
+import ImageBubbleMenu from './image-bubble-menu'
+import { useEffect, useState } from 'react'
+import FileHandler from '@tiptap-pro/extension-file-handler'
 import { Column, Columns } from '@/components/rich-text-editor/custom-extension'
-import ColumnsMenu from '@/components/rich-text-editor/column-menu'
 
-export default function RichTextEditor({ content, onChange }: { content: any; onChange: any }) {
+interface RichTextEditorProps {
+  content: string
+  // eslint-disable-next-line no-unused-vars
+  onChange: (value: string) => void
+  placeholder?: string
+}
+
+export default function RichTextEditor({
+  content = '',
+  onChange,
+  placeholder = 'Viết nội dung...'
+}: RichTextEditorProps) {
+  const [isMounted, setIsMounted] = useState(false)
+  const [localContent, setLocalContent] = useState(content)
+
+  // Khởi tạo editor
   const editor = useEditor({
     extensions: [
-      StarterKit.configure(),
-      TextAlign.configure({
-        types: ['heading', 'paragraph']
-      }),
-      HardBreak.configure(),
-      Heading.configure({
-        levels: [1, 2, 3]
-      }),
-      OrderedList.configure({
-        HTMLAttributes: {
-          class: 'list-decimal ml-3'
-        }
-      }),
-      BulletList.configure({
-        HTMLAttributes: {
-          class: 'ml-3'
-        }
-      }),
-      Highlight,
-      Image.configure({
-        HTMLAttributes: {
-          class: 'rounded-md'
-        }
-      }),
-      ImageResize,
+      StarterKit,
+      Underline,
       Link.configure({
         openOnClick: false,
         HTMLAttributes: {
           class: 'text-blue-500 underline'
         }
       }),
+      Image.configure({
+        HTMLAttributes: {
+          class: 'rounded-md'
+        }
+      }),
+      ImageResize,
+      TextAlign.configure({
+        types: ['heading', 'paragraph', 'image'],
+        alignments: ['left', 'center', 'right', 'justify']
+      }),
+      Placeholder.configure({
+        placeholder
+      }),
+      Highlight,
+      HardBreak,
+      TextStyle,
+      Color,
+      Column,
+      Columns,
       FileHandler.configure({
         allowedMimeTypes: ['image/png', 'image/jpeg', 'image/gif', 'image/webp'],
         onDrop: (currentEditor, files, pos) => {
           files.forEach((file) => {
             const fileReader = new FileReader()
-
             fileReader.readAsDataURL(file)
             fileReader.onload = () => {
               currentEditor
@@ -72,15 +87,8 @@ export default function RichTextEditor({ content, onChange }: { content: any; on
         },
         onPaste: (currentEditor, files, htmlContent) => {
           files.forEach((file) => {
-            if (htmlContent) {
-              // if there is htmlContent, stop manual insertion & let other extensions handle insertion via inputRule
-              // you could extract the pasted file from this url string and upload it to a server for example
-              console.log(htmlContent) // eslint-disable-line no-console
-              return false
-            }
-
+            if (htmlContent) return false
             const fileReader = new FileReader()
-
             fileReader.readAsDataURL(file)
             fileReader.onload = () => {
               currentEditor
@@ -96,39 +104,62 @@ export default function RichTextEditor({ content, onChange }: { content: any; on
             }
           })
         }
-      }),
-      Column,
-      Columns
-      // CustomColumn
+      })
     ],
-    content: content,
+    content: localContent,
     editorProps: {
       attributes: {
-        // class: 'max-h-[500px] overflow-scroll border rounded-md bg-white pb-2 pt-7 px-4 focus-visible:outline-none'
-        class: 'max-h-[1000px] overflow-auto border rounded-md bg-white py-4 px-6 my-6 focus-visible:outline-none'
+        class:
+          'prose prose-slate max-w-none p-4 min-h-[200px] max-h-[600px] overflow-y-auto bg-white focus:outline-none'
       }
     },
     onUpdate: ({ editor }) => {
       const html = editor.getHTML()
       onChange(html)
-    },
-    immediatelyRender: false
+    }
   })
 
+  // Cập nhật nội dung khi prop content thay đổi từ bên ngoài
+  useEffect(() => {
+    if (editor && content !== editor.getHTML()) {
+      console.log('Setting editor content to:', content)
+      setLocalContent(content)
+      editor.commands.setContent(content, false)
+    }
+  }, [content, editor])
+
+  // Giải quyết lỗi hydration (CSR/SSR)
+  useEffect(() => {
+    setIsMounted(true)
+  }, [])
+
+  if (!isMounted) {
+    return <div className='min-h-[200px] border rounded-md p-4 bg-slate-50'></div>
+  }
+
   return (
-    <div>
-      {/* {editor && <CustomBubbleMenu editor={editor} />} */}
-      {editor && (
-        <BubbleMenu
-          editor={editor}
-          tippyOptions={{ duration: 100, moveTransition: 'transform 0.2s ease-out' }}
-          shouldShow={({ editor }) => editor.isActive('columns')}
-        >
-          <ColumnsMenu editor={editor} />
-        </BubbleMenu>
-      )}
-      <ToolBar editor={editor} />
-      <EditorContent editor={editor} />
+    <div className='border rounded-md overflow-hidden'>
+      {editor && <Toolbar editor={editor} />}
+
+      <div className='relative'>
+        <EditorContent editor={editor} />
+
+        {/* Bubble menus */}
+        {editor && (
+          <>
+            <TextBubbleMenu editor={editor} />
+            <ImageBubbleMenu editor={editor} />
+
+            <BubbleMenu
+              editor={editor}
+              tippyOptions={{ duration: 100 }}
+              shouldShow={({ editor }) => editor.isActive('columns')}
+            >
+              <ColumnMenu editor={editor} />
+            </BubbleMenu>
+          </>
+        )}
+      </div>
     </div>
   )
 }

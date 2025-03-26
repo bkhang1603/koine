@@ -2,17 +2,18 @@
 import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Search } from 'lucide-react'
-import { courseCategories } from '../../../../app/(private)/content-creator/_mock/data'
 
 interface CourseFiltersProps {
   searchQuery: string
   selectedCategory: string
   ageFilter: string
   statusFilter: string
+  priceFilter: string
   onSearchChange: (value: string) => void
   onCategoryChange: (value: string) => void
   onAgeFilterChange: (value: string) => void
   onStatusFilterChange: (value: string) => void
+  onPriceFilterChange: (value: string) => void
 }
 
 export function CourseFilters({
@@ -20,10 +21,12 @@ export function CourseFilters({
   selectedCategory,
   ageFilter,
   statusFilter,
+  priceFilter,
   onSearchChange,
   onCategoryChange,
   onAgeFilterChange,
-  onStatusFilterChange
+  onStatusFilterChange,
+  onPriceFilterChange
 }: CourseFiltersProps) {
   return (
     <div className='grid grid-cols-5 gap-4'>
@@ -43,11 +46,11 @@ export function CourseFilters({
         </SelectTrigger>
         <SelectContent>
           <SelectItem value='all'>Tất cả danh mục</SelectItem>
-          {courseCategories.map((category: any) => (
+          {/* {courseCategories.map((category: any) => (
             <SelectItem key={category.id} value={category.id}>
               {category.name}
             </SelectItem>
-          ))}
+          ))} */}
         </SelectContent>
       </Select>
 
@@ -71,6 +74,17 @@ export function CourseFilters({
           <SelectItem value='all'>Tất cả trạng thái</SelectItem>
           <SelectItem value='draft'>Bản nháp</SelectItem>
           <SelectItem value='published'>Đã xuất bản</SelectItem>
+        </SelectContent>
+      </Select>
+
+      <Select value={priceFilter} onValueChange={onPriceFilterChange}>
+        <SelectTrigger>
+          <SelectValue placeholder='Giá' />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value='all'>Tất cả giá</SelectItem>
+          <SelectItem value='free'>Miễn phí</SelectItem>
+          <SelectItem value='paid'>Có giá</SelectItem>
         </SelectContent>
       </Select>
     </div>

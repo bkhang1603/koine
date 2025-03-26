@@ -5,13 +5,13 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { ArrowLeft, Clock, Edit, FileText, GraduationCap, LayoutList, BookOpen } from 'lucide-react'
-import { courses } from '../../_mock/data'
 import Link from 'next/link'
 import Image from 'next/image'
 import { cn } from '@/lib/utils'
 
 export default function CourseDetailPage(props: { params: Promise<{ id: string }> }) {
   const params = use(props.params)
+  const courses: any[] = []
   const course = courses.find((c) => c.id === params.id)
 
   if (!course) return null
@@ -75,7 +75,7 @@ export default function CourseDetailPage(props: { params: Promise<{ id: string }
                 </div>
               </div>
               <CardContent className='p-0'>
-                {course.chapters.map((chapter, index) => (
+                {course.chapters.map((chapter: any, index: any) => (
                   <div key={chapter.id} className='border-b last:border-0'>
                     <div className='p-6 bg-muted/50'>
                       <div className='flex items-center gap-4'>
@@ -89,7 +89,7 @@ export default function CourseDetailPage(props: { params: Promise<{ id: string }
                       </div>
                     </div>
                     <div>
-                      {chapter.lessons.map((lesson, lessonIndex) => (
+                      {chapter.lessons.map((lesson: any, lessonIndex: any) => (
                         <div
                           key={lesson.id}
                           className='p-4 pl-20 hover:bg-muted/50 transition-colors border-b last:border-0'

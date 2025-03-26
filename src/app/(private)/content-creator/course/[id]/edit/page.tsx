@@ -2,7 +2,6 @@
 
 import { Button } from '@/components/ui/button'
 import { ArrowLeft } from 'lucide-react'
-import { courses } from '@/app/(private)/content-creator/_mock/data'
 import { useState, useEffect, use } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
@@ -18,6 +17,8 @@ export default function EditCoursePage(props: { params: Promise<{ id: string }> 
   const [, setSelectedLesson] = useState<{ chapterId: string; lesson: Lesson } | null>(null)
 
   useEffect(() => {
+    // In a real app, you would fetch courses from an API instead of using an empty array
+    const courses: Course[] = []
     const courseData = courses.find((c) => c.id === params.id)
     if (courseData) {
       setCourse(courseData)

@@ -27,7 +27,7 @@ export const DeleteBlogDialog: React.FC<DeleteBlogDialogProps> = ({ open, onOpen
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel>Hủy</AlertDialogCancel>
+          <AlertDialogCancel className='focus-visible:ring-0'>Hủy</AlertDialogCancel>
           <AlertDialogAction onClick={onConfirm} className='bg-destructive hover:bg-destructive/90'>
             Xóa bài viết
           </AlertDialogAction>
