@@ -19,10 +19,6 @@ export const CourseData = z
     isBanned: z.boolean(),
     isCustom: z.boolean(),
     totalEnrollment: z.number(),
-    creator: z.object({
-      id: z.string(),
-      username: z.string()
-    }),
     categories: z.array(
       z.object({
         id: z.string(),
@@ -40,6 +36,7 @@ export const CourseData = z
         lessons: z.array(
           z.object({
             id: z.string(),
+            chapterId: z.string(),
             type: z.enum(TypeResourceValues),
             title: z.string(),
             description: z.string(),
@@ -49,11 +46,39 @@ export const CourseData = z
             sequence: z.number(),
             durationsDisplay: z.string()
           })
-        )
+        ),
+        questions: z
+          .array(
+            z.object({
+              isDeleted: z.boolean(),
+              createdAt: z.string(),
+              updatedAt: z.string(),
+              id: z.string(),
+              content: z.string(),
+              numCorrect: z.number(),
+              questionOptions: z.array(
+                z.object({
+                  isDeleted: z.boolean(),
+                  createdAt: z.string(),
+                  updatedAt: z.string(),
+                  id: z.string(),
+                  questionId: z.string(),
+                  optionData: z.string(),
+                  isCorrect: z.boolean()
+                })
+              )
+            })
+          )
+          .optional() // Thêm optional() nếu questions có thể rỗng.
       })
     ),
     createdAt: z.string(),
-    updatedAt: z.string()
+    updatedAt: z.string(),
+    isDeleted: z.boolean(),
+    level: z.enum(['ALL']), // Thay bằng các giá trị enum thực tế
+    censorId: z.string(),
+    createdAtFormatted: z.string(),
+    updatedAtFormatted: z.string()
   })
   .strict()
 
@@ -355,6 +380,16 @@ export const createCourseBodyRes = z.object({
   statusCode: z.number()
 })
 
+export const createCourseCustomBody = z.object({
+  chapterIds: z.array(z.string())
+})
+
+export const createCourseCustomRes = z.object({
+  data: z.string(),
+  message: z.string(),
+  statusCode: z.number()
+})
+
 export type CourseResType = z.infer<typeof CourseRes>
 
 export type CoursesResType = z.infer<typeof CoursesRes>
@@ -384,3 +419,7 @@ export type PreviewLessonsResType = z.infer<typeof previewLessonsRes>
 export type CreateCourseBodyType = z.infer<typeof createCourseBody>
 
 export type CreateCourseBodyResType = z.infer<typeof createCourseBodyRes>
+
+export type CreateCourseCustomBodyType = z.infer<typeof createCourseCustomBody>
+
+export type CreateCourseCustomResType = z.infer<typeof createCourseCustomRes>

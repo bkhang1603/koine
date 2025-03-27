@@ -2,10 +2,13 @@ import productApiRequest from '@/apiRequests/product'
 import CustomInput from '@/components/public/parent/home/custom-input'
 import ProductSort from '@/components/public/parent/product/sort'
 import configRoute from '@/config/route'
+import { wrapServerApi } from '@/lib/server-utils'
 import { ProductsResType } from '@/schemaValidations/product.schema'
 import { searchParams } from '@/types/query'
 import Image from 'next/image'
 import Link from 'next/link'
+import { Button } from '@/components/ui/button'
+import { ShoppingBag, RefreshCw } from 'lucide-react'
 
 async function List({ searchParams }: { searchParams: searchParams | undefined }) {
   let products: ProductsResType['data'] = []
@@ -21,12 +24,11 @@ async function List({ searchParams }: { searchParams: searchParams | undefined }
     .map((cat) => encodeURIComponent(cat))
     .join('a%a')
 
-  try {
-    const { payload } = await productApiRequest.getProducts({ page_index, page_size, search, range, category, sort })
-    products = payload.data
-  } catch (error) {
-    console.log(error)
-  }
+  const data = await wrapServerApi(() =>
+    productApiRequest.getProducts({ page_index, page_size, search, range, category, sort })
+  )
+
+  products = data?.payload?.data ?? []
 
   const changeCategoriesToString = (categories: string[]) => {
     return categories.join(', ')
@@ -104,11 +106,25 @@ async function List({ searchParams }: { searchParams: searchParams | undefined }
               </article>
             </Link>
           ))}
-
-        {products.length === 0 && (
-          <p className='text-center text-lg text-gray-500 col-span-full'>Không tìm thấy sản phẩm</p>
-        )}
       </div>
+
+      {products.length === 0 ? (
+        <div className='flex flex-col items-center justify-center py-16 px-4'>
+          <div className='w-48 h-48 mb-6 bg-muted rounded-full flex items-center justify-center'>
+            <ShoppingBag className='w-20 h-20 text-muted-foreground/50' />
+          </div>
+          <h3 className='text-xl font-semibold text-center mb-2'>Không tìm thấy sản phẩm nào</h3>
+          <p className='text-muted-foreground text-center max-w-md mb-8'>
+            Không có sản phẩm nào phù hợp với tiêu chí tìm kiếm hiện tại. Hãy thử thay đổi bộ lọc hoặc từ khóa tìm kiếm.
+          </p>
+          <Button asChild variant='outline' size='lg'>
+            <Link href={configRoute.product} className='gap-2'>
+              <RefreshCw className='w-4 h-4' />
+              Xem tất cả sản phẩm
+            </Link>
+          </Button>
+        </div>
+      ) : null}
     </div>
   )
 }

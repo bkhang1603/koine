@@ -80,7 +80,7 @@ export default async function CoursePage(props: { searchParams?: Promise<searchP
           <CourseFilter />
 
           {/* Custom Course Card - Desktop Version */}
-          <Card className='p-4 mt-6 bg-muted/50'>
+          <Card className='p-4 mt-6'>
             <div className='flex items-center gap-2 text-primary mb-2'>
               <Sparkles className='w-5 h-5' />
               <h3 className='font-medium'>Tạo khóa học riêng</h3>

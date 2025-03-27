@@ -1,3 +1,4 @@
+import { OrderStatusValues } from '@/constants/type'
 import http from '@/lib/http'
 import {
   AccountAddressBodyType,
@@ -40,7 +41,7 @@ const accountApiRequest = {
     page_index,
     page_size
   }: {
-    status: 'PROCESSING' | 'DELIVERING' | 'CANCELLED' | 'COMPLETED'
+    status: (typeof OrderStatusValues)[number]
     page_index: number
     page_size: number
   }) =>

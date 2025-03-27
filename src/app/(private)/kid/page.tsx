@@ -11,9 +11,9 @@ import { BookOpen, Target, Scroll } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { motion } from 'framer-motion'
-import { AnimatedBackground } from '@/components/kid/home/AnimatedBackground'
-import { PlayerCard } from '@/components/kid/home/PlayerCard'
-import { AchievementSection } from '@/components/kid/home/AchievementSection'
+import { AnimatedBackground } from '@/components/private/kid/home/AnimatedBackground'
+import { PlayerCard } from '@/components/private/kid/home/PlayerCard'
+import { AchievementSection } from '@/components/private/kid/home/AchievementSection'
 
 // Types
 
