@@ -8,6 +8,8 @@ import {
   CoursesResType,
   CreateCourseBodyResType,
   CreateCourseBodyType,
+  CreateCourseCustomBodyType,
+  CreateCourseCustomResType,
   LessonResType,
   LessonsResType,
   PreviewLessonsResType,
@@ -54,7 +56,9 @@ const courseApiRequest = {
   getCourseReview: (id: string) => http.get<CourseReviewResType>(`/courses/${id}/reviews`),
   getAllCoursesForCustom: () => http.get<AllCoursesForCustomResType>(`/courses/all-basic-course-info`),
   getPreviewLessons: ({ id, limit }: { id: string; limit: number }) =>
-    http.get<PreviewLessonsResType>(`lessons/${id}/preview?limit=${limit}`)
+    http.get<PreviewLessonsResType>(`lessons/${id}/preview?limit=${limit}`),
+  createCourseCustom: (data: CreateCourseCustomBodyType) =>
+    http.post<CreateCourseCustomResType>('/course-customs/request-custom-course', data)
 }
 
 export default courseApiRequest

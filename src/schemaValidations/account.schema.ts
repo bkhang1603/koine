@@ -507,6 +507,7 @@ export const courseDetailForChildRes = z.object({
 })
 
 export const createOrderNeedReviewBody = z.object({
+  orderDetailId: z.string(),
   itemId: z.string(),
   itemType: z.enum(OrderTypeValues),
   rating: z.number(),

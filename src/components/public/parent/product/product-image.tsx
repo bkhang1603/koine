@@ -3,6 +3,7 @@
 import { ProductResType } from '@/schemaValidations/product.schema'
 import Image from 'next/image'
 import React, { useState } from 'react'
+import { ImageOff } from 'lucide-react'
 
 function ProductImage({
   imageData
@@ -11,7 +12,12 @@ function ProductImage({
   // eslint-disable-next-line no-unused-vars
 }) {
   const [mainImage, setMainImage] = useState(imageData[0])
-  const gridCols = `grid-cols-${imageData.length}`
+
+  // Giới hạn hiển thị tối đa 4 ảnh
+  const displayedImages = imageData.slice(0, 4)
+
+  // Tính số placeholder cần thêm vào để đủ 3 ô
+  const placeholdersNeeded = imageData.length < 3 ? 3 - imageData.length : 0
 
   if (!imageData || !Array.isArray(imageData)) {
     return <p>No images available</p>
@@ -27,9 +33,12 @@ function ProductImage({
         className='w-full h-96 object-cover rounded-lg'
         priority={true}
       />
-      <div className={`grid ${gridCols} gap-2`}>
-        {imageData.map((image, index) => (
-          <div key={index} className='w-full h-28 overflow-hidden cursor-pointer rounded-lg'>
+
+      {/* Grid hiển thị tối đa 3 ô, có thể giới hạn số ảnh hiển thị */}
+      <div className='grid grid-cols-3 gap-2'>
+        {/* Hiển thị ảnh thật */}
+        {displayedImages.map((image, index) => (
+          <div key={`image-${index}`} className='w-full h-28 overflow-hidden cursor-pointer rounded-lg'>
             <Image
               src={image.imageUrl}
               alt={image.name}
@@ -39,6 +48,16 @@ function ProductImage({
               priority={true}
               onClick={() => setMainImage(image)}
             />
+          </div>
+        ))}
+
+        {/* Thêm placeholder nếu có ít hơn 3 ảnh */}
+        {Array.from({ length: placeholdersNeeded }).map((_, index) => (
+          <div
+            key={`placeholder-${index}`}
+            className='w-full h-28 bg-gray-100 rounded-lg flex items-center justify-center'
+          >
+            <ImageOff className='w-8 h-8 text-gray-300' />
           </div>
         ))}
       </div>

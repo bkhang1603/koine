@@ -1,4 +1,4 @@
-import { Star, Heart, Share2 } from 'lucide-react'
+import { Star, Heart, Share2, Truck, RotateCcw, ShieldCheck } from 'lucide-react'
 import BreadCrumbCustom from '@/components/breadcrumb-custom'
 import ProductImage from '@/components/public/parent/product/product-image'
 import productApiRequest from '@/apiRequests/product'
@@ -56,11 +56,18 @@ export default async function ProductDetail(props: { params: Promise<{ id: strin
 
           <AddToCartButton product={product} />
 
-          <div className='space-y-2 text-sm'>
-            <p>Mã số sản phẩm: {product.id}</p>
-            <p>
-              Thể loại:{' '}
-              {product.categories && changeCategoriesToString(product.categories.map((category) => category.name))}
+          <div className='space-y-2 text-sm mt-6'>
+            <p className='flex items-center gap-2'>
+              <Truck className='w-4 h-4 text-primary' />
+              <span>Giao hàng miễn phí cho đơn hàng trên 500.000đ</span>
+            </p>
+            <p className='flex items-center gap-2'>
+              <RotateCcw className='w-4 h-4 text-primary' />
+              <span>Đổi trả trong vòng 30 ngày</span>
+            </p>
+            <p className='flex items-center gap-2'>
+              <ShieldCheck className='w-4 h-4 text-primary' />
+              <span>Bảo hành chính hãng 12 tháng</span>
             </p>
           </div>
         </div>

@@ -1,13 +1,5 @@
 import { useState } from 'react'
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger
-} from '@/components/ui/dialog'
+import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
@@ -19,12 +11,11 @@ import { handleErrorApi } from '@/lib/utils'
 
 interface ReviewProductDialogProps {
   itemId: string
-  itemTitle: string
   itemType: string
-  onReviewSuccess: () => void
+  orderDetailId: string
 }
 
-export function ReviewProductDialog({ itemId, itemTitle, itemType, onReviewSuccess }: ReviewProductDialogProps) {
+export function ReviewProductDialog({ itemId, itemType, orderDetailId }: ReviewProductDialogProps) {
   const [open, setOpen] = useState(false)
   const [rating, setRating] = useState(0)
   const [hoverRating, setHoverRating] = useState(0)
@@ -50,6 +41,7 @@ export function ReviewProductDialog({ itemId, itemTitle, itemType, onReviewSucce
       const finalComment = comment.trim() || getDefaultComment(rating, validItemType)
 
       await createReviewMutation.mutateAsync({
+        orderDetailId: orderDetailId,
         rating: rating,
         review: finalComment,
         itemId: itemId,
@@ -62,7 +54,6 @@ export function ReviewProductDialog({ itemId, itemTitle, itemType, onReviewSucce
       })
 
       setOpen(false)
-      onReviewSuccess()
     } catch (error) {
       handleErrorApi({
         error
@@ -122,79 +113,87 @@ export function ReviewProductDialog({ itemId, itemTitle, itemType, onReviewSucce
       }}
     >
       <DialogTrigger asChild>
-        <Button className='gap-1.5 bg-amber-50 hover:bg-amber-100 text-amber-700 border-amber-200' size='sm'>
-          <Star className='h-4 w-4 fill-amber-400' />
+        <Button variant='outline' size='sm' className='text-gray-700 border-gray-200 hover:bg-gray-50'>
           Đánh giá ngay
         </Button>
       </DialogTrigger>
 
-      <DialogContent className='sm:max-w-[500px]'>
-        <DialogHeader>
-          <DialogTitle>Đánh giá {itemType === 'COURSE' ? 'khóa học' : 'sản phẩm'}</DialogTitle>
-          <DialogDescription>
-            <span className='font-medium'>{itemTitle}</span>
-          </DialogDescription>
+      <DialogContent className='sm:max-w-[460px]'>
+        <DialogHeader className='pb-2 space-y-1'>
+          <DialogTitle className='text-lg font-semibold'>
+            Đánh giá {itemType === 'COURSE' ? 'khóa học' : 'sản phẩm'}
+          </DialogTitle>
         </DialogHeader>
 
-        <div className='space-y-6 py-4'>
+        <div className='space-y-5'>
           {/* Star Rating */}
-          <div className='space-y-2'>
-            <Label>Đánh giá của bạn</Label>
-            <div className='flex items-center gap-1'>
-              {[1, 2, 3, 4, 5].map((star) => (
-                <button
-                  key={star}
-                  type='button'
-                  className='focus:outline-none transition-transform hover:scale-110'
-                  onClick={() => setRating(star)}
-                  onMouseEnter={() => setHoverRating(star)}
-                  onMouseLeave={() => setHoverRating(0)}
-                >
-                  <Star
-                    className={`h-8 w-8 ${
-                      star <= (hoverRating || rating) ? 'text-amber-400 fill-amber-400' : 'text-gray-300 fill-gray-100'
-                    } transition-colors`}
-                  />
-                </button>
-              ))}
-
-              <span className='ml-2 text-sm text-gray-600'>{getRatingText(rating)}</span>
+          <div className='space-y-2.5'>
+            <Label className='text-sm font-medium text-gray-700'>Đánh giá sản phẩm</Label>
+            <div className='p-4 bg-gray-50 rounded-md flex flex-col items-center'>
+              <div className='flex items-center gap-1.5 mb-2'>
+                {[1, 2, 3, 4, 5].map((star) => (
+                  <button
+                    key={star}
+                    type='button'
+                    className='focus:outline-none transition-transform hover:scale-110'
+                    onClick={() => setRating(star)}
+                    onMouseEnter={() => setHoverRating(star)}
+                    onMouseLeave={() => setHoverRating(0)}
+                  >
+                    <Star
+                      className={`h-8 w-8 ${
+                        star <= (hoverRating || rating) ? 'text-amber-400 fill-amber-400' : 'text-gray-200 fill-gray-50'
+                      } transition-colors`}
+                      strokeWidth={1.5}
+                    />
+                  </button>
+                ))}
+              </div>
+              <span className='text-sm text-gray-600'>{getRatingText(rating)}</span>
             </div>
           </div>
 
           {/* Comment */}
-          <div className='space-y-2'>
-            <Label htmlFor='comment'>Nhận xét của bạn</Label>
+          <div className='space-y-2.5'>
+            <Label className='text-sm font-medium text-gray-700' htmlFor='comment'>
+              Nhận xét của bạn
+            </Label>
             <Textarea
               id='comment'
-              placeholder={`Chia sẻ trải nghiệm của bạn về ${itemType === 'COURSE' ? 'khóa học' : 'sản phẩm'} này...`}
+              placeholder={`Chia sẻ cảm nhận về ${itemType === 'COURSE' ? 'khóa học' : 'sản phẩm'} này...`}
               value={comment}
               onChange={(e) => setComment(e.target.value)}
-              className='resize-none'
+              className='resize-none h-24 border-gray-200 focus:border-gray-300 focus:ring-gray-200'
               rows={4}
             />
-            <p className='text-xs text-muted-foreground'>
+            <p className='text-xs text-gray-500'>
               Nhận xét của bạn sẽ giúp người dùng khác đưa ra quyết định mua hàng tốt hơn.
             </p>
           </div>
 
           {/* Rating guidelines */}
-          <Alert className='bg-blue-50 border-blue-200 text-blue-800'>
-            <AlertCircle className='h-4 w-4 text-blue-500' />
-            <AlertDescription className='text-xs'>
-              Xin hãy để lại đánh giá chân thực và khách quan. Đánh giá của bạn sẽ được hiển thị công khai.
+          <Alert className='bg-gray-50 border-gray-200 text-gray-700'>
+            <AlertDescription className=' flex items-center justify-center text-xs gap-4'>
+              <AlertCircle className='h-6 w-6 text-gray-500' />
+              Đánh giá của bạn sẽ được hiển thị công khai và giúp cải thiện chất lượng sản phẩm.
             </AlertDescription>
           </Alert>
         </div>
 
-        <DialogFooter>
-          <Button variant='outline' onClick={() => setOpen(false)}>
-            Hủy
+        <DialogFooter className='flex justify-end pt-2 gap-2'>
+          <Button
+            variant='outline'
+            size='sm'
+            onClick={() => setOpen(false)}
+            className='h-9 border-gray-200 text-gray-700 hover:bg-gray-50'
+          >
+            Hủy bỏ
           </Button>
           <Button
+            size='sm'
             onClick={handleReview}
             disabled={rating === 0 || createReviewMutation.isPending}
-            className={rating ? 'bg-amber-600 hover:bg-amber-700' : undefined}
+            className={`h-9 ${rating ? 'bg-gray-900 hover:bg-gray-800' : 'bg-gray-200'} text-white`}
           >
             {createReviewMutation.isPending ? 'Đang gửi...' : 'Gửi đánh giá'}
           </Button>

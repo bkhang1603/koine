@@ -1,5 +1,6 @@
 import Footer from '@/components/layout/footer'
 import Navbar from '@/components/layout/header'
+import SupportButton from '@/components/support/SupportButton'
 
 function PublicLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -7,6 +8,7 @@ function PublicLayout({ children }: { children: React.ReactNode }) {
       <Navbar />
       {children}
       <Footer />
+      <SupportButton />
     </main>
   )
 }

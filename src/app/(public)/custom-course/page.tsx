@@ -9,10 +9,11 @@ import { CustomChapterList } from '@/components/public/parent/custom-course/cust
 import { ChapterPickerDialog } from '@/components/public/parent/custom-course/chapter-picker-dialog'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { CoursesResType } from '@/schemaValidations/course.schema'
-import { useGetAllCoursesForCustomQuery } from '@/queries/useCourse'
+import { useCreateCourseCustomMutation, useGetAllCoursesForCustomQuery } from '@/queries/useCourse'
 import { useToast } from '@/components/ui/use-toast'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { useAppStore } from '@/components/app-provider'
+import { handleErrorApi } from '@/lib/utils'
 
 type Chapter = CoursesResType['data'][0]['chapters'][0]
 
@@ -23,6 +24,8 @@ export default function CustomCoursePage() {
 
   // Query data once
   const { data, isLoading } = useGetAllCoursesForCustomQuery()
+
+  const createCourseCustomMutation = useCreateCourseCustomMutation()
 
   // Get Zustand state with guaranteed initialization
   const chapters = useAppStore((state) => state.customCourse.chapters || [])
@@ -117,21 +120,19 @@ export default function CustomCoursePage() {
     setIsSubmitting(true)
 
     try {
-      // API call would go here
-      await new Promise((resolve) => setTimeout(resolve, 1500))
-      console.log('chapters', chapters)
+      if (createCourseCustomMutation.isPending) return
+      const res = await createCourseCustomMutation.mutateAsync({
+        chapterIds: chapters.map((chapter) => chapter.id)
+      })
 
       toast({
-        title: 'Yêu cầu đã được gửi thành công',
-        description: 'Chúng tôi sẽ tiến hành xử lý và thông báo cho bạn sớm nhất'
+        description: res.payload.message
       })
 
       setCustomCourse({ chapters: [] })
     } catch (error) {
-      toast({
-        title: 'Có lỗi xảy ra',
-        description: 'Không thể gửi yêu cầu. Vui lòng thử lại sau.',
-        variant: 'destructive'
+      handleErrorApi({
+        error
       })
     } finally {
       setIsSubmitting(false)

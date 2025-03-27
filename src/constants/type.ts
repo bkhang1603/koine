@@ -61,17 +61,31 @@ export const OrderType = {
 export const OrderTypeValues = [OrderType.COURSE, OrderType.PRODUCT, OrderType.COMBO] as const
 
 export const OrderStatus = {
+  PENDING: 'PENDING',
   PROCESSING: 'PROCESSING',
   DELIVERING: 'DELIVERING',
+  DELIVERED: 'DELIVERED',
   COMPLETED: 'COMPLETED',
-  CANCELLED: 'CANCELLED'
+  CANCELLED: 'CANCELLED',
+  FAILED_PAYMENT: 'FAILED_PAYMENT',
+  REFUND_REQUEST: 'REFUND_REQUEST',
+  REFUNDING: 'REFUNDING',
+  REFUNDED: 'REFUNDED',
+  FAILED: 'FAILED'
 } as const
 
 export const OrderStatusValues = [
+  OrderStatus.PENDING,
   OrderStatus.PROCESSING,
   OrderStatus.DELIVERING,
+  OrderStatus.DELIVERED,
   OrderStatus.COMPLETED,
-  OrderStatus.CANCELLED
+  OrderStatus.CANCELLED,
+  OrderStatus.FAILED_PAYMENT,
+  OrderStatus.REFUND_REQUEST,
+  OrderStatus.REFUNDING,
+  OrderStatus.REFUNDED,
+  OrderStatus.FAILED
 ] as const
 
 export const PaymentMethod = {

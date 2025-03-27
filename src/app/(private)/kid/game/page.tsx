@@ -70,6 +70,21 @@ const games = [
       accuracy: '72%'
     },
     link: '/kid/game/rocket'
+  },
+  {
+    id: 'colorpattern',
+    title: 'Mẫu Màu Sắc',
+    description: 'Ghi nhớ và tái tạo các mẫu màu sắc xuất hiện',
+    icon: '🎨',
+    level: 'Dễ',
+    category: 'Quan sát',
+    color: 'from-red-100 via-rose-200 to-pink-200',
+    stats: {
+      highScore: 810,
+      gamesPlayed: 14,
+      accuracy: '86%'
+    },
+    link: '/kid/game/colorpattern'
   }
 ]
 
