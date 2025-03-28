@@ -19,7 +19,7 @@ export const ProductData = z
     categoryId: z.string(),
     categories: z.array(
       z.object({
-        id: z.number(),
+        id: z.string(),
         name: z.string()
       })
     ),

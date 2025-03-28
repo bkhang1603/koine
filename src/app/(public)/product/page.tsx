@@ -65,5 +65,4 @@ async function ProductPage(props: { searchParams?: Promise<searchParams> }) {
     </main>
   )
 }
-
 export default ProductPage

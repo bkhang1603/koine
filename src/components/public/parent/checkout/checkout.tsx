@@ -8,7 +8,7 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import { Label } from '@/components/ui/label'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { useAppStore } from '@/components/app-provider'
-import { ChevronRight, MapPin, Plus, ShoppingCart, ArrowLeft } from 'lucide-react'
+import { ChevronRight, MapPin, Plus, ShoppingCart, ArrowLeft, Loader2 } from 'lucide-react'
 import Link from 'next/link'
 import configRoute from '@/config/route'
 import { useGetAccountAddress } from '@/queries/useAccount'
@@ -88,9 +88,17 @@ export default function Checkout() {
           setOrderId(res.payload.data.orderId)
 
           router.push(res.payload.data.paymentLink)
+          toast({
+            title: 'Đặt hàng thành công',
+            description: 'Đơn hàng của bạn đã được tạo'
+          })
         } else {
           // Nếu không có link thanh toán, chuyển hướng đến trang lịch sử đơn hàng
           router.push(configRoute.setting.order)
+          toast({
+            title: 'Đặt hàng thành công',
+            description: 'Đơn hàng của bạn đã được tạo'
+          })
         }
       } else {
         // Xử lý khi không có res hoặc data không đúng format
@@ -332,8 +340,14 @@ export default function Checkout() {
               </div>
               <p className='text-right text-xs text-gray-500 mt-1'>(Đã bao gồm VAT nếu có)</p>
 
-              <Button className='w-full mt-4 font-medium' onClick={handleCreateOrder} disabled={!pickAddress}>
-                {!pickAddress ? 'Vui lòng thêm địa chỉ giao hàng' : 'Đặt hàng'}
+              <Button
+                className='w-full mt-4 font-medium'
+                onClick={handleCreateOrder}
+                disabled={!pickAddress || createOrderMutation.isPending}
+              >
+                {createOrderMutation.isPending && <Loader2 className='w-4 h-4 mr-2 animate-spin' />}
+                {!pickAddress && 'Vui lòng thêm địa chỉ giao hàng'}
+                {pickAddress && !createOrderMutation.isPending && 'Đặt hàng'}
               </Button>
             </CardContent>
           </Card>

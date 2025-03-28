@@ -8,6 +8,7 @@ import Link from 'next/link'
 import configRoute from '@/config/route'
 import { useRePurchaseOrderMutation } from '@/queries/useOrder'
 import { useAppStore } from '@/components/app-provider'
+import { handleErrorApi } from '@/lib/utils'
 
 function CancelPurchasePage() {
   const orderId = useAppStore((state) => state.orderId)
@@ -37,7 +38,9 @@ function CancelPurchasePage() {
     try {
       await rePurchaseOrderMutation.mutateAsync({ id: orderId })
     } catch (error) {
-      console.error(error)
+      handleErrorApi({
+        error
+      })
     }
   }
 

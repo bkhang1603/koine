@@ -17,7 +17,7 @@ function ProductImage({
   const displayedImages = imageData.slice(0, 4)
 
   // Tính số placeholder cần thêm vào để đủ 3 ô
-  const placeholdersNeeded = imageData.length < 3 ? 3 - imageData.length : 0
+  const placeholdersNeeded = imageData.length < 4 ? 4 - imageData.length : 0
 
   if (!imageData || !Array.isArray(imageData)) {
     return <p>No images available</p>
@@ -35,7 +35,7 @@ function ProductImage({
       />
 
       {/* Grid hiển thị tối đa 3 ô, có thể giới hạn số ảnh hiển thị */}
-      <div className='grid grid-cols-3 gap-2'>
+      <div className='grid grid-cols-4 gap-2'>
         {/* Hiển thị ảnh thật */}
         {displayedImages.map((image, index) => (
           <div key={`image-${index}`} className='w-full h-28 overflow-hidden cursor-pointer rounded-lg'>

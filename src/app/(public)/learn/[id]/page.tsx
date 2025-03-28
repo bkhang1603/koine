@@ -14,7 +14,6 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import { handleErrorApi } from '@/lib/utils'
 import { useCallback, use, useEffect, useRef } from 'react'
 import { UserCourseProgressResType } from '@/schemaValidations/course.schema'
-import { Breadcrumb } from '@/components/learn/Breadcrumb'
 import { Sidebar } from '@/components/learn/Sidebar'
 import { LessonContent } from '@/components/learn/LessonContent'
 import { WelcomeScreen } from '@/components/learn/WelcomeScreen'
@@ -23,6 +22,8 @@ import { LoadingSkeleton } from '@/components/learn/LoadingSkeleton'
 import { AlertTriangle } from 'lucide-react'
 import { useGetStillLearningCourse } from '@/queries/useAccount'
 import { toast } from '@/components/ui/use-toast'
+import { BreadcrumbParent } from '@/components/learn/BreadcrumbParent'
+import configRoute from '@/config/route'
 
 type Lesson = UserCourseProgressResType['data']['chapters'][0]['lessons'][0]
 
@@ -110,18 +111,16 @@ function LearnPage(props: { params: Promise<{ id: string }> }) {
     if (!isPreviewMode) {
       // Gọi refetch ngay lập tức khi component mount
       refetchStillLearning()
-      console.log('Initial refetch at:', new Date().toLocaleTimeString())
 
       // Clear previous interval if exists
       if (refetchIntervalRef.current) {
         clearInterval(refetchIntervalRef.current)
       }
 
-      // Set new interval
-      const intervalTime = 300000
+      // Set new interval 1 minute
+      const intervalTime = 1 * 60 * 1000
       refetchIntervalRef.current = setInterval(() => {
         refetchStillLearning()
-        console.log('Interval refetch at:', new Date().toLocaleTimeString())
       }, intervalTime)
     }
 
@@ -210,11 +209,13 @@ function LearnPage(props: { params: Promise<{ id: string }> }) {
   useEffect(() => {
     if (isError) {
       toast({
-        title: 'Hiện đang có thiết bị khác đang học khóa học này',
+        description: 'Hiện đang có thiết bị khác đang học khóa học này',
         variant: 'destructive'
       })
+
+      router.push(configRoute.setting.myCourse)
     }
-  }, [isError])
+  }, [isError, router])
 
   // Render preview UI overlay when in preview mode
   if (isPreviewMode) {
@@ -301,12 +302,12 @@ function LearnPage(props: { params: Promise<{ id: string }> }) {
   if (!course) {
     return (
       <div className='py-8'>
-        <Breadcrumb />
+        <BreadcrumbParent />
         <div className='flex flex-col items-center justify-center min-h-[400px] gap-4'>
           <h3 className='text-lg font-medium text-gray-900'>Không tìm thấy khóa học</h3>
           <p className='text-gray-500'>Khóa học không tồn tại hoặc đã bị xóa</p>
           <Button asChild>
-            <Link href='/learn'>Quay lại danh sách khóa học</Link>
+            <Link href={configRoute.learn}>Quay lại danh sách khóa học</Link>
           </Button>
         </div>
       </div>
@@ -315,6 +316,8 @@ function LearnPage(props: { params: Promise<{ id: string }> }) {
 
   return (
     <div className='pt-32 pb-14 container'>
+      <BreadcrumbParent courseTitle={course.title} />
+
       <div className='grid lg:grid-cols-[340px_1fr] gap-8'>
         <Sidebar
           course={course}

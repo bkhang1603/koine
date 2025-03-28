@@ -5,11 +5,15 @@ import productApiRequest from '@/apiRequests/product'
 import AddToCartButton from '@/components/public/parent/product/add-to-cart-button'
 import ProductDescription from '@/components/public/parent/product/product-description'
 import { wrapServerApi } from '@/lib/server-utils'
+import RecommendedProducts from '@/components/public/parent/product/recommended-products'
+import { searchParams } from '@/types/query'
 
-export default async function ProductDetail(props: { params: Promise<{ id: string }> }) {
-  const params = await props.params
-
-  const { id } = params
+export default async function ProductDetail(props: {
+  params: Promise<{ id: string }>
+  searchParams: Promise<searchParams>
+}) {
+  const { id } = await props.params
+  const searchParams = await props.searchParams
 
   const data = await wrapServerApi(() => productApiRequest.getProduct(id))
   const product = data?.payload?.data
@@ -73,7 +77,15 @@ export default async function ProductDetail(props: { params: Promise<{ id: strin
         </div>
       </div>
 
-      <ProductDescription description={product.description} detail={product.detail} guide={product.guide} id={id} />
+      <ProductDescription
+        description={product.description}
+        detail={product.detail}
+        guide={product.guide}
+        id={id}
+        searchParams={searchParams}
+      />
+
+      <RecommendedProducts currentProductId={id} categoryIds={product.categories.map((category) => category.id)} />
     </section>
   )
 }

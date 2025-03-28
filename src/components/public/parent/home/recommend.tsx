@@ -151,7 +151,7 @@ export default function Recommend() {
                       variant='outline'
                       className='w-full rounded-xl border-primary/20 hover:bg-primary/5 group/btn'
                     >
-                      <Link href={`/course/${course.id}`}>
+                      <Link href={`/course`}>
                         Xem chi tiết
                         <ArrowRight className='w-4 h-4 ml-2 group-hover/btn:translate-x-1 transition-transform' />
                       </Link>

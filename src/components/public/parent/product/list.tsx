@@ -9,12 +9,13 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { ShoppingBag, RefreshCw } from 'lucide-react'
+import PaginationCustom from '@/components/pagination-custom'
 
 async function List({ searchParams }: { searchParams: searchParams | undefined }) {
   let products: ProductsResType['data'] = []
   const page_index = isNaN(Number(searchParams?.page_index)) ? 1 : Number(searchParams?.page_index)
   const search = searchParams?.search ?? ''
-  const page_size = 12
+  const page_size = 8
   const sortOptions = ['pa', 'pd', 'na', 'nd'] as const
   const sort = sortOptions.includes(searchParams?.sort as any) ? searchParams?.sort : 'pa'
   const range = isNaN(Number(searchParams?.range)) ? undefined : Number(searchParams?.range)
@@ -41,7 +42,6 @@ async function List({ searchParams }: { searchParams: searchParams | undefined }
 
         <ProductSort />
       </div>
-
       <div className='grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mt-6'>
         {products &&
           products.map((item) => (
@@ -107,6 +107,11 @@ async function List({ searchParams }: { searchParams: searchParams | undefined }
             </Link>
           ))}
       </div>
+      <PaginationCustom
+        totalPage={data?.payload?.pagination.totalPage ?? 1}
+        href={configRoute.product}
+        className='mt-6'
+      />
 
       {products.length === 0 ? (
         <div className='flex flex-col items-center justify-center py-16 px-4'>

@@ -63,3 +63,10 @@ export const useUpdatePaymentMethodMutation = ({ id }: { id: string }) => {
     }
   })
 }
+
+export const useGetRefundOrders = ({ page_size, page_index }: { page_size: number; page_index: number }) => {
+  return useQuery({
+    queryKey: ['refund-orders', page_size, page_index],
+    queryFn: () => orderApiRequest.getRefundOrders({ page_size, page_index })
+  })
+}

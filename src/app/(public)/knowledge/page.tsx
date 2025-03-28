@@ -5,8 +5,9 @@ import configRoute from '@/config/route'
 import Image from 'next/image'
 import Link from 'next/link'
 import blogApiRequest from '@/apiRequests/blog'
-import { BlogsResType } from '@/schemaValidations/blog.schema'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { wrapServerApi } from '@/lib/server-utils'
+import { searchParams } from '@/types/query'
 
 const categories = [
   { id: 'all', name: 'Tất cả', featured: true },
@@ -18,22 +19,24 @@ const categories = [
   { id: 'boys', name: 'Bé trai' }
 ]
 
-async function KnowledgePage() {
-  let blogs: BlogsResType['data'] = []
+async function KnowledgePage(props: { searchParams?: Promise<searchParams> }) {
+  const searchParams = await props.searchParams
+  const currentPage = Number(searchParams?.page) || 1
+  const pageSize = 9 // 3 columns x 3 rows looks nice on desktop
 
-  try {
-    const { payload } = await blogApiRequest.getBlogs({
-      page_index: 1,
-      page_size: 10,
+  const data = await wrapServerApi(() =>
+    blogApiRequest.getBlogs({
+      page_index: currentPage,
+      page_size: pageSize,
       search: ''
     })
-    blogs = payload.data
-  } catch (error) {
-    console.log(error)
-  }
+  )
 
-  if (!blogs) {
-    return <div>No blogs available</div>
+  const blogs = data?.payload?.data || []
+  const totalPages = data?.payload?.pagination?.totalPage
+
+  if (!blogs || blogs.length === 0) {
+    return <div className='container py-20 text-center'>Không có bài viết nào</div>
   }
 
   return (
@@ -88,7 +91,7 @@ async function KnowledgePage() {
               <Link key={blog.id || index} href={`${configRoute.knowledge}/${blog?.slug}`} className='group'>
                 <div
                   className='bg-white rounded-2xl overflow-hidden border border-gray-100
-                  hover:shadow-xl transition-all duration-300'
+                  hover:shadow-xl transition-all duration-300 flex flex-col h-full'
                 >
                   {/* Image */}
                   <div className='relative aspect-[16/9] overflow-hidden'>
@@ -102,7 +105,7 @@ async function KnowledgePage() {
                   </div>
 
                   {/* Content */}
-                  <div className='p-6'>
+                  <div className='p-6 flex flex-col flex-grow'>
                     {/* Date & Stats */}
                     <div className='flex items-center gap-4 mb-4'>
                       <span className='text-primary text-sm font-medium'>
@@ -120,7 +123,9 @@ async function KnowledgePage() {
                     >
                       {blog.title}
                     </h3>
-                    <p className='text-gray-600 line-clamp-3'>{blog.description}</p>
+                    <div className='text-gray-600 h-[4.5rem] overflow-hidden mb-auto'>
+                      <p className='line-clamp-3'>{blog.description}</p>
+                    </div>
 
                     {/* Author */}
                     <div className='flex items-center gap-3 mt-6 pt-6 border-t border-gray-100'>
@@ -137,6 +142,43 @@ async function KnowledgePage() {
               </Link>
             ))}
           </div>
+
+          {/* Pagination */}
+          {totalPages && totalPages > 1 && (
+            <div className='flex justify-center mt-12'>
+              <div className='flex items-center gap-2'>
+                {currentPage > 1 && (
+                  <Link
+                    href={`/knowledge?page=${currentPage - 1}`}
+                    className='px-4 py-2 rounded-lg bg-gray-100 hover:bg-gray-200 transition-colors'
+                  >
+                    Trước
+                  </Link>
+                )}
+
+                {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                  <Link
+                    key={page}
+                    href={`/knowledge?page=${page}`}
+                    className={`px-4 py-2 rounded-lg transition-colors ${
+                      currentPage === page ? 'bg-primary text-white' : 'bg-gray-100 hover:bg-gray-200'
+                    }`}
+                  >
+                    {page}
+                  </Link>
+                ))}
+
+                {currentPage < totalPages && (
+                  <Link
+                    href={`/knowledge?page=${currentPage + 1}`}
+                    className='px-4 py-2 rounded-lg bg-gray-100 hover:bg-gray-200 transition-colors'
+                  >
+                    Tiếp
+                  </Link>
+                )}
+              </div>
+            </div>
+          )}
         </div>
       </section>
 

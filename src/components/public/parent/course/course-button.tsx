@@ -4,6 +4,7 @@ import { useAppStore } from '@/components/app-provider'
 import { Button } from '@/components/ui/button'
 import { toast } from '@/components/ui/use-toast'
 import configRoute from '@/config/route'
+import { handleErrorApi } from '@/lib/utils'
 import { useCartDetailCreateMutation } from '@/queries/useCartDetail'
 import { ShoppingCart, CreditCard } from 'lucide-react'
 import { useRouter } from 'next/navigation'
@@ -39,7 +40,9 @@ function CourseButton({ id }: { id: string }) {
         description: 'Khóa học đã được thêm vào giỏ hàng'
       })
     } catch (error) {
-      console.log(error)
+      handleErrorApi({
+        error
+      })
     }
   }
 

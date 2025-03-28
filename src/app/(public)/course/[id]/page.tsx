@@ -21,6 +21,8 @@ import Link from 'next/link'
 import { wrapServerApi } from '@/lib/server-utils'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import RecommendedCourses from '@/components/public/parent/course/recommended-courses'
+import { searchParams } from '@/types/query'
 
 const formatDuration = (minutes: number) => {
   const hours = Math.floor(minutes / 60)
@@ -43,10 +45,12 @@ const getLessonIcon = (type: string) => {
   }
 }
 
-export default async function CourseDetail(props: { params: Promise<{ id: string }> }) {
-  const params = await props.params
-
-  const { id } = params
+export default async function CourseDetail(props: {
+  params: Promise<{ id: string }>
+  searchParams: Promise<searchParams>
+}) {
+  const { id } = await props.params
+  const searchParams = await props.searchParams
 
   const data = await wrapServerApi(() => courseApiRequest.getCourse(id))
   const courseData = data?.payload?.data
@@ -296,7 +300,7 @@ export default async function CourseDetail(props: { params: Promise<{ id: string
               </TabsContent>
 
               <TabsContent value='reviews'>
-                <CourseReviews courseId={id} />
+                <CourseReviews courseId={id} searchParams={searchParams} />
               </TabsContent>
             </Tabs>
           </div>
@@ -373,6 +377,10 @@ export default async function CourseDetail(props: { params: Promise<{ id: string
       {/* Fixed Mobile Action Button - Only visible on smallest screens */}
       <div className='fixed bottom-0 left-0 right-0 p-4 bg-white border-t border-gray-200 shadow-lg sm:hidden z-50'>
         {courseData.price === 0 ? <EnrollButton id={courseData.id} /> : <CourseButton id={courseData.id} />}
+      </div>
+
+      <div className='container'>
+        <RecommendedCourses currentCourseId={courseData.id} categoryIds={courseData.categories?.map((cat) => cat.id)} />
       </div>
     </main>
   )

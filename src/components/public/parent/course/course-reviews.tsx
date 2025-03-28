@@ -1,24 +1,50 @@
-'use client'
-
-import { useGetCourseReviewQuery } from '@/queries/useCourse'
-import { Skeleton } from '@/components/ui/skeleton'
 import { Star, MessageSquare, CheckCircle, Award, ThumbsUp, Clock } from 'lucide-react'
-import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
-import { useState, useMemo } from 'react'
 import { cn } from '@/lib/utils'
+import courseApiRequest from '@/apiRequests/course'
+import { wrapServerApi } from '@/lib/server-utils'
+import CourseFilterReviews from './course-filter-reviews'
 
 interface CourseReviewsProps {
   courseId: string
+  searchParams?: { star?: string }
 }
 
-export default function CourseReviews({ courseId }: CourseReviewsProps) {
-  const [selectedFilter, setSelectedFilter] = useState<number | null>(null)
-  const { data, isLoading } = useGetCourseReviewQuery({
-    id: courseId
-  })
+// StarRating component
+function StarRating({ rating, size = 'sm' }: { rating: number; size?: 'sm' | 'md' | 'lg' }) {
+  const sizeClass = {
+    sm: 'w-4 h-4',
+    md: 'w-5 h-5',
+    lg: 'w-6 h-6'
+  }
 
-  const stars = data?.payload?.data?.stars || {
+  return (
+    <div className='flex gap-0.5'>
+      {[1, 2, 3, 4, 5].map((star) => (
+        <Star
+          key={star}
+          className={cn(
+            sizeClass[size],
+            star <= rating ? 'fill-primary text-primary' : 'fill-slate-200 text-slate-200'
+          )}
+        />
+      ))}
+    </div>
+  )
+}
+
+export default async function CourseReviews({ courseId, searchParams }: CourseReviewsProps) {
+  // Parse the star filter from searchParams
+  const selectedFilter = searchParams?.star ? parseInt(searchParams.star) : null
+
+  // Fetch data from server
+  const data = await wrapServerApi(() => courseApiRequest.getCourseReview(courseId))
+
+  if (!data) {
+    return null
+  }
+
+  const stars = data.payload?.data?.stars || {
     averageRating: 0,
     totalRating: 0,
     ratings: { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 }
@@ -27,39 +53,10 @@ export default function CourseReviews({ courseId }: CourseReviewsProps) {
   const totalReviews = stars.totalRating || 0
   const ratingsDistribution = stars.ratings || { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 }
 
-  // Move the entire filtering logic into the useMemo
-  const filteredReviews = useMemo(() => {
-    const allReviews = data?.payload?.data?.ratingInfos || []
-    if (selectedFilter === null) return allReviews
-    return allReviews.filter((review) => review.rating === selectedFilter)
-  }, [data, selectedFilter])
-
-  const handleFilterClick = (rating: number) => {
-    setSelectedFilter(rating === selectedFilter ? null : rating)
-  }
-
-  // Render star rating component
-  const StarRating = ({ rating, size = 'sm' }: { rating: number; size?: 'sm' | 'md' | 'lg' }) => {
-    const sizeClass = {
-      sm: 'w-4 h-4',
-      md: 'w-5 h-5',
-      lg: 'w-6 h-6'
-    }
-
-    return (
-      <div className='flex gap-0.5'>
-        {[1, 2, 3, 4, 5].map((star) => (
-          <Star
-            key={star}
-            className={cn(
-              sizeClass[size],
-              star <= rating ? 'fill-primary text-primary' : 'fill-slate-200 text-slate-200'
-            )}
-          />
-        ))}
-      </div>
-    )
-  }
+  // Filter reviews based on selected filter
+  const allReviews = data.payload?.data?.ratingInfos || []
+  const filteredReviews =
+    selectedFilter === null ? allReviews : allReviews.filter((review) => review.rating === selectedFilter)
 
   return (
     <div className='w-full'>
@@ -77,33 +74,13 @@ export default function CourseReviews({ courseId }: CourseReviewsProps) {
           </div>
         </div>
 
-        <div className='flex flex-wrap gap-2 items-center md:justify-end'>
-          <span className='text-sm text-muted-foreground hidden md:inline-block'>Lọc đánh giá:</span>
-          <div className='flex flex-wrap gap-2'>
-            <Button
-              variant={selectedFilter === null ? 'default' : 'outline'}
-              size='sm'
-              onClick={() => setSelectedFilter(null)}
-              className='rounded-full'
-            >
-              Tất cả ({totalReviews})
-            </Button>
-            {[5, 4, 3, 2, 1].map((rating) => {
-              const count = ratingsDistribution[rating as keyof typeof ratingsDistribution]
-              return (
-                <Button
-                  key={rating}
-                  variant={selectedFilter === rating ? 'default' : 'outline'}
-                  size='sm'
-                  onClick={() => handleFilterClick(rating)}
-                  className='rounded-full'
-                >
-                  {rating} sao ({count})
-                </Button>
-              )
-            })}
-          </div>
-        </div>
+        {/* Client component for filter UI */}
+        <CourseFilterReviews
+          ratingsDistribution={ratingsDistribution}
+          totalReviews={totalReviews}
+          selectedFilter={selectedFilter}
+          courseId={courseId}
+        />
       </div>
 
       {/* Reviews Stats Cards */}
@@ -157,23 +134,7 @@ export default function CourseReviews({ courseId }: CourseReviewsProps) {
       <Separator className='mb-8' />
 
       {/* Reviews List */}
-      {isLoading ? (
-        <div className='space-y-6'>
-          {[1, 2, 3].map((i) => (
-            <div key={i} className='p-6 rounded-lg bg-card border shadow-sm flex items-start gap-4'>
-              <Skeleton className='h-12 w-12 rounded-full' />
-              <div className='flex-1 space-y-4'>
-                <div className='flex justify-between'>
-                  <Skeleton className='h-5 w-32' />
-                  <Skeleton className='h-5 w-24' />
-                </div>
-                <Skeleton className='h-4 w-full' />
-                <Skeleton className='h-4 w-3/4' />
-              </div>
-            </div>
-          ))}
-        </div>
-      ) : filteredReviews.length === 0 ? (
+      {filteredReviews.length === 0 ? (
         <div className='bg-card border border-dashed rounded-lg p-12 text-center'>
           <MessageSquare className='w-12 h-12 mx-auto text-muted-foreground/40 mb-4' />
           <h3 className='text-lg font-medium mb-2'>Không tìm thấy đánh giá phù hợp</h3>

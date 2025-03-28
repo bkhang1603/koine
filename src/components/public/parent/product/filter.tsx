@@ -96,6 +96,9 @@ function Filter() {
     const currentParams = new URLSearchParams(window.location.search)
 
     // Gán các giá trị từ form vào params nếu chúng có giá trị
+    // Luôn set lại page_index = 1
+    currentParams.set('page_index', '1')
+
     if (values.range && values.range !== 500000) {
       currentParams.set('range', values.range.toString())
     } else {
