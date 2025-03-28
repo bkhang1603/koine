@@ -72,11 +72,31 @@ export const CourseData = z
             durationsDisplay: z.string()
           })
         ),
-        questions: z.array(QuestionData)
+        questions: z
+          .array(
+            z.object({
+              isDeleted: z.boolean(),
+              createdAt: z.string(),
+              updatedAt: z.string(),
+              id: z.string(),
+              content: z.string(),
+              numCorrect: z.number(),
+              questionOptions: z.array(
+                z.object({
+                  isDeleted: z.boolean(),
+                  createdAt: z.string(),
+                  updatedAt: z.string(),
+                  id: z.string(),
+                  questionId: z.string(),
+                  optionData: z.string(),
+                  isCorrect: z.boolean()
+                })
+              )
+            })
+          )
+          .optional() // Thêm optional() nếu questions có thể rỗng.
       })
-    ),
-    createdAtFormatted: z.string(),
-    updatedAtFormatted: z.string()
+    )
   })
   .strict()
 
@@ -437,6 +457,16 @@ export const deleteCategoryCourseRes = z.object({
   info: z.string()
 })
 
+export const createCourseCustomBody = z.object({
+  chapterIds: z.array(z.string())
+})
+
+export const createCourseCustomRes = z.object({
+  data: z.string(),
+  message: z.string(),
+  statusCode: z.number()
+})
+
 export type CourseResType = z.infer<typeof CourseRes>
 
 export type CoursesResType = z.infer<typeof CoursesRes>
@@ -478,3 +508,7 @@ export type UpdateCategoryCourseBodyType = z.infer<typeof updateCategoryCourseBo
 export type UpdateCategoryCourseResType = z.infer<typeof updateCategoryCourseRes>
 
 export type DeleteCategoryCourseResType = z.infer<typeof deleteCategoryCourseRes>
+
+export type CreateCourseCustomBodyType = z.infer<typeof createCourseCustomBody>
+
+export type CreateCourseCustomResType = z.infer<typeof createCourseCustomRes>

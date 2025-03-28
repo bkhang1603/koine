@@ -3,7 +3,7 @@
 import { useSearchParams, useRouter } from 'next/navigation'
 import { useEffect } from 'react'
 import { Button } from '@/components/ui/button'
-import { XCircle, Home, RotateCcw } from 'lucide-react'
+import { XCircle, RotateCcw, ShoppingBag } from 'lucide-react'
 import Link from 'next/link'
 import configRoute from '@/config/route'
 import { useRePurchaseOrderMutation } from '@/queries/useOrder'
@@ -13,7 +13,6 @@ function CancelPurchasePage() {
   const orderId = useAppStore((state) => state.orderId)
   const searchParams = useSearchParams()
   const router = useRouter()
-  console.log(orderId)
 
   const code = searchParams.get('code')
   const id = searchParams.get('id') ?? ''
@@ -69,9 +68,9 @@ function CancelPurchasePage() {
           </Button>
 
           <Button variant='outline' className='w-full gap-2' asChild>
-            <Link href={configRoute.home}>
-              <Home className='h-4 w-4' />
-              Về trang chủ
+            <Link href={configRoute.setting.order}>
+              <ShoppingBag className='h-4 w-4' />
+              Về trang đơn hàng
             </Link>
           </Button>
         </div>

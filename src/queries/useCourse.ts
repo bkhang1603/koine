@@ -260,3 +260,9 @@ export const useDeleteCategoryCourseMutation = () => {
     }
   })
 }
+
+export const useCreateCourseCustomMutation = () => {
+  return useMutation({
+    mutationFn: courseApiRequest.createCourseCustom
+  })
+}

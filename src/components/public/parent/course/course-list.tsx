@@ -2,8 +2,13 @@ import courseApiRequest from '@/apiRequests/course'
 import CourseCard from '@/components/public/parent/course/course-card'
 import CustomInput from '@/components/public/parent/home/custom-input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { wrapServerApi } from '@/lib/server-utils'
 import { CoursesResType } from '@/schemaValidations/course.schema'
 import { searchParams } from '@/types/query'
+import { Button } from '@/components/ui/button'
+import { BookOpen, RefreshCw } from 'lucide-react'
+import Link from 'next/link'
+import configRoute from '@/config/route'
 
 async function CourseList({ searchParams }: { searchParams?: searchParams }) {
   let courseData: CoursesResType['data'] = []
@@ -18,8 +23,8 @@ async function CourseList({ searchParams }: { searchParams?: searchParams }) {
     .map((cat) => encodeURIComponent(cat))
     .join('a%a')
 
-  try {
-    const { payload } = await courseApiRequest.getCourses({
+  const data = await wrapServerApi(() =>
+    courseApiRequest.getCourses({
       page_index: page_index,
       page_size: 12,
       keyword: keyword,
@@ -27,11 +32,9 @@ async function CourseList({ searchParams }: { searchParams?: searchParams }) {
       range: range,
       category: category
     })
+  )
 
-    courseData = payload.data
-  } catch (error) {
-    console.log(error)
-  }
+  courseData = data?.payload?.data ?? []
 
   return (
     <section className='col-span-3'>
@@ -52,54 +55,27 @@ async function CourseList({ searchParams }: { searchParams?: searchParams }) {
         </div>
       </div>
 
-      {courseData.length === 0 && <p className='text-center mt-6'>Không tìm thấy khóa học nào</p>}
+      {courseData.length === 0 && (
+        <div className='col-span-full flex flex-col items-center justify-center py-16 px-4'>
+          <div className='w-48 h-48 mb-6 bg-muted rounded-full flex items-center justify-center'>
+            <BookOpen className='w-20 h-20 text-muted-foreground/50' />
+          </div>
+          <h3 className='text-xl font-semibold text-center mb-2'>Không tìm thấy khóa học nào</h3>
+          <p className='text-muted-foreground text-center max-w-md mb-8'>
+            Không có khóa học nào phù hợp với tiêu chí tìm kiếm hiện tại. Hãy thử thay đổi bộ lọc hoặc từ khóa tìm kiếm.
+          </p>
+          <Button asChild variant='outline' size='lg'>
+            <Link href={configRoute.course} className='gap-2'>
+              <RefreshCw className='w-4 h-4' />
+              Xem tất cả khóa học
+            </Link>
+          </Button>
+        </div>
+      )}
 
       {courseData.length > 0 && (
         <div className='grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 mt-6'>
           {courseData.map((course) => (
-            // <Link href={`/course/${course.slug}`} passHref key={course.id}>
-            //   <article
-            //     className='rounded-xl overflow-hidden shadow-lg
-            //           group/course cursor-pointer'
-            //   >
-            //     <div className='w-full aspect-square overflow-hidden'>
-            //       <Image
-            //         src={course.imageUrl}
-            //         alt='koine course'
-            //         width={1000}
-            //         height={1000}
-            //         quality={100}
-            //         className='w-full h-full object-cover group-hover/course:scale-110 ease-linear duration-300 transition-all'
-            //       />
-            //     </div>
-
-            //     <div className='p-4'>
-            //       <h3 className='text-lg'>{course.title}</h3>
-            //       <p className='text-base text-secondary font-semibold'>
-            //         {course.price === 0 ? 'Miễn phí' : course.price ? `${course.price.toLocaleString()}đ` : 'N/A'}
-            //       </p>
-
-            //       <Separator className='my-4 h-[2px]' />
-
-            //       <div className='flex justify-between items-center text-primary/80 font-medium'>
-            //         <div className='flex justify-center items-center gap-1'>
-            //           <Star className='w-4 h-4' />
-            //           <p className='text-sm'>{course.aveRating === 0 ? 5 : course.aveRating}</p>
-            //         </div>
-
-            //         <div className='flex justify-center items-center gap-1'>
-            //           <AlarmClock className='w-4 h-4' />
-            //           <p className='text-sm'>{course.durationsDisplay}</p>
-            //         </div>
-
-            //         <div className='flex justify-center items-center gap-1'>
-            //           <Users className='w-4 h-4' />
-            //           <p className='text-sm'>{course.totalEnrollment}</p>
-            //         </div>
-            //       </div>
-            //     </div>
-            //   </article>
-            // </Link>
             <CourseCard key={course.id} course={course} />
           ))}
         </div>

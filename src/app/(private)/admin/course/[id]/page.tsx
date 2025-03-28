@@ -280,7 +280,7 @@ export default function AdminCourseDetailPage(props: { params: Promise<{ id: str
               </CardTitle>
             </CardHeader>
             <CardContent className='space-y-4'>
-              {course.chapters?.map((chapter, index) => (
+              {course.chapters?.map((chapter: any, index: number) => (
                 <div key={chapter.id} className='border rounded-lg overflow-hidden'>
                   <div
                     className='flex items-center justify-between p-4 cursor-pointer bg-gray-50 hover:bg-gray-100 transition-colors'
@@ -306,7 +306,7 @@ export default function AdminCourseDetailPage(props: { params: Promise<{ id: str
 
                   {expandedChapters.includes(chapter.id) && (
                     <div className='border-t'>
-                      {chapter.lessons.map((lesson, lessonIndex) => (
+                      {chapter.lessons.map((lesson: any, lessonIndex: number) => (
                         <div
                           key={lesson.id}
                           className='p-4 pl-12 border-b last:border-b-0 hover:bg-gray-50 cursor-pointer transition-colors'
@@ -391,7 +391,7 @@ export default function AdminCourseDetailPage(props: { params: Promise<{ id: str
               <div>
                 <h3 className='text-sm font-medium mb-2'>Danh mục</h3>
                 <div className='flex flex-wrap gap-2'>
-                  {course.categories.map((category) => (
+                  {course.categories.map((category: any) => (
                     <Badge key={category.id} variant='outline'>
                       {category.name}
                     </Badge>

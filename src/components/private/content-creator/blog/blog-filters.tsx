@@ -21,7 +21,10 @@ export function BlogFilters({
   onCategoryChange,
   onStatusFilterChange
 }: BlogFiltersProps) {
-  const { data: categoriesResponse } = useCategoryBlogQuery()
+  const { data: categoriesResponse } = useCategoryBlogQuery({
+    page_index: 1,
+    page_size: 99
+  })
   const categories = categoriesResponse?.payload?.data || []
 
   return (

@@ -21,7 +21,10 @@ const formSchema = z.object({
 function CourseFilter() {
   const router = useRouter()
 
-  const { data } = useGetCategoryCoursesQuery()
+  const { data } = useGetCategoryCoursesQuery({
+    page_index: 1,
+    page_size: 99
+  })
   const category = data?.payload.data ?? []
 
   const form = useForm<z.infer<typeof formSchema>>({
