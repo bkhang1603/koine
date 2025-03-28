@@ -269,6 +269,17 @@ function EventPage() {
     return localTime.getTime() >= endTime.getTime() && totalParticipants == 0
   }
 
+  const isCancelable = (eventStartAt: string): boolean => {
+    const now = new Date()
+    // Chuyển giờ về GMT+7 (đảm bảo giờ giữ nguyên)
+    const localTime = new Date(now.getTime() + 7 * 60 * 60 * 1000)
+    const startTime = new Date(eventStartAt)
+    const timeDiff = startTime.getTime() - localTime.getTime() // Chênh lệch giữa startTime và localTime
+
+    // Kiểm tra nếu thời gian hiện tại (localTime) ít nhất 2 giờ sớm hơn startTime
+    return timeDiff >= 2 * 3600 * 1000
+  }
+
   const getEventStatus = (event: any) => {
     if (event.status.toUpperCase() === 'OPENING' && isClosed(event.startedAt, event.durations)) {
       return {
@@ -309,7 +320,7 @@ function EventPage() {
                     alt={event.title}
                     className='w-full h-48 object-cover'
                   />
-                  {event.status == 'PENDING' ? (
+                  {isCancelable(event.startedAt) ? (
                     <div className='absolute top-2 right-2'>
                       <Button
                         variant='destructive'
