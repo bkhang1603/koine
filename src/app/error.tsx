@@ -1,19 +1,11 @@
-'use client'
-
 import Image from 'next/image'
 import Link from 'next/link'
-import { useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 import { ArrowLeft, Home, RefreshCw } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 
 export default function Error({ error, reset }: { error: Error & { digest?: string }; reset: () => void }) {
   const router = useRouter()
-
-  useEffect(() => {
-    // Log lỗi cho developers
-    console.error(error)
-  }, [error])
 
   return (
     <main className='min-h-screen flex flex-col justify-center items-center px-6 py-24 relative overflow-hidden'>
