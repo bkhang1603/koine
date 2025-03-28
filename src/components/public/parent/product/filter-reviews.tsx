@@ -5,15 +5,15 @@ import { useRouter, usePathname } from 'next/navigation'
 
 interface FilterReviewsProps {
   ratingCounts: {
-    1: number;
-    2: number;
-    3: number;
-    4: number;
-    5: number;
-  };
-  totalReviews: number;
-  currentFilter: number;
-  productId: string;
+    1: number
+    2: number
+    3: number
+    4: number
+    5: number
+  }
+  totalReviews: number
+  currentFilter: number
+  productId: string
 }
 
 export default function FilterReviews({ ratingCounts, totalReviews, currentFilter, productId }: FilterReviewsProps) {
@@ -59,4 +59,4 @@ export default function FilterReviews({ ratingCounts, totalReviews, currentFilte
       </div>
     </div>
   )
-} 
+}

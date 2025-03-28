@@ -35,6 +35,10 @@ async function List({ searchParams }: { searchParams: searchParams | undefined }
     return categories.join(', ')
   }
 
+  if (!data) {
+    return null
+  }
+
   return (
     <div className='col-span-3'>
       <div className='flex flex-col md:flex-row justify-between items-start md:items-center gap-4'>

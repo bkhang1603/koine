@@ -37,6 +37,10 @@ async function CourseList({ searchParams }: { searchParams?: searchParams }) {
 
   courseData = data?.payload?.data ?? []
 
+  if (!data) {
+    return null
+  }
+
   return (
     <section className='col-span-3'>
       <div className='flex flex-col md:flex-row justify-between items-start md:items-center gap-4'>
