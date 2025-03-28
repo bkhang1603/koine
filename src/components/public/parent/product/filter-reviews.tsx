@@ -16,7 +16,7 @@ interface FilterReviewsProps {
   productId: string
 }
 
-export default function FilterReviews({ ratingCounts, totalReviews, currentFilter, productId }: FilterReviewsProps) {
+export default function FilterReviews({ ratingCounts, totalReviews, currentFilter }: FilterReviewsProps) {
   const router = useRouter()
   const pathname = usePathname()
 
