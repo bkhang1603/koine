@@ -2,15 +2,13 @@
 
 import { Button } from '@/components/ui/button'
 import { ArrowLeft } from 'lucide-react'
-import { courses } from '@/app/(private)/content-creator/_mock/data'
 import { useState, useEffect, use } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { CourseBasicInfo } from '@/components/private/content-creator/course/course-basic-info'
 import { CourseMedia } from '@/components/private/content-creator/course/course-media'
 import { CourseContent } from '@/components/private/content-creator/course/course-content'
-import { Course, Lesson } from '../../types'
-
+import { Course, Lesson } from '@/components/public/parent/custom-course/chapter-picker-types'
 export default function EditCoursePage(props: { params: Promise<{ id: string }> }) {
   const params = use(props.params)
   const router = useRouter()
@@ -18,6 +16,8 @@ export default function EditCoursePage(props: { params: Promise<{ id: string }> 
   const [, setSelectedLesson] = useState<{ chapterId: string; lesson: Lesson } | null>(null)
 
   useEffect(() => {
+    // In a real app, you would fetch courses from an API instead of using an empty array
+    const courses: Course[] = []
     const courseData = courses.find((c) => c.id === params.id)
     if (courseData) {
       setCourse(courseData)
@@ -201,15 +201,15 @@ export default function EditCoursePage(props: { params: Promise<{ id: string }> 
           <div className='col-span-2 space-y-6'>
             <CourseBasicInfo
               title={course.title}
-              description={course.description}
+              description={course.description || ''}
               categories={course.categories}
               level={course.level}
               ageGroup={course.ageGroup}
               onFieldChange={handleBasicInfoChange}
             />
 
-            <CourseContent
-              chapters={course.chapters}
+            {/* <CourseContent
+              chapters={course.chapters as Chapter[]}
               onChapterAdd={handleChapterAdd}
               onChapterDelete={handleChapterDelete}
               onChapterChange={handleChapterChange}
@@ -217,7 +217,7 @@ export default function EditCoursePage(props: { params: Promise<{ id: string }> 
               onLessonChange={handleLessonChange}
               onLessonDelete={handleLessonDelete}
               onLessonEdit={handleLessonEdit}
-            />
+            /> */}
           </div>
 
           {/* Sidebar */}

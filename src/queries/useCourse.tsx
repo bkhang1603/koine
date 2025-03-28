@@ -1,12 +1,6 @@
 import courseApiRequest from '@/apiRequests/course'
+import { CreateCourseBodyType, UpdateCategoryCourseBodyType } from '@/schemaValidations/course.schema'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-
-export const useGetCourseQuery = ({ id }: { id: string }) => {
-  return useQuery({
-    queryKey: ['course', id],
-    queryFn: () => courseApiRequest.getCourse(id)
-  })
-}
 
 export const useEnrollCourseMutation = () => {
   const queryClient = useQueryClient()
@@ -49,10 +43,18 @@ export const useUpdateCourseProgressMutation = () => {
   })
 }
 
-export const useGetCategoryCoursesQuery = () => {
+export const useGetCategoryCoursesQuery = ({
+  page_index,
+  page_size,
+  keyword
+}: {
+  page_index?: number
+  page_size?: number
+  keyword?: string
+}) => {
   return useQuery({
-    queryKey: ['categoryCourses'],
-    queryFn: courseApiRequest.getCategoryCourses
+    queryKey: ['categoryCourses', page_index, page_size, keyword],
+    queryFn: () => courseApiRequest.getCategoryCourses({ page_index, page_size, keyword })
   })
 }
 
@@ -135,10 +137,126 @@ export const useCourseDetailAdminQuery = ({ courseId }: { courseId: string }) =>
     enabled: !!courseId
   })
 }
+
 export const useGetPreviewLessonsQuery = ({ id, limit, enabled }: { id: string; limit: number; enabled?: boolean }) => {
   return useQuery({
     queryKey: ['preview', id, limit],
     queryFn: () => courseApiRequest.getPreviewLessons({ id, limit }),
     enabled
+  })
+}
+
+export const useGetCoursesQuery = ({
+  page_index,
+  page_size,
+  category,
+  range,
+  sort,
+  keyword
+}: {
+  page_index?: number
+  page_size?: number
+  category?: string
+  range?: number
+  sort?: string
+  keyword?: string
+}) => {
+  return useQuery({
+    queryKey: ['courses', page_index, page_size, category, range, sort, keyword],
+    queryFn: () => courseApiRequest.getCourses({ page_index, page_size, category, range, sort, keyword })
+  })
+}
+
+export const useGetCourseQuery = ({ id }: { id: string }) => {
+  return useQuery({
+    queryKey: ['course', id],
+    queryFn: () => courseApiRequest.getCourse(id)
+  })
+}
+
+export const useAddCourseMutation = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: courseApiRequest.addCourse,
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ['course']
+      })
+    }
+  })
+}
+
+export const useUpdateCourseMutation = ({ id }: { id: string }) => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: (data: CreateCourseBodyType) => courseApiRequest.updateCourse(id, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ['course']
+      })
+    }
+  })
+}
+
+export const useDeleteCourseMutation = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: courseApiRequest.deleteCourse,
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ['course']
+      })
+    }
+  })
+}
+
+export const useGetCategoryCourseDetailQuery = ({ id, enabled }: { id: string; enabled?: boolean }) => {
+  return useQuery({
+    queryKey: ['categoryCourseDetail', id],
+    queryFn: () => courseApiRequest.getCategoryCourseDetail(id),
+    enabled: enabled ?? !!id
+  })
+}
+
+export const useCreateCategoryCourseMutation = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: courseApiRequest.createCategoryCourse,
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ['categoryCourses']
+      })
+    }
+  })
+}
+
+export const useUpdateCategoryCourseMutation = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: ({ id, data }: { id: string; data: UpdateCategoryCourseBodyType }) =>
+      courseApiRequest.updateCategoryCourse(id, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ['categoryCourses']
+      })
+    }
+  })
+}
+
+export const useDeleteCategoryCourseMutation = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: courseApiRequest.deleteCategoryCourse,
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ['categoryCourses']
+      })
+    }
   })
 }

@@ -1,26 +1,49 @@
 import { TypeResourceValues } from '@/constants/type'
 import z from 'zod'
 
+export const QuestionOptionData = z.object({
+  isDeleted: z.boolean(),
+  createdAt: z.string(),
+  updatedAt: z.string(),
+  id: z.string(),
+  questionId: z.string(),
+  optionData: z.string(),
+  isCorrect: z.boolean()
+})
+
+export const QuestionData = z.object({
+  isDeleted: z.boolean(),
+  createdAt: z.string(),
+  updatedAt: z.string(),
+  id: z.string(),
+  content: z.string(),
+  numCorrect: z.number(),
+  questionOptions: z.array(QuestionOptionData)
+})
+
 export const CourseData = z
   .object({
+    isDeleted: z.boolean(),
+    createdAt: z.string(),
+    updatedAt: z.string(),
     id: z.string(),
     creatorId: z.string(),
     title: z.string(),
     titleNoTone: z.string(),
     slug: z.string(),
     description: z.string(),
+    durations: z.number(),
     imageUrl: z.string(),
     imageBanner: z.string(),
     price: z.number(),
     discount: z.number(),
-    durations: z.number(),
-    durationsDisplay: z.string(),
-    aveRating: z.number(),
     totalEnrollment: z.number(),
-    creator: z.object({
-      id: z.string(),
-      username: z.string()
-    }),
+    aveRating: z.number(),
+    isBanned: z.boolean(),
+    isCustom: z.boolean(),
+    level: z.string(),
+    censorId: z.string(),
+    durationsDisplay: z.string(),
     categories: z.array(
       z.object({
         id: z.string(),
@@ -38,6 +61,7 @@ export const CourseData = z
         lessons: z.array(
           z.object({
             id: z.string(),
+            chapterId: z.string(),
             type: z.enum(TypeResourceValues),
             title: z.string(),
             description: z.string(),
@@ -47,11 +71,12 @@ export const CourseData = z
             sequence: z.number(),
             durationsDisplay: z.string()
           })
-        )
+        ),
+        questions: z.array(QuestionData)
       })
     ),
-    createdAt: z.string(),
-    updatedAt: z.string()
+    createdAtFormatted: z.string(),
+    updatedAtFormatted: z.string()
   })
   .strict()
 
@@ -148,13 +173,22 @@ export const CategoryCourses = z.object({
   description: z.string(),
   isDeleted: z.boolean(),
   createdAt: z.string(),
-  updatedAt: z.string()
+  updatedAt: z.string(),
+  createdAtFormatted: z.string(),
+  updatedAtFormatted: z.string()
 })
 
 export const CategoryCoursesRes = z.object({
   data: z.array(CategoryCourses),
   message: z.string(),
-  statusCode: z.number()
+  statusCode: z.number(),
+  pagination: z.object({
+    totalItem: z.number(),
+    pageSize: z.number(),
+    currentPage: z.number(),
+    maxPageSize: z.number(),
+    totalPage: z.number()
+  })
 })
 
 export const ChaptersData = z
@@ -336,6 +370,73 @@ export const previewLessonsRes = z.object({
   statusCode: z.number()
 })
 
+export const createCourseBody = z.object({
+  categoryIds: z.array(z.string()),
+  title: z.string(),
+  description: z.string(),
+  imageUrl: z.string(),
+  imageBanner: z.string(),
+  price: z.number(),
+  discount: z.number(),
+  level: z.string()
+})
+
+export const createCourseBodyRes = z.object({
+  data: createCourseBody,
+  message: z.string(),
+  statusCode: z.number()
+})
+
+export const createCategoryCourseBody = z.object({
+  name: z.string(),
+  description: z.string()
+})
+
+export const createCategoryCourseRes = z.object({
+  data: z.object({
+    name: z.string(),
+    description: z.string(),
+    isDeleted: z.boolean(),
+    createdAt: z.string(),
+    updatedAt: z.string(),
+    id: z.string()
+  }),
+  message: z.string(),
+  statusCode: z.number(),
+  info: z.string()
+})
+
+export const getCategoryCourseDetailRes = z.object({
+  data: z.object({
+    isDeleted: z.boolean(),
+    createdAt: z.string(),
+    updatedAt: z.string(),
+    id: z.string(),
+    name: z.string(),
+    description: z.string()
+  }),
+  message: z.string(),
+  statusCode: z.number(),
+  info: z.string()
+})
+
+export const updateCategoryCourseBody = z.object({
+  name: z.string(),
+  description: z.string()
+})
+
+export const updateCategoryCourseRes = z.object({
+  message: z.string(),
+  statusCode: z.number(),
+  info: z.string()
+})
+
+export const deleteCategoryCourseRes = z.object({
+  message: z.string(),
+  statusCode: z.number(),
+  info: z.string()
+})
+
 export type CourseResType = z.infer<typeof CourseRes>
 
 export type CoursesResType = z.infer<typeof CoursesRes>
@@ -361,3 +462,19 @@ export type CourseReviewResType = z.infer<typeof CourseReviewRes>
 export type AllCoursesForCustomResType = z.infer<typeof AllCoursesForCustomRes>
 
 export type PreviewLessonsResType = z.infer<typeof previewLessonsRes>
+
+export type CreateCourseBodyType = z.infer<typeof createCourseBody>
+
+export type CreateCourseBodyResType = z.infer<typeof createCourseBodyRes>
+
+export type CreateCategoryCourseBodyType = z.infer<typeof createCategoryCourseBody>
+
+export type CreateCategoryCourseResType = z.infer<typeof createCategoryCourseRes>
+
+export type GetCategoryCourseDetailResType = z.infer<typeof getCategoryCourseDetailRes>
+
+export type UpdateCategoryCourseBodyType = z.infer<typeof updateCategoryCourseBody>
+
+export type UpdateCategoryCourseResType = z.infer<typeof updateCategoryCourseRes>
+
+export type DeleteCategoryCourseResType = z.infer<typeof deleteCategoryCourseRes>

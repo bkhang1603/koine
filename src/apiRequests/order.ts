@@ -1,5 +1,5 @@
 import http from '@/lib/http'
-import { GetOrderDetailAdminResType, GetOrderListAdminResType } from '@/schemaValidations/admin.schema';
+import { GetOrderDetailAdminResType, GetOrderListAdminResType } from '@/schemaValidations/admin.schema'
 import {
   CancelOrderBody,
   CancelOrderBodyRes,

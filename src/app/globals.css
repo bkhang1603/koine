@@ -317,3 +317,60 @@
 .animate-wave-slow {
   animation: wave 9s cubic-bezier(0.36, 0.45, 0.63, 0.53) infinite;
 }
+
+/* CSS cho column layout */
+[data-type='columns'] {
+  display: flex;
+  gap: 2rem;
+  margin: 1.5rem 0;
+}
+
+[data-type='columns'][layout='layout-sidebar-left'] > [data-type='column']:first-child {
+  flex: 1;
+}
+
+[data-type='columns'][layout='layout-sidebar-left'] > [data-type='column']:last-child {
+  flex: 2;
+}
+
+[data-type='columns'][layout='layout-sidebar-right'] > [data-type='column']:first-child {
+  flex: 2;
+}
+
+[data-type='columns'][layout='layout-sidebar-right'] > [data-type='column']:last-child {
+  flex: 1;
+}
+
+[data-type='columns'][layout='layout-two-column'] > [data-type='column'] {
+  flex: 1;
+}
+
+[data-type='column'] {
+  min-width: 0;
+}
+
+/* CSS cho căn chỉnh hình ảnh */
+.ProseMirror img[style*='text-align: left'] {
+  float: left;
+  margin-right: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.ProseMirror img[style*='text-align: center'] {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.ProseMirror img[style*='text-align: right'] {
+  float: right;
+  margin-left: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+/* Giới hạn chiều cao của editor với thanh cuộn */
+.ProseMirror {
+  min-height: 200px;
+  max-height: 600px;
+  overflow-y: auto;
+}

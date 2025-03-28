@@ -95,7 +95,7 @@ function AdminUser(props: { searchParams: SearchParams }) {
           <div className='flex items-center gap-3 min-w-[250px] max-w-[350px]'>
             <div className='relative h-12 w-12 flex-shrink-0'>
               <Image
-                src={user.userDetail.avatarUrl || '/images/placeholder.jpg'}
+                src={user.userDetail.avatarUrl ?? '/images/placeholder.jpg'}
                 alt={`Avatar của ${user.username}`}
                 fill
                 className='rounded-full object-cover'

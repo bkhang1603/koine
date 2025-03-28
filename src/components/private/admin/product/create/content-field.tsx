@@ -20,15 +20,11 @@ export function ContentField({ form, name, label }: ContentFieldProps) {
         <FormItem>
           <FormLabel>{label}</FormLabel>
           <FormControl>
-            <Textarea 
-              {...field}
-              className="min-h-[200px]"
-              placeholder={`Nhập ${label.toLowerCase()}...`}
-            />
+            <Textarea {...field} className='min-h-[200px]' placeholder={`Nhập ${label.toLowerCase()}...`} />
           </FormControl>
           <FormMessage />
         </FormItem>
       )}
     />
   )
-} 
+}

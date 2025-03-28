@@ -1,4 +1,5 @@
 import blogApiRequest from '@/apiRequests/blog'
+import { BlogUpdateBodyType } from '@/schemaValidations/blog.schema'
 import { useMutation, useQuery, useQueryClient, useInfiniteQuery } from '@tanstack/react-query'
 
 export const useBlogCommentsQuery = ({
@@ -145,13 +146,20 @@ export const useBlogCreateMutation = () => {
   })
 }
 
-export const useCategoryBlogQuery = () => {
+export const useCategoryBlogQuery = ({
+  page_index,
+  page_size,
+  keyword
+}: {
+  page_index?: number | undefined
+  page_size?: number | undefined
+  keyword?: string | string[] | undefined
+}) => {
   return useQuery({
-    queryKey: ['categoryBlog'],
-    queryFn: () => blogApiRequest.getCategoryBlog()
+    queryKey: ['categoryBlog', page_index, page_size, keyword],
+    queryFn: () => blogApiRequest.getCategoryBlog({ page_index, page_size, keyword })
   })
 }
-
 export const useCategoryBlogDetailQuery = ({ id, enabled }: { id: string; enabled?: boolean }) => {
   return useQuery({
     queryKey: ['categoryBlog', id],
@@ -199,6 +207,31 @@ export const useCategoryBlogDeleteMutation = () => {
   })
 }
 
+export const useBlogUpdateMutation = ({ id }: { id: string }) => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: (data: BlogUpdateBodyType) => blogApiRequest.updateBlog(id, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ['blogs']
+      })
+    }
+  })
+}
+
+export const useBlogDeleteMutation = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: blogApiRequest.deleteBlog,
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ['blogs']
+      })
+    }
+  })
+}
 export const useBlogListAdminQuery = ({
   page_index,
   page_size,
@@ -225,5 +258,18 @@ export const useBlogCommentsAdminQuery = ({ id }: { id: string }) => {
   return useQuery({
     queryKey: ['blogCommentsAdmin', id],
     queryFn: () => blogApiRequest.getBlogCommentsAdmin(id)
+  })
+}
+
+export const useMyBlogsQuery = ({
+  page_index,
+  page_size
+}: {
+  page_index?: number | undefined
+  page_size?: number | undefined
+}) => {
+  return useQuery({
+    queryKey: ['blogs', page_index, page_size],
+    queryFn: () => blogApiRequest.getMyBlogs({ page_index, page_size })
   })
 }

@@ -1,6 +1,6 @@
 import productApiRequest from '@/apiRequests/product'
 import { useQuery, useMutation } from '@tanstack/react-query'
-import { CreateProductBodyType, CreateProductResType } from '@/schemaValidations/product.schema'
+import { CreateProductBodyType } from '@/schemaValidations/product.schema'
 
 export const useGetCategoryProductsQuery = () => {
   return useQuery({

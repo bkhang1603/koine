@@ -1,121 +1,128 @@
 /* eslint-disable no-unused-vars */
-import { Card } from '@/components/ui/card'
+import { MoreHorizontal, Edit, Trash } from 'lucide-react'
+import Image from 'next/image'
+import { formatDate, formatCurrency } from '@/lib/utils'
+import { Card, CardFooter } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { MoreVertical, Eye, Edit, Trash2, BookOpen, FileText, Clock } from 'lucide-react'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
-import Image from 'next/image'
 import Link from 'next/link'
-import { Course } from '../../../../app/(private)/content-creator/course/types'
-import { courseCategories } from '../../../../app/(private)/content-creator/_mock/data'
 
 interface CourseCardProps {
-  course: Course
-  onDelete: (courseId: number) => void
-  onNavigate: (path: string) => void
+  course: any
+  onDelete: (id: string) => void
+  onNavigate: (url: string) => void
 }
 
 export function CourseCard({ course, onDelete, onNavigate }: CourseCardProps) {
+  // Tính giá sau khi giảm
+  const discountedPrice = course.price - (course.price * course.discount) / 100
+
   return (
-    <Card className='group relative overflow-hidden hover:border-primary/50 transition-colors'>
-      {/* Thumbnail Section */}
-      <div className='aspect-[16/9] relative'>
-        <Image src={course.thumbnail} alt={course.title} fill className='object-cover' />
-        <div className='absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent' />
-
-        {/* Status & Actions */}
-        <CourseCardActions course={course} onDelete={onDelete} onNavigate={onNavigate} />
-
-        {/* Category Badge */}
-        <div className='absolute bottom-4 left-4'>
-          <Badge variant='outline' className='font-normal bg-background/80 backdrop-blur-sm border-0'>
-            {course.categories.map((cat) => courseCategories.find((c) => c.id === cat)?.name).join(', ')}
-          </Badge>
+    <Link href={`/content-creator/course/${course.id}`}>
+      <Card className='overflow-hidden flex flex-col h-full hover:shadow-md transition-shadow duration-200 cursor-pointer'>
+        {/* Card Image */}
+        <div className='relative h-48 w-full overflow-hidden'>
+          <div className='absolute inset-0 bg-gradient-to-t from-black/30 to-transparent z-10' />
+          <Image
+            src={course.imageUrl || '/images/placeholder-image.jpg'}
+            alt={course.title}
+            fill
+            className='object-cover transition-transform duration-300 hover:scale-105'
+            sizes='(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw'
+          />
+          {course.isBanned && (
+            <Badge variant='destructive' className='absolute top-3 left-3 z-20'>
+              Đã khóa
+            </Badge>
+          )}
+          {course.isCustom && <Badge className='absolute top-3 left-3 z-20'>Tùy chỉnh</Badge>}
         </div>
-      </div>
 
-      {/* Content Section */}
-      <Link href={`/content-creator/course/${course.id}`}>
-        <div className='p-5 space-y-4'>
-          <CourseInfo course={course} />
-          <CourseStats course={course} />
+        <div className='flex flex-col flex-grow p-4'>
+          {/* Categories */}
+          <div className='flex flex-wrap gap-1.5 mb-3 min-h-[24px]'>
+            {course.categories?.slice(0, 3).map((category: any) => (
+              <Badge variant='secondary' key={category.id} className='font-normal text-xs'>
+                {category.name}
+              </Badge>
+            ))}
+            {course.categories?.length > 3 && (
+              <Badge variant='outline' className='font-normal text-xs'>
+                +{course.categories.length - 3}
+              </Badge>
+            )}
+          </div>
+
+          {/* Title - fixed height */}
+          <h3 className='font-bold text-lg line-clamp-2 min-h-[56px] mb-2'>{course.title}</h3>
+
+          {/* Description - fixed height */}
+          <p className='text-muted-foreground text-sm line-clamp-2 min-h-[40px] mb-auto'>{course.description}</p>
+
+          {/* Price and Rating */}
+          <div className='flex items-center justify-between mt-4'>
+            <div className='flex flex-col'>
+              {course.discount > 0 ? (
+                <>
+                  <span className='font-bold'>{formatCurrency(discountedPrice)}</span>
+                  <span className='text-sm text-muted-foreground line-through'>{formatCurrency(course.price)}</span>
+                </>
+              ) : (
+                <span className='font-bold'>{formatCurrency(course.price)}</span>
+              )}
+            </div>
+            <div className='flex items-center'>
+              <span className='text-sm font-medium'>
+                {course.aveRating > 0 ? `${course.aveRating.toFixed(1)} ★` : 'Chưa có đánh giá'}
+              </span>
+            </div>
+          </div>
         </div>
-      </Link>
-    </Card>
-  )
-}
 
-function CourseCardActions({ course, onDelete, onNavigate }: CourseCardProps) {
-  return (
-    <div className='absolute top-4 right-4 z-10 flex items-center gap-2'>
-      <Badge
-        variant={course.status === 'published' ? 'default' : 'secondary'}
-        className='h-6 px-2 text-xs font-medium bg-background/80 backdrop-blur-sm'
-      >
-        {course.status === 'published' ? 'Đã xuất bản' : 'Bản nháp'}
-      </Badge>
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button variant='secondary' size='icon' className='h-6 w-6 bg-background/80 backdrop-blur-sm'>
-            <MoreVertical className='h-4 w-4' />
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align='end' className='w-48'>
-          <DropdownMenuItem onClick={() => onNavigate(`/content-creator/course/${course.id}`)}>
-            <Eye className='w-4 h-4 mr-2' />
-            Xem chi tiết
-          </DropdownMenuItem>
-          <DropdownMenuItem onClick={() => onNavigate(`/content-creator/course/${course.id}/edit`)}>
-            <Edit className='w-4 h-4 mr-2' />
-            Chỉnh sửa
-          </DropdownMenuItem>
-          <DropdownMenuItem
-            onClick={() => onDelete(course.id as unknown as number)}
-            className='text-destructive focus:text-destructive'
-          >
-            <Trash2 className='w-4 h-4 mr-2' />
-            Xóa khóa học
-          </DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
-    </div>
-  )
-}
+        <CardFooter className='p-4 border-t flex justify-between items-center bg-muted/10'>
+          <div className='flex items-center text-xs text-muted-foreground'>
+            <span>
+              {course.durationsDisplay} • {course.totalEnrollment} học viên
+            </span>
+          </div>
 
-function CourseInfo({ course }: { course: Course }) {
-  return (
-    <div className='space-y-2'>
-      <div className='flex items-center gap-2 text-xs text-muted-foreground'>
-        <div>{course.level}</div>
-        <span>•</span>
-        <div>{course.ageGroup}</div>
-      </div>
-      <h3 className='font-semibold text-lg group-hover:text-primary transition-colors line-clamp-2'>{course.title}</h3>
-      <p className='text-sm text-muted-foreground line-clamp-2 min-h-[2.5rem]'>{course.description}</p>
-    </div>
-  )
-}
-
-function CourseStats({ course }: { course: Course }) {
-  return (
-    <div className='grid grid-cols-3 gap-3 pt-4 border-t'>
-      <StatItem icon={BookOpen} value={course.chapters?.length || 0} label='Chương' />
-      <StatItem icon={FileText} value={course.totalLessons || 0} label='Bài học' />
-      <StatItem icon={Clock} value={course.duration} label='Giờ' />
-    </div>
-  )
-}
-
-function StatItem({ icon: Icon, value, label }: { icon: any; value: string | number; label: string }) {
-  return (
-    <div className='flex items-center gap-3 p-3 bg-muted/50 rounded-lg'>
-      <div className='shrink-0 w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center'>
-        <Icon className='w-[18px] h-[18px] text-primary' />
-      </div>
-      <div>
-        <div className='text-sm font-medium'>{value}</div>
-        <div className='text-xs text-muted-foreground'>{label}</div>
-      </div>
-    </div>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant='ghost'
+                size='icon'
+                className='h-8 w-8 rounded-full dropdown-trigger focus-visible:ring-0'
+                onClick={(e) => e.stopPropagation()}
+              >
+                <MoreHorizontal className='h-4 w-4' />
+                <span className='sr-only'>Mở menu</span>
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align='end'>
+              <DropdownMenuItem
+                onClick={(e) => {
+                  e.stopPropagation()
+                  onNavigate(`/content-creator/course/${course.id}/edit`)
+                }}
+              >
+                <Edit className='h-4 w-4 mr-2' />
+                Chỉnh sửa
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                className='text-destructive focus:text-destructive'
+                onClick={(e) => {
+                  e.stopPropagation()
+                  onDelete(course.id)
+                }}
+              >
+                <Trash className='h-4 w-4 mr-2' />
+                Xóa khóa học
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </CardFooter>
+      </Card>
+    </Link>
   )
 }

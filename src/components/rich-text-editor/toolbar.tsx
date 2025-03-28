@@ -2,7 +2,6 @@
 'use client'
 
 import { Button } from '@/components/ui/button'
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Toggle } from '@/components/ui/toggle'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
@@ -26,106 +25,99 @@ import {
 } from 'lucide-react'
 import { useState } from 'react'
 import Image from 'next/image'
+import { LinkDialog } from './link-dialog'
+import { ImgDialog } from '@/components/rich-text-editor/img-dialog'
 
-export default function ToolBar({ editor }: { editor: any }) {
-  const [isLinkModalOpen, setIsLinkModalOpen] = useState(false)
-  const [isImageModalOpen, setIsImageModalOpen] = useState(false)
+export default function Toolbar({ editor }: { editor: any }) {
+  const [showLinkDialog, setShowLinkDialog] = useState(false)
+  const [showImageDialog, setShowImageDialog] = useState(false)
 
   if (!editor) return null
 
-  const Options = [
+  const options = [
     {
-      icon: <Heading1 className='size-4' />,
+      icon: <Heading1 className='w-4 h-4' />,
       onClick: () => editor.chain().focus().toggleHeading({ level: 1 }).run(),
       pressed: editor.isActive('heading', { level: 1 }),
       tooltip: 'Heading 1'
     },
     {
-      icon: <Heading2 className='size-4' />,
+      icon: <Heading2 className='w-4 h-4' />,
       onClick: () => editor.chain().focus().toggleHeading({ level: 2 }).run(),
       pressed: editor.isActive('heading', { level: 2 }),
       tooltip: 'Heading 2'
     },
     {
-      icon: <Heading3 className='size-4' />,
+      icon: <Heading3 className='w-4 h-4' />,
       onClick: () => editor.chain().focus().toggleHeading({ level: 3 }).run(),
       pressed: editor.isActive('heading', { level: 3 }),
       tooltip: 'Heading 3'
     },
     {
-      icon: <Bold className='size-4' />,
+      icon: <Bold className='w-4 h-4' />,
       onClick: () => editor.chain().focus().toggleBold().run(),
       pressed: editor.isActive('bold'),
       tooltip: 'Bold'
     },
     {
-      icon: <Italic className='size-4' />,
+      icon: <Italic className='w-4 h-4' />,
       onClick: () => editor.chain().focus().toggleItalic().run(),
       pressed: editor.isActive('italic'),
       tooltip: 'Italic'
     },
     {
-      icon: <Strikethrough className='size-4' />,
+      icon: <Strikethrough className='w-4 h-4' />,
       onClick: () => editor.chain().focus().toggleStrike().run(),
       pressed: editor.isActive('strike'),
       tooltip: 'Strikethrough'
     },
     {
-      icon: <AlignLeft className='size-4' />,
+      icon: <AlignLeft className='w-4 h-4' />,
       onClick: () => editor.chain().focus().setTextAlign('left').run(),
       pressed: editor.isActive({ textAlign: 'left' }),
       tooltip: 'Align Left'
     },
     {
-      icon: <AlignCenter className='size-4' />,
+      icon: <AlignCenter className='w-4 h-4' />,
       onClick: () => editor.chain().focus().setTextAlign('center').run(),
       pressed: editor.isActive({ textAlign: 'center' }),
       tooltip: 'Align Center'
     },
     {
-      icon: <AlignRight className='size-4' />,
+      icon: <AlignRight className='w-4 h-4' />,
       onClick: () => editor.chain().focus().setTextAlign('right').run(),
       pressed: editor.isActive({ textAlign: 'right' }),
       tooltip: 'Align Right'
     },
     {
-      icon: <List className='size-4' />,
+      icon: <List className='w-4 h-4' />,
       onClick: () => editor.chain().focus().toggleBulletList().run(),
       pressed: editor.isActive('bulletList'),
       tooltip: 'Bullet List'
     },
     {
-      icon: <ListOrdered className='size-4' />,
+      icon: <ListOrdered className='w-4 h-4' />,
       onClick: () => editor.chain().focus().toggleOrderedList().run(),
       pressed: editor.isActive('orderedList'),
       tooltip: 'Ordered List'
     },
     {
-      icon: <Highlighter className='size-4' />,
+      icon: <Highlighter className='w-4 h-4' />,
       onClick: () => editor.chain().focus().toggleHighlight().run(),
       pressed: editor.isActive('highlight'),
       tooltip: 'Highlight'
     },
     {
-      // HardBreak
-      icon: <WrapText className='size-4' />,
-      onClick: () => editor.chain().focus().setHardBreak().run(),
-      pressed: false,
-      tooltip: 'Wrap Text'
-    },
-    {
-      // CustomColumn
-      icon: <Columns className='size-4' />,
+      icon: <Columns className='w-4 h-4' />,
       onClick: () => editor.chain().focus().setColumns().run(),
       pressed: false,
-      tooltip: 'Columns'
+      tooltip: 'Add Columns'
     }
   ]
 
   return (
-    // <div className='border rounded-md p-1.5 mb-1 bg-slate-50 space-x-1 sticky top-10 z-50'>
-    <div className='sticky top-10 z-40 flex flex-wrap gap-1 p-1.5 mb-1 bg-white border rounded-md shadow-sm'>
-      {Options.map((option, i) => (
+    <div className='flex flex-wrap gap-1 p-1.5 bg-white border-b'>
+      {options.map((option, i) => (
         <TooltipProvider key={i}>
           <Tooltip>
             <TooltipTrigger asChild>
@@ -133,15 +125,12 @@ export default function ToolBar({ editor }: { editor: any }) {
                 size='sm'
                 pressed={option.pressed}
                 onPressedChange={option.onClick}
-                className={`
-                ${option.pressed ? 'bg-gray-100' : 'hover:bg-gray-100'}`}
+                className={option.pressed ? 'bg-gray-100' : 'hover:bg-gray-100'}
               >
                 {option.icon}
               </Toggle>
             </TooltipTrigger>
-            <TooltipContent className='bg-white text-black border border-gray-300'>
-              <p>{option.tooltip}</p>
-            </TooltipContent>
+            <TooltipContent>{option.tooltip}</TooltipContent>
           </Tooltip>
         </TooltipProvider>
       ))}
@@ -151,70 +140,32 @@ export default function ToolBar({ editor }: { editor: any }) {
           <TooltipTrigger asChild>
             <Toggle
               size='sm'
-              onClick={() => setIsLinkModalOpen(true)}
-              data-state={editor.isActive('link') ? 'on' : 'off'}
+              pressed={editor.isActive('link')}
+              onPressedChange={() => setShowLinkDialog(true)}
               disabled={editor.state.selection.empty}
             >
-              <Link className='size-4' />
+              <Link className='w-4 h-4' />
             </Toggle>
           </TooltipTrigger>
-          <TooltipContent>
-            <p>Add Link</p>
-          </TooltipContent>
+          <TooltipContent>Add Link</TooltipContent>
         </Tooltip>
       </TooltipProvider>
-      <Dialog open={isLinkModalOpen} onOpenChange={setIsLinkModalOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Add Link</DialogTitle>
-            <DialogDescription>Enter the URL for the link</DialogDescription>
-          </DialogHeader>
-          <LinkForm
-            editor={editor}
-            onSubmit={(url) => {
-              if (!editor.state.selection.empty) {
-                editor.chain().focus().setLink({ href: url }).run()
-              }
-              setIsLinkModalOpen(false)
-            }}
-          />
-        </DialogContent>
-      </Dialog>
+
       <TooltipProvider>
         <Tooltip>
           <TooltipTrigger asChild>
-            <Toggle size='sm' onClick={() => setIsImageModalOpen(true)} data-state={'off'}>
-              <ImageIcon className='size-4' />
+            <Toggle size='sm' onPressedChange={() => setShowImageDialog(true)}>
+              <ImageIcon className='w-4 h-4' />
             </Toggle>
           </TooltipTrigger>
-          <TooltipContent className='bg-white text-black border border-gray-300'>
-            <p>Add Image</p>
-          </TooltipContent>
+          <TooltipContent>Add Image</TooltipContent>
         </Tooltip>
       </TooltipProvider>
-      <Dialog open={isImageModalOpen} onOpenChange={setIsImageModalOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Add Image</DialogTitle>
-            <DialogDescription>Enter the URL of the image</DialogDescription>
-          </DialogHeader>
-          <ImageForm
-            onSubmit={(file) => {
-              const reader = new FileReader()
-              reader.onload = (e) => {
-                const result = e.target?.result
-                if (typeof result === 'string') {
-                  editor.chain().focus().setImage({ src: result }).run()
-                }
-              }
-              reader.readAsDataURL(file)
-              setIsImageModalOpen(false)
-            }}
-          />
-        </DialogContent>
-      </Dialog>
+
+      {/* Dialogs */}
+      <LinkDialog editor={editor} open={showLinkDialog} setOpen={setShowLinkDialog} />
+      <ImgDialog editor={editor} open={showImageDialog} setOpen={setShowImageDialog} />
     </div>
-    // <div className='border rounded-md flex space-x-1'>
   )
 }
 

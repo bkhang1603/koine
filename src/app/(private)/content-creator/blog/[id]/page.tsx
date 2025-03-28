@@ -5,109 +5,195 @@ import Link from 'next/link'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import { ArrowLeft, Calendar, User } from 'lucide-react'
+import {
+  ArrowLeft,
+  Calendar,
+  Clock,
+  User,
+  ThumbsUp,
+  MessageSquare,
+  Edit,
+  ExternalLink,
+  ChevronRight
+} from 'lucide-react'
 import Image from 'next/image'
+import { useBlogDetailQuery } from '@/queries/useBlog'
+import { Skeleton } from '@/components/ui/skeleton'
+import { formatDate } from '@/lib/utils'
 
 export default function BlogPostDetail(props: { params: Promise<{ id: string }> }) {
   const params = use(props.params)
-  const blogPosts = [
-    {
-      id: 1,
-      title: '10 Tips for Learning a New Language',
-      content: 'Learning a new language can be challenging, but with these tips...',
-      image: '/images/language-learning.jpg',
-      status: 'Published',
-      date: '2023-06-15',
-      category: 'Language Learning',
-      author: 'John Doe'
-    },
-    {
-      id: 2,
-      title: 'The Benefits of Bilingualism',
-      content: 'Being bilingual has numerous cognitive and social benefits...',
-      image: '/images/bilingualism.jpg',
-      status: 'Draft',
-      date: '2023-06-10',
-      category: 'Language Science',
-      author: 'Jane Smith'
-    },
-    {
-      id: 3,
-      title: 'Common Mistakes in English Grammar',
-      content: 'Even native speakers make these common grammar mistakes...',
-      image: '/images/english-grammar.jpg',
-      status: 'Published',
-      date: '2023-06-05',
-      category: 'Grammar',
-      author: 'Emily Brown'
-    },
-    {
-      id: 4,
-      title: 'How to Improve Your Listening Skills',
-      content: "Effective listening is crucial for language learning. Here's how to improve...",
-      image: '/images/listening-skills.jpg',
-      status: 'Draft',
-      date: '2023-06-01',
-      category: 'Language Skills',
-      author: 'Michael Wilson'
-    },
-    {
-      id: 5,
-      title: 'The Best Language Learning Apps',
-      content: 'These language learning apps are perfect for beginners and advanced learners...',
-      image: '/images/language-learning-apps.jpg',
-      status: 'Published',
-      date: '2023-05-25',
-      category: 'Language Learning',
-      author: 'Sarah Johnson'
-    }
-  ]
+  const { data, isLoading } = useBlogDetailQuery({ id: params.id })
+  const post = data?.payload.data
 
-  const post = blogPosts.find((post) => post.id === parseInt(params.id, 10))
+  // Skeleton loading component
+  if (isLoading) {
+    return (
+      <div className='max-w-5xl mx-auto space-y-6'>
+        <div className='flex justify-between items-center'>
+          <Skeleton className='h-10 w-32' />
+          <Skeleton className='h-10 w-24' />
+        </div>
 
-  if (!post) {
-    return <div>Loading...</div>
+        <Card>
+          <CardHeader>
+            <Skeleton className='w-full h-64 rounded-t-lg' />
+          </CardHeader>
+          <CardContent className='space-y-4'>
+            <div className='flex justify-between items-center'>
+              <Skeleton className='h-6 w-20' />
+              <Skeleton className='h-6 w-24' />
+            </div>
+            <Skeleton className='h-12 w-3/4' />
+            <div className='flex items-center text-sm text-muted-foreground gap-2'>
+              <Skeleton className='h-4 w-4 rounded-full' />
+              <Skeleton className='h-4 w-32' />
+              <Skeleton className='h-4 w-4 rounded-full' />
+              <Skeleton className='h-4 w-32' />
+            </div>
+            <div className='space-y-4'>
+              <Skeleton className='h-4 w-full' />
+              <Skeleton className='h-4 w-full' />
+              <Skeleton className='h-4 w-3/4' />
+              <Skeleton className='h-4 w-full' />
+              <Skeleton className='h-4 w-5/6' />
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    )
   }
 
-  return (
-    <div className='max-w-5xl mx-auto space-y-6'>
-      <div className='flex justify-between items-center'>
-        <Button variant='outline' asChild>
-          <Link href='/content-creator/blog'>
-            <ArrowLeft className='mr-2 h-4 w-4' />
-            Back to Blog
-          </Link>
-        </Button>
-        <Button variant='outline' asChild>
-          <Link href={`/content-creator/blog/${post.id}/edit`}>Edit Post</Link>
-        </Button>
-      </div>
+  if (!post) {
+    return (
+      <div className='max-w-5xl mx-auto space-y-6'>
+        <div className='flex justify-between items-center'>
+          <Button variant='outline' asChild>
+            <Link href='/content-creator/blog'>
+              <ArrowLeft className='mr-2 h-4 w-4' />
+              Quay lại danh sách
+            </Link>
+          </Button>
+        </div>
 
-      <Card>
-        <CardHeader>
-          <Image
-            src={`https://picsum.photos/seed/${post.id}/800/400`}
-            width={800}
-            height={400}
-            alt={post.title}
-            className='w-full h-64 object-cover rounded-t-lg'
-          />
-        </CardHeader>
-        <CardContent className='space-y-4'>
-          <div className='flex justify-between items-center'>
-            <Badge variant='outline'>{post.category}</Badge>
-            <Badge variant={post.status === 'Published' ? 'default' : 'secondary'}>{post.status}</Badge>
+        <Card className='p-8 text-center'>
+          <div className='space-y-4'>
+            <h2 className='text-2xl font-bold'>Không tìm thấy bài viết</h2>
+            <p className='text-muted-foreground'>Bài viết không tồn tại hoặc đã bị xóa</p>
+            <Button asChild>
+              <Link href='/content-creator/blog'>Quay lại danh sách</Link>
+            </Button>
           </div>
-          <CardTitle className='text-3xl'>{post.title}</CardTitle>
-          <div className='flex items-center text-sm text-muted-foreground'>
-            <User className='mr-2 h-4 w-4' />
-            {post.author}
-            <Calendar className='ml-4 mr-2 h-4 w-4' />
-            {post.date}
+        </Card>
+      </div>
+    )
+  }
+
+  // Tính thời gian đọc
+  const readingTime = Math.ceil(post.content.split(/\s+/).length / 200) // 200 từ/phút
+
+  return (
+    <div className='container max-w-4xl mx-auto px-4 py-6'>
+      {/* Breadcrumb */}
+      <nav className='flex items-center space-x-1 text-sm text-muted-foreground mb-6'>
+        <Link href='/content-creator/blog' className='hover:text-primary transition-colors'>
+          Blog
+        </Link>
+        <ChevronRight className='h-4 w-4' />
+        <span className='font-medium text-foreground max-w-[300px] truncate'>{post?.title || 'Chi tiết bài viết'}</span>
+      </nav>
+
+      <div className='max-w-5xl mx-auto space-y-6'>
+        <div className='flex justify-between items-center mb-6'>
+          <div>
+            <h1 className='text-2xl font-bold line-clamp-1 max-w-[500px]'>{post.title}</h1>
+            <p className='text-sm text-muted-foreground mt-1'>Chi tiết bài viết</p>
           </div>
-          <div className='prose max-w-none' dangerouslySetInnerHTML={{ __html: post.content }} />
-        </CardContent>
-      </Card>
+          <div className='space-x-2'>
+            <Button variant='outline' asChild>
+              <Link href={`/content-creator/blog/${post.id}/edit`}>
+                <Edit className='mr-2 h-4 w-4' />
+                Chỉnh sửa
+              </Link>
+            </Button>
+            <Button variant='outline' asChild>
+              <Link href={`/preview/blog/${post.slug}`} target='_blank'>
+                <ExternalLink className='mr-2 h-4 w-4' />
+                Xem trước
+              </Link>
+            </Button>
+          </div>
+        </div>
+
+        <Card>
+          <CardHeader className='p-0 relative'>
+            <div className='aspect-[21/9] w-full relative overflow-hidden rounded-t-lg'>
+              <Image
+                src={post.imageUrl}
+                alt={post.title}
+                fill
+                className='object-cover'
+                sizes='(max-width: 768px) 100vw, (max-width: 1200px) 80vw, 1200px'
+              />
+            </div>
+          </CardHeader>
+          <CardContent className='space-y-6 pt-6'>
+            <div className='flex flex-wrap gap-2'>
+              {post.categories.map((category) => (
+                <Badge key={category.id} variant='outline' className='rounded-full px-3 py-1'>
+                  {category.name}
+                </Badge>
+              ))}
+              <Badge variant='secondary' className='rounded-full px-3 py-1 ml-auto'>
+                <Clock className='mr-1 h-3 w-3' />
+                {readingTime} phút đọc
+              </Badge>
+            </div>
+
+            <CardTitle className='text-3xl font-bold'>{post.title}</CardTitle>
+
+            <p className='text-muted-foreground text-lg'>{post.description}</p>
+
+            <div className='flex items-center justify-between border-y border-slate-200 py-4'>
+              <div className='flex items-center space-x-4'>
+                <div className='w-10 h-10 rounded-full overflow-hidden bg-slate-100 flex-shrink-0'>
+                  {post.creatorInfo.avatarUrl ? (
+                    <Image
+                      src={post.creatorInfo.avatarUrl}
+                      alt={post.creatorInfo.firstName}
+                      width={40}
+                      height={40}
+                      className='object-cover'
+                    />
+                  ) : (
+                    <User className='w-full h-full p-2 text-slate-400' />
+                  )}
+                </div>
+                <div>
+                  <div className='font-medium'>{post.creatorInfo.firstName}</div>
+                  <div className='text-sm text-muted-foreground'>Tác giả</div>
+                </div>
+              </div>
+              <div className='flex items-center space-x-4 text-sm text-muted-foreground'>
+                <div className='flex items-center'>
+                  <Calendar className='mr-1 h-4 w-4' />
+                  {formatDate(post.createdAt)}
+                </div>
+                <div className='flex items-center'>
+                  <ThumbsUp className='mr-1 h-4 w-4' />
+                  {post.totalReact} lượt thích
+                </div>
+                <div className='flex items-center'>
+                  <MessageSquare className='mr-1 h-4 w-4' />
+                  {post.totalComment} bình luận
+                </div>
+              </div>
+            </div>
+
+            <div className='prose prose-lg max-w-none' dangerouslySetInnerHTML={{ __html: post.content }} />
+          </CardContent>
+        </Card>
+      </div>
     </div>
   )
 }

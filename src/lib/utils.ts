@@ -305,11 +305,11 @@ export const changeTime = (createdAt: string) => {
   return 'Vừa xong'
 }
 
-export const formatCurrency = (value: number) => {
+export function formatCurrency(amount: number): string {
   return new Intl.NumberFormat('vi-VN', {
     style: 'currency',
     currency: 'VND'
-  }).format(value)
+  }).format(amount)
 }
 
 export const formatCurrencyWithoutSymbol = (value: number) => {
@@ -321,4 +321,19 @@ export const formatCurrencyWithoutSymbol = (value: number) => {
 
 export const formatDate = (date: string) => {
   return format(new Date(date), 'dd/MM/yyyy')
+}
+
+export const formatLevel = (level: string) => {
+  switch (level) {
+    case 'ALL':
+      return 'Tất cả'
+    case 'BEGINNER':
+      return 'Cơ bản'
+    case 'INTERMEDIATE':
+      return 'Trung bình'
+    case 'ADVANCED':
+      return 'Nâng cao'
+    default:
+      return level
+  }
 }

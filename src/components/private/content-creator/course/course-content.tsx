@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
-import { Chapter, Lesson } from '../../../../app/(private)/content-creator/course/types'
+import { Chapter, Lesson } from '@/app/(private)/content-creator/course/types'
 import { FileText, Plus, MoreVertical, Video, ListChecks, Pencil, Trash2 } from 'lucide-react'
 import Link from 'next/link'
 

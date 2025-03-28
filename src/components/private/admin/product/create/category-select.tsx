@@ -1,11 +1,11 @@
 'use client'
 
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { CategoryProductData } from '@/schemaValidations/product.schema'
 
 interface CategorySelectProps {
-  categories: CategoryProductData[]
+  categories: any[]
   selectedCategories: string[]
+  // eslint-disable-next-line no-unused-vars
   onChange: (value: string[]) => void
 }
 

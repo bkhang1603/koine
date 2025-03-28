@@ -1,14 +1,12 @@
 'use client'
 
 import { Button } from '@/components/ui/button'
-import { Plus, Search } from 'lucide-react'
+import { Plus } from 'lucide-react'
 import { Input } from '@/components/ui/input'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { useState } from 'react'
-import { CategoryTable } from '@/components/private/content-creator/blog/category-table'
+import { useState, useEffect, useRef } from 'react'
 import { CreateCategoryDialog } from '@/components/private/content-creator/blog/create-category-dialog'
 import { EditCategoryDialog } from '@/components/private/content-creator/blog/edit-category-dialog'
-import Loading from '@/components/loading'
+import { DeleteCategoryDialog } from '@/components/private/content-creator/blog/delete-category-dialog'
 import {
   useCategoryBlogCreateMutation,
   useCategoryBlogDeleteMutation,
@@ -16,7 +14,13 @@ import {
   useCategoryBlogQuery,
   useCategoryBlogUpdateMutation
 } from '@/queries/useBlog'
-import { useToast } from '@/components/ui/use-toast'
+import { toast } from '@/components/ui/use-toast'
+import { handleErrorApi } from '@/lib/utils'
+import { format } from 'date-fns'
+import { vi } from 'date-fns/locale'
+import { TableCustom, dataListType } from '@/components/table-custom'
+import { useRouter, useSearchParams } from 'next/navigation'
+import { MoreOptions } from '@/components/private/content-creator/blog/category/more-options'
 
 type CategoryFormData = {
   name: string
@@ -24,16 +28,57 @@ type CategoryFormData = {
 }
 
 export default function BlogCategoriesPage() {
+  const router = useRouter()
+  const searchParams = useSearchParams()
+
+  // Get values from searchParams or use default values
+  const currentKeyword = searchParams.get('keyword') || ''
+  const currentPageSize = Number(searchParams.get('page_size')) || 5
+  const currentPageIndex = Number(searchParams.get('page_index')) || 1
+
+  // Function to update URL when values change
+  const updateSearchParams = (newParams: { keyword?: string; page_size?: number; page_index?: number }) => {
+    const params = new URLSearchParams(searchParams.toString())
+
+    if (newParams.keyword !== undefined) {
+      if (newParams.keyword === '') {
+        params.delete('keyword')
+      } else {
+        params.set('keyword', newParams.keyword)
+      }
+    }
+
+    if (newParams.page_size !== undefined) {
+      params.set('page_size', newParams.page_size.toString())
+    }
+
+    if (newParams.page_index !== undefined) {
+      params.set('page_index', newParams.page_index.toString())
+    }
+
+    router.push(`?${params.toString()}`)
+  }
+
   const [createDialogOpen, setCreateDialogOpen] = useState(false)
   const [editDialogOpen, setEditDialogOpen] = useState(false)
-  const [searchQuery, setSearchQuery] = useState('')
-  const [statusFilter, setStatusFilter] = useState('all')
   const [editingCategoryId, setEditingCategoryId] = useState<string | undefined>()
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
+  const [deleteCategoryId, setDeleteCategoryId] = useState<string | undefined>()
 
-  const { toast } = useToast()
-  const { data: categoriesResponse, isLoading } = useCategoryBlogQuery()
+  const isMounted = useRef(true)
 
-  // Chỉ query category detail khi đang edit và có ID
+  useEffect(() => {
+    return () => {
+      isMounted.current = false
+    }
+  }, [])
+
+  const { data: categoriesResponse, isLoading } = useCategoryBlogQuery({
+    page_index: currentPageIndex,
+    page_size: currentPageSize,
+    keyword: currentKeyword
+  })
+
   const { data: categoryDetailResponse } = useCategoryBlogDetailQuery({
     id: editingCategoryId || '',
     enabled: !!editingCategoryId
@@ -46,8 +91,11 @@ export default function BlogCategoriesPage() {
   const categories = categoriesResponse?.payload?.data || []
   const categoryDetail = categoryDetailResponse?.payload?.data
 
+  const handleOpenCreateModal = () => {
+    setCreateDialogOpen(true)
+  }
+
   const handleCreate = async (data: CategoryFormData) => {
-    // Trim dữ liệu trước khi gửi
     const trimmedData = {
       name: data.name.trim(),
       description: data.description.trim()
@@ -61,33 +109,39 @@ export default function BlogCategoriesPage() {
       })
       setCreateDialogOpen(false)
     } catch (error) {
-      toast({
-        variant: 'destructive',
-        title: 'Có lỗi xảy ra',
-        description: 'Vui lòng thử lại sau'
+      handleErrorApi({
+        error
       })
+    }
+  }
+
+  const handleEdit = (id: string) => {
+    setEditingCategoryId(id)
+    setTimeout(() => setEditDialogOpen(true), 100)
+  }
+
+  const handleCloseEditDialog = (open: boolean) => {
+    if (!open) {
+      setEditDialogOpen(false)
+      setTimeout(() => setEditingCategoryId(undefined), 300)
     }
   }
 
   const handleUpdate = async (data: CategoryFormData) => {
     if (!editingCategoryId || !categoryDetail) return
 
-    // Trim dữ liệu từ form
     const trimmedData = {
       name: data.name.trim(),
       description: data.description.trim()
     }
 
-    // So sánh với dữ liệu gốc
     const originalData = {
       name: categoryDetail.name,
       description: categoryDetail.description
     }
 
-    // Kiểm tra xem có thay đổi gì không
     const hasChanges = trimmedData.name !== originalData.name || trimmedData.description !== originalData.description
 
-    // Nếu không có thay đổi, đóng dialog và thông báo
     if (!hasChanges) {
       toast({
         title: 'Thông báo',
@@ -102,7 +156,7 @@ export default function BlogCategoriesPage() {
     try {
       await updateCategoryMutation.mutateAsync({
         id: editingCategoryId,
-        data: trimmedData // Sử dụng dữ liệu đã trim
+        data: trimmedData
       })
       toast({
         title: 'Thành công',
@@ -111,92 +165,140 @@ export default function BlogCategoriesPage() {
       setEditDialogOpen(false)
       setTimeout(() => setEditingCategoryId(undefined), 300)
     } catch (error) {
-      toast({
-        variant: 'destructive',
-        title: 'Có lỗi xảy ra',
-        description: 'Vui lòng thử lại sau'
+      handleErrorApi({
+        error
       })
     }
   }
 
-  const handleDelete = async (id: string) => {
+  const handleDeleteConfirm = async ({ id }: { id: string }) => {
+    if (!id) return
     try {
+      if (deleteCategoryMutation.isPending) return
       await deleteCategoryMutation.mutateAsync(id)
       toast({
         title: 'Thành công',
         description: 'Xóa danh mục thành công'
       })
+      setDeleteDialogOpen(false)
+      setTimeout(() => setDeleteCategoryId(undefined), 300)
     } catch (error) {
-      toast({
-        variant: 'destructive',
-        title: 'Có lỗi xảy ra',
-        description: 'Vui lòng thử lại sau'
+      handleErrorApi({
+        error
       })
     }
   }
 
-  // Hàm xử lý khi ấn nút Edit
-  const handleEdit = (id: string) => {
-    setEditingCategoryId(id)
-    setTimeout(() => setEditDialogOpen(true), 100)
-  }
+  // Column configuration for the table
+  const headerColumn = [
+    { id: 1, name: 'Tên danh mục' },
+    { id: 2, name: 'Mô tả' },
+    { id: 3, name: 'Ngày tạo' },
+    { id: 4, name: 'Ngày cập nhật' },
+    { id: 5, name: '' }
+  ]
 
-  // Xử lý khi đóng dialog
-  const handleCloseEditDialog = (open: boolean) => {
-    if (!open) {
-      setEditDialogOpen(false)
-      setTimeout(() => setEditingCategoryId(undefined), 300)
+  const bodyColumn = [
+    {
+      id: 1,
+      render: (category: any) => <div className='font-medium'>{category.name}</div>
+    },
+    {
+      id: 2,
+      render: (category: any) => (
+        <div className='text-muted-foreground text-sm'>
+          <div className='truncate max-w-[400px]' title={category.description || 'Không có mô tả'}>
+            {category.description || 'Không có mô tả'}
+          </div>
+        </div>
+      )
+    },
+    {
+      id: 3,
+      render: (category: any) => (
+        <div className='min-w-[120px]'>
+          <div className='text-sm'>{format(new Date(category.createdAt), 'dd/MM/yyyy', { locale: vi })}</div>
+          <div className='text-xs text-muted-foreground'>
+            {format(new Date(category.createdAt), 'HH:mm', { locale: vi })}
+          </div>
+        </div>
+      )
+    },
+    {
+      id: 4,
+      render: (category: any) => (
+        <div className='min-w-[120px]'>
+          <div className='text-sm'>{format(new Date(category.updatedAt), 'dd/MM/yyyy', { locale: vi })}</div>
+          <div className='text-xs text-muted-foreground'>
+            {format(new Date(category.updatedAt), 'HH:mm', { locale: vi })}
+          </div>
+        </div>
+      )
+    },
+    {
+      id: 5,
+      render: (category: any) => (
+        <div className='flex justify-end'>
+          <MoreOptions
+            blog={{
+              id: category.id,
+              title: category.name,
+              status: 'VISIBLE',
+              slug: category.name.toLowerCase().replace(/\s+/g, '-')
+            }}
+            onEdit={() => handleEdit(category.id)}
+            onDelete={() => handleDeleteConfirm({ id: category.id })}
+          />
+        </div>
+      )
+    }
+  ]
+
+  const tableData: dataListType = {
+    data: categories,
+    message: categoriesResponse?.payload.message || '',
+    pagination: categoriesResponse?.payload.pagination || {
+      pageSize: 0,
+      totalItem: 0,
+      currentPage: 0,
+      totalPage: 0,
+      maxPageSize: 0
     }
   }
 
-  if (isLoading) {
-    return (
-      <div className='flex justify-center items-center min-h-[calc(100vh-10rem)]'>
-        <Loading />
-      </div>
-    )
-  }
-
   return (
-    <div className='container mx-auto px-4 py-6 space-y-8'>
+    <div className='container mx-auto px-4 py-6 space-y-6'>
       {/* Header */}
-      <div className='flex justify-between items-center'>
+      <div className='flex items-center justify-between'>
         <div>
-          <h1 className='text-2xl font-bold'>Quản lý danh mục Blog</h1>
-          <p className='text-sm text-muted-foreground mt-1'>Quản lý các danh mục cho bài viết blog</p>
+          <h1 className='text-2xl font-bold'>Quản lý danh mục</h1>
+          <p className='text-muted-foreground mt-1'>Thêm, sửa, xóa các danh mục cho bài viết</p>
         </div>
-        <Button onClick={() => setCreateDialogOpen(true)}>
+        <Button onClick={handleOpenCreateModal}>
           <Plus className='w-4 h-4 mr-2' />
-          Thêm danh mục
+          Tạo danh mục
         </Button>
       </div>
 
-      {/* Search and Filters */}
-      <div className='flex flex-col sm:flex-row gap-4 mb-6 w-full justify-start md:justify-between'>
-        <div className='relative flex-1 max-w-[500px]'>
-          <Search className='absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground' />
-          <Input
-            placeholder='Tìm kiếm danh mục...'
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className='pl-9'
-          />
-        </div>
-        <Select value={statusFilter} onValueChange={setStatusFilter}>
-          <SelectTrigger className='w-full sm:w-[180px]'>
-            <SelectValue placeholder='Trạng thái' />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value='all'>Tất cả trạng thái</SelectItem>
-            <SelectItem value='active'>Đang hoạt động</SelectItem>
-            <SelectItem value='inactive'>Không hoạt động</SelectItem>
-          </SelectContent>
-        </Select>
+      {/* Search */}
+      <div className='flex flex-col sm:flex-row gap-4'>
+        <Input
+          placeholder='Tìm kiếm danh mục...'
+          className='w-full sm:w-[300px]'
+          value={currentKeyword}
+          onChange={(e) => updateSearchParams({ keyword: e.target.value, page_index: 1 })}
+        />
       </div>
 
-      <CategoryTable data={categories} onEdit={handleEdit} onDelete={handleDelete} />
+      {/* Table */}
+      <TableCustom
+        data={tableData}
+        headerColumn={headerColumn}
+        bodyColumn={bodyColumn}
+        href={'/content-creator/blog/categories'}
+        loading={isLoading}
+      />
 
-      {/* Dialog tạo mới */}
       <CreateCategoryDialog
         open={createDialogOpen}
         onOpenChange={setCreateDialogOpen}
@@ -204,7 +306,6 @@ export default function BlogCategoriesPage() {
         isLoading={createCategoryMutation.isPending}
       />
 
-      {/* Dialog chỉnh sửa */}
       {editDialogOpen && (
         <EditCategoryDialog
           categoryDetail={categoryDetail}

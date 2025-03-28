@@ -1,8 +1,8 @@
 'use client'
 
-import { use, useEffect, useMemo, useState } from 'react'
+import { use, useEffect, useMemo } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { BookOpen, MessageSquare, BarChart, Calendar, ThumbsUp, User } from 'lucide-react'
+import { BookOpen, MessageSquare, BarChart, ThumbsUp } from 'lucide-react'
 import { TableCustom, dataListType } from '@/components/table-custom'
 import configRoute from '@/config/route'
 import { SearchParams } from '@/types/query'
@@ -25,8 +25,6 @@ function AdminBlog(props: { searchParams: SearchParams }) {
   const currentKeyword = (searchParams.keyword as string) || ''
   const currentPageSize = Number(searchParams.page_size) || 5
   const currentPageIndex = Number(searchParams.page_index) || 1
-
-  const [showAllCategories, setShowAllCategories] = useState(false)
 
   // Function to update URL when values change
   const updateSearchParams = (newParams: { keyword?: string; page_size?: number; page_index?: number }) => {

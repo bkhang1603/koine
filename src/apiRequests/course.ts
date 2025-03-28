@@ -7,11 +7,19 @@ import {
   CourseResType,
   CourseReviewResType,
   CoursesResType,
+  CreateCourseBodyResType,
+  CreateCourseBodyType,
   LessonResType,
   LessonsResType,
   PreviewLessonsResType,
   UserCourseProgressResType,
-  UserCoursesResType
+  UserCoursesResType,
+  CreateCategoryCourseBodyType,
+  CreateCategoryCourseResType,
+  DeleteCategoryCourseResType,
+  GetCategoryCourseDetailResType,
+  UpdateCategoryCourseBodyType,
+  UpdateCategoryCourseResType
 } from '@/schemaValidations/course.schema'
 import { OnlyMessageResType } from '@/schemaValidations/special.schema'
 
@@ -32,19 +40,17 @@ const courseApiRequest = {
     keyword?: string | string[] | undefined
   }) =>
     http.get<CoursesResType>(
-      `/courses?page_index=${page_index}&page_size=${page_size}&keyword=${keyword}&category=${category}&range=${range}&sort=${sort}`
+      `/courses?page_index=${page_index}&page_size=${page_size}${
+        keyword ? `&keyword=${keyword}` : ''
+      }${category ? `&category=${category}` : ''}${range ? `&range=${range}` : ''}${sort ? `&sort=${sort}` : ''}`
     ),
-  getCourse: (id: string) =>
-    http.get<CourseResType>(`/courses/${id}`, {
-      cache: 'no-cache'
-    }),
-  addCourse: (data: any) => http.post('/courses', data),
-  updateCourse: (data: any) => http.put('/courses', data),
-  deleteCourse: (id: string) => http.delete(`/courses/${id}`),
-  enrollCourse: (id: string) => http.post(`/courses/enroll/${id}`, {}),
+  getCourse: (id: string) => http.get<CourseResType>(`/courses/${id}`),
+  addCourse: (data: CreateCourseBodyType) => http.post<CreateCourseBodyResType>('/courses', data),
+  updateCourse: (id: string, data: CreateCourseBodyType) => http.put<CreateCourseBodyResType>(`/courses/${id}`, data),
+  deleteCourse: (id: string) => http.delete<OnlyMessageResType>(`/courses/${id}`),
+  enrollCourse: (id: string) => http.post<OnlyMessageResType>(`/courses/enroll/${id}`, {}),
   getUserCourses: () => http.get<UserCoursesResType>('/course-enrollment/enrolled'),
-  updateCourseProgress: (lessonId: string) => http.post('/user-progresses', { lessonId }),
-  getCategoryCourses: () => http.get<CategoryCoursesResType>(`/category-courses`),
+  updateCourseProgress: (lessonId: string) => http.post<OnlyMessageResType>('/user-progresses', { lessonId }),
   activeCourse: (data: { childId?: string | null; courseId: string | null }) =>
     http.post<OnlyMessageResType>(`/courses/active-course-enroll`, data),
   getCourseProgress: (id: string) => http.get<UserCourseProgressResType>(`/user-progresses/status/${id}`),
@@ -66,7 +72,25 @@ const courseApiRequest = {
   getCourseDetailAdmin: ({ courseId }: { courseId: string }) =>
     http.get<GetCourseDetailAdminResType>(`courses/${courseId}`),
   getPreviewLessons: ({ id, limit }: { id: string; limit: number }) =>
-    http.get<PreviewLessonsResType>(`lessons/${id}/preview?limit=${limit}`)
+    http.get<PreviewLessonsResType>(`lessons/${id}/preview?limit=${limit}`),
+  getCategoryCourses: ({
+    page_index,
+    page_size,
+    keyword
+  }: {
+    page_index?: number | undefined
+    page_size?: number | undefined
+    keyword?: string | string[] | undefined
+  }) =>
+    http.get<CategoryCoursesResType>(
+      `/category-courses?${keyword ? `keyword=${keyword}` : ''}${page_index ? `&page_index=${page_index}` : ''}${page_size ? `&page_size=${page_size}` : ''}`
+    ),
+  createCategoryCourse: (data: CreateCategoryCourseBodyType) =>
+    http.post<CreateCategoryCourseResType>('/category-courses', data),
+  getCategoryCourseDetail: (id: string) => http.get<GetCategoryCourseDetailResType>(`/category-courses/${id}`),
+  updateCategoryCourse: (id: string, data: UpdateCategoryCourseBodyType) =>
+    http.put<UpdateCategoryCourseResType>(`/category-courses/${id}`, data),
+  deleteCategoryCourse: (id: string) => http.delete<DeleteCategoryCourseResType>(`/category-courses/${id}`)
 }
 
 export default courseApiRequest

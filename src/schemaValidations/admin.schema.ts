@@ -1,4 +1,4 @@
-import { DeliveryMethodValues, TypeResourceValues } from '@/constants/type'
+import { DeliveryMethodValues } from '@/constants/type'
 import z from 'zod'
 
 export const getCoursesListAdminRes = z.object({

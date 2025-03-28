@@ -1,5 +1,9 @@
 import http from '@/lib/http'
-import { GetBlogCommentsAdminResType, GetBlogDetailAdminResType, GetBlogsListAdminResType } from '@/schemaValidations/admin.schema'
+import {
+  GetBlogCommentsAdminResType,
+  GetBlogDetailAdminResType,
+  GetBlogsListAdminResType
+} from '@/schemaValidations/admin.schema'
 import {
   BlogBodyResType,
   BlogCommentCreateReqType,
@@ -8,8 +12,10 @@ import {
   BlogDataResType,
   BlogResType,
   BlogsResType,
+  BlogUpdateBodyType,
   CategoryBlogDetailResType,
-  CategoryBlogResType
+  CategoryBlogResType,
+  GetMyBlogsResType
 } from '@/schemaValidations/blog.schema'
 import { ReactDataResType, UpdateReactDataType } from '@/schemaValidations/course.schema'
 import { OnlyMessageResType } from '@/schemaValidations/special.schema'
@@ -26,8 +32,8 @@ const blogApiRequest = {
   }) => http.get<BlogsResType>(`/blogs?page_index=${page_index}&keyword=${search}&page_size=${page_size}`),
   getBlog: (id: string) => http.get<BlogResType>(`/blogs/${id}`),
   createBlog: (data: BlogDataResType) => http.post<BlogBodyResType>('/blogs', data),
-  updateBlog: (id: string, data: any) => http.put(`/blogs/${id}`, data),
-  deleteBlog: (id: string) => http.delete(`/blogs/${id}`),
+  updateBlog: (id: string, data: BlogUpdateBodyType) => http.put<OnlyMessageResType>(`/blogs/${id}`, data),
+  deleteBlog: (id: string) => http.delete<OnlyMessageResType>(`/blogs/${id}`),
   getBlogComments: ({
     id,
     page_index,
@@ -43,7 +49,18 @@ const blogApiRequest = {
   deleteBlogComment: (id: string) => http.delete<OnlyMessageResType>(`/blog-comments/${id}`),
   updateBlogComment: ({ id, data }: { id: string; data: BlogCommentUpdateResType }) =>
     http.put<OnlyMessageResType>(`/blog-comments/${id}`, data),
-  getCategoryBlog: () => http.get<CategoryBlogResType>('/category-blogs'),
+  getCategoryBlog: ({
+    page_index,
+    page_size,
+    keyword
+  }: {
+    page_index?: number | undefined
+    page_size?: number | undefined
+    keyword?: string | string[] | undefined
+  }) =>
+    http.get<CategoryBlogResType>(
+      `/category-blogs?${keyword ? `keyword=${keyword}` : ''}${page_index ? `&page_index=${page_index}` : ''}${page_size ? `&page_size=${page_size}` : ''}`
+    ),
   getCategoryBlogDetail: (id: string) => http.get<CategoryBlogDetailResType>(`/category-blogs/${id}`),
   createCategoryBlog: (data: { name: string; description: string }) =>
     http.post<CategoryBlogDetailResType>('/category-blogs', data),
@@ -60,7 +77,9 @@ const blogApiRequest = {
     keyword?: string | string[] | undefined
   }) => http.get<GetBlogsListAdminResType>(`/blogs?page_index=${page_index}&page_size=${page_size}&keyword=${keyword}`),
   getBlogDetailAdmin: (id: string) => http.get<GetBlogDetailAdminResType>(`/blogs/${id}`),
-  getBlogCommentsAdmin: (id: string) => http.get<GetBlogCommentsAdminResType>(`/blog-comments/${id}`)
+  getBlogCommentsAdmin: (id: string) => http.get<GetBlogCommentsAdminResType>(`/blog-comments/${id}`),
+  getMyBlogs: ({ page_index, page_size }: { page_index?: number | undefined; page_size?: number | undefined }) =>
+    http.get<GetMyBlogsResType>(`/blogs/my-blogs?page_index=${page_index}&page_size=${page_size}`)
 }
 
 export default blogApiRequest

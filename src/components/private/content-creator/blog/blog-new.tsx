@@ -4,8 +4,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
-import { ArrowLeft, Upload, Loader2, Save } from 'lucide-react'
-import Link from 'next/link'
+import { Upload, Loader2, Save } from 'lucide-react'
 import RichTextEditor from '@/components/rich-text-editor'
 import { useState, useRef } from 'react'
 import { useForm } from 'react-hook-form'
@@ -18,9 +17,7 @@ import { handleErrorApi } from '@/lib/utils'
 import { useRouter } from 'next/navigation'
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { Badge } from '@/components/ui/badge'
-import { X } from 'lucide-react'
+import { MultiSelect } from '@/components/ui/multi-select'
 
 // LocalStorage key for saving draft
 const BLOG_DRAFT_KEY = 'blog_draft_data'
@@ -35,7 +32,10 @@ export default function NewBlogPage({ localDraft }: { localDraft: BlogDataResTyp
   const uploadMutation = useUploadImageMutation()
   const createBlogMutation = useBlogCreateMutation()
 
-  const { data: categoriesResponse } = useCategoryBlogQuery()
+  const { data: categoriesResponse } = useCategoryBlogQuery({
+    page_index: 1,
+    page_size: 99
+  })
   const categories = categoriesResponse?.payload?.data || []
 
   // Initialize the form with React Hook Form
@@ -129,29 +129,30 @@ export default function NewBlogPage({ localDraft }: { localDraft: BlogDataResTyp
   const isLoading = uploadMutation.isPending || createBlogMutation.isPending || isSubmitting
 
   return (
-    <div className='container max-w-4xl mx-auto px-4 py-6'>
-      {/* Back Button */}
-      <Button variant='ghost' asChild className='mb-6'>
-        <Link href='/content-creator/blog'>
-          <ArrowLeft className='w-4 h-4 mr-2' />
-          Quay lại
-        </Link>
-      </Button>
-
-      {/* Header */}
+    <>
+      {/* Header - thêm vào để đồng bộ với các màn hình khác */}
       <div className='flex justify-between items-center mb-6'>
         <div>
           <h1 className='text-2xl font-bold'>Tạo bài viết mới</h1>
-          <p className='text-sm text-muted-foreground mt-1'>Tạo và xuất bản bài viết của bạn</p>
+          <p className='text-sm text-muted-foreground mt-1'>Viết bài và chia sẻ kiến thức của bạn</p>
         </div>
         <div className='flex items-center gap-4'>
-          <Button variant='outline' onClick={saveDraft} disabled={isLoading}>
-            {isLoading ? <Loader2 className='w-4 h-4 mr-2 animate-spin' /> : <Save className='w-4 h-4 mr-2' />}
-            Lưu nháp cục bộ
+          <Button type='button' variant='outline' onClick={saveDraft}>
+            <Save className='mr-2 h-4 w-4' />
+            Lưu nháp
           </Button>
-          <Button onClick={form.handleSubmit(onSubmit)} disabled={isLoading}>
-            {isLoading ? <Loader2 className='w-4 h-4 mr-2 animate-spin' /> : null}
-            Xuất bản
+          <Button type='submit' disabled={isLoading} onClick={form.handleSubmit(onSubmit)}>
+            {isLoading ? (
+              <>
+                <Loader2 className='mr-2 h-4 w-4 animate-spin' />
+                Đang lưu...
+              </>
+            ) : (
+              <>
+                <Save className='mr-2 h-4 w-4' />
+                Tạo bài viết
+              </>
+            )}
           </Button>
         </div>
       </div>
@@ -164,56 +165,7 @@ export default function NewBlogPage({ localDraft }: { localDraft: BlogDataResTyp
               <CardTitle>Thông tin bài viết</CardTitle>
             </CardHeader>
             <CardContent className='space-y-6'>
-              <FormField
-                control={form.control}
-                name='title'
-                render={({ field }) => (
-                  <FormItem className='space-y-2'>
-                    <FormLabel className='text-sm font-medium'>Tiêu đề</FormLabel>
-                    <FormControl>
-                      <Input placeholder='Nhập tiêu đề bài viết' {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name='description'
-                render={({ field }) => (
-                  <FormItem className='space-y-2'>
-                    <FormLabel className='text-sm font-medium'>Mô tả ngắn</FormLabel>
-                    <FormControl>
-                      <Textarea placeholder='Nhập mô tả ngắn về bài viết' {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name='content'
-                render={({ field }) => (
-                  <FormItem className='space-y-2'>
-                    <FormLabel className='text-sm font-medium'>Nội dung</FormLabel>
-                    <FormControl>
-                      <RichTextEditor content={field.value} onChange={field.onChange} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </CardContent>
-          </Card>
-
-          {/* Sidebar */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Cài đặt bài viết</CardTitle>
-            </CardHeader>
-            <CardContent className='space-y-6'>
+              {/* Image Field - Di chuyển lên đầu */}
               <FormField
                 control={form.control}
                 name='imageUrl'
@@ -257,79 +209,81 @@ export default function NewBlogPage({ localDraft }: { localDraft: BlogDataResTyp
                 )}
               />
 
+              {/* Categories Field - Di chuyển lên */}
               <FormField
                 control={form.control}
                 name='categoryIds'
                 render={({ field }) => {
-                  // Đảm bảo field.value luôn là mảng
-                  const selectedIds = Array.isArray(field.value) ? field.value : []
-
-                  // Tìm tên danh mục đã chọn để hiển thị
-                  const selectedCategories = categories
-                    .filter((cat) => selectedIds.includes(cat.id))
-                    .map((cat) => ({ id: cat.id, name: cat.name }))
-
-                  // Hàm xử lý khi chọn một danh mục
-                  const handleSelect = (value: string) => {
-                    // Nếu đã chọn rồi thì không làm gì
-                    if (selectedIds.includes(value)) return
-
-                    // Thêm vào danh sách đã chọn
-                    field.onChange([...selectedIds, value])
-                  }
-
-                  // Hàm xử lý khi xóa một danh mục
-                  const handleRemove = (id: string) => {
-                    field.onChange(selectedIds.filter((catId) => catId !== id))
-                  }
-
                   return (
                     <FormItem className='space-y-2'>
                       <FormLabel className='text-sm font-medium'>Danh mục</FormLabel>
-                      <div className='space-y-2'>
-                        <Select onValueChange={handleSelect}>
-                          <SelectTrigger>
-                            <SelectValue placeholder='Chọn danh mục' />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {categories.map((category) => (
-                              <SelectItem
-                                key={category.id}
-                                value={category.id}
-                                disabled={selectedIds.includes(category.id)}
-                              >
-                                {category.name}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-
-                        {/* Hiển thị các thẻ đã chọn */}
-                        <div className='flex flex-wrap gap-1 mt-2'>
-                          {selectedCategories.map((category) => (
-                            <Badge key={category.id} variant='secondary' className='px-2 py-1'>
-                              {category.name}
-                              <button
-                                type='button'
-                                onClick={() => handleRemove(category.id)}
-                                className='ml-1 rounded-full outline-none hover:text-destructive'
-                              >
-                                <X className='h-3 w-3' />
-                              </button>
-                            </Badge>
-                          ))}
-                        </div>
-
-                        <FormMessage />
-                      </div>
+                      <FormControl>
+                        <MultiSelect
+                          options={categories.map((category) => ({
+                            value: category.id,
+                            label: category.name
+                          }))}
+                          placeholder='Chọn danh mục'
+                          selected={field.value.map((id) => {
+                            const category = categories.find((cat) => cat.id === id)
+                            return category ? { value: category.id, label: category.name } : { value: id, label: id }
+                          })}
+                          onChange={(selected) => {
+                            field.onChange(selected.map((item) => item.value))
+                          }}
+                        />
+                      </FormControl>
+                      <FormMessage />
                     </FormItem>
                   )
                 }}
+              />
+
+              <FormField
+                control={form.control}
+                name='title'
+                render={({ field }) => (
+                  <FormItem className='space-y-2'>
+                    <FormLabel className='text-sm font-medium'>Tiêu đề</FormLabel>
+                    <FormControl>
+                      <Input placeholder='Nhập tiêu đề bài viết' {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name='description'
+                render={({ field }) => (
+                  <FormItem className='space-y-2'>
+                    <FormLabel className='text-sm font-medium'>Mô tả ngắn</FormLabel>
+                    <FormControl>
+                      <Textarea placeholder='Nhập mô tả ngắn về bài viết' {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name='content'
+                render={({ field }) => (
+                  <FormItem className='space-y-2'>
+                    <FormLabel className='text-sm font-medium'>Nội dung</FormLabel>
+                    <FormControl>
+                      <RichTextEditor content={field.value} onChange={field.onChange} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
               />
             </CardContent>
           </Card>
         </div>
       </Form>
-    </div>
+    </>
   )
 }
