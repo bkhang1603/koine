@@ -41,12 +41,56 @@ function BlogComments({ id }: { id: string }) {
   const isReacted = data2?.payload?.data.isReact || false
   const reactMutation = useBlogReactUpdateMutation()
 
+  const [localReacted, setLocalReacted] = useState(isReacted)
+  const [localTotalReacts, setLocalTotalReacts] = useState(totalReacts)
+  const [shouldUpdateApi, setShouldUpdateApi] = useState(false)
+  const timeoutRef = useRef<NodeJS.Timeout>(null)
+
   useEffect(() => {
     if (textareaRef.current) {
       textareaRef.current.style.height = 'auto'
       textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`
     }
   }, [content])
+
+  useEffect(() => {
+    setLocalReacted(isReacted)
+    setLocalTotalReacts(totalReacts)
+  }, [isReacted, totalReacts])
+
+  useEffect(() => {
+    if (shouldUpdateApi && localReacted !== isReacted) {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current)
+      }
+
+      timeoutRef.current = setTimeout(async () => {
+        try {
+          if (reactMutation.isPending) return
+
+          if (localReacted !== isReacted) {
+            await reactMutation.mutateAsync({
+              identifier: id,
+              isReact: localReacted
+            })
+          }
+
+          setShouldUpdateApi(false)
+        } catch (error) {
+          setLocalReacted(isReacted)
+          setLocalTotalReacts(totalReacts)
+          handleErrorApi({ error })
+          setShouldUpdateApi(false)
+        }
+      }, 500)
+    }
+
+    return () => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current)
+      }
+    }
+  }, [localReacted, shouldUpdateApi])
 
   const handleKeyDown = async (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === 'Enter' && !e.shiftKey) {
@@ -80,6 +124,8 @@ function BlogComments({ id }: { id: string }) {
   const handleActionClick = async () => {
     if (content.trim()) {
       try {
+        if (commentMutation.isPending) return
+
         await commentMutation.mutateAsync({
           content,
           identifier: id,
@@ -102,15 +148,11 @@ function BlogComments({ id }: { id: string }) {
     }
   }
 
-  const handleReact = async () => {
-    try {
-      if (reactMutation.isPending) return
-
-      await reactMutation.mutateAsync({
-        identifier: id,
-        isReact: !isReacted
-      })
-    } catch (error) {}
+  const handleReact = () => {
+    if (reactMutation.isPending) return
+    setLocalReacted(!localReacted)
+    setLocalTotalReacts((prev) => (!localReacted ? prev + 1 : prev - 1))
+    setShouldUpdateApi(true)
   }
 
   return (
@@ -118,8 +160,8 @@ function BlogComments({ id }: { id: string }) {
       <div className='flex justify-center sm:justify-between items-center border-t-2 border-b-2 py-2 mt-8'>
         <div className='hidden sm:flex justify-start items-center gap-4'>
           <div className='flex items-center gap-2 cursor-pointer text-secondary hover:underline' onClick={handleReact}>
-            {isReacted ? <Heart className='w-6 h-6 fill-secondary' /> : <Heart className='w-6 h-6' />}
-            {totalReacts !== 0 && <span className='text-lg'>{totalReacts}</span>}
+            {localReacted ? <Heart className='w-6 h-6 fill-secondary' /> : <Heart className='w-6 h-6' />}
+            {localTotalReacts !== 0 && <span className='text-lg'>{localTotalReacts}</span>}
           </div>
 
           <div
@@ -134,25 +176,16 @@ function BlogComments({ id }: { id: string }) {
         </div>
 
         <div className='flex items-center justify-between'>
-          {isReacted ? (
-            <Button
-              variant={'ghost'}
-              className='w-full flex items-center justify-center gap-2 text-secondary hover:text-secondary hover:bg-secondary/5'
-              onClick={handleReact}
-            >
-              <Heart className='fill-secondary w-5 h-5' />
-              <span>Yêu thích</span>
-            </Button>
-          ) : (
-            <Button
-              variant={'ghost'}
-              className='w-full flex items-center justify-center gap-2 text-secondary hover:text-secondary hover:bg-secondary/5'
-              onClick={handleReact}
-            >
-              <Heart className='w-5 h-5' />
-              <span>Yêu thích</span>
-            </Button>
-          )}
+          <Button
+            variant={'ghost'}
+            className={`w-full flex items-center justify-center gap-2 ${
+              localReacted ? 'text-secondary hover:text-secondary hover:bg-secondary/5' : ''
+            }`}
+            onClick={handleReact}
+          >
+            <Heart className={`w-5 h-5 ${localReacted ? 'fill-secondary' : ''}`} />
+            <span>Yêu thích</span>
+          </Button>
 
           <Button
             variant={'ghost'}
@@ -179,11 +212,9 @@ function BlogComments({ id }: { id: string }) {
         </div>
       )}
 
-      {/* {!isFetching && comments.length === 0 && <div>Chưa có bình luận nào</div>} */}
-
       {!isFetching &&
         comments.length > 0 &&
-        comments.map((comment) => <CommentItem key={comment.id} comment={comment} login={role} />)}
+        comments.map((comment) => <CommentItem key={comment.id} comment={comment} login={role} maxDepth={2} />)}
 
       {role && (
         <div className='flex justify-between items-start gap-3 py-4'>

@@ -58,7 +58,7 @@ export const useUpdatePaymentMethodMutation = ({ id }: { id: string }) => {
     mutationFn: orderApiRequest.updatePaymentMethod,
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: ['order', id]
+        queryKey: ['orders', id]
       })
     }
   })

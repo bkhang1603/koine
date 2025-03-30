@@ -18,11 +18,13 @@ import { toast } from '@/components/ui/use-toast'
 export default function CommentItem({
   comment,
   level = 0,
-  login
+  login,
+  maxDepth
 }: {
   comment: BlogCommentResType['data']
   level?: number
   login?: RoleType | undefined
+  maxDepth?: number
 }) {
   const avatar = useAppStore((state) => state.avatar)
   const username = useAppStore((state) => state.username)
@@ -255,7 +257,7 @@ export default function CommentItem({
             <span>{changeTime(comment.createdAt)}</span>
           </Button>
 
-          {login && (
+          {login && level < (maxDepth || 2) && (
             <Button variant={'link'} className='text-gray-500 px-2' onClick={() => setShowReplyInput(!showReplyInput)}>
               <span>Trả lời</span>
             </Button>
@@ -318,7 +320,7 @@ export default function CommentItem({
             </Button>
             {showReplies &&
               comment.replies.map((reply: any) => (
-                <CommentItem key={reply.id} comment={reply} level={level + 1} login={login} />
+                <CommentItem key={reply.id} comment={reply} level={level + 1} login={login} maxDepth={maxDepth} />
               ))}
           </>
         )}

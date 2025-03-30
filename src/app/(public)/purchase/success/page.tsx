@@ -6,8 +6,10 @@ import { Button } from '@/components/ui/button'
 import { CheckCircle2, Home, FileText, ArrowRight } from 'lucide-react'
 import Link from 'next/link'
 import configRoute from '@/config/route'
+import { useAppStore } from '@/components/app-provider'
 
 function SuccessPurchasePage() {
+  const orderId = useAppStore((state) => state.orderId)
   const searchParams = useSearchParams()
   const router = useRouter()
 
@@ -54,7 +56,7 @@ function SuccessPurchasePage() {
 
         <div className='space-y-3'>
           <Button variant='default' className='w-full gap-2' asChild>
-            <Link href={configRoute.setting.order}>
+            <Link href={`${configRoute.setting.order}/${orderId}`}>
               <FileText className='h-4 w-4' />
               Xem chi tiết đơn hàng
             </Link>

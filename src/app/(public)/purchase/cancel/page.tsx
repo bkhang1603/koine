@@ -33,10 +33,15 @@ function CancelPurchasePage() {
 
   const handleRePurchaseOrder = async () => {
     if (!orderId) return
-    if (rePurchaseOrderMutation.isPending) return
 
     try {
-      await rePurchaseOrderMutation.mutateAsync({ id: orderId })
+      if (rePurchaseOrderMutation.isPending) return
+
+      const res = await rePurchaseOrderMutation.mutateAsync({ id: orderId })
+
+      if (res?.payload?.data?.paymentLink) {
+        window.location.href = res.payload.data.paymentLink
+      }
     } catch (error) {
       handleErrorApi({
         error
@@ -71,7 +76,7 @@ function CancelPurchasePage() {
           </Button>
 
           <Button variant='outline' className='w-full gap-2' asChild>
-            <Link href={configRoute.setting.order}>
+            <Link href={`${configRoute.setting.order}/${orderId}`}>
               <ShoppingBag className='h-4 w-4' />
               Về trang đơn hàng
             </Link>

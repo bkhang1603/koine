@@ -139,6 +139,10 @@ export const updatePaymentMethodBodyRes = z.object({
 })
 
 export const rePurchaseOrderRes = z.object({
+  data: z.object({
+    paymentLink: z.string(),
+    orderId: z.string()
+  }),
   message: z.string()
 })
 
