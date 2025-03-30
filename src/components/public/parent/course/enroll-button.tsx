@@ -8,7 +8,7 @@ interface EnrollButtonProps {
   className?: string
 }
 
-export default function EnrollButton({ id, className }: EnrollButtonProps) {
+export default function EnrollButton({ className }: EnrollButtonProps) {
   return (
     <Button className={className}>
       <GraduationCap className='w-4 h-4 mr-2' />

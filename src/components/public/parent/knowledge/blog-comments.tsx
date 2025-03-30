@@ -90,7 +90,7 @@ function BlogComments({ id }: { id: string }) {
         clearTimeout(timeoutRef.current)
       }
     }
-  }, [localReacted, shouldUpdateApi])
+  }, [localReacted, shouldUpdateApi, id, reactMutation, isReacted, totalReacts])
 
   const handleKeyDown = async (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === 'Enter' && !e.shiftKey) {

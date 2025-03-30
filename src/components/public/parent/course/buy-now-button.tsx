@@ -24,15 +24,26 @@ export default function BuyNowButton({ course, className }: BuyNowButtonProps) {
   const handleBuyNow = () => {
     const checkoutData = {
       id: course.id,
+      productId: null,
+      courseId: course.id,
+      comboId: null,
+      quantity: 1,
+      unitPrice: course.price,
+      totalPrice: course.price * (1 - course.discount),
+      discount: course.discount,
+      isDeleted: false,
+      payMethod: 'COD' as const,
+      note: null,
+      status: 'PENDING' as const,
+      product: null,
       course: {
-        id: course.id,
         title: course.title,
+        description: '',
         imageUrl: course.imageUrl
       },
-      product: null,
       combo: null,
-      quantity: 1,
-      totalPrice: course.price * (1 - course.discount)
+      createdAt: '',
+      updatedAt: ''
     }
 
     setCheckoutBuyNow(checkoutData)

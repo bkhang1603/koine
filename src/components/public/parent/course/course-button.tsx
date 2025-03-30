@@ -22,7 +22,7 @@ interface CourseButtonProps {
   className?: string
 }
 
-export default function CourseButton({ id, course, variant = 'default', className }: CourseButtonProps) {
+export default function CourseButton({ course, variant = 'default', className }: CourseButtonProps) {
   const role = useAppStore((state) => state.role)
   const addToCartMutation = useCartDetailCreateMutation()
 
