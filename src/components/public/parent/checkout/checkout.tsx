@@ -25,15 +25,15 @@ export default function Checkout() {
   const checkoutBuyNow = useAppStore((state) => state.checkoutBuyNow)
   const pickAddress = useAppStore((state) => state.pickAddress)
   const setPickAddress = useAppStore((state) => state.setPickAddress)
-  const [type, setType] = useState<'cart' | 'buyNow'>('cart')
+  const [type, setType] = useState<'checkoutData' | 'checkoutBuyNow'>('checkoutData')
   const checkoutBuyNowFromLocalStorage = getCheckoutBuyNowFromLocalStorage()
   const checkoutFormLocalStorage = getCheckoutDataFromLocalStorage()
 
   useEffect(() => {
     if (checkoutFormLocalStorage) {
-      setType('cart')
+      setType('checkoutData')
     } else if (checkoutBuyNowFromLocalStorage) {
-      setType('buyNow')
+      setType('checkoutBuyNow')
     }
   }, [checkoutBuyNow, checkoutBuyNowFromLocalStorage, checkoutFormLocalStorage])
 
@@ -60,7 +60,7 @@ export default function Checkout() {
 
   // Thêm các biến kiểm tra loại đơn hàng
   const hasPhysicalItems = useMemo(() => {
-    if (type === 'cart') {
+    if (type === 'checkoutData') {
       return checkoutData?.cartDetails.some((item) => item.product !== null)
     }
     return checkoutBuyNow?.product !== null
@@ -68,7 +68,7 @@ export default function Checkout() {
 
   // Tính tổng tiền dựa trên loại đơn hàng
   const calculateTotal = useMemo(() => {
-    const baseAmount = type === 'cart' ? checkoutData?.totalAmount : checkoutBuyNow?.totalPrice
+    const baseAmount = type === 'checkoutData' ? checkoutData?.totalAmount : checkoutBuyNow?.totalPrice
     if (!hasPhysicalItems) return baseAmount || 0 // Không có phí ship cho đơn chỉ có khóa học
     return (baseAmount || 0) + (shippingMethod === DeliveryMethod.EXPEDITED ? 50000 : 26000)
   }, [type, checkoutData, checkoutBuyNow, hasPhysicalItems, shippingMethod])
@@ -102,7 +102,7 @@ export default function Checkout() {
         if (res.payload.data.paymentLink) {
           setOrderId(res.payload.data.orderId)
 
-          window.location.href = res.payload.data.paymentLink
+          router.push(res.payload.data.paymentLink)
           toast({
             title: 'Đặt hàng thành công',
             description: 'Đơn hàng của bạn đã được tạo'
@@ -143,7 +143,7 @@ export default function Checkout() {
         <div className='lg:col-span-3'>
           <Card className='mb-4 p-4'>
             <h2 className='font-semibold mb-4'>Sản phẩm</h2>
-            {type === 'cart' &&
+            {type === 'checkoutData' &&
               checkoutData?.cartDetails.map((item, index) => (
                 <CardContent
                   className={`p-0 pb-4 ${index !== checkoutData.cartDetails.length - 1 ? 'border-b mb-4' : ''}`}
@@ -186,7 +186,7 @@ export default function Checkout() {
                 </CardContent>
               ))}
 
-            {type === 'buyNow' && (
+            {type === 'checkoutBuyNow' && (
               <CardContent className='p-0 pb-4'>
                 {checkoutBuyNow?.product !== null && (
                   <div className='flex items-start'>
@@ -338,7 +338,11 @@ export default function Checkout() {
                 <div className='flex justify-between text-sm'>
                   <span className='text-gray-600'>Tạm tính</span>
                   <span>
-                    {(type === 'cart' ? checkoutData?.totalAmount : checkoutBuyNow?.totalPrice)?.toLocaleString()}đ
+                    {(type === 'checkoutData'
+                      ? checkoutData?.totalAmount
+                      : checkoutBuyNow?.totalPrice
+                    )?.toLocaleString()}
+                    đ
                   </span>
                 </div>
 
