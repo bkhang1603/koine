@@ -31,7 +31,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/
 import { Switch } from '@/components/ui/switch'
 import { Label } from '@/components/ui/label'
 import { toast } from '@/components/ui/use-toast'
-import { CoursesDetailSkeleton } from '@/components/public/parent/setting/child-account/detail/course/CoursesDetailSkeleton'
+import { CoursesDetailSkeleton } from '@/components/public/parent/setting/child-account/detail/course/course-detail-skeleton'
 import { cn } from '@/lib/utils'
 import { useGetCourseDetailForChild } from '@/queries/useAccount'
 

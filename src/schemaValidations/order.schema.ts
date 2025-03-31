@@ -171,6 +171,15 @@ export const refundOrderRes = z.object({
   })
 })
 
+export const createRefundOrderBody = z.object({
+  reason: z.string()
+})
+
+export const createRefundOrderBodyRes = z.object({
+  message: z.string(),
+  statusCode: z.number()
+})
+
 export type OrderBody = z.infer<typeof orderBody>
 
 export type OrderBodyResType = z.TypeOf<typeof orderBodyRes>
@@ -194,3 +203,7 @@ export type UpdatePaymentMethodBodyRes = z.TypeOf<typeof updatePaymentMethodBody
 export type RePurchaseOrderRes = z.TypeOf<typeof rePurchaseOrderRes>
 
 export type RefundOrderResType = z.TypeOf<typeof refundOrderRes>
+
+export type CreateRefundOrderBody = z.TypeOf<typeof createRefundOrderBody>
+
+export type CreateRefundOrderBodyRes = z.TypeOf<typeof createRefundOrderBodyRes>

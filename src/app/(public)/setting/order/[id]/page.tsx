@@ -29,6 +29,7 @@ import { toast } from '@/components/ui/use-toast'
 import configRoute from '@/config/route'
 import { SettingBreadcrumb } from '@/components/public/parent/setting/SettingBreadcrumb'
 import { handleErrorApi } from '@/lib/utils'
+import { RefundOrderDialog } from '@/components/public/parent/setting/order/RefundOrderDialog'
 
 // Helper để lấy màu và văn bản cho trạng thái đơn hàng
 const getOrderStatusConfig = (status: string) => {
@@ -408,6 +409,13 @@ export default function OrderDetailPage(props: { params: Promise<{ id: string }>
                   )}
 
                   <CancelOrderDialog orderId={order.id} orderCode={order.orderCode} onCancelSuccess={() => {}} />
+                </div>
+              )}
+
+              {/* Nút yêu cầu hoàn tiền khi đơn hàng đã hoàn thành */}
+              {order.status === 'COMPLETED' && (
+                <div className='pt-2'>
+                  <RefundOrderDialog orderId={order.id} orderCode={order.orderCode} />
                 </div>
               )}
             </CardContent>

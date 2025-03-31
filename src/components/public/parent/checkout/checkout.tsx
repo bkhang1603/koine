@@ -18,6 +18,7 @@ import { DeliveryMethod, PaymentMethod } from '@/constants/type'
 import { useRouter } from 'next/navigation'
 import { getCheckoutBuyNowFromLocalStorage, getCheckoutDataFromLocalStorage, handleErrorApi } from '@/lib/utils'
 import { toast } from '@/components/ui/use-toast'
+import AddressForm from '@/components/public/parent/setting/address-form'
 
 export default function Checkout() {
   const setOrderId = useAppStore((state) => state.setOrderId)
@@ -48,6 +49,7 @@ export default function Checkout() {
     DeliveryMethod.STANDARD
   )
   const [payMethod, setPayMethod] = useState<(typeof PaymentMethod)[keyof typeof PaymentMethod]>(PaymentMethod.BANKING)
+  const [showAddAddressForm, setShowAddAddressForm] = useState(false)
 
   // Set selectedAddressId after addresses are loaded
   useEffect(() => {
@@ -299,11 +301,9 @@ export default function Checkout() {
                       <p className='text-gray-500 text-sm'>Chưa có địa chỉ giao hàng</p>
                     </div>
 
-                    <Button variant='outline' className='w-full' asChild>
-                      <Link href={configRoute.setting.address}>
-                        <Plus className='w-4 h-4 mr-2' />
-                        Thêm địa chỉ giao hàng
-                      </Link>
+                    <Button variant='outline' className='w-full' onClick={() => setShowAddAddressForm(true)}>
+                      <Plus className='w-4 h-4 mr-2' />
+                      Thêm địa chỉ giao hàng
                     </Button>
                   </div>
                 ) : pickAddress ? (
@@ -383,6 +383,16 @@ export default function Checkout() {
         </div>
       </div>
 
+      <AddressForm
+        open={showAddAddressForm}
+        onOpenChange={setShowAddAddressForm}
+        mode='add'
+        onSuccess={(newAddress) => {
+          setPickAddress(newAddress)
+          setShowAddAddressForm(false)
+        }}
+      />
+
       <Dialog open={showAddressModal} onOpenChange={setShowAddressModal}>
         <DialogContent className='sm:max-w-[600px]'>
           <DialogHeader>
@@ -438,15 +448,17 @@ export default function Checkout() {
           </div>
 
           <div className='flex items-center justify-between pt-4 mt-4 border-t'>
-            <Link
-              href={configRoute.setting.address}
-              className='text-sm text-muted-foreground hover:text-primary transition-colors'
+            <Button
+              variant='outline'
+              size='sm'
+              onClick={() => {
+                setShowAddressModal(false)
+                setShowAddAddressForm(true)
+              }}
             >
-              <Button variant='outline' size='sm'>
-                <Plus className='w-4 h-4 mr-2' />
-                Thêm địa chỉ mới
-              </Button>
-            </Link>
+              <Plus className='w-4 h-4 mr-2' />
+              Thêm địa chỉ mới
+            </Button>
             <Button variant='ghost' size='sm' onClick={() => setShowAddressModal(false)}>
               Đóng
             </Button>

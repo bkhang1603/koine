@@ -43,9 +43,10 @@ type AddressFormProps = {
   onOpenChange: (open: boolean) => void
   defaultValues?: AccountOneAddressResType['data']
   mode?: 'add' | 'edit'
+  onSuccess?: (address: AccountOneAddressResType['data']) => void
 }
 
-export default function AddressForm({ open, onOpenChange, defaultValues, mode = 'add' }: AddressFormProps) {
+export default function AddressForm({ open, onOpenChange, defaultValues, mode = 'add', onSuccess }: AddressFormProps) {
   const addMutation = useAddAccountAddressMutation()
   const editMutation = useUpdateAccountAddressMutation()
 
@@ -77,7 +78,7 @@ export default function AddressForm({ open, onOpenChange, defaultValues, mode = 
       const fullAddress = `${values.streetAddress}, ${wardName}, ${districtName}, ${provinceName}`
 
       if (mode === 'add') {
-        await addMutation.mutateAsync({
+        const response = await addMutation.mutateAsync({
           name: values.name,
           phone: values.phone,
           address: fullAddress,
@@ -87,9 +88,10 @@ export default function AddressForm({ open, onOpenChange, defaultValues, mode = 
         toast({
           description: 'Thêm địa chỉ mới thành công'
         })
+        onSuccess?.(response.payload.data)
       } else {
         if (!defaultValues?.id) return
-        await editMutation.mutateAsync({
+        const response = await editMutation.mutateAsync({
           id: defaultValues.id,
           name: values.name,
           phone: values.phone,
@@ -100,6 +102,7 @@ export default function AddressForm({ open, onOpenChange, defaultValues, mode = 
         toast({
           description: 'Cập nhật địa chỉ thành công'
         })
+        onSuccess?.(response.payload.data)
       }
       onOpenChange(false)
       form.reset()
