@@ -18,10 +18,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { Loader2 } from 'lucide-react'
 
 const formSchema = z.object({
-  name: z
-    .string()
-    .min(1, 'Tên danh mục không được để trống')
-    .max(100, 'Tên danh mục không được vượt quá 100 ký tự'),
+  name: z.string().min(1, 'Tên danh mục không được để trống').max(100, 'Tên danh mục không được vượt quá 100 ký tự'),
   description: z.string().max(500, 'Mô tả không được vượt quá 500 ký tự').optional()
 })
 
@@ -104,4 +101,4 @@ export function CreateCategoryDialog({ open, onOpenChange, onSubmit, isLoading }
       </DialogContent>
     </Dialog>
   )
-} 
+}

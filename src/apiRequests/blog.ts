@@ -34,16 +34,21 @@ const blogApiRequest = {
   getBlogsCache: ({
     page_index,
     search,
-    page_size
+    page_size,
+    categoryId
   }: {
     page_index?: number | undefined
     search?: string | string[] | undefined
     page_size?: number | undefined
+    categoryId?: string | string[] | undefined
   }) =>
-    http.get<BlogsResType>(`/blogs?page_index=${page_index}&keyword=${search}&page_size=${page_size}`, {
-      cache: 'force-cache',
-      next: { revalidate: 24 * 60 * 60 }
-    }),
+    http.get<BlogsResType>(
+      `/blogs?page_index=${page_index}&keyword=${search}&page_size=${page_size}${categoryId ? `&categoryId=${categoryId}` : ''}`,
+      {
+        cache: 'force-cache',
+        next: { revalidate: 24 * 60 * 60 }
+      }
+    ),
   getBlog: (id: string) => http.get<BlogResType>(`/blogs/${id}`),
   // getBlog with caching
   getBlogCache: (id: string) =>
@@ -78,6 +83,9 @@ const blogApiRequest = {
     http.get<CategoryBlogResType>(
       `/category-blogs?${keyword ? `keyword=${keyword}` : ''}${page_index ? `&page_index=${page_index}` : ''}${page_size ? `&page_size=${page_size}` : ''}`
     ),
+  // getCategoryBlog with caching
+  getCategoryBlogCache: () =>
+    http.get<CategoryBlogResType>('/category-blogs', { cache: 'force-cache', next: { revalidate: 24 * 60 * 60 } }),
   getCategoryBlogDetail: (id: string) => http.get<CategoryBlogDetailResType>(`/category-blogs/${id}`),
   createCategoryBlog: (data: { name: string; description: string }) =>
     http.post<CategoryBlogDetailResType>('/category-blogs', data),
