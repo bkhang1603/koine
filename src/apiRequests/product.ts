@@ -1,6 +1,9 @@
 import http from '@/lib/http'
+import { GetProductDetailAdminResType, GetProductListAdminResType } from '@/schemaValidations/admin.schema'
 import {
   CategoryProductsResType,
+  CreateProductBodyType,
+  CreateProductResType,
   ProductResType,
   ProductReviewsResType,
   ProductsResType
@@ -49,7 +52,7 @@ const productApiRequest = {
   // getProduct with caching
   getProductCache: (id: string) =>
     http.get<ProductResType>(`/products/${id}`, { cache: 'force-cache', next: { revalidate: 12 * 60 * 60 } }),
-  createProduct: (data: any) => http.post('/products', data),
+  createProduct: (data: CreateProductBodyType) => http.post<CreateProductResType>('/products', data),
   updateProduct: (id: string, data: any) => http.put(`/products/${id}`, data),
   deleteProduct: (id: string) => http.delete(`/products/${id}`),
   getCategoryProducts: () => http.get<CategoryProductsResType>('/category-products'),
@@ -72,7 +75,20 @@ const productApiRequest = {
   }) =>
     http.get<ProductReviewsResType>(
       `/products/${id}/reviews?star=${star}&page_index=${page_index}&page_size=${page_size}`
-    )
+    ),
+  getProductListAdmin: ({
+    page_index,
+    page_size,
+    keyword
+  }: {
+    page_index?: number | undefined
+    page_size?: number | undefined
+    keyword?: string | string[] | undefined
+  }) =>
+    http.get<GetProductListAdminResType>(
+      `/products?page_index=${page_index}&page_size=${page_size}&keyword=${keyword}`
+    ),
+  getProductDetailAdmin: (id: string) => http.get<GetProductDetailAdminResType>(`/products/${id}`)
 }
 
 export default productApiRequest

@@ -37,7 +37,10 @@ export default function EditBlogPage(props: { params: Promise<{ id: string }> })
   const router = useRouter()
 
   const { data: blogData, isLoading: isBlogLoading } = useBlogDetailQuery({ id: params.id })
-  const { data: categoriesData, isLoading: isCategoriesLoading } = useCategoryBlogQuery()
+  const { data: categoriesData, isLoading: isCategoriesLoading } = useCategoryBlogQuery({
+    page_index: 1,
+    page_size: 99
+  })
   const updateBlogMutation = useBlogUpdateMutation({ id: params.id })
   const uploadMutation = useUploadImageMutation()
 

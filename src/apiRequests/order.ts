@@ -1,4 +1,5 @@
 import http from '@/lib/http'
+import { GetOrderDetailAdminResType, GetOrderListAdminResType } from '@/schemaValidations/admin.schema'
 import {
   CancelOrderBody,
   CancelOrderBodyRes,
@@ -25,7 +26,12 @@ const orderApiRequest = {
   getRefundOrders: ({ page_size, page_index }: { page_size: number; page_index: number }) =>
     http.get<RefundOrderResType>(`/orders/my-refund?page_size=${page_size}&page_index=${page_index}`),
   createRefundOrder: ({ orderId, body }: { orderId: string; body: CreateRefundOrderBody }) =>
-    http.post<CreateRefundOrderBodyRes>(`/orders/refund/${orderId}/request-refund`, body)
+    http.post<CreateRefundOrderBodyRes>(`/orders/refund/${orderId}/request-refund`, body),
+  getAdminOrders: (pageSize: number, pageIndex: number, status?: string) =>
+    http.get<GetOrderListAdminResType>(
+      `/orders?${status ? `status=${status}` : ``}page_size=${pageSize}&page_index=${pageIndex}`
+    ),
+  getAdminOrderById: (id: string) => http.get<GetOrderDetailAdminResType>(`/orders/${id}`)
 }
 
 export default orderApiRequest

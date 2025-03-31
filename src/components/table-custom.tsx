@@ -43,6 +43,62 @@ export function TableCustom({
   href: string
   loading?: boolean
 }) {
+  const renderSkeleton = () => {
+    return (
+      <>
+        {/* Tạo 5 dòng skeleton */}
+        {[1, 2, 3, 4, 5].map((index) => (
+          <TableRow key={index}>
+            {headerColumn.map((col) => (
+              <TableCell key={col.id} className={col.className}>
+                {/* Tùy chỉnh skeleton cho từng cột dựa vào id */}
+                {col.id === 1 && <Skeleton className='w-24 h-6' />}
+                {col.id === 2 && (
+                  <div className='space-y-1'>
+                    <Skeleton className='w-20 h-4' />
+                    <Skeleton className='w-16 h-3' />
+                  </div>
+                )}
+                {col.id === 3 && (
+                  <div className='space-y-1'>
+                    <Skeleton className='w-32 h-4' />
+                    <Skeleton className='w-24 h-3' />
+                  </div>
+                )}
+                {col.id === 4 && (
+                  <div className='flex items-center gap-2'>
+                    <Skeleton className='w-4 h-4 rounded-full' />
+                    <Skeleton className='w-8 h-4' />
+                  </div>
+                )}
+                {col.id === 5 && (
+                  <div className='flex items-center gap-2'>
+                    <Skeleton className='w-4 h-4 rounded-full' />
+                    <Skeleton className='w-8 h-4' />
+                  </div>
+                )}
+                {col.id === 6 && (
+                  <div className='space-y-1'>
+                    <Skeleton className='w-24 h-4' />
+                    <Skeleton className='w-20 h-3' />
+                  </div>
+                )}
+                {col.id === 7 && (
+                  <div className='flex items-center gap-2'>
+                    <Skeleton className='w-4 h-4 rounded-full' />
+                    <Skeleton className='w-32 h-4' />
+                  </div>
+                )}
+                {col.id === 8 && <Skeleton className='w-20 h-6 rounded-full' />}
+                {col.id === 9 && <Skeleton className='w-8 h-8 rounded-full' />}
+              </TableCell>
+            ))}
+          </TableRow>
+        ))}
+      </>
+    )
+  }
+
   return (
     <Card>
       <CardContent className='p-6'>
@@ -57,23 +113,17 @@ export function TableCustom({
             </TableRow>
           </TableHeader>
           <TableBody>
-            {loading ? (
-              <TableRow>
-                <TableCell colSpan={headerColumn.length}>
-                  <Skeleton className='w-full h-24' />
-                </TableCell>
-              </TableRow>
-            ) : (
-              data.data.map((item, index) => (
-                <TableRow key={index}>
-                  {bodyColumn.map((col) => (
-                    <TableCell key={col.id} className={col.className ?? ''}>
-                      {col.render(item)}
-                    </TableCell>
-                  ))}
-                </TableRow>
-              ))
-            )}
+            {loading
+              ? renderSkeleton()
+              : data.data.map((item, index) => (
+                  <TableRow key={index}>
+                    {bodyColumn.map((col) => (
+                      <TableCell key={col.id} className={col.className ?? ''}>
+                        {col.render(item)}
+                      </TableCell>
+                    ))}
+                  </TableRow>
+                ))}
           </TableBody>
         </Table>
       </CardContent>
@@ -81,7 +131,7 @@ export function TableCustom({
         <div className='flex justify-between items-center w-full'>
           <div className='text-xs text-muted-foreground'>
             {loading ? (
-              <Skeleton className='w-20 h-6' />
+              <Skeleton className='w-32 h-4' />
             ) : (
               <p>
                 Hiện <strong>{data.data.length}</strong> trên <strong>{data.pagination.totalItem}</strong> kết quả
@@ -89,7 +139,17 @@ export function TableCustom({
             )}
           </div>
 
-          <div>{loading ? null : <PaginationTable href={href} totalPage={data.pagination.totalPage} />}</div>
+          <div>
+            {loading ? (
+              <div className='flex items-center gap-1'>
+                <Skeleton className='w-8 h-8 rounded-md' />
+                <Skeleton className='w-8 h-8 rounded-md' />
+                <Skeleton className='w-8 h-8 rounded-md' />
+              </div>
+            ) : (
+              <PaginationTable href={href} totalPage={data.pagination.totalPage} />
+            )}
+          </div>
         </div>
       </CardFooter>
     </Card>

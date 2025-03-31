@@ -68,7 +68,7 @@ export function MultiSelect({ options, selected, onChange, placeholder = 'Chọn
         }}
       >
         {selected.map((option) => (
-          <Badge key={option.value} variant='secondary' className='px-2 py-1 h-7 gap-1 bg-slate-100 hover:bg-slate-200'>
+          <Badge key={option.value} variant='secondary' className='px-2 py-1 h-7 gap-1 bg-slate-400 hover:bg-slate-500'>
             {option.label}
             <button
               type='button'

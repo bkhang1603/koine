@@ -73,7 +73,7 @@ export default function LoginForm({ className }: { className?: string }) {
             router.push('/salesman')
             break
           case 'SUPPORTER':
-            router.push('/supporter')
+            router.push('/support')
             break
           case 'CONTENT_CREATOR':
             router.push('/content-creator')

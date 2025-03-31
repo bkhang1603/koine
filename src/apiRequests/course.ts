@@ -1,4 +1,5 @@
 import http from '@/lib/http'
+import { GetCourseDetailAdminResType, GetCoursesListAdminResType } from '@/schemaValidations/admin.schema'
 import {
   AllCoursesForCustomResType,
   CategoryCoursesResType,
@@ -14,7 +15,13 @@ import {
   LessonsResType,
   PreviewLessonsResType,
   UserCourseProgressResType,
-  UserCoursesResType
+  UserCoursesResType,
+  CreateCategoryCourseBodyType,
+  CreateCategoryCourseResType,
+  DeleteCategoryCourseResType,
+  GetCategoryCourseDetailResType,
+  UpdateCategoryCourseBodyType,
+  UpdateCategoryCourseResType
 } from '@/schemaValidations/course.schema'
 import { OnlyMessageResType } from '@/schemaValidations/special.schema'
 
@@ -71,7 +78,7 @@ const courseApiRequest = {
   enrollCourse: (id: string) => http.post<OnlyMessageResType>(`/courses/enroll/${id}`, {}),
   getUserCourses: () => http.get<UserCoursesResType>('/course-enrollment/enrolled'),
   updateCourseProgress: (lessonId: string) => http.post<OnlyMessageResType>('/user-progresses', { lessonId }),
-  getCategoryCourses: () => http.get<CategoryCoursesResType>(`/category-courses`),
+  // getCategoryCourses: () => http.get<CategoryCoursesResType>(`/category-courses`),
   // getCategoryCourses with caching
   getCategoryCoursesCache: () =>
     http.get<CategoryCoursesResType>(`/category-courses`, { cache: 'force-cache', next: { revalidate: 24 * 60 * 60 } }),
@@ -83,10 +90,40 @@ const courseApiRequest = {
   getLesson: (id: string) => http.get<LessonResType>(`/lessons/detail/${id}`),
   getCourseReview: (id: string) => http.get<CourseReviewResType>(`/courses/${id}/reviews`),
   getAllCoursesForCustom: () => http.get<AllCoursesForCustomResType>(`/courses/all-basic-course-info`),
+  getCoursesAdmin: ({
+    page_index,
+    page_size,
+    keyword
+  }: {
+    page_index?: number | undefined
+    page_size?: number | undefined
+    keyword?: string | string[] | undefined
+  }) =>
+    http.get<GetCoursesListAdminResType>(`/courses?page_index=${page_index}&page_size=${page_size}&keyword=${keyword}`),
+  getCourseDetailAdmin: ({ courseId }: { courseId: string }) =>
+    http.get<GetCourseDetailAdminResType>(`courses/${courseId}`),
   getPreviewLessons: ({ id, limit }: { id: string; limit: number }) =>
     http.get<PreviewLessonsResType>(`lessons/${id}/preview?limit=${limit}`),
   createCourseCustom: (data: CreateCourseCustomBodyType) =>
-    http.post<CreateCourseCustomResType>('/course-customs/request-custom-course', data)
+    http.post<CreateCourseCustomResType>('/course-customs/request-custom-course', data),
+  getCategoryCourses: ({
+    page_index,
+    page_size,
+    keyword
+  }: {
+    page_index?: number | undefined
+    page_size?: number | undefined
+    keyword?: string | string[] | undefined
+  }) =>
+    http.get<CategoryCoursesResType>(
+      `/category-courses?${keyword ? `keyword=${keyword}` : ''}${page_index ? `&page_index=${page_index}` : ''}${page_size ? `&page_size=${page_size}` : ''}`
+    ),
+  createCategoryCourse: (data: CreateCategoryCourseBodyType) =>
+    http.post<CreateCategoryCourseResType>('/category-courses', data),
+  getCategoryCourseDetail: (id: string) => http.get<GetCategoryCourseDetailResType>(`/category-courses/${id}`),
+  updateCategoryCourse: (id: string, data: UpdateCategoryCourseBodyType) =>
+    http.put<UpdateCategoryCourseResType>(`/category-courses/${id}`, data),
+  deleteCategoryCourse: (id: string) => http.delete<DeleteCategoryCourseResType>(`/category-courses/${id}`)
 }
 
 export default courseApiRequest

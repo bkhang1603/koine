@@ -329,3 +329,39 @@ export const formatPrice = (price: number) => {
     currency: 'VND'
   }).format(price)
 }
+
+export const formatLevel = (level: string) => {
+  switch (level) {
+    case 'ALL':
+      return 'Tất cả'
+    case 'BEGINNER':
+      return 'Cơ bản'
+    case 'INTERMEDIATE':
+      return 'Trung bình'
+    case 'ADVANCED':
+      return 'Nâng cao'
+    default:
+      return level
+  }
+}
+
+export const formatRole = (role: string) => {
+  switch (role) {
+    case 'ADULT':
+      return 'Phụ huynh'
+    case 'CHILD':
+      return 'Trẻ em'
+    case 'CONTENT_CREATOR':
+      return 'Người tạo nội dung'
+    case 'SUPPORTER':
+      return 'Hỗ trợ'
+    case 'EXPERT':
+      return 'Chuyên gia'
+    case 'SALESMAN':
+      return 'Bán hàng'
+    case 'MANAGER':
+      return 'Quản lý'
+    default:
+      return role
+  }
+}
