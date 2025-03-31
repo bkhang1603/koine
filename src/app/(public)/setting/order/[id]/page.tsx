@@ -4,10 +4,22 @@ import { use } from 'react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Separator } from '@/components/ui/separator'
-import { Package, ArrowLeft, Clock, BookOpen, AlertCircle, Package2, Tag, ShoppingCart } from 'lucide-react'
+import {
+  Package,
+  ArrowLeft,
+  Clock,
+  BookOpen,
+  AlertCircle,
+  Package2,
+  Tag,
+  ShoppingCart,
+  CreditCard,
+  Wallet,
+  BanknoteIcon
+} from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
-import { useGetOrder, useUpdatePaymentMethodMutation } from '@/queries/useOrder'
+import { useGetOrder, useUpdatePaymentMethodMutation, useRePurchaseOrderMutation } from '@/queries/useOrder'
 import { format } from 'date-fns'
 import { vi } from 'date-fns/locale'
 import { OrderDetailSkeleton } from '@/components/public/parent/setting/order/OrderDetailSkeleton'
@@ -16,6 +28,7 @@ import { CancelOrderDialog } from '@/components/public/parent/setting/order/Canc
 import { toast } from '@/components/ui/use-toast'
 import configRoute from '@/config/route'
 import { SettingBreadcrumb } from '@/components/public/parent/setting/SettingBreadcrumb'
+import { handleErrorApi } from '@/lib/utils'
 
 // Helper để lấy màu và văn bản cho trạng thái đơn hàng
 const getOrderStatusConfig = (status: string) => {
@@ -35,6 +48,7 @@ export default function OrderDetailPage(props: { params: Promise<{ id: string }>
   const params = use(props.params)
   const { isLoading, error, data } = useGetOrder({ id: params.id })
   const updatePaymentMethodMutation = useUpdatePaymentMethodMutation({ id: params.id })
+  const rePurchaseOrderMutation = useRePurchaseOrderMutation()
 
   const order = data?.payload.data
 
@@ -86,9 +100,31 @@ export default function OrderDetailPage(props: { params: Promise<{ id: string }>
         description: 'Phương thức thanh toán đã được cập nhật'
       })
     } catch (error) {
-      console.log(error)
+      handleErrorApi({
+        error
+      })
     }
   }
+
+  const handleRePurchase = async () => {
+    try {
+      if (rePurchaseOrderMutation.isPending) return
+
+      const res = await rePurchaseOrderMutation.mutateAsync({
+        id: order.id
+      })
+
+      if (res?.payload?.data?.paymentLink) {
+        window.location.href = res.payload.data.paymentLink
+      }
+    } catch (error) {
+      handleErrorApi({
+        error
+      })
+    }
+  }
+
+  const hasOnlyCourses = order.orderDetails.every((item) => item.courseId && item.course)
 
   const orderBreadcrumbItems = [
     { label: 'Đơn hàng', href: configRoute.setting.order },
@@ -310,63 +346,66 @@ export default function OrderDetailPage(props: { params: Promise<{ id: string }>
 
               {canCancel && (
                 <div className='pt-2 space-y-3'>
-                  {/* Thêm button đổi phương thức thanh toán */}
-                  <Button
-                    className='w-full border border-primary/30 bg-primary/5 hover:bg-primary/10 hover:text-primary/80 text-primary flex items-center justify-center gap-2'
-                    variant='outline'
-                    onClick={handleUpdatePaymentMethod}
-                    disabled={updatePaymentMethodMutation.isPending}
-                  >
-                    {updatePaymentMethodMutation.isPending ? (
-                      <>
-                        <span className='h-4 w-4 animate-spin rounded-full border-2 border-primary border-r-transparent'></span>
-                        <span>Đang cập nhật...</span>
-                      </>
-                    ) : (
-                      <>
-                        {order.payMethod === 'COD' ? (
+                  {/* Nút thanh toán ngay khi phương thức là Banking */}
+                  {order.payMethod === 'BANKING' && (
+                    <>
+                      <Button
+                        className='w-full'
+                        onClick={handleRePurchase}
+                        disabled={rePurchaseOrderMutation.isPending}
+                      >
+                        {rePurchaseOrderMutation.isPending ? (
                           <>
-                            <svg
-                              xmlns='http://www.w3.org/2000/svg'
-                              width='16'
-                              height='16'
-                              viewBox='0 0 24 24'
-                              fill='none'
-                              stroke='currentColor'
-                              strokeWidth='2'
-                              strokeLinecap='round'
-                              strokeLinejoin='round'
-                              className='lucide lucide-credit-card'
-                            >
-                              <rect width='20' height='14' x='2' y='5' rx='2' />
-                              <line x1='2' x2='22' y1='10' y2='10' />
-                            </svg>
-                            <span>Đổi sang chuyển khoản</span>
+                            <span className='h-4 w-4 animate-spin rounded-full border-2 border-white border-r-transparent mr-2'></span>
+                            <span>Đang xử lý...</span>
                           </>
                         ) : (
                           <>
-                            <svg
-                              xmlns='http://www.w3.org/2000/svg'
-                              width='16'
-                              height='16'
-                              viewBox='0 0 24 24'
-                              fill='none'
-                              stroke='currentColor'
-                              strokeWidth='2'
-                              strokeLinecap='round'
-                              strokeLinejoin='round'
-                              className='lucide lucide-wallet'
-                            >
-                              <path d='M21 12V7H5a2 2 0 0 1 0-4h14v4' />
-                              <path d='M3 5v14a2 2 0 0 0 2 2h16v-5' />
-                              <path d='M18 12a2 2 0 0 0 0 4h4v-4Z' />
-                            </svg>
-                            <span>Đổi sang thanh toán COD</span>
+                            <BanknoteIcon className='w-4 h-4 mr-2' />
+                            Thanh toán ngay
                           </>
                         )}
-                      </>
-                    )}
-                  </Button>
+                      </Button>
+
+                      <div className='relative flex items-center w-full gap-3'>
+                        <div className='h-[1px] flex-1 bg-gray-200'></div>
+                        <span className='text-sm text-gray-500 flex-shrink-0'>hoặc</span>
+                        <div className='h-[1px] flex-1 bg-gray-200'></div>
+                      </div>
+                    </>
+                  )}
+
+                  {/* Nút đổi phương thức thanh toán */}
+                  {/* Chỉ cho phép đổi sang COD nếu đơn hàng có product */}
+                  {(!hasOnlyCourses || (hasOnlyCourses && order.payMethod === 'COD')) && (
+                    <Button
+                      className='w-full border border-primary/30 bg-primary/5 hover:bg-primary/10 hover:text-primary/80 text-primary flex items-center justify-center gap-2'
+                      variant='outline'
+                      onClick={handleUpdatePaymentMethod}
+                      disabled={updatePaymentMethodMutation.isPending}
+                    >
+                      {updatePaymentMethodMutation.isPending ? (
+                        <>
+                          <span className='h-4 w-4 animate-spin rounded-full border-2 border-primary border-r-transparent'></span>
+                          <span>Đang cập nhật...</span>
+                        </>
+                      ) : (
+                        <>
+                          {order.payMethod === 'COD' ? (
+                            <>
+                              <CreditCard className='w-4 h-4 mr-2' />
+                              <span>Đổi sang chuyển khoản</span>
+                            </>
+                          ) : (
+                            <>
+                              <Wallet className='w-4 h-4 mr-2' />
+                              <span>Đổi sang thanh toán COD</span>
+                            </>
+                          )}
+                        </>
+                      )}
+                    </Button>
+                  )}
 
                   <CancelOrderDialog orderId={order.id} orderCode={order.orderCode} onCancelSuccess={() => {}} />
                 </div>

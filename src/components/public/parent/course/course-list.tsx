@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button'
 import { BookOpen, RefreshCw } from 'lucide-react'
 import Link from 'next/link'
 import configRoute from '@/config/route'
+import PaginationCustom from '@/components/pagination-custom'
 
 async function CourseList({ searchParams }: { searchParams?: searchParams }) {
   let courseData: CoursesResType['data'] = []
@@ -26,7 +27,7 @@ async function CourseList({ searchParams }: { searchParams?: searchParams }) {
   const data = await wrapServerApi(() =>
     courseApiRequest.getCourses({
       page_index: page_index,
-      page_size: 12,
+      page_size: 9,
       keyword: keyword,
       sort: sort,
       range: range,
@@ -35,6 +36,10 @@ async function CourseList({ searchParams }: { searchParams?: searchParams }) {
   )
 
   courseData = data?.payload?.data ?? []
+
+  if (!data) {
+    return null
+  }
 
   return (
     <section className='col-span-3'>
@@ -74,11 +79,18 @@ async function CourseList({ searchParams }: { searchParams?: searchParams }) {
       )}
 
       {courseData.length > 0 && (
-        <div className='grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 mt-6'>
-          {courseData.map((course) => (
-            <CourseCard key={course.id} course={course} />
-          ))}
-        </div>
+        <>
+          <div className='grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 mt-6'>
+            {courseData.map((course) => (
+              <CourseCard key={course.id} course={course} />
+            ))}
+          </div>
+          <PaginationCustom
+            totalPage={data?.payload?.pagination.totalPage ?? 1}
+            href={configRoute.course}
+            className='mt-6'
+          />
+        </>
       )}
     </section>
   )

@@ -155,7 +155,30 @@ export const UserCourseProgressData = z.object({
           sequence: z.number(),
           status: z.string()
         })
-      )
+      ),
+      questions: z
+        .array(
+          z.object({
+            isDeleted: z.boolean(),
+            createdAt: z.string(),
+            updatedAt: z.string(),
+            id: z.string(),
+            content: z.string(),
+            numCorrect: z.number(),
+            questionOptions: z.array(
+              z.object({
+                isDeleted: z.boolean(),
+                createdAt: z.string(),
+                updatedAt: z.string(),
+                id: z.string(),
+                questionId: z.string(),
+                optionData: z.string(),
+                isCorrect: z.boolean()
+              })
+            )
+          })
+        )
+        .optional()
     })
   ),
   totalLessonsInCourse: z.number(),

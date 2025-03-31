@@ -139,7 +139,36 @@ export const updatePaymentMethodBodyRes = z.object({
 })
 
 export const rePurchaseOrderRes = z.object({
+  data: z.object({
+    paymentLink: z.string(),
+    orderId: z.string()
+  }),
   message: z.string()
+})
+
+export const refundOrder = z.object({
+  orderId: z.string(),
+  orderCode: z.string(),
+  paymentId: z.string(),
+  amount: z.number(),
+  refundReason: z.string(),
+  requestDate: z.string(),
+  customerName: z.string(),
+  orderDate: z.string(),
+  orderStatus: z.enum(OrderStatusValues)
+})
+
+export const refundOrderRes = z.object({
+  data: z.array(refundOrder),
+  message: z.string(),
+  statusCode: z.number(),
+  pagination: z.object({
+    totalItem: z.number(),
+    pageSize: z.number(),
+    currentPage: z.number(),
+    maxPageSize: z.number(),
+    totalPage: z.number()
+  })
 })
 
 export type OrderBody = z.infer<typeof orderBody>
@@ -163,3 +192,5 @@ export type UpdatePaymentMethodBody = z.TypeOf<typeof updatePaymentMethodBody>
 export type UpdatePaymentMethodBodyRes = z.TypeOf<typeof updatePaymentMethodBodyRes>
 
 export type RePurchaseOrderRes = z.TypeOf<typeof rePurchaseOrderRes>
+
+export type RefundOrderResType = z.TypeOf<typeof refundOrderRes>

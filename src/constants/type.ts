@@ -89,8 +89,8 @@ export const OrderStatusValues = [
 ] as const
 
 export const PaymentMethod = {
-  COD: 'COD',
-  BANKING: 'BANKING'
+  BANKING: 'BANKING',
+  COD: 'COD'
 } as const
 
-export const PaymentMethodValues = [PaymentMethod.COD, PaymentMethod.BANKING] as const
+export const PaymentMethodValues = [PaymentMethod.BANKING, PaymentMethod.COD] as const

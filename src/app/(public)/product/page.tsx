@@ -3,9 +3,6 @@ import List from '@/components/public/parent/product/list'
 import images from '@/assets/images'
 import { searchParams } from '@/types/query'
 import Image from 'next/image'
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet'
-import { Button } from '@/components/ui/button'
-import { SlidersHorizontal } from 'lucide-react'
 import MobileFilter from '@/components/public/parent/product/mobile-filter'
 
 async function ProductPage(props: { searchParams?: Promise<searchParams> }) {
@@ -26,20 +23,7 @@ async function ProductPage(props: { searchParams?: Promise<searchParams> }) {
 
       <div className='container mt-8'>
         <div className='flex md:hidden justify-end mb-4'>
-          <Sheet>
-            <SheetTrigger asChild>
-              <Button variant='outline' size='sm' className='gap-2'>
-                <SlidersHorizontal className='w-4 h-4' />
-                Bộ lọc
-              </Button>
-            </SheetTrigger>
-            <SheetContent side='left' className='w-[300px] p-0 pb-16'>
-              <SheetHeader className='p-4 border-b'>
-                <SheetTitle>Bộ lọc sản phẩm</SheetTitle>
-              </SheetHeader>
-              <MobileFilter />
-            </SheetContent>
-          </Sheet>
+          <MobileFilter />
         </div>
 
         <div className='grid grid-cols-1 md:grid-cols-4 gap-6'>
@@ -65,5 +49,4 @@ async function ProductPage(props: { searchParams?: Promise<searchParams> }) {
     </main>
   )
 }
-
 export default ProductPage

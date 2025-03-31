@@ -322,3 +322,10 @@ export const formatCurrencyWithoutSymbol = (value: number) => {
 export const formatDate = (date: string) => {
   return format(new Date(date), 'dd/MM/yyyy')
 }
+
+export const formatPrice = (price: number) => {
+  return new Intl.NumberFormat('vi-VN', {
+    style: 'currency',
+    currency: 'VND'
+  }).format(price)
+}

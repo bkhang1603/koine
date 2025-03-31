@@ -103,7 +103,12 @@ function CommentModal({
           )}
 
           {commentData.map((comment: any) => (
-            <CommentItem key={comment.id} comment={comment} login={role} />
+            <CommentItem
+              key={comment.id}
+              comment={comment}
+              login={role}
+              maxDepth={2} // Giới hạn độ sâu tối đa là 2 cấp
+            />
           ))}
 
           {/* Load more button */}

@@ -8,7 +8,7 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import { Label } from '@/components/ui/label'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { useAppStore } from '@/components/app-provider'
-import { ChevronRight, MapPin, Plus, ShoppingCart, ArrowLeft } from 'lucide-react'
+import { ChevronRight, MapPin, Plus, ShoppingCart, ArrowLeft, Loader2 } from 'lucide-react'
 import Link from 'next/link'
 import configRoute from '@/config/route'
 import { useGetAccountAddress } from '@/queries/useAccount'
@@ -25,15 +25,15 @@ export default function Checkout() {
   const checkoutBuyNow = useAppStore((state) => state.checkoutBuyNow)
   const pickAddress = useAppStore((state) => state.pickAddress)
   const setPickAddress = useAppStore((state) => state.setPickAddress)
-  const [type, setType] = useState<'cart' | 'buyNow'>('cart')
+  const [type, setType] = useState<'checkoutData' | 'checkoutBuyNow'>('checkoutData')
   const checkoutBuyNowFromLocalStorage = getCheckoutBuyNowFromLocalStorage()
   const checkoutFormLocalStorage = getCheckoutDataFromLocalStorage()
 
   useEffect(() => {
     if (checkoutFormLocalStorage) {
-      setType('cart')
+      setType('checkoutData')
     } else if (checkoutBuyNowFromLocalStorage) {
-      setType('buyNow')
+      setType('checkoutBuyNow')
     }
   }, [checkoutBuyNow, checkoutBuyNowFromLocalStorage, checkoutFormLocalStorage])
 
@@ -47,7 +47,7 @@ export default function Checkout() {
   const [shippingMethod, setShippingMethod] = useState<(typeof DeliveryMethod)[keyof typeof DeliveryMethod]>(
     DeliveryMethod.STANDARD
   )
-  const [payMethod, setPayMethod] = useState<(typeof PaymentMethod)[keyof typeof PaymentMethod]>(PaymentMethod.COD)
+  const [payMethod, setPayMethod] = useState<(typeof PaymentMethod)[keyof typeof PaymentMethod]>(PaymentMethod.BANKING)
 
   // Set selectedAddressId after addresses are loaded
   useEffect(() => {
@@ -57,6 +57,21 @@ export default function Checkout() {
       setPickAddress(defaultAddress)
     }
   }, [addresses, pickAddress, setPickAddress])
+
+  // Thêm các biến kiểm tra loại đơn hàng
+  const hasPhysicalItems = useMemo(() => {
+    if (type === 'checkoutData') {
+      return checkoutData?.cartDetails.some((item) => item.product !== null)
+    }
+    return checkoutBuyNow?.product !== null
+  }, [type, checkoutData, checkoutBuyNow])
+
+  // Tính tổng tiền dựa trên loại đơn hàng
+  const calculateTotal = useMemo(() => {
+    const baseAmount = type === 'checkoutData' ? checkoutData?.totalAmount : checkoutBuyNow?.totalPrice
+    if (!hasPhysicalItems) return baseAmount || 0 // Không có phí ship cho đơn chỉ có khóa học
+    return (baseAmount || 0) + (shippingMethod === DeliveryMethod.EXPEDITED ? 50000 : 26000)
+  }, [type, checkoutData, checkoutBuyNow, hasPhysicalItems, shippingMethod])
 
   const handleCreateOrder = async () => {
     if (createOrderMutation.isPending) return
@@ -88,9 +103,17 @@ export default function Checkout() {
           setOrderId(res.payload.data.orderId)
 
           router.push(res.payload.data.paymentLink)
+          toast({
+            title: 'Đặt hàng thành công',
+            description: 'Đơn hàng của bạn đã được tạo'
+          })
         } else {
           // Nếu không có link thanh toán, chuyển hướng đến trang lịch sử đơn hàng
           router.push(configRoute.setting.order)
+          toast({
+            title: 'Đặt hàng thành công',
+            description: 'Đơn hàng của bạn đã được tạo'
+          })
         }
       } else {
         // Xử lý khi không có res hoặc data không đúng format
@@ -120,7 +143,7 @@ export default function Checkout() {
         <div className='lg:col-span-3'>
           <Card className='mb-4 p-4'>
             <h2 className='font-semibold mb-4'>Sản phẩm</h2>
-            {type === 'cart' &&
+            {type === 'checkoutData' &&
               checkoutData?.cartDetails.map((item, index) => (
                 <CardContent
                   className={`p-0 pb-4 ${index !== checkoutData.cartDetails.length - 1 ? 'border-b mb-4' : ''}`}
@@ -163,7 +186,7 @@ export default function Checkout() {
                 </CardContent>
               ))}
 
-            {type === 'buyNow' && (
+            {type === 'checkoutBuyNow' && (
               <CardContent className='p-0 pb-4'>
                 {checkoutBuyNow?.product !== null && (
                   <div className='flex items-start'>
@@ -203,26 +226,29 @@ export default function Checkout() {
             )}
           </Card>
 
-          <Card className='mb-4'>
-            <CardContent className='p-4'>
-              <h2 className='font-medium mb-4'>Phương thức vận chuyển</h2>
-              <RadioGroup
-                value={shippingMethod}
-                onValueChange={(value: (typeof DeliveryMethod)[keyof typeof DeliveryMethod]) =>
-                  setShippingMethod(value)
-                }
-              >
-                <div className='flex items-center space-x-2 mb-2'>
-                  <RadioGroupItem value={DeliveryMethod.STANDARD} id='standard' />
-                  <Label htmlFor='standard'>Giao hàng tiêu chuẩn</Label>
-                </div>
-                <div className='flex items-center space-x-2 mb-2'>
-                  <RadioGroupItem value={DeliveryMethod.EXPEDITED} id='express' />
-                  <Label htmlFor='express'>Giao hàng hỏa tốc (Chỉ áp dụng cho TP.HCM)</Label>
-                </div>
-              </RadioGroup>
-            </CardContent>
-          </Card>
+          {/* Chỉ hiện shipping method khi có sản phẩm vật lý */}
+          {hasPhysicalItems && (
+            <Card className='mb-4'>
+              <CardContent className='p-4'>
+                <h2 className='font-medium mb-4'>Phương thức vận chuyển</h2>
+                <RadioGroup
+                  value={shippingMethod}
+                  onValueChange={(value: (typeof DeliveryMethod)[keyof typeof DeliveryMethod]) =>
+                    setShippingMethod(value)
+                  }
+                >
+                  <div className='flex items-center space-x-2 mb-2'>
+                    <RadioGroupItem value={DeliveryMethod.STANDARD} id='standard' />
+                    <Label htmlFor='standard'>Giao hàng tiêu chuẩn</Label>
+                  </div>
+                  <div className='flex items-center space-x-2 mb-2'>
+                    <RadioGroupItem value={DeliveryMethod.EXPEDITED} id='express' />
+                    <Label htmlFor='express'>Giao hàng hỏa tốc (Chỉ áp dụng cho TP.HCM)</Label>
+                  </div>
+                </RadioGroup>
+              </CardContent>
+            </Card>
+          )}
 
           <Card>
             <CardContent className='p-4'>
@@ -236,10 +262,13 @@ export default function Checkout() {
                   <Label htmlFor='BANKING'>Thanh toán qua ngân hàng</Label>
                 </div>
 
-                <div className='flex items-center space-x-2 mb-2'>
-                  <RadioGroupItem value='COD' id='COD' />
-                  <Label htmlFor='COD'>Thanh toán khi nhận hàng</Label>
-                </div>
+                {/* Chỉ hiện COD khi có sản phẩm vật lý */}
+                {hasPhysicalItems && (
+                  <div className='flex items-center space-x-2 mb-2'>
+                    <RadioGroupItem value='COD' id='COD' />
+                    <Label htmlFor='COD'>Thanh toán khi nhận hàng</Label>
+                  </div>
+                )}
               </RadioGroup>
             </CardContent>
           </Card>
@@ -252,52 +281,55 @@ export default function Checkout() {
         </div>
 
         <div className='lg:col-span-1'>
-          <Card className='mb-4'>
-            <CardContent className='p-4'>
-              <div className='flex items-center justify-between mb-2'>
-                <h2 className='font-semibold'>Giao tới</h2>
-                <Button variant='link' className='p-0 h-auto text-blue-600' onClick={() => setShowAddressModal(true)}>
-                  Thay đổi
-                </Button>
-              </div>
-
-              {addresses.length === 0 ? (
-                <div className='space-y-3 mt-4'>
-                  <div className='flex items-center gap-2'>
-                    <MapPin className='w-6 h-6 text-yellow-500' />
-                    <p className='text-gray-500 text-sm'>Chưa có địa chỉ giao hàng</p>
-                  </div>
-
-                  <Button variant='outline' className='w-full' asChild>
-                    <Link href={configRoute.setting.address}>
-                      <Plus className='w-4 h-4 mr-2' />
-                      Thêm địa chỉ giao hàng
-                    </Link>
+          {/* Chỉ hiện địa chỉ giao hàng khi có sản phẩm vật lý */}
+          {hasPhysicalItems && (
+            <Card className='mb-4'>
+              <CardContent className='p-4'>
+                <div className='flex items-center justify-between mb-2'>
+                  <h2 className='font-semibold'>Giao tới</h2>
+                  <Button variant='link' className='p-0 h-auto text-blue-600' onClick={() => setShowAddressModal(true)}>
+                    Thay đổi
                   </Button>
                 </div>
-              ) : pickAddress ? (
-                <div>
-                  <div className='flex items-center gap-2'>
-                    <span className='font-medium'>{pickAddress.name}</span>
-                    <span className='text-muted-foreground'>|</span>
-                    <span>{pickAddress.phone}</span>
-                    {pickAddress.isDefault && (
-                      <>
-                        <span className='text-muted-foreground'>|</span>
-                        <span className='text-xs bg-primary/10 text-primary px-2 py-1 rounded-full font-medium'>
-                          Mặc định
-                        </span>
-                      </>
-                    )}
+
+                {addresses.length === 0 ? (
+                  <div className='space-y-3 mt-4'>
+                    <div className='flex items-center gap-2'>
+                      <MapPin className='w-6 h-6 text-yellow-500' />
+                      <p className='text-gray-500 text-sm'>Chưa có địa chỉ giao hàng</p>
+                    </div>
+
+                    <Button variant='outline' className='w-full' asChild>
+                      <Link href={configRoute.setting.address}>
+                        <Plus className='w-4 h-4 mr-2' />
+                        Thêm địa chỉ giao hàng
+                      </Link>
+                    </Button>
                   </div>
-                  <div className='text-muted-foreground'>
-                    <p className='text-green-500 font-medium text-sm'>{pickAddress.tag}</p>
-                    <p className='text-sm'>{pickAddress.address}</p>
+                ) : pickAddress ? (
+                  <div>
+                    <div className='flex items-center gap-2'>
+                      <span className='font-medium'>{pickAddress.name}</span>
+                      <span className='text-muted-foreground'>|</span>
+                      <span>{pickAddress.phone}</span>
+                      {pickAddress.isDefault && (
+                        <>
+                          <span className='text-muted-foreground'>|</span>
+                          <span className='text-xs bg-primary/10 text-primary px-2 py-1 rounded-full font-medium'>
+                            Mặc định
+                          </span>
+                        </>
+                      )}
+                    </div>
+                    <div className='text-muted-foreground'>
+                      <p className='text-green-500 font-medium text-sm'>{pickAddress.tag}</p>
+                      <p className='text-sm'>{pickAddress.address}</p>
+                    </div>
                   </div>
-                </div>
-              ) : null}
-            </CardContent>
-          </Card>
+                ) : null}
+              </CardContent>
+            </Card>
+          )}
 
           <Card>
             <CardContent className='p-4'>
@@ -305,35 +337,46 @@ export default function Checkout() {
               <div className='space-y-2 mb-2 border-b border-gray-300 pb-2'>
                 <div className='flex justify-between text-sm'>
                   <span className='text-gray-600'>Tạm tính</span>
-                  {type === 'cart' && <span>{checkoutData?.totalAmount.toLocaleString()}đ</span>}
-                  {type === 'buyNow' && <span>{checkoutBuyNow?.totalPrice.toLocaleString()}đ</span>}
+                  <span>
+                    {(type === 'checkoutData'
+                      ? checkoutData?.totalAmount
+                      : checkoutBuyNow?.totalPrice
+                    )?.toLocaleString()}
+                    đ
+                  </span>
                 </div>
-                <div className='flex justify-between text-sm'>
-                  <span className='text-gray-600'>Phí vận chuyển</span>
-                  <span>{shippingMethod === DeliveryMethod.EXPEDITED ? '50,000đ' : '26,000đ'}</span>
-                </div>
-                <div className='flex justify-between text-sm text-green-600'>
-                  <span>Giảm giá vận chuyển</span>
-                  <span>0,000đ</span>
-                </div>
+
+                {/* Chỉ hiện phí ship khi có sản phẩm vật lý */}
+                {hasPhysicalItems && (
+                  <>
+                    <div className='flex justify-between text-sm'>
+                      <span className='text-gray-600'>Phí vận chuyển</span>
+                      <span>{shippingMethod === DeliveryMethod.EXPEDITED ? '50,000đ' : '26,000đ'}</span>
+                    </div>
+                    <div className='flex justify-between text-sm text-green-600'>
+                      <span>Giảm giá vận chuyển</span>
+                      <span>0,000đ</span>
+                    </div>
+                  </>
+                )}
               </div>
+
               <div className='flex justify-between font-medium'>
                 <span>Tổng tiền</span>
-                <span className='text-xl text-red-600'>
-                  {shippingMethod === DeliveryMethod.EXPEDITED
-                    ? (
-                        ((type === 'cart' ? checkoutData?.totalAmount : checkoutBuyNow?.totalPrice) ?? 0) + 50000
-                      ).toLocaleString()
-                    : (
-                        ((type === 'cart' ? checkoutData?.totalAmount : checkoutBuyNow?.totalPrice) ?? 0) + 26000
-                      ).toLocaleString()}
-                  đ
-                </span>
+                <span className='text-xl text-red-600'>{calculateTotal.toLocaleString()}đ</span>
               </div>
-              <p className='text-right text-xs text-gray-500 mt-1'>(Đã bao gồm VAT nếu có)</p>
 
-              <Button className='w-full mt-4 font-medium' onClick={handleCreateOrder} disabled={!pickAddress}>
-                {!pickAddress ? 'Vui lòng thêm địa chỉ giao hàng' : 'Đặt hàng'}
+              <Button
+                className='w-full mt-4 font-medium'
+                onClick={handleCreateOrder}
+                disabled={
+                  (hasPhysicalItems && !pickAddress) || // Yêu cầu địa chỉ nếu có sản phẩm vật lý
+                  createOrderMutation.isPending
+                }
+              >
+                {createOrderMutation.isPending && <Loader2 className='w-4 h-4 mr-2 animate-spin' />}
+                {hasPhysicalItems && !pickAddress && 'Vui lòng thêm địa chỉ giao hàng'}
+                {(!hasPhysicalItems || pickAddress) && !createOrderMutation.isPending && 'Đặt hàng'}
               </Button>
             </CardContent>
           </Card>

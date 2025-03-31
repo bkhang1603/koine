@@ -21,6 +21,9 @@ import Link from 'next/link'
 import { wrapServerApi } from '@/lib/server-utils'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import RecommendedCourses from '@/components/public/parent/course/recommended-courses'
+import { searchParams } from '@/types/query'
+import BuyNowButton from '@/components/public/parent/course/buy-now-button'
 
 const formatDuration = (minutes: number) => {
   const hours = Math.floor(minutes / 60)
@@ -43,10 +46,12 @@ const getLessonIcon = (type: string) => {
   }
 }
 
-export default async function CourseDetail(props: { params: Promise<{ id: string }> }) {
-  const params = await props.params
-
-  const { id } = params
+export default async function CourseDetail(props: {
+  params: Promise<{ id: string }>
+  searchParams: Promise<searchParams>
+}) {
+  const { id } = await props.params
+  const searchParams = await props.searchParams
 
   const data = await wrapServerApi(() => courseApiRequest.getCourse(id))
   const courseData = data?.payload?.data
@@ -171,10 +176,39 @@ export default async function CourseDetail(props: { params: Promise<{ id: string
                     )}
                   </div>
                   <div className='sm:hidden'>
-                    {courseData.price === 0 ? <EnrollButton id={courseData.id} /> : <CourseButton id={courseData.id} />}
+                    {courseData.price === 0 ? (
+                      <EnrollButton id={courseData.id} className='w-full h-12 text-base font-medium' />
+                    ) : (
+                      <CourseButton
+                        id={courseData.id}
+                        course={{
+                          id: courseData.id,
+                          title: courseData.title,
+                          imageUrl: courseData.imageBanner,
+                          price: courseData.price,
+                          discount: courseData.discount
+                        }}
+                        className='w-full h-12 text-base font-medium'
+                      />
+                    )}
                   </div>
                   <div className='hidden sm:block lg:hidden'>
-                    {courseData.price === 0 ? <EnrollButton id={courseData.id} /> : <CourseButton id={courseData.id} />}
+                    {courseData.price === 0 ? (
+                      <EnrollButton id={courseData.id} className='w-full h-12 text-base font-medium' />
+                    ) : (
+                      <CourseButton
+                        id={courseData.id}
+                        course={{
+                          id: courseData.id,
+                          title: courseData.title,
+                          imageUrl: courseData.imageBanner,
+                          price: courseData.price,
+                          discount: courseData.discount
+                        }}
+                        variant='outline'
+                        className='w-full h-12 text-base font-medium'
+                      />
+                    )}
                   </div>
                 </div>
               </Card>
@@ -296,7 +330,7 @@ export default async function CourseDetail(props: { params: Promise<{ id: string
               </TabsContent>
 
               <TabsContent value='reviews'>
-                <CourseReviews courseId={id} />
+                <CourseReviews courseId={id} searchParams={searchParams} />
               </TabsContent>
             </Tabs>
           </div>
@@ -354,12 +388,41 @@ export default async function CourseDetail(props: { params: Promise<{ id: string
                     </div>
                   </div>
 
-                  {/* Action Button */}
+                  {/* Action Buttons */}
                   {courseData.price === 0 ? (
-                    <EnrollButton id={courseData.id} />
+                    <div className='space-y-4'>
+                      <EnrollButton id={courseData.id} className='w-full h-12 text-base font-medium' />
+                      <p className='text-center text-sm text-gray-500'>Học ngay hôm nay</p>
+                    </div>
                   ) : (
                     <div className='space-y-4'>
-                      <CourseButton id={courseData.id} />
+                      <BuyNowButton
+                        course={{
+                          id: courseData.id,
+                          title: courseData.title,
+                          imageUrl: courseData.imageBanner,
+                          price: courseData.price,
+                          discount: courseData.discount
+                        }}
+                        className='w-full h-12 text-base font-medium'
+                      />
+                      <div className='relative flex items-center w-full gap-3'>
+                        <div className='h-[1px] flex-1 bg-gray-200'></div>
+                        <span className='text-sm text-gray-500 flex-shrink-0'>hoặc</span>
+                        <div className='h-[1px] flex-1 bg-gray-200'></div>
+                      </div>
+                      <CourseButton
+                        id={courseData.id}
+                        course={{
+                          id: courseData.id,
+                          title: courseData.title,
+                          imageUrl: courseData.imageBanner,
+                          price: courseData.price,
+                          discount: courseData.discount
+                        }}
+                        variant='outline'
+                        className='w-full h-12 text-base font-medium'
+                      />
                       <p className='text-center text-sm text-gray-500'>Hoàn tiền trong 30 ngày nếu không hài lòng</p>
                     </div>
                   )}
@@ -372,7 +435,43 @@ export default async function CourseDetail(props: { params: Promise<{ id: string
 
       {/* Fixed Mobile Action Button - Only visible on smallest screens */}
       <div className='fixed bottom-0 left-0 right-0 p-4 bg-white border-t border-gray-200 shadow-lg sm:hidden z-50'>
-        {courseData.price === 0 ? <EnrollButton id={courseData.id} /> : <CourseButton id={courseData.id} />}
+        {courseData.price === 0 ? (
+          <EnrollButton id={courseData.id} className='w-full h-12 text-base font-medium' />
+        ) : (
+          <div className='space-y-2'>
+            <BuyNowButton
+              course={{
+                id: courseData.id,
+                title: courseData.title,
+                imageUrl: courseData.imageBanner,
+                price: courseData.price,
+                discount: courseData.discount
+              }}
+              className='w-full h-12 text-base font-medium'
+            />
+            <div className='relative flex items-center w-full gap-3'>
+              <div className='h-[1px] flex-1 bg-gray-200'></div>
+              <span className='text-sm text-gray-500 flex-shrink-0'>hoặc</span>
+              <div className='h-[1px] flex-1 bg-gray-200'></div>
+            </div>
+            <CourseButton
+              id={courseData.id}
+              course={{
+                id: courseData.id,
+                title: courseData.title,
+                imageUrl: courseData.imageBanner,
+                price: courseData.price,
+                discount: courseData.discount
+              }}
+              variant='outline'
+              className='w-full h-12 text-base font-medium'
+            />
+          </div>
+        )}
+      </div>
+
+      <div className='container'>
+        <RecommendedCourses currentCourseId={courseData.id} categoryIds={courseData.categories?.map((cat) => cat.id)} />
       </div>
     </main>
   )
