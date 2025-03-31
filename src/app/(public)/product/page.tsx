@@ -29,9 +29,7 @@ async function ProductPage(props: { searchParams?: Promise<searchParams> }) {
       </div>
 
       <div className='container mt-8'>
-        <div className='flex md:hidden justify-end mb-4'>
-          <MobileFilter />
-        </div>
+        <div className='flex md:hidden justify-end mb-4'>{categories && <MobileFilter categories={categories} />}</div>
 
         <div className='grid grid-cols-1 md:grid-cols-4 gap-6'>
           <div className='hidden md:block'>{categories && <Filter categories={categories} />}</div>
