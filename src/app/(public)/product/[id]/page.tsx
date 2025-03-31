@@ -1,4 +1,4 @@
-import { Star, Heart, Share2, Truck, RotateCcw, ShieldCheck } from 'lucide-react'
+import { Star, Truck, RotateCcw, ShieldCheck } from 'lucide-react'
 import BreadCrumbCustom from '@/components/breadcrumb-custom'
 import ProductImage from '@/components/public/parent/product/product-image'
 import productApiRequest from '@/apiRequests/product'
@@ -15,7 +15,7 @@ export default async function ProductDetail(props: {
   const { id } = await props.params
   const searchParams = await props.searchParams
 
-  const data = await wrapServerApi(() => productApiRequest.getProduct(id))
+  const data = await wrapServerApi(() => productApiRequest.getProductCache(id))
   const product = data?.payload?.data
   const overallRating = data?.payload?.data.averageRating ?? 0
 
@@ -53,9 +53,9 @@ export default async function ProductDetail(props: {
                 className={`w-5 h-5 ${i <= Math.ceil(overallRating) ? 'text-yellow-400 fill-current' : 'text-gray-400 fill-current'}`}
               />
             ))}
-            <span className='ml-2 text-gray-600'>({product.totalRating} đánh giá)</span>
-            <Heart className='ml-4 w-5 h-5' />
-            <Share2 className='ml-4 w-5 h-5' />
+            <span className='ml-2 text-gray-600'>
+              {product.totalRating > 0 ? `(${product.totalRating} đánh giá)` : '(Chưa có đánh giá)'}
+            </span>
           </div>
 
           <AddToCartButton product={product} />

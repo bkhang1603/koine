@@ -24,7 +24,24 @@ const blogApiRequest = {
     search?: string | string[] | undefined
     page_size?: number | undefined
   }) => http.get<BlogsResType>(`/blogs?page_index=${page_index}&keyword=${search}&page_size=${page_size}`),
+  // getBlogs with caching
+  getBlogsCache: ({
+    page_index,
+    search,
+    page_size
+  }: {
+    page_index?: number | undefined
+    search?: string | string[] | undefined
+    page_size?: number | undefined
+  }) =>
+    http.get<BlogsResType>(`/blogs?page_index=${page_index}&keyword=${search}&page_size=${page_size}`, {
+      cache: 'force-cache',
+      next: { revalidate: 24 * 60 * 60 }
+    }),
   getBlog: (id: string) => http.get<BlogResType>(`/blogs/${id}`),
+  // getBlog with caching
+  getBlogCache: (id: string) =>
+    http.get<BlogResType>(`/blogs/${id}`, { cache: 'force-cache', next: { revalidate: 24 * 60 * 60 } }),
   createBlog: (data: BlogDataResType) => http.post<BlogBodyResType>('/blogs', data),
   updateBlog: (id: string, data: BlogUpdateBodyType) => http.put<OnlyMessageResType>(`/blogs/${id}`, data),
   deleteBlog: (id: string) => http.delete<OnlyMessageResType>(`/blogs/${id}`),

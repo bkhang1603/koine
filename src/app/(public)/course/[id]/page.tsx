@@ -53,7 +53,7 @@ export default async function CourseDetail(props: {
   const { id } = await props.params
   const searchParams = await props.searchParams
 
-  const data = await wrapServerApi(() => courseApiRequest.getCourse(id))
+  const data = await wrapServerApi(() => courseApiRequest.getCourseCache(id))
   const courseData = data?.payload?.data
 
   const limit = 2
@@ -66,7 +66,7 @@ export default async function CourseDetail(props: {
     <main className='min-h-screen bg-white'>
       {/* Banner */}
       <div className='relative h-[30vh] sm:h-[40vh] lg:h-[45vh] bg-gray-100'>
-        <Image src={courseData.imageBanner} alt='Course banner' fill className='object-cover' priority />
+        <Image src={courseData.imageBanner} alt='Course banner' fill className='object-cover' />
       </div>
 
       {/* Course Content */}

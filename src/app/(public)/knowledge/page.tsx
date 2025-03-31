@@ -8,6 +8,8 @@ import blogApiRequest from '@/apiRequests/blog'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { wrapServerApi } from '@/lib/server-utils'
 import { searchParams } from '@/types/query'
+import { Suspense } from 'react'
+import DynamicData from '@/components/public/parent/knowledge/dynamic-data'
 
 const categories = [
   { id: 'all', name: 'Tất cả', featured: true },
@@ -25,7 +27,7 @@ async function KnowledgePage(props: { searchParams?: Promise<searchParams> }) {
   const pageSize = 9 // 3 columns x 3 rows looks nice on desktop
 
   const data = await wrapServerApi(() =>
-    blogApiRequest.getBlogs({
+    blogApiRequest.getBlogsCache({
       page_index: currentPage,
       page_size: pageSize,
       search: ''
@@ -111,9 +113,12 @@ async function KnowledgePage(props: { searchParams?: Promise<searchParams> }) {
                       <span className='text-primary text-sm font-medium'>
                         {new Date(blog.createdAt).toLocaleDateString('vi-VN')}
                       </span>
-                      <span className='text-gray-500 text-sm'>
+                      {/* <span className='text-gray-500 text-sm'>
                         {blog.totalReact} lượt thích • {blog.totalComment} bình luận
-                      </span>
+                      </span> */}
+                      <Suspense fallback={<div className='w-32 h-4 bg-gray-200 animate-pulse rounded'></div>}>
+                        <DynamicData id={blog.id} />
+                      </Suspense>
                     </div>
 
                     {/* Title & Description */}

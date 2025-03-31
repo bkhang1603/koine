@@ -16,7 +16,6 @@ function CourseCard({ course }: { course: CoursesResType['data'][0] }) {
             width={400}
             height={400}
             className='w-full h-full object-cover rounded-lg'
-            priority={true}
           />
 
           {/* Discount Tag */}

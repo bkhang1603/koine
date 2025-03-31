@@ -1,18 +1,16 @@
 import courseApiRequest from '@/apiRequests/course'
 import CourseCard from '@/components/public/parent/course/course-card'
 import CustomInput from '@/components/public/parent/home/custom-input'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { wrapServerApi } from '@/lib/server-utils'
-import { CoursesResType } from '@/schemaValidations/course.schema'
 import { searchParams } from '@/types/query'
 import { Button } from '@/components/ui/button'
 import { BookOpen, RefreshCw } from 'lucide-react'
 import Link from 'next/link'
 import configRoute from '@/config/route'
 import PaginationCustom from '@/components/pagination-custom'
+import CourseSort from '@/components/public/parent/course/course-sort'
 
 async function CourseList({ searchParams }: { searchParams?: searchParams }) {
-  let courseData: CoursesResType['data'] = []
   const page_index = isNaN(Number(searchParams?.page_index)) ? 1 : Number(searchParams?.page_index)
   const keyword = searchParams?.search ?? ''
   const sortOptions = ['pa', 'pd', 'na', 'nd'] as const
@@ -25,7 +23,7 @@ async function CourseList({ searchParams }: { searchParams?: searchParams }) {
     .join('a%a')
 
   const data = await wrapServerApi(() =>
-    courseApiRequest.getCourses({
+    courseApiRequest.getCoursesCache({
       page_index: page_index,
       page_size: 9,
       keyword: keyword,
@@ -35,7 +33,7 @@ async function CourseList({ searchParams }: { searchParams?: searchParams }) {
     })
   )
 
-  courseData = data?.payload?.data ?? []
+  const courseData = data?.payload?.data ?? []
 
   if (!data) {
     return null
@@ -46,18 +44,7 @@ async function CourseList({ searchParams }: { searchParams?: searchParams }) {
       <div className='flex flex-col md:flex-row justify-between items-start md:items-center gap-4'>
         <CustomInput className='w-full md:max-w-[400px] h-9' placeholder='Tìm kiếm sản phẩm...' />
 
-        <div className='hidden sm:flex items-center gap-2 w-full md:w-auto'>
-          <Select>
-            <SelectTrigger className='w-[150px] focus:ring-0'>
-              <SelectValue placeholder='Sắp xếp theo' />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value='price-asc'>Giá thấp đến cao</SelectItem>
-              <SelectItem value='price-desc'>Giá cao đến thấp</SelectItem>
-              <SelectItem value='most-popular'>Phổ biến nhất</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
+        <CourseSort />
       </div>
 
       {courseData.length === 0 && (

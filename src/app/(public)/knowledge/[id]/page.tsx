@@ -9,7 +9,7 @@ async function BlogDetailPage(props: { params: Promise<{ id: string }> }) {
 
   const { id } = params
 
-  const data = await wrapServerApi(() => blogApiRequest.getBlog(id))
+  const data = await wrapServerApi(() => blogApiRequest.getBlogCache(id))
   const blog = data?.payload?.data
 
   if (!blog) {
