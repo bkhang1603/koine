@@ -44,12 +44,24 @@ const configRoute = {
   admin: {
     dashboard: '/admin',
     order: '/admin/order',
-    course: '/admin/course',
     blog: '/admin/blog',
+    addBlog: '/admin/blog/add',
+    editBlog: '/admin/blog/edit',
+    course: '/admin/course',
+    addCourse: '/admin/course/add',
+    editCourse: '/admin/course/edit',
     product: '/admin/product',
     productNew: '/admin/product/new',
     productEdit: '/admin/product/edit',
     user: '/admin/user'
+  },
+  support: {
+    dashboard: '/support',
+    order: '/support/order',
+    user: '/support/user',
+    refund: '/support/refund',
+    faq: '/support/faq',
+    settings: '/support/settings'
   }
 }
 

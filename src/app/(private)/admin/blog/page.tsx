@@ -1,8 +1,8 @@
 'use client'
 
-import { use, useEffect, useMemo } from 'react'
+import { use, useEffect, useMemo, useCallback } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { BookOpen, MessageSquare, BarChart, ThumbsUp } from 'lucide-react'
+import { BookOpen, MessageSquare, BarChart, ThumbsUp, Settings, Plus } from 'lucide-react'
 import { TableCustom, dataListType } from '@/components/table-custom'
 import configRoute from '@/config/route'
 import { SearchParams } from '@/types/query'
@@ -11,10 +11,14 @@ import { Badge } from '@/components/ui/badge'
 import { format } from 'date-fns'
 import { vi } from 'date-fns/locale'
 import { Input } from '@/components/ui/input'
-import { MoreOptions } from '@/components/private/admin/blog/more-options'
-import { useBlogListAdminQuery } from '@/queries/useBlog'
+import { MoreOptions } from '@/components/private/common/more-options'
+import { useBlogDeleteMutation, useMyBlogsQuery } from '@/queries/useBlog'
 import { Skeleton } from '@/components/ui/skeleton'
 import Image from 'next/image'
+import { Button } from '@/components/ui/button'
+import Link from 'next/link'
+import { toast } from '@/components/ui/use-toast'
+import { handleErrorApi } from '@/lib/utils'
 
 function AdminBlog(props: { searchParams: SearchParams }) {
   const searchParams = use(props.searchParams)
@@ -23,7 +27,7 @@ function AdminBlog(props: { searchParams: SearchParams }) {
 
   // Get values from searchParams or use default values
   const currentKeyword = (searchParams.keyword as string) || ''
-  const currentPageSize = Number(searchParams.page_size) || 5
+  const currentPageSize = Number(searchParams.page_size) || 10
   const currentPageIndex = Number(searchParams.page_index) || 1
 
   // Function to update URL when values change
@@ -54,11 +58,29 @@ function AdminBlog(props: { searchParams: SearchParams }) {
     data: responseData,
     isLoading,
     error
-  } = useBlogListAdminQuery({
-    keyword: currentKeyword,
+  } = useMyBlogsQuery({
     page_size: currentPageSize,
     page_index: currentPageIndex
   })
+
+  // Thêm mutation và hàm xử lý xóa blog
+  const deleteBlogMutation = useBlogDeleteMutation()
+
+  const handleDelete = useCallback(
+    async (blogId: string) => {
+      try {
+        await deleteBlogMutation.mutateAsync(blogId)
+        toast({
+          description: 'Xóa bài viết thành công'
+        })
+      } catch (error) {
+        handleErrorApi({
+          error
+        })
+      }
+    },
+    [deleteBlogMutation]
+  )
 
   useEffect(() => {
     if (responseData) {
@@ -161,12 +183,25 @@ function AdminBlog(props: { searchParams: SearchParams }) {
         id: 8,
         render: (blog: any) => (
           <div className='flex justify-end min-w-[40px]'>
-            <MoreOptions type='blog' onView={() => router.push(`/admin/blog/${blog.id}`)} />
+            <MoreOptions
+              item={{
+                id: blog.id,
+                title: blog.title,
+                status: blog.status,
+                slug: blog.slug
+              }}
+              itemType='blog'
+              onView={() => router.push(`/admin/blog/${blog.id}`)}
+              onEdit={() => router.push(`/admin/blog/${blog.id}/edit`)}
+              onDelete={() => handleDelete(blog.id)}
+              onManageComments={() => router.push(`/admin/blog/${blog.id}/comments`)}
+              onPreview={() => window.open(`/knowledge/${blog.slug}`, '_blank')}
+            />
           </div>
         )
       }
     ],
-    [router]
+    [router, handleDelete]
   )
 
   const tableData: dataListType = {
@@ -184,9 +219,25 @@ function AdminBlog(props: { searchParams: SearchParams }) {
   return (
     <div className='container mx-auto px-4 py-6 space-y-6'>
       {/* Header */}
-      <div>
-        <h1 className='text-2xl font-bold'>Quản lý bài viết</h1>
-        <p className='text-muted-foreground mt-1'>Quản lý và theo dõi tất cả bài viết trong hệ thống</p>
+      <div className='flex items-center justify-between'>
+        <div>
+          <h1 className='text-2xl font-bold'>Quản lý bài viết</h1>
+          <p className='text-muted-foreground mt-1'>Quản lý và theo dõi tất cả bài viết trong hệ thống</p>
+        </div>
+        <div className='flex items-center gap-4'>
+          <Button variant='outline' asChild>
+            <Link href='/admin/blog/categories'>
+              <Settings className='w-4 h-4 mr-2' />
+              Quản lý danh mục
+            </Link>
+          </Button>
+          <Button asChild>
+            <Link href='/admin/blog/new'>
+              <Plus className='w-4 h-4 mr-2' />
+              Tạo bài viết mới
+            </Link>
+          </Button>
+        </div>
       </div>
 
       {/* Stats Cards with Skeleton */}

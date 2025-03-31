@@ -23,7 +23,7 @@ function AdminCourse(props: { searchParams: SearchParams }) {
 
   // Lấy giá trị từ searchParams hoặc sử dụng giá trị mặc định
   const currentKeyword = (searchParams.keyword as string) || ''
-  const currentPageSize = Number(searchParams.page_size) || 5
+  const currentPageSize = Number(searchParams.page_size) || 10
   const currentPageIndex = Number(searchParams.page_index) || 1
 
   // Hàm để cập nhật URL khi thay đổi các giá trị

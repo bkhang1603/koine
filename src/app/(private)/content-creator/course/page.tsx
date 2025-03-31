@@ -11,7 +11,7 @@ import { Badge } from '@/components/ui/badge'
 import { format } from 'date-fns'
 import { vi } from 'date-fns/locale'
 import { Input } from '@/components/ui/input'
-import { MoreOptions } from '@/components/private/content-creator/course/more-options'
+import { MoreOptions } from '@/components/private/common/more-options'
 import { useCoursesAdminQuery } from '@/queries/useCourse'
 import { Skeleton } from '@/components/ui/skeleton'
 import Image from 'next/image'
@@ -24,7 +24,7 @@ function ContentCreatorCourse(props: { searchParams: SearchParams }) {
 
   // Lấy giá trị từ searchParams hoặc sử dụng giá trị mặc định
   const currentKeyword = (searchParams.keyword as string) || ''
-  const currentPageSize = Number(searchParams.page_size) || 5
+  const currentPageSize = Number(searchParams.page_size) || 10
   const currentPageIndex = Number(searchParams.page_index) || 1
 
   // Hàm để cập nhật URL khi thay đổi các giá trị
@@ -156,7 +156,13 @@ function ContentCreatorCourse(props: { searchParams: SearchParams }) {
         render: (course: any) => (
           <div className='flex justify-end min-w-[40px]'>
             <MoreOptions
-              blog={course}
+              item={{
+                id: course.id,
+                title: course.title,
+                status: course.isBanned ? 'Đã khóa' : 'Hoạt động',
+                slug: course.slug
+              }}
+              itemType='course'
               onView={() => router.push(`/content-creator/course/${course.id}`)}
               onEdit={() => router.push(`/content-creator/course/${course.id}/edit`)}
               onPreview={() => router.push(`/course/${course.slug}`)}

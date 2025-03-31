@@ -229,6 +229,9 @@ export const useBlogDeleteMutation = () => {
       queryClient.invalidateQueries({
         queryKey: ['blogs']
       })
+      queryClient.invalidateQueries({
+        queryKey: ['myBlogs']
+      })
     }
   })
 }
@@ -269,7 +272,7 @@ export const useMyBlogsQuery = ({
   page_size?: number | undefined
 }) => {
   return useQuery({
-    queryKey: ['blogs', page_index, page_size],
+    queryKey: ['myBlogs', page_index, page_size],
     queryFn: () => blogApiRequest.getMyBlogs({ page_index, page_size })
   })
 }

@@ -1,6 +1,6 @@
 'use client'
 
-import NewBlogPage from '@/components/private/content-creator/blog/blog-new'
+import NewBlogPage from '@/components/private/common/blog/blog-new'
 import { BlogDataResType } from '@/schemaValidations/blog.schema'
 import { useEffect, useState } from 'react'
 import { ChevronRight } from 'lucide-react'
@@ -35,7 +35,9 @@ function Page() {
         <ChevronRight className='h-4 w-4' />
         <span className='font-medium text-foreground'>Tạo mới</span>
       </nav>
-      <div>{<NewBlogPage localDraft={localDraft} />}</div>
+      <div>
+        <NewBlogPage localDraft={localDraft} baseUrl='/content-creator/blog' />
+      </div>
     </div>
   )
 }

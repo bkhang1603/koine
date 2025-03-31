@@ -15,8 +15,8 @@ import { Badge } from '@/components/ui/badge'
 import { format } from 'date-fns'
 import { vi } from 'date-fns/locale'
 import { TableCustom, dataListType } from '@/components/table-custom'
-import { MoreOptions } from '@/components/private/content-creator/blog/more-options'
 import Image from 'next/image'
+import { MoreOptions } from '@/components/private/common/more-options'
 
 // Custom hook useDebounce
 // eslint-disable-next-line no-unused-vars
@@ -185,7 +185,13 @@ export default function BlogPage() {
         render: (blog: any) => (
           <div className='flex justify-end min-w-[40px]'>
             <MoreOptions
-              blog={blog}
+              item={{
+                id: blog.id,
+                title: blog.title,
+                status: blog.status,
+                slug: blog.slug
+              }}
+              itemType='blog'
               onView={() => router.push(`/content-creator/blog/${blog.id}`)}
               onEdit={() => router.push(`/content-creator/blog/${blog.id}/edit`)}
               onDelete={() => handleDelete(blog.id)}

@@ -24,7 +24,7 @@ function AdminProduct(props: { searchParams: SearchParams }) {
   const router = useRouter()
   const pathname = usePathname()
 
-  const currentPageSize = Number(searchParams.page_size) || 5
+  const currentPageSize = Number(searchParams.page_size) || 10
   const currentPageIndex = Number(searchParams.page_index) || 1
   const currentKeyword = (searchParams.keyword as string) || ''
 

@@ -10,7 +10,7 @@ import { format } from 'date-fns'
 import { vi } from 'date-fns/locale'
 import { TableCustom, dataListType } from '@/components/table-custom'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { MoreOptions } from '@/components/private/content-creator/course/category/more-options'
+import { MoreOptions } from '@/components/private/common/more-options'
 import {
   useGetCategoryCoursesQuery,
   useCreateCategoryCourseMutation,
@@ -18,9 +18,8 @@ import {
   useUpdateCategoryCourseMutation,
   useDeleteCategoryCourseMutation
 } from '@/queries/useCourse'
-import { CreateCategoryDialog } from '@/components/private/content-creator/course/create-category-dialog'
-import { EditCategoryDialog } from '@/components/private/content-creator/course/edit-category-dialog'
-import { DeleteCategoryDialog } from '@/components/private/content-creator/course/delete-category-dialog'
+import { CreateCategoryDialog } from '@/components/private/common/course/create-category-dialog'
+import { EditCategoryDialog } from '@/components/private/common/course/edit-category-dialog'
 
 type CategoryFormData = {
   name: string
@@ -240,12 +239,13 @@ export default function CourseCategoriesPage() {
       render: (category: any) => (
         <div className='flex justify-end'>
           <MoreOptions
-            blog={{
+            item={{
               id: category.id,
               title: category.name,
               status: 'VISIBLE',
               slug: category.name.toLowerCase().replace(/\s+/g, '-')
             }}
+            itemType='category'
             onEdit={() => handleEdit(category.id)}
             onDelete={() => handleDeleteConfirm({ id: category.id })}
           />

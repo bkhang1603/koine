@@ -1,401 +1,197 @@
 'use client'
-import { use, useState } from 'react'
+import { use } from 'react'
 
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Separator } from '@/components/ui/separator'
-import { ArrowLeft, AlertCircle, User, ThumbsUp, MessageCircle, Reply } from 'lucide-react'
-import Image from 'next/image'
 import Link from 'next/link'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import { useBlogDetailAdminQuery, useBlogCommentsAdminQuery } from '@/queries/useBlog'
+import {
+  ArrowLeft,
+  Calendar,
+  Clock,
+  User,
+  ThumbsUp,
+  MessageSquare,
+  Edit,
+  ExternalLink,
+  ChevronRight
+} from 'lucide-react'
+import Image from 'next/image'
+import { useBlogDetailQuery } from '@/queries/useBlog'
 import { Skeleton } from '@/components/ui/skeleton'
-import { vi } from 'date-fns/locale'
-import { format } from 'date-fns'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { formatDate } from '@/lib/utils'
 
-export default function AdminBlogDetailPage(props: { params: Promise<{ id: string }> }) {
+export default function BlogPostDetail(props: { params: Promise<{ id: string }> }) {
   const params = use(props.params)
-  const { isLoading, error, data } = useBlogDetailAdminQuery({ id: params.id })
-  const {
-    data: commentsData,
-    isLoading: isCommentsLoading,
-    error: commentsError
-  } = useBlogCommentsAdminQuery({ id: params.id })
+  const { data, isLoading } = useBlogDetailQuery({ id: params.id })
+  const post = data?.payload.data
 
-  const blog = data?.payload.data
-  const comments = commentsData?.payload.data.commentsWithReplies || []
-  const totalComments = commentsData?.payload.data.totalComments || 0
-
+  // Skeleton loading component
   if (isLoading) {
     return (
-      <div className='container max-w-7xl mx-auto py-6 space-y-8'>
-        {/* Back button skeleton */}
-        <Skeleton className='w-[200px] h-10' />
-
-        {/* Header skeleton */}
-        <div>
-          <div className='flex items-center justify-between mb-4'>
-            <Skeleton className='w-[300px] h-8' />
-            <Skeleton className='w-[80px] h-6' />
-          </div>
-          <div className='flex items-center gap-6'>
-            <Skeleton className='w-[100px] h-5' />
-            <Skeleton className='w-[80px] h-5' />
-            <Skeleton className='w-[120px] h-5' />
-          </div>
+      <div className='max-w-5xl mx-auto space-y-6'>
+        <div className='flex justify-between items-center'>
+          <Skeleton className='h-10 w-32' />
+          <Skeleton className='h-10 w-24' />
         </div>
 
-        <div className='grid grid-cols-3 gap-6'>
-          <div className='col-span-2 space-y-6'>
-            {/* Blog image skeleton */}
-            <Card>
-              <CardHeader>
-                <Skeleton className='w-[150px] h-6' />
-              </CardHeader>
-              <CardContent>
-                <Skeleton className='w-full h-[300px] rounded-lg' />
-              </CardContent>
-            </Card>
-
-            {/* Description skeleton */}
-            <Card>
-              <CardHeader>
-                <Skeleton className='w-[150px] h-6' />
-              </CardHeader>
-              <CardContent>
-                <Skeleton className='w-full h-20' />
-              </CardContent>
-            </Card>
-
-            {/* Content skeleton */}
-            <Card>
-              <CardHeader>
-                <Skeleton className='w-[150px] h-6' />
-              </CardHeader>
-              <CardContent>
-                <Skeleton className='w-full h-[400px]' />
-              </CardContent>
-            </Card>
-          </div>
-
-          {/* Blog info skeleton */}
-          <div className='space-y-6'>
-            <Card>
-              <CardHeader>
-                <Skeleton className='w-[150px] h-6' />
-              </CardHeader>
-              <CardContent className='space-y-6'>
-                <div className='space-y-2'>
-                  {[1, 2, 3, 4].map((item) => (
-                    <div key={item} className='flex justify-between'>
-                      <Skeleton className='w-[120px] h-5' />
-                      <Skeleton className='w-[100px] h-5' />
-                    </div>
-                  ))}
-                </div>
-
-                <Skeleton className='w-full h-px' />
-
-                <div className='space-y-3'>
-                  <Skeleton className='w-[100px] h-5' />
-                  <div className='flex flex-wrap gap-2'>
-                    <Skeleton className='w-[80px] h-6 rounded-full' />
-                    <Skeleton className='w-[60px] h-6 rounded-full' />
-                    <Skeleton className='w-[70px] h-6 rounded-full' />
-                  </div>
-                </div>
-
-                <Skeleton className='w-full h-px' />
-
-                <div className='space-y-3'>
-                  <Skeleton className='w-[150px] h-5' />
-                  <div className='flex items-center gap-3'>
-                    <Skeleton className='w-12 h-12 rounded-full' />
-                    <div className='space-y-1'>
-                      <Skeleton className='w-[100px] h-5' />
-                      <Skeleton className='w-[80px] h-4' />
-                    </div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Action buttons skeleton */}
-            <div className='space-y-3'>
-              <Skeleton className='w-full h-10 rounded-md' />
-              <Skeleton className='w-full h-10 rounded-md' />
+        <Card>
+          <CardHeader>
+            <Skeleton className='w-full h-64 rounded-t-lg' />
+          </CardHeader>
+          <CardContent className='space-y-4'>
+            <div className='flex justify-between items-center'>
+              <Skeleton className='h-6 w-20' />
+              <Skeleton className='h-6 w-24' />
             </div>
-          </div>
-        </div>
+            <Skeleton className='h-12 w-3/4' />
+            <div className='flex items-center text-sm text-muted-foreground gap-2'>
+              <Skeleton className='h-4 w-4 rounded-full' />
+              <Skeleton className='h-4 w-32' />
+              <Skeleton className='h-4 w-4 rounded-full' />
+              <Skeleton className='h-4 w-32' />
+            </div>
+            <div className='space-y-4'>
+              <Skeleton className='h-4 w-full' />
+              <Skeleton className='h-4 w-full' />
+              <Skeleton className='h-4 w-3/4' />
+              <Skeleton className='h-4 w-full' />
+              <Skeleton className='h-4 w-5/6' />
+            </div>
+          </CardContent>
+        </Card>
       </div>
     )
   }
 
-  if (error || !blog) {
+  if (!post) {
     return (
-      <div className='flex flex-col items-center justify-center min-h-[400px] gap-4'>
-        <AlertCircle className='w-12 h-12 text-red-500' />
-        <div className='text-center'>
-          <h3 className='text-lg font-medium text-gray-900 mb-1'>Không tìm thấy bài viết</h3>
-          <p className='text-gray-500'>Bài viết không tồn tại hoặc đã bị xóa</p>
+      <div className='max-w-5xl mx-auto space-y-6'>
+        <div className='flex justify-between items-center'>
+          <Button variant='outline' asChild>
+            <Link href='/admin/blog'>
+              <ArrowLeft className='mr-2 h-4 w-4' />
+              Quay lại danh sách
+            </Link>
+          </Button>
         </div>
-        <Button variant='outline' asChild>
-          <Link href='/admin/blog'>Quay lại danh sách bài viết</Link>
-        </Button>
+
+        <Card className='p-8 text-center'>
+          <div className='space-y-4'>
+            <h2 className='text-2xl font-bold'>Không tìm thấy bài viết</h2>
+            <p className='text-muted-foreground'>Bài viết không tồn tại hoặc đã bị xóa</p>
+            <Button asChild>
+              <Link href='/admin/blog'>Quay lại danh sách</Link>
+            </Button>
+          </div>
+        </Card>
       </div>
     )
   }
 
-  // Format date for comments
-  const formatCommentDate = (dateString: string) => {
-    return format(new Date(dateString), 'dd/MM/yyyy HH:mm', { locale: vi })
-  }
-
-  // Render a single comment
-  const renderComment = (comment: any) => (
-    <div key={comment.id} className='border rounded-lg p-4 mb-4'>
-      <div className='flex items-start gap-3'>
-        <Avatar className='h-10 w-10'>
-          <AvatarImage src={comment.user.avatarUrl || '/avatar-placeholder.png'} alt={comment.user.firstName} />
-          <AvatarFallback>{comment.user.firstName?.[0] || comment.user.username?.[0] || 'U'}</AvatarFallback>
-        </Avatar>
-        <div className='flex-1'>
-          <div className='flex justify-between items-center mb-1'>
-            <div className='font-medium'>{comment.user.firstName || comment.user.username}</div>
-            <div className='text-xs text-muted-foreground'>{formatCommentDate(comment.createdAt)}</div>
-          </div>
-          <p className='text-sm text-gray-700'>{comment.content}</p>
-        </div>
-      </div>
-
-      {/* Render replies if available */}
-      {comment.replies && comment.replies.length > 0 && (
-        <div className='ml-12 mt-4 space-y-4'>
-          {comment.replies.map((reply: any) => (
-            <div key={reply.id} className='border-l-2 border-gray-200 pl-4'>
-              <div className='flex items-start gap-3'>
-                <Avatar className='h-8 w-8'>
-                  <AvatarImage src={reply.user.avatarUrl || '/avatar-placeholder.png'} alt={reply.user.firstName} />
-                  <AvatarFallback>{reply.user.firstName?.[0] || reply.user.username?.[0] || 'U'}</AvatarFallback>
-                </Avatar>
-                <div className='flex-1'>
-                  <div className='flex justify-between items-center mb-1'>
-                    <div className='font-medium text-sm'>{reply.user.firstName || reply.user.username}</div>
-                    <div className='text-xs text-muted-foreground'>{formatCommentDate(reply.createdAt)}</div>
-                  </div>
-                  <p className='text-sm text-gray-700'>{reply.content}</p>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
-    </div>
-  )
+  const readingTime = Math.ceil(post.content.split(/\s+/).length / 200)
 
   return (
-    <div className='container max-w-7xl mx-auto py-6 space-y-8'>
-      {/* Back button */}
-      <Button variant='ghost' asChild className='gap-2 hover:bg-gray-100'>
-        <Link href='/admin/blog'>
-          <ArrowLeft className='h-4 w-4' />
-          Quay lại danh sách bài viết
+    <div className='container max-w-4xl mx-auto px-4 py-6'>
+      {/* Breadcrumb */}
+      <nav className='flex items-center space-x-1 text-sm text-muted-foreground mb-6'>
+        <Link href='/admin/blog' className='hover:text-primary transition-colors'>
+          Blog
         </Link>
-      </Button>
+        <ChevronRight className='h-4 w-4' />
+        <span className='font-medium text-foreground max-w-[300px] truncate'>{post?.title || 'Chi tiết bài viết'}</span>
+      </nav>
 
-      {/* Header */}
-      <div>
-        <div className='flex items-center justify-between mb-4'>
-          <h1 className='text-2xl font-bold text-gray-900'>{blog.title}</h1>
-          <Badge variant={blog.status === 'PUBLISHED' ? 'secondary' : 'destructive'}>
-            {blog.status === 'PUBLISHED' ? 'Đã xuất bản' : 'Bản nháp'}
-          </Badge>
-        </div>
-        <div className='flex items-center gap-6 text-sm text-gray-500'>
-          <div className='flex items-center gap-2'>
-            <User className='h-4 w-4' />
-            {blog.creatorInfo.firstName}
+      <div className='max-w-5xl mx-auto space-y-6'>
+        <div className='flex justify-between items-center mb-6'>
+          <div>
+            <h1 className='text-2xl font-bold line-clamp-1 max-w-[500px]'>{post.title}</h1>
+            <p className='text-sm text-muted-foreground mt-1'>Chi tiết bài viết</p>
           </div>
-          <div className='flex items-center gap-2'>
-            <ThumbsUp className='h-4 w-4' />
-            {blog.totalReact} lượt thích
+          <div className='space-x-2'>
+            <Button variant='outline' asChild>
+              <Link href={`/admin/blog/${post.id}/edit`}>
+                <Edit className='mr-2 h-4 w-4' />
+                Chỉnh sửa
+              </Link>
+            </Button>
+            <Button variant='outline' asChild>
+              <Link href={`/knowledge/${post.slug}`} target='_blank'>
+                <ExternalLink className='mr-2 h-4 w-4' />
+                Xem trước
+              </Link>
+            </Button>
           </div>
-          <div className='flex items-center gap-2'>
-            <MessageCircle className='h-4 w-4' />
-            {blog.totalComment} bình luận
-          </div>
-        </div>
-      </div>
-
-      <div className='grid grid-cols-3 gap-6'>
-        <div className='col-span-2 space-y-6'>
-          <Tabs defaultValue='content'>
-            <TabsList className='mb-4'>
-              <TabsTrigger value='content'>Nội dung</TabsTrigger>
-              <TabsTrigger value='comments'>Bình luận ({totalComments})</TabsTrigger>
-            </TabsList>
-
-            <TabsContent value='content' className='space-y-6'>
-              {/* Blog Image */}
-              <Card>
-                <CardHeader>
-                  <CardTitle>Hình ảnh bài viết</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className='relative w-full h-[600px]'>
-                    <Image src={blog.imageUrl} alt={blog.title} fill className='object-cover rounded-lg' />
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* Blog Description */}
-              <Card>
-                <CardHeader>
-                  <CardTitle>Mô tả ngắn</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className='text-gray-600'>{blog.description}</p>
-                </CardContent>
-              </Card>
-
-              {/* Blog Content */}
-              <Card>
-                <CardHeader>
-                  <CardTitle>Nội dung bài viết</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className='prose max-w-none' dangerouslySetInnerHTML={{ __html: blog.content }} />
-                </CardContent>
-              </Card>
-            </TabsContent>
-
-            <TabsContent value='comments'>
-              <Card>
-                <CardHeader>
-                  <CardTitle>Bình luận ({totalComments})</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  {isCommentsLoading ? (
-                    <div className='space-y-4'>
-                      {[1, 2, 3].map((i) => (
-                        <div key={i} className='border rounded-lg p-4'>
-                          <div className='flex items-start gap-3'>
-                            <Skeleton className='h-10 w-10 rounded-full' />
-                            <div className='flex-1 space-y-2'>
-                              <div className='flex justify-between'>
-                                <Skeleton className='h-4 w-28' />
-                                <Skeleton className='h-3 w-20' />
-                              </div>
-                              <Skeleton className='h-16 w-full' />
-                            </div>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  ) : commentsError ? (
-                    <div className='text-center py-8'>
-                      <AlertCircle className='h-8 w-8 text-red-500 mx-auto mb-2' />
-                      <p>Không thể tải bình luận, vui lòng thử lại sau.</p>
-                    </div>
-                  ) : comments.length === 0 ? (
-                    <div className='text-center py-8 text-muted-foreground'>
-                      <MessageCircle className='h-8 w-8 mx-auto mb-2' />
-                      <p>Chưa có bình luận nào cho bài viết này.</p>
-                    </div>
-                  ) : (
-                    <div className='space-y-0'>{comments.map(renderComment)}</div>
-                  )}
-                </CardContent>
-              </Card>
-            </TabsContent>
-          </Tabs>
         </div>
 
-        {/* Blog Info */}
-        <div className='space-y-6'>
-          <Card>
-            <CardHeader>
-              <CardTitle>Thông tin bài viết</CardTitle>
-            </CardHeader>
-            <CardContent className='space-y-4'>
-              <div className='space-y-2 text-sm'>
-                <div className='flex justify-between'>
-                  <span className='text-muted-foreground'>Trạng thái</span>
-                  <span>{blog.status === 'PUBLISHED' ? 'Đã xuất bản' : 'Bản nháp'}</span>
-                </div>
-                <div className='flex justify-between'>
-                  <span className='text-muted-foreground'>Lượt thích</span>
-                  <span>{blog.totalReact}</span>
-                </div>
-                <div className='flex justify-between'>
-                  <span className='text-muted-foreground'>Bình luận</span>
-                  <span>{blog.totalComment}</span>
-                </div>
-                <div className='flex justify-between'>
-                  <span className='text-muted-foreground'>Ngày tạo</span>
-                  <span>{format(new Date(blog.createdAt), 'dd/MM/yyyy', { locale: vi })}</span>
-                </div>
-                <div className='flex justify-between'>
-                  <span className='text-muted-foreground'>Cập nhật lần cuối</span>
-                  <span>{format(new Date(blog.updatedAt), 'dd/MM/yyyy', { locale: vi })}</span>
-                </div>
-              </div>
+        <Card>
+          <CardHeader className='p-0 relative'>
+            <div className='aspect-[21/9] w-full relative overflow-hidden rounded-t-lg'>
+              <Image
+                src={post.imageUrl}
+                alt={post.title}
+                fill
+                className='object-cover'
+                sizes='(max-width: 768px) 100vw, (max-width: 1200px) 80vw, 1200px'
+              />
+            </div>
+          </CardHeader>
+          <CardContent className='space-y-6 pt-6'>
+            <div className='flex flex-wrap gap-2'>
+              {post.categories.map((category) => (
+                <Badge key={category.id} variant='outline' className='rounded-full px-3 py-1'>
+                  {category.name}
+                </Badge>
+              ))}
+              <Badge variant='secondary' className='rounded-full px-3 py-1 ml-auto'>
+                <Clock className='mr-1 h-3 w-3' />
+                {readingTime} phút đọc
+              </Badge>
+            </div>
 
-              <Separator />
+            <CardTitle className='text-3xl font-bold'>{post.title}</CardTitle>
 
-              <div>
-                <h3 className='text-sm font-medium mb-2'>Danh mục</h3>
-                <div className='flex flex-wrap gap-2'>
-                  {blog.categories.map((category) => (
-                    <Badge key={category.id} variant='outline'>
-                      {category.name}
-                    </Badge>
-                  ))}
-                </div>
-              </div>
+            <p className='text-muted-foreground text-lg'>{post.description}</p>
 
-              <Separator />
-
-              <div>
-                <h3 className='text-sm font-medium mb-2'>Tác giả</h3>
-                <div className='flex items-center gap-3'>
-                  <div className='relative w-12 h-12 rounded-full overflow-hidden'>
+            <div className='flex items-center justify-between border-y border-slate-200 py-4'>
+              <div className='flex items-center space-x-4'>
+                <div className='w-10 h-10 rounded-full overflow-hidden bg-slate-100 flex-shrink-0'>
+                  {post.creatorInfo.avatarUrl ? (
                     <Image
-                      src={blog.creatorInfo.avatarUrl || '/avatar-placeholder.png'}
-                      alt={blog.creatorInfo.firstName}
-                      fill
+                      src={post.creatorInfo.avatarUrl}
+                      alt={post.creatorInfo.firstName}
+                      width={40}
+                      height={40}
                       className='object-cover'
                     />
-                  </div>
-                  <div>
-                    <p className='font-medium'>{blog.creatorInfo.firstName}</p>
-                    <p className='text-sm text-muted-foreground'>ID: {blog.creatorInfo.id.slice(0, 8)}</p>
-                  </div>
+                  ) : (
+                    <User className='w-full h-full p-2 text-slate-400' />
+                  )}
+                </div>
+                <div>
+                  <div className='font-medium'>{post.creatorInfo.firstName}</div>
+                  <div className='text-sm text-muted-foreground'>Tác giả</div>
                 </div>
               </div>
-            </CardContent>
-          </Card>
+              <div className='flex items-center space-x-4 text-sm text-muted-foreground'>
+                <div className='flex items-center'>
+                  <Calendar className='mr-1 h-4 w-4' />
+                  {formatDate(post.createdAt)}
+                </div>
+                <div className='flex items-center'>
+                  <ThumbsUp className='mr-1 h-4 w-4' />
+                  {post.totalReact} lượt thích
+                </div>
+                <div className='flex items-center'>
+                  <MessageSquare className='mr-1 h-4 w-4' />
+                  {post.totalComment} bình luận
+                </div>
+              </div>
+            </div>
 
-          {/* Action buttons */}
-          <div className='space-y-3'>
-            <Button className='w-full' variant='default'>
-              Chỉnh sửa bài viết
-            </Button>
-            <Button
-              variant='outline'
-              className={`w-full ${
-                blog.status === 'PUBLISHED' ? 'text-yellow-600 border-yellow-600' : 'text-green-600 border-green-600'
-              }`}
-            >
-              {blog.status === 'PUBLISHED' ? 'Chuyển sang bản nháp' : 'Xuất bản bài viết'}
-            </Button>
-            <Button className='w-full' variant='destructive'>
-              Xóa bài viết
-            </Button>
-          </div>
-        </div>
+            <div className='prose prose-lg max-w-none' dangerouslySetInnerHTML={{ __html: post.content }} />
+          </CardContent>
+        </Card>
       </div>
     </div>
   )

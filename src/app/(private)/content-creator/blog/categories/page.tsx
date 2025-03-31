@@ -4,9 +4,8 @@ import { Button } from '@/components/ui/button'
 import { Plus } from 'lucide-react'
 import { Input } from '@/components/ui/input'
 import { useState, useEffect, useRef } from 'react'
-import { CreateCategoryDialog } from '@/components/private/content-creator/blog/create-category-dialog'
-import { EditCategoryDialog } from '@/components/private/content-creator/blog/edit-category-dialog'
-import { DeleteCategoryDialog } from '@/components/private/content-creator/blog/delete-category-dialog'
+import { CreateCategoryDialog } from '@/components/private/common/blog/create-category-dialog'
+import { EditCategoryDialog } from '@/components/private/common/blog/edit-category-dialog'
 import {
   useCategoryBlogCreateMutation,
   useCategoryBlogDeleteMutation,
@@ -20,7 +19,7 @@ import { format } from 'date-fns'
 import { vi } from 'date-fns/locale'
 import { TableCustom, dataListType } from '@/components/table-custom'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { MoreOptions } from '@/components/private/content-creator/blog/category/more-options'
+import { MoreOptions } from '@/components/private/common/more-options'
 
 type CategoryFormData = {
   name: string
@@ -62,8 +61,8 @@ export default function BlogCategoriesPage() {
   const [createDialogOpen, setCreateDialogOpen] = useState(false)
   const [editDialogOpen, setEditDialogOpen] = useState(false)
   const [editingCategoryId, setEditingCategoryId] = useState<string | undefined>()
-  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
-  const [deleteCategoryId, setDeleteCategoryId] = useState<string | undefined>()
+  const [, setDeleteDialogOpen] = useState(false)
+  const [, setDeleteCategoryId] = useState<string | undefined>()
 
   const isMounted = useRef(true)
 
@@ -240,12 +239,13 @@ export default function BlogCategoriesPage() {
       render: (category: any) => (
         <div className='flex justify-end'>
           <MoreOptions
-            blog={{
+            item={{
               id: category.id,
               title: category.name,
               status: 'VISIBLE',
               slug: category.name.toLowerCase().replace(/\s+/g, '-')
             }}
+            itemType='category'
             onEdit={() => handleEdit(category.id)}
             onDelete={() => handleDeleteConfirm({ id: category.id })}
           />

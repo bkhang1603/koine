@@ -24,7 +24,7 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { format } from 'date-fns'
 import { vi } from 'date-fns/locale'
 import { useRouter } from 'next/navigation'
-import { MoreOptions } from '@/components/private/content-creator/course/courseDetail/more-options'
+import { MoreOptions } from '@/components/private/common/more-options'
 
 // Skeleton component cho course detail
 const CourseDetailSkeleton = () => {

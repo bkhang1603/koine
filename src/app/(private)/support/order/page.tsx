@@ -15,7 +15,7 @@ import { vi } from 'date-fns/locale'
 import { MoreOptions } from '@/components/private/common/more-options'
 import { Skeleton } from '@/components/ui/skeleton'
 
-function AdminOrder(props: { searchParams: SearchParams }) {
+function SupportOrder(props: { searchParams: SearchParams }) {
   const searchParams = use(props.searchParams)
   const router = useRouter()
   const pathname = usePathname()
@@ -216,7 +216,7 @@ function AdminOrder(props: { searchParams: SearchParams }) {
       {
         id: 9,
         render: (order: any) => (
-          <MoreOptions item={order} itemType='order' onView={() => router.push(`/admin/order/${order.id}`)} />
+          <MoreOptions item={order} itemType='order' onView={() => router.push(`/support/order/${order.id}`)} />
         )
       }
     ],
@@ -328,11 +328,11 @@ function AdminOrder(props: { searchParams: SearchParams }) {
         data={tableData}
         headerColumn={headerColumn}
         bodyColumn={bodyColumn}
-        href={configRoute.admin.order}
+        href={configRoute.support.order}
         loading={isLoading}
       />
     </div>
   )
 }
 
-export default AdminOrder
+export default SupportOrder

@@ -337,3 +337,24 @@ export const formatLevel = (level: string) => {
       return level
   }
 }
+
+export const formatRole = (role: string) => {
+  switch (role) {
+    case 'ADULT':
+      return 'Phụ huynh'
+    case 'CHILD':
+      return 'Trẻ em'
+    case 'CONTENT_CREATOR':
+      return 'Người tạo nội dung'
+    case 'SUPPORTER':
+      return 'Hỗ trợ'
+    case 'EXPERT':
+      return 'Chuyên gia'
+    case 'SALESMAN':
+      return 'Bán hàng'
+    case 'MANAGER':
+      return 'Quản lý'
+    default:
+      return role
+  }
+}

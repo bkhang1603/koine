@@ -9,10 +9,10 @@ import { useRouter, usePathname } from 'next/navigation'
 import Image from 'next/image'
 import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
-import { MoreOptions } from '@/components/private/admin/user/more-options'
+import { MoreOptions } from '@/components/private/common/more-options'
 import { formatRole } from '@/lib/utils'
 
-function AdminUser(props: { searchParams: SearchParams }) {
+function SupportUser(props: { searchParams: SearchParams }) {
   const searchParams = use(props.searchParams)
   const router = useRouter()
   const pathname = usePathname()
@@ -55,12 +55,18 @@ function AdminUser(props: { searchParams: SearchParams }) {
 
   useEffect(() => {
     if (responseData) {
-      console.log('Dữ liệu người dùng từ admin')
+      console.log('Dữ liệu người dùng từ admin:', responseData)
     }
     if (error) {
       console.error('Lỗi khi tải người dùng:', error)
     }
   }, [responseData, error])
+
+  useEffect(() => {
+    console.log('Search params:', searchParams)
+    console.log('Current page index:', currentPageIndex)
+    console.log('Current page size:', currentPageSize)
+  }, [searchParams, currentPageIndex, currentPageSize])
 
   const users = responseData?.payload.data || []
   const pagination = responseData?.payload.pagination || {
@@ -124,7 +130,9 @@ function AdminUser(props: { searchParams: SearchParams }) {
       },
       {
         id: 6,
-        render: (user: any) => <MoreOptions type='user' onView={() => router.push(`/admin/user/${user.id}`)} />
+        render: (user: any) => (
+          <MoreOptions item={user} itemType='user' onView={() => router.push(`/support/user/${user.id}`)} />
+        )
       }
     ],
     [router]
@@ -159,11 +167,11 @@ function AdminUser(props: { searchParams: SearchParams }) {
         data={tableData}
         headerColumn={headerColumn}
         bodyColumn={bodyColumn}
-        href={configRoute.admin.user}
+        href={configRoute.support.user}
         loading={isLoading}
       />
     </div>
   )
 }
 
-export default AdminUser
+export default SupportUser

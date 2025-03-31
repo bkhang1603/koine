@@ -5,9 +5,9 @@ import { ArrowLeft } from 'lucide-react'
 import { useState, useEffect, use } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { CourseBasicInfo } from '@/components/private/content-creator/course/course-basic-info'
-import { CourseMedia } from '@/components/private/content-creator/course/course-media'
-import { CourseContent } from '@/components/private/content-creator/course/course-content'
+import { CourseBasicInfo } from '@/components/private/common/course/course-basic-info'
+import { CourseMedia } from '@/components/private/common/course/course-media'
+import { CourseContent } from '@/components/private/common/course/course-content'
 import { Course, Lesson } from '@/components/public/parent/custom-course/chapter-picker-types'
 export default function EditCoursePage(props: { params: Promise<{ id: string }> }) {
   const params = use(props.params)

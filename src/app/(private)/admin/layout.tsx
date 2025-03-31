@@ -23,12 +23,6 @@ export default function Layout({
       title: 'Quản lý',
       group: [
         {
-          id: 'user',
-          href: '/admin/user',
-          icon: <Users className='h-5 w-5' />,
-          label: 'Người dùng'
-        },
-        {
           id: 'orderDashboard',
           href: '/admin/order',
           icon: <ShoppingCart className='h-5 w-5' />,
@@ -51,6 +45,12 @@ export default function Layout({
           href: '/admin/product',
           icon: <Package className='h-5 w-5' />,
           label: 'Sản phẩm'
+        },
+        {
+          id: 'user',
+          href: '/admin/user',
+          icon: <Users className='h-5 w-5' />,
+          label: 'Người dùng'
         }
       ]
     },
