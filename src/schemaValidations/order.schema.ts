@@ -8,7 +8,8 @@ export const orderBody = z
     deliMethod: z.enum(DeliveryMethodValues),
     itemId: z.string().nullable(),
     quantity: z.number().nullable(),
-    itemType: z.enum(OrderTypeValues).nullable()
+    itemType: z.enum(OrderTypeValues).nullable(),
+    payMethod: z.enum(PaymentMethodValues)
   })
   .strict()
 
@@ -139,10 +140,7 @@ export const updatePaymentMethodBodyRes = z.object({
 })
 
 export const rePurchaseOrderRes = z.object({
-  data: z.object({
-    paymentLink: z.string(),
-    orderId: z.string()
-  }),
+  data: z.string(),
   message: z.string()
 })
 

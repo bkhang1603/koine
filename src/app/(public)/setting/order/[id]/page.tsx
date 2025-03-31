@@ -115,8 +115,8 @@ export default function OrderDetailPage(props: { params: Promise<{ id: string }>
         id: order.id
       })
 
-      if (res?.payload?.data?.paymentLink) {
-        window.location.href = res.payload.data.paymentLink
+      if (res?.payload?.data) {
+        window.location.href = res.payload.data
       }
     } catch (error) {
       handleErrorApi({

@@ -19,6 +19,8 @@ import { useRouter } from 'next/navigation'
 import { getCheckoutBuyNowFromLocalStorage, getCheckoutDataFromLocalStorage, handleErrorApi } from '@/lib/utils'
 import { toast } from '@/components/ui/use-toast'
 import AddressForm from '@/components/public/parent/setting/address-form'
+import { OrderBody } from '@/schemaValidations/order.schema'
+import { OrderType } from '@/constants/type'
 
 export default function Checkout() {
   const setOrderId = useAppStore((state) => state.setOrderId)
@@ -80,20 +82,36 @@ export default function Checkout() {
 
     if (!pickAddress) return
 
-    const orderData = {
+    const orderData: OrderBody = {
       arrayCartDetailIds: checkoutData?.cartDetails?.map((item) => item.id) ?? [],
       deliveryInfoId: pickAddress.id,
-      deliMethod: shippingMethod,
-      itemId: checkoutBuyNow?.id ?? null,
-      quantity: checkoutBuyNow?.quantity ?? null,
-      itemType: (checkoutBuyNow?.product !== null
-        ? 'PRODUCT'
-        : checkoutBuyNow?.course !== null
-          ? 'COURSE'
-          : checkoutBuyNow?.combo !== null
-            ? 'COMBO'
-            : null) as 'PRODUCT' | 'COURSE' | 'COMBO' | null,
-      payMethod
+      deliMethod: checkoutBuyNow?.course !== null ? DeliveryMethod.NONESHIP : shippingMethod,
+      itemId: null,
+      quantity: null,
+      itemType: null,
+      payMethod: payMethod
+    }
+
+    // Nếu là mua ngay (checkoutBuyNow)
+    if (checkoutBuyNow) {
+      if (checkoutBuyNow.product !== null) {
+        orderData.itemId = checkoutBuyNow.productId
+        orderData.quantity = checkoutBuyNow.quantity
+        orderData.itemType = OrderType.PRODUCT
+      } else if (checkoutBuyNow.course !== null) {
+        orderData.itemId = checkoutBuyNow.courseId
+        orderData.quantity = checkoutBuyNow.quantity
+        orderData.itemType = OrderType.COURSE
+      } else if (checkoutBuyNow.combo !== null) {
+        orderData.itemId = checkoutBuyNow.comboId
+        orderData.quantity = checkoutBuyNow.quantity
+        orderData.itemType = OrderType.COMBO
+      }
+    }
+    // Nếu là mua từ giỏ hàng (checkoutData)
+    else if (checkoutData?.cartDetails && checkoutData.cartDetails.length > 0) {
+      // Giữ nguyên arrayCartDetailIds đã được set ở trên
+      // Không cần set itemId, quantity và itemType vì đã có trong cartDetails
     }
 
     try {
@@ -111,7 +129,7 @@ export default function Checkout() {
           })
         } else {
           // Nếu không có link thanh toán, chuyển hướng đến trang lịch sử đơn hàng
-          router.push(configRoute.setting.order)
+          router.push(`${configRoute.setting.order}/${res.payload.data.orderId}`)
           toast({
             title: 'Đặt hàng thành công',
             description: 'Đơn hàng của bạn đã được tạo'

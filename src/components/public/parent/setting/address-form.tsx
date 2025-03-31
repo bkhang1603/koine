@@ -22,6 +22,7 @@ import { VIETNAM_PROVINCES } from '@/data/vietnam-provinces'
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import { Label } from '@/components/ui/label'
 import { MapPin, Home, Building } from 'lucide-react'
+import { ScrollArea } from '@/components/ui/scroll-area'
 
 const addressSchema = z.object({
   name: z.string().min(1, { message: 'Vui lòng nhập họ tên' }),
@@ -257,12 +258,14 @@ export default function AddressForm({ open, onOpenChange, defaultValues, mode = 
                           <SelectValue placeholder='Chọn tỉnh/thành phố' />
                         </SelectTrigger>
                       </FormControl>
-                      <SelectContent className='max-h-[300px]'>
-                        {VIETNAM_PROVINCES.map((province) => (
-                          <SelectItem key={province.code} value={province.code}>
-                            {province.name}
-                          </SelectItem>
-                        ))}
+                      <SelectContent>
+                        <ScrollArea className='h-[300px]'>
+                          {VIETNAM_PROVINCES.map((province) => (
+                            <SelectItem key={province.code} value={province.code}>
+                              {province.name}
+                            </SelectItem>
+                          ))}
+                        </ScrollArea>
                       </SelectContent>
                     </Select>
                     <FormMessage />
@@ -286,12 +289,14 @@ export default function AddressForm({ open, onOpenChange, defaultValues, mode = 
                           <SelectValue placeholder='Chọn quận/huyện' />
                         </SelectTrigger>
                       </FormControl>
-                      <SelectContent className='max-h-[300px]'>
-                        {districts.map((district) => (
-                          <SelectItem key={district.code} value={district.code}>
-                            {district.name}
-                          </SelectItem>
-                        ))}
+                      <SelectContent>
+                        <ScrollArea className='h-[300px]'>
+                          {districts.map((district) => (
+                            <SelectItem key={district.code} value={district.code}>
+                              {district.name}
+                            </SelectItem>
+                          ))}
+                        </ScrollArea>
                       </SelectContent>
                     </Select>
                     <FormMessage />
@@ -317,12 +322,14 @@ export default function AddressForm({ open, onOpenChange, defaultValues, mode = 
                           <SelectValue placeholder='Chọn phường/xã' />
                         </SelectTrigger>
                       </FormControl>
-                      <SelectContent className='max-h-[300px]'>
-                        {wards.map((ward) => (
-                          <SelectItem key={ward.code} value={ward.code}>
-                            {ward.name}
-                          </SelectItem>
-                        ))}
+                      <SelectContent>
+                        <ScrollArea className='h-[300px]'>
+                          {wards.map((ward) => (
+                            <SelectItem key={ward.code} value={ward.code}>
+                              {ward.name}
+                            </SelectItem>
+                          ))}
+                        </ScrollArea>
                       </SelectContent>
                     </Select>
                     <FormMessage />
