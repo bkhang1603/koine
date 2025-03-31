@@ -30,7 +30,7 @@ export function AddressCard({ address, onEdit, onDelete, onSetDefault }: Address
                 address.isDefault ? 'bg-primary/10' : 'bg-gray-100'
               )}
             >
-              {address.tag === 'Nhà riêng' ? (
+              {address.tag === 'HOME' ? (
                 <Home className={cn('w-4 h-4', address.isDefault ? 'text-primary' : 'text-gray-600')} />
               ) : (
                 <Building2 className={cn('w-4 h-4', address.isDefault ? 'text-primary' : 'text-gray-600')} />
@@ -46,7 +46,7 @@ export function AddressCard({ address, onEdit, onDelete, onSetDefault }: Address
             <span
               className={cn(
                 'inline-flex items-center px-2 py-0.5 text-xs font-medium rounded-md',
-                address.tag === 'Nhà riêng' ? 'bg-blue-50 text-blue-700' : 'bg-purple-50 text-purple-700'
+                address.tag === 'HOME' ? 'bg-blue-50 text-blue-700' : 'bg-purple-50 text-purple-700'
               )}
             >
               {address.tag}

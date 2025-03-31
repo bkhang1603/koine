@@ -11,19 +11,18 @@ function CourseCard({ course }: { course: CoursesResType['data'][0] }) {
         {/* Image Container */}
         <div className='w-full aspect-square rounded-lg overflow-hidden relative'>
           <Image
-            src={course.imageUrl || '/no-image.png'}
+            src={course.imageUrl ?? '/no-image.png'}
             alt={course.title}
             width={400}
             height={400}
             className='w-full h-full object-cover rounded-lg'
-            priority={true}
           />
 
           {/* Discount Tag */}
           {course.discount > 0 && (
             <div
               className='absolute -right-12 top-6 rotate-45 bg-gradient-to-r from-red-500 to-rose-500 
-                          text-white py-1 px-12 text-sm font-medium shadow-lg transform transition-transform'
+            text-white py-1 px-12 text-sm font-medium shadow-lg transform transition-transform'
             >
               {course.discount * 100}% OFF
             </div>
@@ -42,7 +41,7 @@ function CourseCard({ course }: { course: CoursesResType['data'][0] }) {
         {/* Content */}
         <div className='p-2'>
           {/* Categories */}
-          <p className='text-xs text-gray-500'>{course.categories.map((cat) => cat.name).join(' • ')}</p>
+          <p className='text-xs text-gray-500'>{course.categories.map((cat) => cat.name).join(', ')}</p>
 
           {/* Title */}
           <h3 className='text-lg font-semibold line-clamp-1'>{course.title}</h3>

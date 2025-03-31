@@ -12,17 +12,16 @@ import {
 import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { handleErrorApi } from '@/lib/utils'
-import { useCallback, use, useEffect, useRef } from 'react'
+import { useCallback, use, useEffect, useRef, useState } from 'react'
 import { UserCourseProgressResType } from '@/schemaValidations/course.schema'
-import { Breadcrumb } from '@/components/learn/Breadcrumb'
-import { Sidebar } from '@/components/learn/Sidebar'
 import { LessonContent } from '@/components/learn/LessonContent'
-import { WelcomeScreen } from '@/components/learn/WelcomeScreen'
-import { NavigationButtons } from '@/components/learn/NavigationButtons'
 import { LoadingSkeleton } from '@/components/learn/LoadingSkeleton'
 import { AlertTriangle } from 'lucide-react'
 import { useGetStillLearningCourse } from '@/queries/useAccount'
 import { toast } from '@/components/ui/use-toast'
+import { BreadcrumbParent } from '@/components/learn/BreadcrumbParent'
+import configRoute from '@/config/route'
+import { LearnPageContent } from '@/components/learn/LearnPageContent'
 
 type Lesson = UserCourseProgressResType['data']['chapters'][0]['lessons'][0]
 
@@ -80,7 +79,11 @@ function LearnPage(props: { params: Promise<{ id: string }> }) {
   const { data, isLoading } = useGetCourseProgressQuery({ id })
 
   // Lesson data query chỉ gọi khi KHÔNG ở chế độ preview
-  const { data: lessonData, isLoading: lessonLoading } = useGetLessonQuery({
+  const {
+    data: lessonData,
+    isLoading: lessonLoading,
+    isFetching: lessonFetching
+  } = useGetLessonQuery({
     id: lessonId!,
     enabled: !!lessonId && !isPreviewMode
   })
@@ -105,23 +108,23 @@ function LearnPage(props: { params: Promise<{ id: string }> }) {
   const { refetch: refetchStillLearning, isError } = useGetStillLearningCourse({ enabled: !isPreviewMode })
   const refetchIntervalRef = useRef<NodeJS.Timeout | null>(null)
 
+  const [, setSelectedChapterQuiz] = useState<any>(null)
+
   useEffect(() => {
     // Chỉ setup interval và gọi refetch khi không ở chế độ preview
     if (!isPreviewMode) {
       // Gọi refetch ngay lập tức khi component mount
       refetchStillLearning()
-      console.log('Initial refetch at:', new Date().toLocaleTimeString())
 
       // Clear previous interval if exists
       if (refetchIntervalRef.current) {
         clearInterval(refetchIntervalRef.current)
       }
 
-      // Set new interval
-      const intervalTime = 300000
+      // Set new interval 1 minute
+      const intervalTime = 1 * 60 * 1000
       refetchIntervalRef.current = setInterval(() => {
         refetchStillLearning()
-        console.log('Interval refetch at:', new Date().toLocaleTimeString())
       }, intervalTime)
     }
 
@@ -200,6 +203,8 @@ function LearnPage(props: { params: Promise<{ id: string }> }) {
   const handleLessonClick = useCallback(
     (lesson: any) => {
       if (canAccessLesson(lesson, course)) {
+        // Reset quiz state khi chuyển bài học
+        setSelectedChapterQuiz(null)
         router.push(`/learn/${id}?lessonId=${lesson.id}`)
       }
     },
@@ -210,11 +215,18 @@ function LearnPage(props: { params: Promise<{ id: string }> }) {
   useEffect(() => {
     if (isError) {
       toast({
-        title: 'Hiện đang có thiết bị khác đang học khóa học này',
+        description: 'Hiện đang có thiết bị khác đang học khóa học này',
         variant: 'destructive'
       })
+
+      router.push(configRoute.setting.myCourse)
     }
-  }, [isError])
+  }, [isError, router])
+
+  // Thêm effect để reset quiz state khi URL thay đổi
+  useEffect(() => {
+    setSelectedChapterQuiz(null)
+  }, [lessonId])
 
   // Render preview UI overlay when in preview mode
   if (isPreviewMode) {
@@ -295,82 +307,28 @@ function LearnPage(props: { params: Promise<{ id: string }> }) {
     )
   }
 
-  // Continue with regular UI for enrolled users
   if (isLoading) return <LoadingSkeleton />
-
-  if (!course) {
-    return (
-      <div className='py-8'>
-        <Breadcrumb />
-        <div className='flex flex-col items-center justify-center min-h-[400px] gap-4'>
-          <h3 className='text-lg font-medium text-gray-900'>Không tìm thấy khóa học</h3>
-          <p className='text-gray-500'>Khóa học không tồn tại hoặc đã bị xóa</p>
-          <Button asChild>
-            <Link href='/learn'>Quay lại danh sách khóa học</Link>
-          </Button>
-        </div>
-      </div>
-    )
-  }
 
   return (
     <div className='pt-32 pb-14 container'>
-      <div className='grid lg:grid-cols-[340px_1fr] gap-8'>
-        <Sidebar
-          course={course}
-          courseId={id}
-          lessonId={lessonId}
-          onLessonClick={handleLessonClick}
-          canAccessLesson={canAccessLesson}
-        />
+      <BreadcrumbParent courseTitle={course?.title} />
 
-        <Card className='bg-white backdrop-blur-sm border-none shadow-lg flex flex-col overflow-hidden'>
-          <div className='flex-1 overflow-y-auto'>
-            <div className='p-8'>
-              <div className='max-w-4xl mx-auto'>
-                {isLessonLoading ? (
-                  <div className='space-y-6'>
-                    <Skeleton className='h-10 w-2/3' />
-                    <Skeleton className='h-4 w-full' />
-                    <Skeleton className='h-4 w-3/4' />
-                    <div className='aspect-video'>
-                      <Skeleton className='h-full w-full rounded-2xl' />
-                    </div>
-                  </div>
-                ) : lesson ? (
-                  <LessonContent lesson={lesson} />
-                ) : (
-                  <WelcomeScreen />
-                )}
-              </div>
-            </div>
-          </div>
-
-          {/* Navigation Footer - Fixed at bottom */}
-          {lesson && (
-            <div className='flex-shrink-0 bg-white py-6'>
-              <NavigationButtons
-                course={course}
-                lesson={lesson}
-                prevLesson={getPreviousLesson()}
-                nextLesson={getNextLesson()}
-                canAccessNext={!!getNextLesson() && canAccessLesson(getNextLesson(), course)}
-                onPrevClick={() => {
-                  const prevLesson = getPreviousLesson()
-                  if (prevLesson) handleLessonClick(prevLesson)
-                }}
-                onNextClick={() => {
-                  const nextLesson = getNextLesson()
-                  if (nextLesson) handleLessonClick(nextLesson)
-                }}
-                onComplete={() => handleUpdate({ lessonId: lesson.id, status: lesson.status })}
-                isUpdating={updateCourseMutation.isPending}
-                canAccessLesson={canAccessLesson}
-              />
-            </div>
-          )}
-        </Card>
-      </div>
+      <LearnPageContent
+        course={course}
+        lesson={lesson}
+        lessonId={lessonId}
+        courseId={id}
+        isLoading={isLessonLoading}
+        isFetching={lessonFetching}
+        onLessonClick={handleLessonClick}
+        canAccessLesson={canAccessLesson}
+        handleUpdate={handleUpdate}
+        getNextLesson={getNextLesson}
+        getPreviousLesson={getPreviousLesson}
+        isUpdating={updateCourseMutation.isPending}
+        backUrl={configRoute.learn}
+        backLabel='Quay lại danh sách khóa học'
+      />
     </div>
   )
 }

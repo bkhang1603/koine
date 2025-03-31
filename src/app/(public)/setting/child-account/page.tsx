@@ -16,8 +16,8 @@ import { registerChildAccountBody, RegisterChildAccountBodyType } from '@/schema
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import { handleErrorApi } from '@/lib/utils'
-import { ChildAccountCard } from '@/components/public/parent/setting/child-account/ChildAccountCard'
-import { ChildAccountListSkeleton } from '@/components/public/parent/setting/child-account/ChildAccountListSkeleton'
+import { ChildAccountCard } from '@/components/public/parent/setting/child-account/child-account-card'
+import { ChildAccountListSkeleton } from '@/components/public/parent/setting/child-account/child-account-list-skeleton'
 import { Skeleton } from '@/components/ui/skeleton'
 
 // Thêm interface cho filters
@@ -140,7 +140,6 @@ export default function ChildAccountPage() {
                   <SelectValue placeholder='Sắp xếp theo' />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value='recent'>Gần đây nhất</SelectItem>
                   <SelectItem value='name'>Tên</SelectItem>
                   <SelectItem value='courses'>Số khóa học</SelectItem>
                 </SelectContent>

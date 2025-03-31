@@ -9,17 +9,8 @@ async function BlogDetailPage(props: { params: Promise<{ id: string }> }) {
 
   const { id } = params
 
-  // let blog: BlogResType['data'] | null = null
-
-  const data = await wrapServerApi(() => blogApiRequest.getBlog(id))
+  const data = await wrapServerApi(() => blogApiRequest.getBlogCache(id))
   const blog = data?.payload?.data
-
-  // try {
-  //   const { payload } = await blogApiRequest.getBlog(id)
-  //   blog = payload.data
-  // } catch (error) {
-  //   console.log(error)
-  // }
 
   if (!blog) {
     return <div>Blog không tồn tại</div>
@@ -69,7 +60,7 @@ async function BlogDetailPage(props: { params: Promise<{ id: string }> }) {
               className='prose prose-lg max-w-none prose-headings:text-gray-900 
               prose-p:text-gray-600 prose-p:leading-relaxed'
             >
-              <div className='tiptap-editor' dangerouslySetInnerHTML={{ __html: blog.content }} />
+              <div dangerouslySetInnerHTML={{ __html: blog.content }} />
             </div>
           )}
         </div>

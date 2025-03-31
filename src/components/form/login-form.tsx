@@ -17,6 +17,7 @@ import InputPassword from '@/components/input-password'
 import { useEffect } from 'react'
 import { useAppStore } from '@/components/app-provider'
 import { useGetIpMutation } from '@/queries/useIp'
+import { Loader2 } from 'lucide-react'
 
 export default function LoginForm({ className }: { className?: string }) {
   const { data } = useGetIpMutation()
@@ -144,8 +145,13 @@ export default function LoginForm({ className }: { className?: string }) {
           </Link>
         </div>
 
-        <Button type='submit' className='!mt-8 w-full h-10 bg-sixth hover:bg-sixth/80 text-base'>
-          Đăng nhập
+        <Button
+          type='submit'
+          className='!mt-8 w-full h-10 bg-sixth hover:bg-sixth/80 text-base'
+          disabled={loginMutation.isPending}
+        >
+          {loginMutation.isPending && <Loader2 className='w-4 h-4 mr-2 animate-spin' />}
+          {loginMutation.isPending ? 'Đang xử lý...' : 'Đăng nhập'}
         </Button>
       </form>
     </Form>

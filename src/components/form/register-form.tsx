@@ -14,7 +14,7 @@ import { useRegisterMutation } from '@/queries/useAuth'
 import InputPassword from '@/components/input-password'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
-import { CalendarIcon } from 'lucide-react'
+import { CalendarIcon, Loader2 } from 'lucide-react'
 import { format } from 'date-fns'
 import { Calendar } from '@/components/ui/calendar'
 
@@ -215,8 +215,13 @@ export default function RegisterForm({ className }: { className?: string }) {
           )}
         />
 
-        <Button type='submit' className='w-full h-10 bg-sixth hover:bg-sixth/80 text-base'>
-          Đăng ký
+        <Button
+          type='submit'
+          className='w-full h-10 bg-sixth hover:bg-sixth/80 text-base'
+          disabled={registerMutation.isPending}
+        >
+          {registerMutation.isPending && <Loader2 className='w-4 h-4 mr-2 animate-spin' />}
+          {registerMutation.isPending ? 'Đang xử lý...' : 'Đăng ký'}
         </Button>
       </form>
     </Form>

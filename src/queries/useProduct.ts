@@ -32,6 +32,27 @@ export const useGetProductReviewsQuery = ({
   })
 }
 
+export const useGetProductsQuery = ({
+  page_index,
+  page_size,
+  search,
+  range,
+  category,
+  sort
+}: {
+  page_index?: number
+  page_size?: number
+  search?: string
+  range?: number
+  category?: string
+  sort?: string
+}) => {
+  return useQuery({
+    queryKey: ['products', page_index, page_size, search, range, category, sort],
+    queryFn: () => productApiRequest.getProducts({ page_index, page_size, search, range, category, sort })
+  })
+}
+
 export const useGetProductListAdminQuery = ({
   page_index,
   page_size,

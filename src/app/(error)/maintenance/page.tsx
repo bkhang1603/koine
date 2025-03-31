@@ -10,7 +10,6 @@ function Maintenance() {
           alt='Maintenance image'
           width={800}
           height={800}
-          priority
           className='mx-auto h-80 w-auto'
         />
         <h1 className='mb-4 mt-10 text-3xl font-bold tracking-tight leading-none text-gray-900 lg:mb-6 md:text-4xl xl:text-5xl dark:text-white'>

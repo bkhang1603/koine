@@ -127,9 +127,10 @@ export default function PurchasedCoursesPage() {
                   <SelectContent>
                     <SelectItem value='all'>Tất cả danh mục</SelectItem>
                     {/* Populate with your categories */}
-                    <SelectItem value='1'>Ngoại ngữ</SelectItem>
-                    <SelectItem value='2'>Khoa học</SelectItem>
-                    <SelectItem value='3'>Kỹ năng mềm</SelectItem>
+                    <SelectItem value='1'>Tên A-Z</SelectItem>
+                    <SelectItem value='2'>Tên Z-A</SelectItem>
+                    <SelectItem value='3'>Ngày mua từ gần đây nhất</SelectItem>
+                    <SelectItem value='4'>Ngày mua từ xa nhất</SelectItem>
                   </SelectContent>
                 </Select>
               </div>

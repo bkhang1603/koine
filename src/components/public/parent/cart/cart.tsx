@@ -38,6 +38,7 @@ import { toast } from '@/components/ui/use-toast'
 export default function Cart() {
   const pickAddress = useAppStore((state) => state.pickAddress)
   const setPickAddress = useAppStore((state) => state.setPickAddress)
+  const setCheckoutData = useAppStore((state) => state.setCheckoutData)
 
   const { data, isLoading } = useCartDetailQuery()
   const updateMutation = useCartDetailUpdateMutation()
@@ -177,8 +178,6 @@ export default function Cart() {
 
   const cartDetails = data?.payload.data.cartDetails || []
   const isCartEmpty = !isLoading && cartDetails.length === 0
-
-  const setCheckoutData = useAppStore((state) => state.setCheckoutData)
 
   const handleCheckout = () => {
     const selectedItemsData = cartDetails.filter((item) => selectedItems.has(item.id))

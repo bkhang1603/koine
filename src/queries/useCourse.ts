@@ -65,7 +65,14 @@ export const useActiveCourseMutation = () => {
     mutationFn: courseApiRequest.activeCourse,
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: ['userCourses', 'account-store', 'courseProgress']
+        queryKey: ['userCourses']
+      })
+      // Nếu bạn cần invalidate các query khác, hãy gọi riêng
+      queryClient.invalidateQueries({
+        queryKey: ['account-store']
+      })
+      queryClient.invalidateQueries({
+        queryKey: ['courseProgress']
       })
     }
   })
@@ -264,5 +271,26 @@ export const useDeleteCategoryCourseMutation = () => {
 export const useCreateCourseCustomMutation = () => {
   return useMutation({
     mutationFn: courseApiRequest.createCourseCustom
+  })
+}
+
+export const useGetCourses = ({
+  page_index,
+  page_size,
+  category,
+  range,
+  sort,
+  keyword
+}: {
+  page_index?: number
+  page_size?: number
+  category?: string
+  range?: number
+  sort?: string
+  keyword?: string
+}) => {
+  return useQuery({
+    queryKey: ['courses', page_index, page_size, category, range, sort, keyword],
+    queryFn: () => courseApiRequest.getCourses({ page_index, page_size, category, range, sort, keyword })
   })
 }

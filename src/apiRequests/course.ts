@@ -46,13 +46,42 @@ const courseApiRequest = {
         keyword ? `&keyword=${keyword}` : ''
       }${category ? `&category=${category}` : ''}${range ? `&range=${range}` : ''}${sort ? `&sort=${sort}` : ''}`
     ),
+  // getCourses with caching
+  getCoursesCache: ({
+    page_index,
+    page_size,
+    category,
+    range,
+    sort,
+    keyword
+  }: {
+    page_index?: number | undefined
+    page_size?: number | undefined
+    category?: string | undefined
+    range?: number | undefined
+    sort?: string | undefined | ['pa', 'pd', 'na', 'nd'] | string[]
+    keyword?: string | string[] | undefined
+  }) =>
+    http.get<CoursesResType>(
+      `/courses?page_index=${page_index}&page_size=${page_size}${
+        keyword ? `&keyword=${keyword}` : ''
+      }${category ? `&category=${category}` : ''}${range ? `&range=${range}` : ''}${sort ? `&sort=${sort}` : ''}`,
+      { cache: 'force-cache', next: { revalidate: 12 * 60 * 60 } }
+    ),
   getCourse: (id: string) => http.get<CourseResType>(`/courses/${id}`),
+  // getCourse with caching
+  getCourseCache: (id: string) =>
+    http.get<CourseResType>(`/courses/${id}`, { cache: 'force-cache', next: { revalidate: 12 * 60 * 60 } }),
   addCourse: (data: CreateCourseBodyType) => http.post<CreateCourseBodyResType>('/courses', data),
   updateCourse: (id: string, data: CreateCourseBodyType) => http.put<CreateCourseBodyResType>(`/courses/${id}`, data),
   deleteCourse: (id: string) => http.delete<OnlyMessageResType>(`/courses/${id}`),
   enrollCourse: (id: string) => http.post<OnlyMessageResType>(`/courses/enroll/${id}`, {}),
   getUserCourses: () => http.get<UserCoursesResType>('/course-enrollment/enrolled'),
   updateCourseProgress: (lessonId: string) => http.post<OnlyMessageResType>('/user-progresses', { lessonId }),
+  // getCategoryCourses: () => http.get<CategoryCoursesResType>(`/category-courses`),
+  // getCategoryCourses with caching
+  getCategoryCoursesCache: () =>
+    http.get<CategoryCoursesResType>(`/category-courses`, { cache: 'force-cache', next: { revalidate: 24 * 60 * 60 } }),
   activeCourse: (data: { childId?: string | null; courseId: string | null }) =>
     http.post<OnlyMessageResType>(`/courses/active-course-enroll`, data),
   getCourseProgress: (id: string) => http.get<UserCourseProgressResType>(`/user-progresses/status/${id}`),
