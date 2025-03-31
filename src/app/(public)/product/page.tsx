@@ -12,7 +12,7 @@ async function ProductPage(props: { searchParams?: Promise<searchParams> }) {
 
   const data = await wrapServerApi(() => productApiRequest.getCategoryProductsCache())
 
-  const categories = data?.payload?.data
+  const categories = data?.payload?.data || []
 
   return (
     <main className='pb-28'>
