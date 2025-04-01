@@ -94,7 +94,7 @@ export default function OrderDetailPage(props: { params: Promise<{ id: string }>
 
       await updatePaymentMethodMutation.mutateAsync({
         id: order.id,
-        body: { payMethod: order.payMethod === 'COD' ? 'BANKING' : 'COD' }
+        body: { payMethod: order.payment.payMethod === 'COD' ? 'BANKING' : 'COD' }
       })
 
       toast({
@@ -313,7 +313,7 @@ export default function OrderDetailPage(props: { params: Promise<{ id: string }>
                 </div>
                 <div className='flex justify-between'>
                   <span className='text-muted-foreground'>Phương thức</span>
-                  <span className='font-medium'>{order.payMethod === 'COD' ? 'COD' : 'Banking'}</span>
+                  <span className='font-medium'>{order.payment.payMethod === 'COD' ? 'COD' : 'Banking'}</span>
                 </div>
                 <div className='flex justify-between'>
                   <span className='text-muted-foreground'>Ngày tạo</span>
@@ -348,7 +348,7 @@ export default function OrderDetailPage(props: { params: Promise<{ id: string }>
               {canCancel && (
                 <div className='pt-2 space-y-3'>
                   {/* Nút thanh toán ngay khi phương thức là Banking */}
-                  {order.payMethod === 'BANKING' && (
+                  {order.payment.payMethod === 'BANKING' && (
                     <>
                       <Button
                         className='w-full'
@@ -378,7 +378,7 @@ export default function OrderDetailPage(props: { params: Promise<{ id: string }>
 
                   {/* Nút đổi phương thức thanh toán */}
                   {/* Chỉ cho phép đổi sang COD nếu đơn hàng có product */}
-                  {(!hasOnlyCourses || (hasOnlyCourses && order.payMethod === 'COD')) && (
+                  {(!hasOnlyCourses || (hasOnlyCourses && order.payment.payMethod === 'COD')) && (
                     <Button
                       className='w-full border border-primary/30 bg-primary/5 hover:bg-primary/10 hover:text-primary/80 text-primary flex items-center justify-center gap-2'
                       variant='outline'
@@ -392,7 +392,7 @@ export default function OrderDetailPage(props: { params: Promise<{ id: string }>
                         </>
                       ) : (
                         <>
-                          {order.payMethod === 'COD' ? (
+                          {order.payment.payMethod === 'COD' ? (
                             <>
                               <CreditCard className='w-4 h-4 mr-2' />
                               <span>Đổi sang chuyển khoản</span>

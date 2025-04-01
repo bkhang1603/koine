@@ -25,7 +25,6 @@ export const orderDetail = z
   .object({
     id: z.string(),
     status: z.enum(OrderStatusValues),
-    payMethod: z.enum(PaymentMethodValues),
     deliMethod: z.enum(DeliveryMethodValues),
     deliAmount: z.number(),
     note: z.string().nullable(),
@@ -68,7 +67,25 @@ export const orderDetail = z
           description: z.string()
         })
       })
-    )
+    ),
+    orderStatusHistory: z.array(
+      z.object({
+        status: z.enum(OrderStatusValues),
+        timestamp: z.string()
+      })
+    ),
+    deliveryInfo: z.object({
+      name: z.string(),
+      address: z.string(),
+      phone: z.string(),
+      status: z.enum(OrderStatusValues)
+    }),
+    payment: z.object({
+      payMethod: z.enum(PaymentMethodValues),
+      payDate: z.string(),
+      payAmount: z.number(),
+      payStatus: z.enum(OrderStatusValues)
+    })
   })
   .strict()
 
