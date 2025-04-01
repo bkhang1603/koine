@@ -19,7 +19,7 @@ import { useAppStore } from '@/components/app-provider'
 import { useGetIpMutation } from '@/queries/useIp'
 import { Loader2 } from 'lucide-react'
 
-export default function LoginForm({ className }: { className?: string }) {
+export default function LoginForm({ className, onSuccess }: { className?: string; onSuccess?: () => void }) {
   const { data } = useGetIpMutation()
   const ipAddress = data?.payload.data.clientIp ?? ''
 
@@ -53,6 +53,12 @@ export default function LoginForm({ className }: { className?: string }) {
 
       setRole(result.payload.data.account.role)
 
+      // Nếu có callback onSuccess từ modal, gọi callback
+      if (onSuccess) {
+        onSuccess()
+        return
+      }
+
       // Kiểm tra xem có redirect parameter từ URL không (khi bị chuyển hướng từ middleware)
       const redirect = searchParams.get('redirect')
 
@@ -79,13 +85,13 @@ export default function LoginForm({ className }: { className?: string }) {
             router.push('/content-creator')
             break
           case 'ADULT':
-            router.push('/')
+            router.back()
             break
           case 'CHILD':
             router.push('/kid')
             break
           default:
-            router.push('/')
+            router.back()
             break
         }
       }
@@ -94,8 +100,6 @@ export default function LoginForm({ className }: { className?: string }) {
         description: result.payload.message || 'Đăng nhập thành công!'
       })
     } catch (error: any) {
-      console.log(error)
-
       handleErrorApi({
         error,
         setError: form.setError

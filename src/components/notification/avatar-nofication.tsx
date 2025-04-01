@@ -63,7 +63,7 @@ function AvatarNotification() {
       setAvatar()
       setUsername()
       setUser()
-      router.push(configRoute.home)
+      router.back()
       router.refresh()
     } catch (error: any) {
       handleErrorApi(error)

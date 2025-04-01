@@ -18,7 +18,7 @@ import { CalendarIcon, Loader2 } from 'lucide-react'
 import { format } from 'date-fns'
 import { Calendar } from '@/components/ui/calendar'
 
-export default function RegisterForm({ className }: { className?: string }) {
+export default function RegisterForm({ className, onSuccess }: { className?: string; onSuccess?: () => void }) {
   const { toast } = useToast()
   const router = useRouter()
   const registerMutation = useRegisterMutation()
@@ -51,6 +51,11 @@ export default function RegisterForm({ className }: { className?: string }) {
       toast({
         description: result.payload.message || 'Đăng ký thành công'
       })
+
+      if (onSuccess) {
+        onSuccess()
+        return
+      }
 
       router.push(`/otp?id=${result.payload.data}&time=${encodeURIComponent(new Date().toString())}`)
     } catch (error: any) {
@@ -131,7 +136,10 @@ export default function RegisterForm({ className }: { className?: string }) {
                     <PopoverTrigger asChild>
                       <Button
                         variant={'outline'}
-                        className={cn('w-full text-left font-normal h-9', !field.value && 'text-muted-foreground')}
+                        className={cn(
+                          'w-full text-left font-normal h-9 bg-transparent hover:bg-transparent',
+                          !field.value && 'text-muted-foreground'
+                        )}
                       >
                         {field.value ? format(new Date(field.value), 'dd/MM/yyyy') : <span>Chọn ngày sinh</span>}
                         <CalendarIcon className='ml-auto h-4 w-4 opacity-50' />

@@ -8,11 +8,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage, FormDes
 import { Input } from '@/components/ui/input'
 import { toast } from '@/components/ui/use-toast'
 import { useAddAccountAddressMutation, useUpdateAccountAddressMutation } from '@/queries/useAccount'
-import {
-  accountAddressBody,
-  AccountAddressBodyType,
-  AccountOneAddressResType
-} from '@/schemaValidations/account.schema'
+import { AccountOneAddressResType } from '@/schemaValidations/account.schema'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
@@ -21,8 +17,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { VIETNAM_PROVINCES } from '@/data/vietnam-provinces'
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import { Label } from '@/components/ui/label'
-import { MapPin, Home, Building } from 'lucide-react'
-import { ScrollArea } from '@/components/ui/scroll-area'
+import { MapPin } from 'lucide-react'
 
 const addressSchema = z.object({
   name: z.string().min(1, { message: 'Vui lòng nhập họ tên' }),
@@ -207,7 +202,7 @@ export default function AddressForm({ open, onOpenChange, defaultValues, mode = 
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className='sm:max-w-md overflow-y-auto max-h-[80vh]'>
+      <DialogContent>
         <DialogHeader>
           <DialogTitle className='flex items-center gap-2'>
             <MapPin className='h-5 w-5 text-primary' />
@@ -259,13 +254,13 @@ export default function AddressForm({ open, onOpenChange, defaultValues, mode = 
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        <ScrollArea className='h-[300px]'>
+                        <div className='max-h-[300px] overflow-y-auto'>
                           {VIETNAM_PROVINCES.map((province) => (
                             <SelectItem key={province.code} value={province.code}>
                               {province.name}
                             </SelectItem>
                           ))}
-                        </ScrollArea>
+                        </div>
                       </SelectContent>
                     </Select>
                     <FormMessage />
@@ -290,13 +285,13 @@ export default function AddressForm({ open, onOpenChange, defaultValues, mode = 
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        <ScrollArea className='h-[300px]'>
+                        <div className='max-h-[300px] overflow-y-auto'>
                           {districts.map((district) => (
                             <SelectItem key={district.code} value={district.code}>
                               {district.name}
                             </SelectItem>
                           ))}
-                        </ScrollArea>
+                        </div>
                       </SelectContent>
                     </Select>
                     <FormMessage />
@@ -323,13 +318,13 @@ export default function AddressForm({ open, onOpenChange, defaultValues, mode = 
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        <ScrollArea className='h-[300px]'>
+                        <div className='max-h-[300px] overflow-y-auto'>
                           {wards.map((ward) => (
                             <SelectItem key={ward.code} value={ward.code}>
                               {ward.name}
                             </SelectItem>
                           ))}
-                        </ScrollArea>
+                        </div>
                       </SelectContent>
                     </Select>
                     <FormMessage />

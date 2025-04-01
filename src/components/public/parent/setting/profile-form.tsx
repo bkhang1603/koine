@@ -197,7 +197,8 @@ export function ProfileForm() {
 
                       // Định dạng để hiển thị trên giao diện người dùng
                       const formatDateForDisplay = (date: Date) => {
-                        return format(date, 'dd MMMM, yyyy')
+                        // format theo tiếng việt hoặc số không chứ không để tiếng anh
+                        return format(date, 'dd/MM/yyyy')
                       }
 
                       // Định dạng để gửi về backend (mm/dd/yyyy)

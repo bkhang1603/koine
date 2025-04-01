@@ -6,8 +6,8 @@ import { Button } from '@/components/ui/button'
 import { ShoppingCart } from 'lucide-react'
 import { toast } from '@/components/ui/use-toast'
 import { useCartDetailCreateMutation } from '@/queries/useCartDetail'
-import configRoute from '@/config/route'
-import Link from 'next/link'
+import { useAuthModal } from '@/components/auth/auth-modal-provider'
+import { handleErrorApi } from '@/lib/utils'
 
 interface CourseButtonProps {
   id: string
@@ -23,11 +23,17 @@ interface CourseButtonProps {
 }
 
 export default function CourseButton({ course, variant = 'default', className }: CourseButtonProps) {
-  const role = useAppStore((state) => state.role)
+  const isAuth = useAppStore((state) => state.isAuth)
   const addToCartMutation = useCartDetailCreateMutation()
+  const { showLoginModal } = useAuthModal()
 
   const handleAddToCart = async () => {
     try {
+      if (!isAuth) {
+        showLoginModal()
+        return
+      }
+
       if (addToCartMutation.isPending) {
         return
       }
@@ -47,19 +53,8 @@ export default function CourseButton({ course, variant = 'default', className }:
         description: 'Khóa học đã được thêm vào giỏ hàng'
       })
     } catch (error) {
-      console.log(error)
+      handleErrorApi({ error })
     }
-  }
-
-  if (!role) {
-    return (
-      <Button variant={variant} className={className} asChild>
-        <Link href={configRoute.login}>
-          <ShoppingCart className='w-4 h-4 mr-2' />
-          Thêm vào giỏ hàng
-        </Link>
-      </Button>
-    )
   }
 
   return (

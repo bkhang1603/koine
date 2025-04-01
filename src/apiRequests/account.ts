@@ -41,11 +41,13 @@ const accountApiRequest = {
     page_index,
     page_size
   }: {
-    status: (typeof OrderStatusValues)[number]
+    status?: (typeof OrderStatusValues)[number]
     page_index: number
     page_size: number
   }) =>
-    http.get<AccountOrderResType>(`/orders/my-orders?status=${status}&page_index=${page_index}&page_size=${page_size}`),
+    http.get<AccountOrderResType>(
+      `/orders/my-orders?${status ? `status=${status}&` : ''}&page_index=${page_index}&page_size=${page_size}`
+    ),
   getChildAccount: () => http.get<MyChildAccountResType>('/users/my-child-course'),
   getChildAccountById: (id: string) => http.get<MyChildAccountByIdResType>(`/users/my-child-course/${id}`),
   getSuggestCoursesFree: () => http.get<SuggestCoursesFreeResType>('/courses/suggest-courses-free'),

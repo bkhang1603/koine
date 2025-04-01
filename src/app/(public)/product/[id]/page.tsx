@@ -42,7 +42,13 @@ export default async function ProductDetail(props: {
             {product.categories && changeCategoriesToString(product.categories.map((category) => category.name))}
           </p>
           <h2 className='text-4xl mb-4'>{product.name}</h2>
-          <p className='text-2xl mb-4'>{(product.price - product.price * product.discount).toLocaleString()}đ</p>
+          <div className='mb-4 flex items-center gap-2'>
+            <p className='text-2xl'>{(product.price - product.price * product.discount).toLocaleString()}đ</p>
+            {/* Hiện số sản phẩm còn lại trong kho */}
+            <span className='text-gray-600 text-sm'>
+              {product.stockQuantity > 0 ? `(${product.stockQuantity} sản phẩm còn lại)` : '(Hết hàng)'}
+            </span>
+          </div>
 
           <p className='mb-6 line-clamp-3'>{product.description}</p>
 
@@ -53,7 +59,7 @@ export default async function ProductDetail(props: {
                 className={`w-5 h-5 ${i <= Math.ceil(overallRating) ? 'text-yellow-400 fill-current' : 'text-gray-400 fill-current'}`}
               />
             ))}
-            <span className='ml-2 text-gray-600'>
+            <span className='ml-2 text-gray-600 text-sm'>
               {product.totalRating > 0 ? `(${product.totalRating} đánh giá)` : '(Chưa có đánh giá)'}
             </span>
           </div>

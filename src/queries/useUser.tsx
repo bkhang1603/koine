@@ -1,5 +1,5 @@
 import userApiRequest from '@/apiRequests/user'
-import { useMutation, useQuery } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 
 export const useUsersAdminQuery = ({
   keyword,
