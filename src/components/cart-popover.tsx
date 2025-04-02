@@ -106,7 +106,7 @@ export default function CartPopover({ data }: { data: CartDetailResType['data'] 
                     </div>
                     <p className='text-xs text-muted-foreground'>Số lượng: {item.quantity}</p>
                     <p className='text-sm font-medium text-secondary'>
-                      {item.totalPrice === 0 ? 'Miễn phí' : `${item.totalPrice.toLocaleString()} đ`}
+                      {item.totalPrice === 0 ? 'Miễn phí' : `${item.unitPrice.toLocaleString()} đ`}
                     </p>
                   </div>
                 </div>
