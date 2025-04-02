@@ -3,7 +3,6 @@ import {
   CancelEventRequestType,
   CreateEventMeetingRequestType,
   CreateEventRoomRequestType,
-  GetAllEventResType,
   UpdateEventRequestType
 } from '@/schemaValidations/event.schema'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'

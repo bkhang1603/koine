@@ -41,14 +41,12 @@ export const getAllEventResType = z.object({
 
 export type GetAllEventResType = z.infer<typeof getAllEventResType>
 
-
 //cancel
 export const cancelEventRequest = z.object({
   eventId: z.string(),
   note: z.string()
 })
 export type CancelEventRequestType = z.infer<typeof cancelEventRequest>
-
 
 //update thông tin lúc tạo phòng
 export const createEventRoomRequest = z.object({
@@ -58,7 +56,6 @@ export const createEventRoomRequest = z.object({
 })
 export type CreateEventRoomRequestType = z.infer<typeof createEventRoomRequest>
 
-
 //update thông tin khác
 export const updateEventRequest = z.object({
   title: z.string().optional(),
@@ -66,7 +63,7 @@ export const updateEventRequest = z.object({
   startedAt: z
     .union([
       z.string().refine((val) => !isNaN(new Date(val).getTime()), {
-        message:"Thời gian bắt đầu không hợp lệ, sử dụng định dạng ISO: YYYY-MM-DDTHH:MM:SS"
+        message: 'Thời gian bắt đầu không hợp lệ, sử dụng định dạng ISO: YYYY-MM-DDTHH:MM:SS'
       }),
       z.date()
     ])
@@ -83,4 +80,3 @@ export const updateEventRequest = z.object({
 })
 
 export type UpdateEventRequestType = z.infer<typeof updateEventRequest>
-

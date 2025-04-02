@@ -13,6 +13,10 @@ function DesktopNavbar() {
       name: 'Khóa học',
       href: configRoute.course
     },
+    {
+      name: 'Sự kiện',
+      href: configRoute.event
+    },
     { name: 'Kiến thức', href: configRoute.knowledge },
     { name: 'Tổng quan', href: configRoute.about },
     { name: 'Liên hệ', href: configRoute.contact }

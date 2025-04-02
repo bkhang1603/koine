@@ -1,241 +1,191 @@
 'use client'
 
-import type React from 'react'
-import { useState } from 'react'
-import { useRouter, useSearchParams } from 'next/navigation'
-import Image from 'next/image'
 import { Button } from '@/components/ui/button'
-import { Calendar, Clock, Mic, ArrowLeft, Bell, FileVideo } from 'lucide-react'
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger
-} from '@/components/ui/alert-dialog'
-import { useUploadRecordMutation } from '@/queries/useUpload'
-import { useUpdateEventMutation } from '@/queries/useEvent'
+import { Badge } from '@/components/ui/badge'
+import { useEvent } from '@/queries/useEvent'
+import { EventStatus } from '../types'
+import Image from 'next/image'
+import { useRouter, useSearchParams } from 'next/navigation'
+import { useState } from 'react'
+import { Calendar, Users, Clock, PlayCircle, ArrowLeft, Share2, Bookmark } from 'lucide-react'
+import { cn, handleErrorApi } from '@/lib/utils'
+import { WherebyMeeting } from '../ui'
+import { EventDetailSkeleton } from '../components/EventDetailSkeleton'
+import { Breadcrumb } from '@/components/public/parent/setting/Breadcrumb'
 
-//for expert
+const eventStatusConfig: Record<EventStatus, { label: string; color: string }> = {
+  OPENING: {
+    label: 'Đang diễn ra',
+    color: 'bg-green-50 text-green-600'
+  },
+  PENDING: {
+    label: 'Sắp diễn ra',
+    color: 'bg-blue-50 text-blue-600'
+  },
+  DONE: {
+    label: 'Đã kết thúc',
+    color: 'bg-gray-50 text-gray-600'
+  },
+  CANCELLED: {
+    label: 'Đã hủy',
+    color: 'bg-red-50 text-red-600'
+  }
+}
+
 export default function EventDetailPage() {
-  const router = useRouter()
   const searchParams = useSearchParams()
-  const id = searchParams.get('id')
-  const data = searchParams.get('data')
+  const eventData = searchParams.get('data')
+  const event = eventData ? JSON.parse(decodeURIComponent(eventData)) : null
+  const [isProcessing, setIsProcessing] = useState(false)
+  const [isMeetingOpen, setIsMeetingOpen] = useState(false)
+  const [meetingUrl, setMeetingUrl] = useState('')
+  const router = useRouter()
 
-  const uploadRecord = useUploadRecordMutation()
-  const updateEventInfo = useUpdateEventMutation()
+  if (!event) {
+    return (
+      <div className='min-h-screen flex items-center justify-center bg-gray-50/50'>
+        <div className='text-center'>
+          <h1 className='text-2xl font-bold mb-4'>Không tìm thấy sự kiện</h1>
+          <Button onClick={() => router.push('/event-user')}>Quay lại</Button>
+        </div>
+      </div>
+    )
+  }
 
-  // Parse event data from URL
-  const eventData = data ? JSON.parse(decodeURIComponent(data)) : null
-
-  const [processing, setProcessing] = useState(false)
-  const [uploaded, setUploaded] = useState(eventData?.recordUrl ? true : false)
-
-  // Status styles mapping
-  const statusStyles = {
-    OPENING: {
-      textBackgroundColor: 'bg-green-500',
-      text: 'Đang diễn ra',
-      textColor: 'text-black',
-      backgroundColor: 'bg-green-500'
-    },
-    PENDING: {
-      textBackgroundColor: 'bg-yellow-500',
-      text: 'Chưa mở',
-      textColor: 'text-black',
-      backgroundColor: 'bg-gray-300'
-    },
-    DONE: {
-      textBackgroundColor: 'bg-gray-300',
-      text: 'Đã kết thúc',
-      textColor: 'text-black',
-      backgroundColor: 'bg-gray-300'
-    },
-    CANCELLED: {
-      textBackgroundColor: 'bg-gray-300',
-      text: 'Đã hủy',
-      textColor: 'text-black',
-      backgroundColor: 'bg-gray-300'
+  const openMeet = async (roomUrl: string) => {
+    try {
+      setIsProcessing(true)
+      setMeetingUrl(roomUrl)
+      setIsMeetingOpen(true)
+    } catch (error) {
+      handleErrorApi({ error })
+    } finally {
+      setTimeout(() => {
+        setIsProcessing(false)
+      }, 500)
     }
   }
 
-  // Check if event is closed
-  const isClosed = (eventStartAt: string, duration: number): boolean => {
+  const isOpenable = (eventStartAt: string, duration: number): boolean => {
     const now = new Date()
-    // Convert to GMT+7
     const localTime = new Date(now.getTime() + 7 * 60 * 60 * 1000)
     const startTime = new Date(eventStartAt)
-    const endDate = new Date(startTime.getTime() + duration * 1000) // duration in seconds
-    return localTime.getTime() >= endDate.getTime()
-  }
-
-  // Handle video upload
-  const handleVideoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (processing) return
-    if (!e.target.files || e.target.files.length === 0) return
-
-    try {
-      setProcessing(true)
-
-      const file = e.target.files[0]
-
-      // Kiểm tra MIME type của file để chắc chắn rằng đó là video
-      const allowedVideoTypes = ['video/mp4', 'video/avi', 'video/mov', 'video/webm'] // Các loại video cho phép
-      if (!allowedVideoTypes.includes(file.type)) {
-        alert('Vui lòng chọn một file video hợp lệ.')
-        return // Dừng nếu file không phải video
-      }
-
-      // Kiểm tra phần mở rộng video và định dạng lại tên file
-
-      let newFileName = eventData.title + `-record-${new Date().getTime()}.mp4`
-
-      const formData = new FormData()
-      formData.append('file', new File([file], newFileName, { type: file.type }))
-
-      const videoUrl = await uploadRecord.mutateAsync(formData)
-      console.log('video url ', videoUrl)
-
-      const res = updateEventInfo.mutateAsync({
-        body: { recordUrl: videoUrl.payload.data },
-        eventId: eventData.id
-      })
-      setUploaded(true)
-      alert('Cập nhật bản ghi sự kiện thành công')
-    } catch (error) {
-      console.error('Lỗi upload video', error)
-      alert(`Lỗi: ${error}`)
-    } finally {
-      setProcessing(false)
-    }
+    const endDate = new Date(startTime.getTime() + duration * 1000)
+    return localTime.getTime() >= startTime.getTime() && localTime.getTime() < endDate.getTime()
   }
 
   return (
-    <div className='flex flex-col min-h-screen  justify-center items-center  bg-white'>
-      <div className='flex-1 pb-6 mt-[150px]'>
-        {eventData ? (
-          <>
-            <div className='relative w-[600px] h-[400px]'>
-              <Image
-                src={eventData.imageUrl || '/placeholder.svg?height=240&width=600'}
-                alt={eventData.title}
-                fill
-                className='object-cover'
-              />
+    <main className='min-h-screen bg-gray-50/50'>
+      {/* Hero Section */}
+      <section className='relative h-[40vh] bg-black'>
+        <div className='absolute inset-0'>
+          <Image
+            src={event.imageUrl || '/placeholder.svg'}
+            alt={event.title}
+            fill
+            className='object-cover opacity-50'
+          />
+          <div className='absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-black/60' />
+        </div>
+
+        <div className='relative h-full container flex flex-col justify-end pb-16'>
+          <Breadcrumb
+            items={[
+              { title: 'Trang chủ', href: '/' },
+              { title: 'Sự kiện', href: '/event-user' },
+              { title: event.title, href: `/event-user/${event.id}` }
+            ]}
+            className='absolute top-8 left-0 ml-8 text-primary'
+            colorForLink='text-white hover:text-white/80'
+          />
+
+          <Badge className={cn('self-start mb-4', eventStatusConfig[event.status as EventStatus].color)}>
+            {eventStatusConfig[event.status as EventStatus].label}
+          </Badge>
+          <h1 className='text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-6 max-w-3xl'>{event.title}</h1>
+          <div className='flex items-center gap-4 text-white/80 mb-2'>
+            <div className='flex items-center gap-2'>
+              <Calendar className='h-4 w-4' />
+              <span>{event.startAtFormatted}</span>
             </div>
+            <div className='flex items-center gap-2'>
+              <Clock className='h-4 w-4' />
+              <span>{event.durationsDisplay}</span>
+            </div>
+            <div className='flex items-center gap-2'>
+              <Users className='h-4 w-4' />
+              <span>{event.totalParticipants} người tham gia</span>
+            </div>
+          </div>
+        </div>
+      </section>
 
-            <div className='p-4 space-y-4'>
-              <h1 className='font-bold text-xl'>{eventData.title}</h1>
-              <p className='ml-1'>{eventData.description}</p>
-
-              <div className='flex items-center py-2'>
-                <Mic className='h-5 w-5 mr-2' />
-                <span className='font-semibold'>{eventData.hostInfo?.fullName || 'Unknown Host'}</span>
-              </div>
-
-              <div className='flex items-center py-2'>
-                <Calendar className='h-5 w-5 mr-2' />
-                <span className='font-semibold'>
-                  {eventData.startAtFormatted || new Date(eventData.startedAt).toLocaleString()}
-                </span>
-              </div>
-
-              <div className='flex items-center py-2'>
-                <Clock className='h-5 w-5 mr-2' />
-                <span className='font-semibold'>
-                  {eventData.durationsDisplay ||
-                    `${Math.floor(eventData.durations / 3600)} giờ ${Math.floor((eventData.durations % 3600) / 60)} phút`}
-                </span>
-              </div>
-
-              <div className='flex items-center py-2'>
-                <span className='font-semibold mr-2'>Trạng thái:</span>
-                <div
-                  className={`p-1 ${statusStyles[eventData.status.toUpperCase() as keyof typeof statusStyles]?.textBackgroundColor} rounded-lg`}
-                >
-                  <span
-                    className={`${statusStyles[eventData.status.toUpperCase() as keyof typeof statusStyles]?.textColor} font-semibold`}
-                  >
-                    {eventData.status.toUpperCase() === 'OPENING' && isClosed(eventData.startedAt, eventData.durations)
-                      ? 'Đã kết thúc'
-                      : statusStyles[eventData.status.toUpperCase() as keyof typeof statusStyles]?.text}
-                  </span>
+      {/* Content Section */}
+      <section className='container -mt-16 relative'>
+        <div className='bg-white rounded-2xl shadow-lg p-6 md:p-8'>
+          <div className='flex flex-col md:flex-row gap-8'>
+            {/* Left Column */}
+            <div className='flex-1'>
+              <div className='flex items-center gap-4 mb-6'>
+                <div className='h-12 w-12 rounded-full overflow-hidden'>
+                  <Image
+                    src={event.hostInfo.avatarUrl}
+                    alt={event.hostInfo.fullName}
+                    width={48}
+                    height={48}
+                    className='object-cover'
+                  />
+                </div>
+                <div>
+                  <p className='font-medium'>{event.hostInfo.fullName}</p>
+                  <p className='text-sm text-gray-500'>{event.hostInfo.email}</p>
                 </div>
               </div>
 
-              <div className='flex items-center py-2'>
-                <FileVideo className='h-5 w-5 mr-2' />
-                <div
-                  className={`${uploaded || eventData.recordUrl?.length > 0 ? 'bg-gray-300' : 'bg-blue-400'} rounded-lg p-1`}
-                >
-                  <span className='font-semibold'>
-                    {uploaded || eventData.recordUrl?.length > 0 ? 'Đã chọn' : 'Chưa chọn'}
-                  </span>
-                </div>
+              <div className='prose max-w-none'>
+                <h2 className='text-2xl font-semibold mb-4'>Giới thiệu sự kiện</h2>
+                <p className='text-gray-600'>{event.description}</p>
               </div>
             </div>
 
-            {!isClosed(eventData.startedAt, eventData.durations) ? null : (
-              <div className='w-full flex justify-center items-center mt-4 px-4'>
-                {uploaded ? (
-                  <AlertDialog>
-                    <AlertDialogTrigger asChild>
-                      <Button className='w-full py-6 bg-gray-300 hover:bg-gray-400' disabled={processing}>
-                        <span className='font-bold'>Tải lên bản ghi cuộc họp</span>
-                      </Button>
-                    </AlertDialogTrigger>
-                    <AlertDialogContent>
-                      <AlertDialogHeader>
-                        <AlertDialogTitle>Thông báo</AlertDialogTitle>
-                        <AlertDialogDescription>Nếu tải lên bản ghi mới, bản ghi cũ sẽ bị xóa</AlertDialogDescription>
-                      </AlertDialogHeader>
-                      <AlertDialogFooter>
-                        <AlertDialogCancel>Hủy</AlertDialogCancel>
-                        <AlertDialogAction asChild>
-                          <label className='inline-flex h-10 items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground ring-offset-background transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 cursor-pointer'>
-                            Tải lên
-                            <input
-                              type='file'
-                              accept='video/*'
-                              className='hidden'
-                              onChange={handleVideoUpload}
-                              disabled={processing}
-                            />
-                          </label>
-                        </AlertDialogAction>
-                      </AlertDialogFooter>
-                    </AlertDialogContent>
-                  </AlertDialog>
-                ) : (
-                  <label
-                    className={`inline-flex h-12 w-full items-center justify-center rounded-lg ${!processing ? 'bg-cyan-500 hover:bg-cyan-600' : 'bg-gray-300'} px-4 py-2 text-sm font-medium text-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 cursor-pointer`}
-                  >
-                    <span className='font-bold'>Tải lên bản ghi cuộc họp</span>
-                    <input
-                      type='file'
-                      accept='video/*'
-                      className='hidden'
-                      onChange={handleVideoUpload}
-                      disabled={processing}
-                    />
-                  </label>
-                )}
+            {/* Right Column */}
+            <div className='w-full md:w-80 space-y-6'>
+              {isOpenable(event.startedAt, event.durations) && event.status === 'OPENING' && (
+                <Button className='w-full' size='lg' onClick={() => openMeet(event.roomUrl)} disabled={isProcessing}>
+                  <PlayCircle className='h-4 w-4 mr-2' />
+                  {isProcessing ? 'Đang kết nối...' : 'Tham gia ngay'}
+                </Button>
+              )}
+
+              <div className='space-y-4'>
+                <div className='flex items-center gap-2 text-gray-500'>
+                  <Calendar className='h-4 w-4' />
+                  <div>
+                    <p className='text-sm font-medium'>Thời gian</p>
+                    <p className='text-sm'>{event.startAtFormatted}</p>
+                  </div>
+                </div>
+                <div className='flex items-center gap-2 text-gray-500'>
+                  <Clock className='h-4 w-4' />
+                  <div>
+                    <p className='text-sm font-medium'>Thời lượng</p>
+                    <p className='text-sm'>{event.durationsDisplay}</p>
+                  </div>
+                </div>
+                <div className='flex items-center gap-2 text-gray-500'>
+                  <Users className='h-4 w-4' />
+                  <div>
+                    <p className='text-sm font-medium'>Số người tham gia</p>
+                    <p className='text-sm'>{event.totalParticipants} người</p>
+                  </div>
+                </div>
               </div>
-            )}
-          </>
-        ) : (
-          <Alert className='m-4'>
-            <AlertTitle>Không có thông tin sự kiện</AlertTitle>
-            <AlertDescription>Không thể tải thông tin sự kiện. Vui lòng thử lại sau.</AlertDescription>
-          </Alert>
-        )}
-      </div>
-    </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <WherebyMeeting url={meetingUrl} isOpen={isMeetingOpen} onClose={() => setIsMeetingOpen(false)} />
+    </main>
   )
 }
