@@ -58,8 +58,43 @@ export const useUpdatePaymentMethodMutation = ({ id }: { id: string }) => {
     mutationFn: orderApiRequest.updatePaymentMethod,
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: ['order', id]
+        queryKey: ['orders', id]
       })
     }
+  })
+}
+
+export const useGetRefundOrders = ({ page_size, page_index }: { page_size: number; page_index: number }) => {
+  return useQuery({
+    queryKey: ['refund-orders', page_size, page_index],
+    queryFn: () => orderApiRequest.getRefundOrders({ page_size, page_index })
+  })
+}
+
+export const useCreateRefundOrderMutation = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: orderApiRequest.createRefundOrder,
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ['orders']
+      })
+    }
+  })
+}
+
+// get order cho admin
+export const useGetAdminOrdersQuery = (pageSize: number, pageIndex: number, status: string) => {
+  return useQuery({
+    queryKey: ['adminOrders', status, pageSize, pageIndex],
+    queryFn: () => orderApiRequest.getAdminOrders(pageSize, pageIndex, status)
+  })
+}
+
+export const useGetAdminOrderQuery = ({ id }: { id: string }) => {
+  return useQuery({
+    queryKey: ['order', id],
+    queryFn: () => orderApiRequest.getAdminOrderById(id)
   })
 }

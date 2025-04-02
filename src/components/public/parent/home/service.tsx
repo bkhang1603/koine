@@ -64,7 +64,7 @@ const itemVariants = {
 
 export default function Service() {
   return (
-    <section className='overflow-hidden'>
+    <section className='overflow-hidden bg-muted/30'>
       <div className='container py-24'>
         <motion.div
           initial={{ opacity: 0, y: 20 }}

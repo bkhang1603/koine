@@ -1,17 +1,21 @@
-import { Star, Heart, Share2, Truck, RotateCcw, ShieldCheck } from 'lucide-react'
+import { Star, Truck, RotateCcw, ShieldCheck } from 'lucide-react'
 import BreadCrumbCustom from '@/components/breadcrumb-custom'
 import ProductImage from '@/components/public/parent/product/product-image'
 import productApiRequest from '@/apiRequests/product'
 import AddToCartButton from '@/components/public/parent/product/add-to-cart-button'
 import ProductDescription from '@/components/public/parent/product/product-description'
 import { wrapServerApi } from '@/lib/server-utils'
+import RecommendedProducts from '@/components/public/parent/product/recommended-products'
+import { searchParams } from '@/types/query'
 
-export default async function ProductDetail(props: { params: Promise<{ id: string }> }) {
-  const params = await props.params
+export default async function ProductDetail(props: {
+  params: Promise<{ id: string }>
+  searchParams: Promise<searchParams>
+}) {
+  const { id } = await props.params
+  const searchParams = await props.searchParams
 
-  const { id } = params
-
-  const data = await wrapServerApi(() => productApiRequest.getProduct(id))
+  const data = await wrapServerApi(() => productApiRequest.getProductCache(id))
   const product = data?.payload?.data
   const overallRating = data?.payload?.data.averageRating ?? 0
 
@@ -38,7 +42,13 @@ export default async function ProductDetail(props: { params: Promise<{ id: strin
             {product.categories && changeCategoriesToString(product.categories.map((category) => category.name))}
           </p>
           <h2 className='text-4xl mb-4'>{product.name}</h2>
-          <p className='text-2xl mb-4'>{(product.price - product.price * product.discount).toLocaleString()}đ</p>
+          <div className='mb-4 flex items-center gap-2'>
+            <p className='text-2xl'>{(product.price - product.price * product.discount).toLocaleString()}đ</p>
+            {/* Hiện số sản phẩm còn lại trong kho */}
+            <span className='text-gray-600 text-sm'>
+              {product.stockQuantity > 0 ? `(${product.stockQuantity} sản phẩm còn lại)` : '(Hết hàng)'}
+            </span>
+          </div>
 
           <p className='mb-6 line-clamp-3'>{product.description}</p>
 
@@ -49,9 +59,9 @@ export default async function ProductDetail(props: { params: Promise<{ id: strin
                 className={`w-5 h-5 ${i <= Math.ceil(overallRating) ? 'text-yellow-400 fill-current' : 'text-gray-400 fill-current'}`}
               />
             ))}
-            <span className='ml-2 text-gray-600'>({product.totalRating} đánh giá)</span>
-            <Heart className='ml-4 w-5 h-5' />
-            <Share2 className='ml-4 w-5 h-5' />
+            <span className='ml-2 text-gray-600 text-sm'>
+              {product.totalRating > 0 ? `(${product.totalRating} đánh giá)` : '(Chưa có đánh giá)'}
+            </span>
           </div>
 
           <AddToCartButton product={product} />
@@ -73,7 +83,15 @@ export default async function ProductDetail(props: { params: Promise<{ id: strin
         </div>
       </div>
 
-      <ProductDescription description={product.description} detail={product.detail} guide={product.guide} id={id} />
+      <ProductDescription
+        description={product.description}
+        detail={product.detail}
+        guide={product.guide}
+        id={id}
+        searchParams={searchParams}
+      />
+
+      <RecommendedProducts currentProductId={id} categoryIds={product.categories.map((category) => category.id)} />
     </section>
   )
 }

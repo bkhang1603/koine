@@ -1,56 +1,25 @@
 'use client'
 
-import { Button } from '@/components/ui/button'
+import { useState, useEffect, useMemo, useCallback } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Plus, Settings } from 'lucide-react'
-import { useState, useEffect } from 'react'
-import { useRouter } from 'next/navigation'
+import { Button } from '@/components/ui/button'
+import { Plus, Settings, BookOpen, MessageSquare, BarChart, ThumbsUp } from 'lucide-react'
+import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
-import { BlogCard } from '@/components/private/content-creator/blog/blog-card'
-import { BlogFilters } from '@/components/private/content-creator/blog/blog-filters'
-import { EmptyBlogs } from '@/components/private/content-creator/blog/empty-blogs'
-import { DeleteBlogDialog } from '@/components/private/content-creator/blog/delete-blog-dialog'
-import { useBlogDeleteMutation, useBlogQuery } from '@/queries/useBlog'
+import { useBlogDeleteMutation, useMyBlogsQuery } from '@/queries/useBlog'
 import { Skeleton } from '@/components/ui/skeleton'
 import { toast } from '@/components/ui/use-toast'
 import { handleErrorApi } from '@/lib/utils'
-
-// Tạo component BlogCardSkeleton
-const BlogCardSkeleton = () => (
-  <div className='rounded-lg border bg-card shadow-sm overflow-hidden'>
-    <Skeleton className='h-[200px] w-full' />
-    <div className='p-6'>
-      <div className='flex items-center gap-2 mb-4'>
-        <Skeleton className='h-4 w-4' />
-        <div className='flex gap-1.5'>
-          <Skeleton className='h-5 w-16' />
-          <Skeleton className='h-5 w-20' />
-        </div>
-      </div>
-      <Skeleton className='h-6 w-full mb-2' />
-      <Skeleton className='h-4 w-full mb-2' />
-      <Skeleton className='h-4 w-3/4 mb-6' />
-      <div className='flex items-center gap-3'>
-        <Skeleton className='h-9 w-9 rounded-full' />
-        <div className='flex flex-col'>
-          <Skeleton className='h-4 w-20 mb-1' />
-          <Skeleton className='h-3 w-24' />
-        </div>
-      </div>
-    </div>
-    <div className='px-6 py-4 border-t'>
-      <div className='flex justify-between'>
-        <div className='flex items-center gap-4'>
-          <Skeleton className='h-4 w-12' />
-          <Skeleton className='h-4 w-12' />
-        </div>
-        <Skeleton className='h-8 w-8 rounded-full' />
-      </div>
-    </div>
-  </div>
-)
+import { Input } from '@/components/ui/input'
+import { Badge } from '@/components/ui/badge'
+import { format } from 'date-fns'
+import { vi } from 'date-fns/locale'
+import { TableCustom, dataListType } from '@/components/table-custom'
+import Image from 'next/image'
+import { MoreOptions } from '@/components/private/common/more-options'
 
 // Custom hook useDebounce
+// eslint-disable-next-line no-unused-vars
 function useDebounce<T>(value: T, delay: number = 500): T {
   const [debouncedValue, setDebouncedValue] = useState<T>(value)
 
@@ -70,76 +39,185 @@ function useDebounce<T>(value: T, delay: number = 500): T {
 }
 
 export default function BlogPage() {
-  const [selectedCategory, setSelectedCategory] = useState<string>('all')
-  const [searchQuery, setSearchQuery] = useState('')
-  const [statusFilter, setStatusFilter] = useState('all')
-  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
-  const [selectedBlog, setSelectedBlog] = useState<string | undefined>(undefined)
-  const [pageIndex, setPageIndex] = useState(1)
-  const [pageSize] = useState(10)
   const router = useRouter()
+  const searchParams = useSearchParams()
 
-  // Áp dụng debounce cho searchQuery
-  const debouncedSearchQuery = useDebounce(searchQuery, 500)
+  // Get values from searchParams or use default values
+  const currentKeyword = searchParams.get('keyword') || ''
+  const currentPageSize = Number(searchParams.get('page_size')) || 5
+  const currentPageIndex = Number(searchParams.get('page_index')) || 1
 
-  // Lấy danh sách blog từ API - sử dụng giá trị đã debounce
-  const { data: blogsResponse, isLoading } = useBlogQuery({
-    page_index: pageIndex,
-    search: debouncedSearchQuery, // Sử dụng giá trị debounced thay vì searchQuery
-    page_size: pageSize
+  // Function to update URL when values change
+  const updateSearchParams = (newParams: { keyword?: string; page_size?: number; page_index?: number }) => {
+    const params = new URLSearchParams(searchParams.toString())
+
+    if (newParams.keyword !== undefined) {
+      if (newParams.keyword === '') {
+        params.delete('keyword')
+      } else {
+        params.set('keyword', newParams.keyword)
+      }
+    }
+
+    if (newParams.page_size !== undefined) {
+      params.set('page_size', newParams.page_size.toString())
+    }
+
+    if (newParams.page_index !== undefined) {
+      params.set('page_index', newParams.page_index.toString())
+    }
+
+    router.push(`?${params.toString()}`)
+  }
+
+  // Lấy danh sách blog từ API
+  const { data: blogsResponse, isLoading } = useMyBlogsQuery({
+    page_index: currentPageIndex,
+    page_size: currentPageSize
   })
 
   const deleteBlogMutation = useBlogDeleteMutation()
 
   // Dữ liệu blog từ API
-  const blogs = blogsResponse?.payload?.data || []
-  const totalBlogs = blogsResponse?.payload?.pagination?.totalItem || 0
-  const totalPages = Math.ceil(totalBlogs / pageSize)
-
-  // Xử lý xóa blog
-  const handleDelete = (blogId: string) => {
-    setSelectedBlog(blogId)
-    setTimeout(() => setDeleteDialogOpen(true), 100)
+  const blogs = blogsResponse?.payload.data || []
+  const pagination = blogsResponse?.payload.pagination || {
+    pageSize: 0,
+    totalItem: 0,
+    currentPage: 0,
+    totalPage: 0,
+    maxPageSize: 0
   }
 
-  // Xác nhận xóa blog
-  const confirmDelete = async () => {
-    if (!selectedBlog) return
+  const handleDelete = useCallback(
+    async (blogId: string) => {
+      try {
+        await deleteBlogMutation.mutateAsync(blogId)
+        toast({
+          description: 'Xóa bài viết thành công'
+        })
+      } catch (error) {
+        handleErrorApi({
+          error
+        })
+      }
+    },
+    [deleteBlogMutation]
+  )
 
-    try {
-      await deleteBlogMutation.mutateAsync(selectedBlog)
-      toast({
-        description: 'Xóa bài viết thành công'
-      })
-      // Refresh danh sách sau khi xóa
-    } catch (error) {
-      handleErrorApi({
-        error
-      })
-    } finally {
-      setDeleteDialogOpen(false)
-      setTimeout(() => setSelectedBlog(undefined), 300)
-    }
+  // Calculate statistics
+  const totalBlogs = pagination.totalItem || 0
+  const totalReacts = blogs.reduce((sum: number, blog: any) => sum + blog.totalReact, 0)
+  const totalComments = blogs.reduce((sum: number, blog: any) => sum + blog.totalComment, 0)
+  const publishedBlogs = blogs.filter((blog: any) => blog.status === 'VISIBLE').length
+
+  // Column configuration for the table
+  const headerColumn = [
+    { id: 1, name: 'Tiêu đề bài viết' },
+    { id: 2, name: 'Lượt thích' },
+    { id: 3, name: 'Bình luận' },
+    { id: 4, name: 'Trạng thái' },
+    { id: 5, name: 'Ngày tạo' },
+    { id: 6, name: '' }
+  ]
+
+  const bodyColumn = useMemo(
+    () => [
+      {
+        id: 1,
+        render: (blog: any) => (
+          <div className='flex items-center gap-3 min-w-[300px] max-w-[400px]'>
+            <div className='relative h-12 w-12 flex-shrink-0'>
+              <Image
+                src={blog.imageUrl}
+                alt={`Hình ảnh bài viết ${blog.title}`}
+                fill
+                className='rounded-md object-cover'
+                sizes='48px'
+                priority={false}
+              />
+            </div>
+            <div className='space-y-0.5 overflow-hidden'>
+              <div className='font-medium truncate'>{blog.title}</div>
+              <div className='text-xs text-muted-foreground line-clamp-1'>{blog.description}</div>
+            </div>
+          </div>
+        )
+      },
+      {
+        id: 2,
+        render: (blog: any) => (
+          <div className='flex items-center min-w-[80px]'>
+            <span className='text-sm font-medium'>{blog.totalReact}</span>
+          </div>
+        )
+      },
+      {
+        id: 3,
+        render: (blog: any) => (
+          <div className='flex items-center min-w-[100px]'>
+            <span className='text-sm font-medium'>{blog.totalComment}</span>
+          </div>
+        )
+      },
+      {
+        id: 4,
+        render: (blog: any) => (
+          <div className='flex items-center min-w-[100px]'>
+            <Badge variant={blog.status === 'VISIBLE' ? 'green' : 'secondary'} className='w-fit'>
+              {blog.status === 'VISIBLE' ? 'Đã xuất bản' : 'Bản nháp'}
+            </Badge>
+          </div>
+        )
+      },
+      {
+        id: 5,
+        render: (blog: any) => (
+          <div className='min-w-[120px]'>
+            <div className='text-sm'>{format(new Date(blog.createdAt), 'dd/MM/yyyy', { locale: vi })}</div>
+            <div className='text-xs text-muted-foreground'>
+              {format(new Date(blog.createdAt), 'HH:mm', { locale: vi })}
+            </div>
+          </div>
+        )
+      },
+      {
+        id: 6,
+        render: (blog: any) => (
+          <div className='flex justify-end min-w-[40px]'>
+            <MoreOptions
+              item={{
+                id: blog.id,
+                title: blog.title,
+                status: blog.status,
+                slug: blog.slug
+              }}
+              itemType='blog'
+              onView={() => router.push(`/content-creator/blog/${blog.id}`)}
+              onEdit={() => router.push(`/content-creator/blog/${blog.id}/edit`)}
+              onDelete={() => handleDelete(blog.id)}
+              onManageComments={() => router.push(`/content-creator/blog/${blog.id}/comments`)}
+              onPreview={() => window.open(`/knowledge/${blog.slug}`, '_blank')}
+            />
+          </div>
+        )
+      }
+    ],
+    [router, handleDelete]
+  )
+
+  const tableData: dataListType = {
+    data: blogs,
+    message: blogsResponse?.payload.message || '',
+    pagination
   }
-
-  // Xử lý chuyển trang
-  const handlePageChange = (page: number) => {
-    setPageIndex(page)
-  }
-
-  // Xử lý khi thay đổi bộ lọc
-  useEffect(() => {
-    // Reset về trang 1 khi thay đổi bất kỳ bộ lọc nào
-    setPageIndex(1)
-  }, [debouncedSearchQuery, selectedCategory, statusFilter]) // Sử dụng debouncedSearchQuery
 
   return (
-    <div className='container mx-auto px-4 py-6'>
+    <div className='container mx-auto px-4 py-6 space-y-6'>
       {/* Header */}
-      <div className='flex items-center justify-between mb-8'>
+      <div className='flex items-center justify-between'>
         <div>
           <h1 className='text-2xl font-bold'>Bài viết của bạn</h1>
-          <p className='text-sm text-muted-foreground mt-1'>Quản lý và tạo mới các bài viết</p>
+          <p className='text-muted-foreground mt-1'>Quản lý và tạo mới các bài viết</p>
         </div>
         <div className='flex items-center gap-4'>
           <Button variant='outline' asChild>
@@ -157,86 +235,87 @@ export default function BlogPage() {
         </div>
       </div>
 
-      {/* Filters trong Card */}
-      <Card className='mb-6'>
-        <CardHeader>
-          <CardTitle>Tìm kiếm và lọc</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <BlogFilters
-            searchQuery={searchQuery}
-            selectedCategory={selectedCategory}
-            statusFilter={statusFilter}
-            onSearchChange={setSearchQuery}
-            onCategoryChange={setSelectedCategory}
-            onStatusFilterChange={setStatusFilter}
-          />
-        </CardContent>
-      </Card>
+      {/* Stats Cards with Skeleton */}
+      <div className='grid grid-cols-1 md:grid-cols-4 gap-4'>
+        {isLoading ? (
+          // Stats Cards Skeleton
+          [...Array(4)].map((_, i) => (
+            <Card key={i}>
+              <CardHeader className='flex flex-row items-center justify-between pb-2'>
+                <Skeleton className='h-5 w-[120px]' />
+                <Skeleton className='h-5 w-5 rounded-full' />
+              </CardHeader>
+              <CardContent>
+                <Skeleton className='h-9 w-[80px] mb-2' />
+                <Skeleton className='h-4 w-[160px]' />
+              </CardContent>
+            </Card>
+          ))
+        ) : (
+          // Actual Stats Cards
+          <>
+            <Card>
+              <CardHeader className='flex flex-row items-center justify-between pb-2'>
+                <CardTitle className='text-sm font-medium'>Tổng bài viết</CardTitle>
+                <BookOpen className='h-4 w-4 text-muted-foreground' />
+              </CardHeader>
+              <CardContent>
+                <div className='text-2xl font-bold'>{totalBlogs}</div>
+                <p className='text-xs text-muted-foreground'>Số lượng bài viết của bạn</p>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardHeader className='flex flex-row items-center justify-between pb-2'>
+                <CardTitle className='text-sm font-medium'>Tổng lượt thích</CardTitle>
+                <ThumbsUp className='h-4 w-4 text-muted-foreground' />
+              </CardHeader>
+              <CardContent>
+                <div className='text-2xl font-bold'>{totalReacts}</div>
+                <p className='text-xs text-muted-foreground'>Số lượt thích của bài viết</p>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardHeader className='flex flex-row items-center justify-between pb-2'>
+                <CardTitle className='text-sm font-medium'>Tổng bình luận</CardTitle>
+                <MessageSquare className='h-4 w-4 text-muted-foreground' />
+              </CardHeader>
+              <CardContent>
+                <div className='text-2xl font-bold'>{totalComments}</div>
+                <p className='text-xs text-muted-foreground'>Số bình luận của bài viết</p>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardHeader className='flex flex-row items-center justify-between pb-2'>
+                <CardTitle className='text-sm font-medium'>Bài viết đã xuất bản</CardTitle>
+                <BarChart className='h-4 w-4 text-muted-foreground' />
+              </CardHeader>
+              <CardContent>
+                <div className='text-2xl font-bold'>{publishedBlogs}</div>
+                <p className='text-xs text-muted-foreground'>Số bài viết đã được xuất bản</p>
+              </CardContent>
+            </Card>
+          </>
+        )}
+      </div>
 
-      {/* Blog List - Trong Card */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Danh sách bài viết</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'>
-            {isLoading ? (
-              // Hiển thị skeleton cards khi đang tải
-              Array(6)
-                .fill(0)
-                .map((_, index) => <BlogCardSkeleton key={index} />)
-            ) : blogs.length > 0 ? (
-              // Hiển thị blog cards khi có dữ liệu
-              blogs.map((post) => (
-                <BlogCard key={post.id} post={post} onDelete={handleDelete} onNavigate={(url) => router.push(url)} />
-              ))
-            ) : (
-              // Hiển thị trạng thái trống khi không có dữ liệu
-              <div className='col-span-full'>
-                <EmptyBlogs />
-              </div>
-            )}
-          </div>
-        </CardContent>
-      </Card>
+      {/* Search */}
+      <div className='flex flex-col sm:flex-row gap-4'>
+        <Input
+          placeholder='Tìm kiếm bài viết...'
+          className='w-full sm:w-[300px]'
+          value={currentKeyword}
+          onChange={(e) => updateSearchParams({ keyword: e.target.value, page_index: 1 })}
+        />
+      </div>
 
-      {/* Pagination - Đưa vào card footer hoặc phần dưới */}
-      {totalPages > 1 && (
-        <div className='flex justify-center mt-8'>
-          <div className='flex space-x-2'>
-            <Button
-              variant='outline'
-              onClick={() => handlePageChange(pageIndex - 1)}
-              disabled={pageIndex === 1 || isLoading}
-            >
-              Trước
-            </Button>
-
-            {Array.from({ length: totalPages }).map((_, i) => (
-              <Button
-                key={i}
-                variant={pageIndex === i + 1 ? 'default' : 'outline'}
-                onClick={() => handlePageChange(i + 1)}
-                disabled={isLoading}
-              >
-                {i + 1}
-              </Button>
-            ))}
-
-            <Button
-              variant='outline'
-              onClick={() => handlePageChange(pageIndex + 1)}
-              disabled={pageIndex === totalPages || isLoading}
-            >
-              Sau
-            </Button>
-          </div>
-        </div>
-      )}
-
-      {/* Delete Dialog */}
-      <DeleteBlogDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen} onConfirm={confirmDelete} />
+      {/* Table */}
+      <TableCustom
+        data={tableData}
+        headerColumn={headerColumn}
+        bodyColumn={bodyColumn}
+        href={'/content-creator/blog'}
+        loading={isLoading}
+      />
     </div>
   )
 }

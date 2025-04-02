@@ -9,6 +9,7 @@ import { TokenPayload } from '@/types/jwt.types'
 import { format } from 'date-fns'
 import { io } from 'socket.io-client'
 import authApiRequest from '@/apiRequests/auth'
+import { OrderStatus, OrderStatusValues } from '@/constants/type'
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
@@ -321,4 +322,76 @@ export const formatCurrencyWithoutSymbol = (value: number) => {
 
 export const formatDate = (date: string) => {
   return format(new Date(date), 'dd/MM/yyyy')
+}
+
+export const formatPrice = (price: number) => {
+  return new Intl.NumberFormat('vi-VN', {
+    style: 'currency',
+    currency: 'VND'
+  }).format(price)
+}
+
+export const formatLevel = (level: string) => {
+  switch (level) {
+    case 'ALL':
+      return 'Tất cả'
+    case 'BEGINNER':
+      return 'Cơ bản'
+    case 'INTERMEDIATE':
+      return 'Trung bình'
+    case 'ADVANCED':
+      return 'Nâng cao'
+    default:
+      return level
+  }
+}
+
+export const formatRole = (role: string) => {
+  switch (role) {
+    case 'ADULT':
+      return 'Phụ huynh'
+    case 'CHILD':
+      return 'Trẻ em'
+    case 'CONTENT_CREATOR':
+      return 'Người tạo nội dung'
+    case 'SUPPORTER':
+      return 'Hỗ trợ'
+    case 'EXPERT':
+      return 'Chuyên gia'
+    case 'SALESMAN':
+      return 'Bán hàng'
+    case 'MANAGER':
+      return 'Quản lý'
+    default:
+      return role
+  }
+}
+
+export const translateOrderStatus = (status: (typeof OrderStatusValues)[number]) => {
+  switch (status) {
+    case OrderStatus.PENDING:
+      return 'Chờ xác nhận'
+    case OrderStatus.PROCESSING:
+      return 'Đang xử lý'
+    case OrderStatus.DELIVERING:
+      return 'Đang giao hàng'
+    case OrderStatus.DELIVERED:
+      return 'Đã giao hàng'
+    case OrderStatus.CANCELLED:
+      return 'Đã hủy'
+    case OrderStatus.FAILED:
+      return 'Thất bại'
+    case OrderStatus.FAILED_PAYMENT:
+      return 'Thất bại'
+    case OrderStatus.REFUND_REQUEST:
+      return 'Yêu cầu hoàn tiền'
+    case OrderStatus.REFUNDING:
+      return 'Đang hoàn tiền'
+    case OrderStatus.REFUNDED:
+      return 'Đã hoàn tiền'
+    case OrderStatus.COMPLETED:
+      return 'Đã hoàn tất'
+    default:
+      return status
+  }
 }

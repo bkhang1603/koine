@@ -7,10 +7,17 @@ import { Card } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
 import { Plus, Sparkles } from 'lucide-react'
-import { CourseMobileFilter } from '@/components/public/parent/course/course-mobile-filter'
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet'
+import { SlidersHorizontal } from 'lucide-react'
+import { wrapServerApi } from '@/lib/server-utils'
+import courseApiRequest from '@/apiRequests/course'
 
 export default async function CoursePage(props: { searchParams?: Promise<searchParams> }) {
   const searchParams = await props.searchParams
+
+  const data = await wrapServerApi(() => courseApiRequest.getCategoryCoursesCache())
+  const categories = data?.payload?.data ?? []
+
   return (
     <main>
       <Image
@@ -26,58 +33,48 @@ export default async function CoursePage(props: { searchParams?: Promise<searchP
       {/* Mobile: Filter Trigger & Custom Course Card - Enhanced Design */}
       <div className='container mt-6'>
         <div className='md:hidden space-y-3'>
-          {/* Filter Button */}
-          <CourseMobileFilter />
-
-          {/* Custom Course Card */}
-          <Card className='overflow-hidden border-0 shadow-md'>
-            {/* Top Gradient Banner */}
-            <div className='h-1.5 bg-gradient-to-r from-primary via-purple-500 to-secondary'></div>
-
-            <div className='p-4 flex items-center justify-between'>
-              <div className='flex items-center gap-3'>
-                <div className='bg-primary/10 p-2 rounded-full'>
-                  <Sparkles className='w-5 h-5 text-primary' />
-                </div>
-                <div>
-                  <h3 className='font-medium text-sm'>Tạo khóa học riêng</h3>
-                  <p className='text-xs text-muted-foreground mt-0.5'>Tùy chỉnh nội dung theo nhu cầu</p>
-                </div>
+          {/* Custom Course Card - Redesigned */}
+          <div className='flex items-center justify-between bg-white p-4 rounded-lg border'>
+            <div className='flex items-center gap-3'>
+              <div className='bg-primary/10 p-2 rounded-full'>
+                <Sparkles className='w-5 h-5 text-primary' />
               </div>
-              <Button
-                asChild
-                size='sm'
-                className='whitespace-nowrap bg-gradient-to-r from-primary to-secondary hover:opacity-90'
-              >
-                <Link href='/custom-course'>
-                  <Plus className='w-3 h-3 mr-1' />
-                  Bắt đầu
-                </Link>
-              </Button>
+              <div>
+                <h3 className='font-medium text-sm'>Tạo khóa học riêng</h3>
+                <p className='text-xs text-muted-foreground mt-0.5'>Tùy chỉnh nội dung theo nhu cầu</p>
+              </div>
             </div>
-          </Card>
+            <Button asChild size='sm' variant='outline' className='whitespace-nowrap'>
+              <Link href='/custom-course'>
+                <Plus className='w-3 h-3 mr-1' />
+                Bắt đầu
+              </Link>
+            </Button>
+          </div>
 
-          {/* Optional: Quick Filter Categories */}
-          {/* <div className='overflow-x-auto pb-2 -mx-4 px-4'>
-            <div className='flex items-center gap-2'>
-              {['Mới nhất', 'Phổ biến', 'Cho trẻ em', 'Cho phụ huynh', 'Miễn phí'].map((cat) => (
-                <Button
-                  key={cat}
-                  variant='outline'
-                  size='sm'
-                  className='rounded-full whitespace-nowrap text-xs py-0 px-3 h-8 border-primary/20 hover:border-primary'
-                >
-                  {cat}
-                </Button>
-              ))}
-            </div>
-          </div> */}
+          {/* Filter Button */}
+          <Sheet>
+            <SheetTrigger asChild>
+              <Button variant='outline' size='sm' className='w-full gap-2 bg-white'>
+                <SlidersHorizontal className='w-4 h-4' />
+                Bộ lọc
+              </Button>
+            </SheetTrigger>
+            <SheetContent side='left' className='w-[300px] p-0'>
+              <SheetHeader className='p-4 border-b'>
+                <SheetTitle>Bộ lọc khóa học</SheetTitle>
+              </SheetHeader>
+              <div className='p-4 overflow-y-auto max-h-[calc(100vh-80px)]'>
+                {categories && <CourseFilter categories={categories} />}
+              </div>
+            </SheetContent>
+          </Sheet>
         </div>
       </div>
       <div className='grid grid-cols-1 md:grid-cols-4 gap-4 md:gap-6 mt-4 md:mt-8 container'>
         {/* Desktop: Sidebar with Filter */}
         <div className='md:col-span-1 hidden md:block'>
-          <CourseFilter />
+          {categories && <CourseFilter categories={categories} />}
 
           {/* Custom Course Card - Desktop Version */}
           <Card className='p-4 mt-6'>

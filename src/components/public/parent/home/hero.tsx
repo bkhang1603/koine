@@ -8,6 +8,7 @@ import Link from 'next/link'
 import images from '@/assets/images'
 import { useState } from 'react'
 import { cn } from '@/lib/utils'
+import configRoute from '@/config/route'
 
 const features = [
   {
@@ -22,8 +23,8 @@ const features = [
   },
   {
     icon: <Sparkles className='w-6 h-6' />,
-    title: 'Nội dung phù hợp',
-    description: 'Được thiết kế riêng cho từng độ tuổi'
+    title: 'Tự tạo khóa học',
+    description: 'Tạo khóa học phù hợp với nhu cầu và mục tiêu của bạn'
   }
 ]
 
@@ -63,7 +64,7 @@ export default function Hero() {
                   variant='outline'
                   className='h-12 px-6 text-base rounded-full border-2 hover:bg-primary/5'
                 >
-                  <Link href='/about'>Tìm hiểu thêm</Link>
+                  <Link href={configRoute.customCourse}>Tạo khóa học của bạn</Link>
                 </Button>
               </div>
 

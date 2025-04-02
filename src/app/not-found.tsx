@@ -1,180 +1,105 @@
 'use client'
 
-import images from '@/assets/images'
-import { Button } from '@/components/ui/button'
-import configRoute from '@/config/route'
-import { Home, RefreshCw } from 'lucide-react'
-import Image from 'next/image'
 import Link from 'next/link'
 import { motion } from 'framer-motion'
-import { useEffect, useState } from 'react'
+import { Button } from '@/components/ui/button'
+import { ArrowLeft, Home, SearchX } from 'lucide-react'
 
-function NotFoundPage() {
-  const [mounted, setMounted] = useState(false)
-
-  useEffect(() => {
-    setMounted(true)
-  }, [])
-
-  if (!mounted) return null
-
+export default function NotFoundPage() {
   return (
-    <section className='min-h-screen overflow-hidden relative bg-gradient-to-b from-white via-blue-50/30 to-purple-50/30'>
-      {/* Floating background elements */}
-      <div className='absolute inset-0 overflow-hidden z-0'>
-        <motion.div
-          className='absolute top-[10%] left-[10%] w-32 h-32 rounded-full bg-primary/5'
-          animate={{
-            y: [0, -15, 0],
-            scale: [1, 1.05, 1]
-          }}
-          transition={{
-            repeat: Infinity,
-            duration: 6,
-            ease: 'easeInOut'
-          }}
-        />
-        <motion.div
-          className='absolute bottom-[30%] right-[15%] w-40 h-40 rounded-full bg-secondary/5'
-          animate={{
-            y: [0, 20, 0],
-            scale: [1, 0.95, 1]
-          }}
-          transition={{
-            repeat: Infinity,
-            duration: 7,
-            ease: 'easeInOut'
-          }}
-        />
-        <motion.div
-          className='absolute top-[35%] right-[25%] w-24 h-24 rounded-full bg-amber-400/5'
-          animate={{
-            y: [0, -10, 0],
-            x: [0, 10, 0]
-          }}
-          transition={{
-            repeat: Infinity,
-            duration: 8,
-            ease: 'easeInOut'
-          }}
-        />
-
-        {/* Grid pattern */}
-        <div className="absolute inset-0 bg-[url('/grid-pattern.svg')] bg-center opacity-[0.015]" />
+    <div className='min-h-screen bg-white relative overflow-hidden'>
+      {/* Animated Background */}
+      <div className='absolute inset-0'>
+        <div className='absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(99,102,241,0.05),transparent_70%)]' />
+        <div className='absolute inset-0 bg-[linear-gradient(to_bottom,transparent,rgba(255,255,255,0.95))]' />
       </div>
 
-      <div className='container max-w-6xl mx-auto relative z-10 pt-12 sm:pt-20 px-4 flex flex-col items-center justify-center min-h-[calc(100vh-100px)]'>
-        <div className='flex flex-col lg:flex-row items-center justify-center gap-8 lg:gap-16'>
-          <div className='flex-1 max-w-md'>
-            {/* 404 image with floating animation */}
-            <motion.div
-              initial={{ opacity: 0, y: -20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5 }}
-              className='relative'
-            >
-              <motion.div
-                animate={{
-                  y: [0, -15, 0]
-                }}
-                transition={{
-                  repeat: Infinity,
-                  duration: 3,
-                  ease: 'easeInOut'
-                }}
-              >
-                <Image src={images.notFound404} alt='404' width={350} height={350} quality={100} className='mx-auto' />
-              </motion.div>
-            </motion.div>
-          </div>
+      {/* Animated Grid */}
+      <div className='absolute inset-0 bg-[linear-gradient(to_right,rgba(99,102,241,0.03)_1px,transparent_1px),linear-gradient(to_bottom,rgba(99,102,241,0.03)_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_80%_80%_at_50%_50%,#fff_70%,transparent_100%)]' />
 
-          <motion.div
-            className='flex-1 max-w-md text-center lg:text-left'
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-          >
-            <h1 className='text-4xl sm:text-5xl lg:text-6xl font-bold text-gray-800 bg-clip-text text-transparent bg-gradient-to-r from-gray-900 to-primary/80'>
-              Không tìm thấy trang
-            </h1>
-
-            <motion.p
-              className='mt-4 text-lg text-gray-600 sm:text-xl'
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.5, delay: 0.6 }}
-            >
-              Trang bạn đang tìm kiếm không tồn tại hoặc đã được di chuyển đến một vị trí khác.
-            </motion.p>
-
-            <div className='mt-8 sm:mt-10 flex flex-col sm:flex-row gap-4 justify-center lg:justify-start'>
-              <motion.div
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.4, delay: 0.8 }}
-                whileHover={{ scale: 1.03 }}
-                whileTap={{ scale: 0.98 }}
-              >
-                <Button asChild variant='default' size='lg' className='h-12 px-6 w-full sm:w-auto gap-2'>
-                  <Link href={configRoute.home}>
-                    <Home className='w-4 h-4 mr-1' />
-                    Quay về trang chủ
-                  </Link>
-                </Button>
-              </motion.div>
-
-              <motion.div
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.4, delay: 1 }}
-                whileHover={{ scale: 1.03 }}
-                whileTap={{ scale: 0.98 }}
-              >
-                <Button
-                  asChild
-                  variant='outline'
-                  size='lg'
-                  className='h-12 px-6 w-full sm:w-auto border-gray-300'
-                  onClick={() => window.history.back()}
-                >
-                  <button>
-                    <RefreshCw className='w-4 h-4 mr-1' />
-                    Quay lại trang trước
-                  </button>
-                </Button>
-              </motion.div>
-            </div>
-          </motion.div>
-        </div>
+      {/* Animated Glow */}
+      <div className='absolute inset-0'>
+        <div className='absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-indigo-500/5 rounded-full blur-[128px] animate-pulse' />
       </div>
 
-      {/* Bottom wave decoration */}
-      <motion.div
-        className='absolute bottom-0 left-0 right-0 z-10 w-full'
-        initial={{ y: 50 }}
-        animate={{ y: 0 }}
-        transition={{ duration: 0.7 }}
-      >
-        <svg
-          xmlns='http://www.w3.org/2000/svg'
-          viewBox='0 0 1440 160'
-          className='w-full h-auto transform scale-110'
-          preserveAspectRatio='none'
+      <div className='container relative flex items-center justify-center min-h-screen py-8'>
+        <motion.div
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.5 }}
+          className='w-full max-w-4xl'
         >
-          <path
-            fill='#f0fbff'
-            fillOpacity='0.8'
-            d='M0,64L48,74.7C96,85,192,107,288,106.7C384,107,480,85,576,74.7C672,64,768,64,864,85.3C960,107,1056,149,1152,149.3C1248,149,1344,107,1392,85.3L1440,64L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z'
-          />
-          <path
-            fill='#dff6ff'
-            fillOpacity='0.6'
-            d='M0,128L48,138.7C96,149,192,171,288,165.3C384,160,480,128,576,128C672,128,768,160,864,160C960,160,1056,128,1152,122.7C1248,117,1344,139,1392,149.3L1440,160L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z'
-          />
-        </svg>
-      </motion.div>
-    </section>
+          <div className='relative'>
+            {/* Decorative Elements */}
+            <div className='absolute -inset-4 border border-indigo-500/10 rounded-[2rem]' />
+            <div className='absolute -inset-8 border border-indigo-500/5 rounded-[2rem]' />
+            <div className='absolute -inset-12 border border-indigo-500/5 rounded-[2rem]' />
+
+            {/* Main Content */}
+            <div className='relative p-12 rounded-[2rem] bg-white/95 backdrop-blur-xl border border-indigo-500/10 shadow-xl'>
+              <div className='text-center space-y-12'>
+                {/* Icon Container */}
+                <motion.div
+                  initial={{ scale: 0, rotate: -180 }}
+                  animate={{ scale: 1, rotate: 0 }}
+                  transition={{ type: 'spring', duration: 0.8, delay: 0.2 }}
+                  className='relative mx-auto w-40 h-40'
+                >
+                  <div className='absolute inset-0 bg-indigo-500/10 rounded-full animate-pulse' />
+                  <div className='absolute inset-2 bg-indigo-500/5 rounded-full' />
+                  <div className='absolute inset-4 bg-white rounded-full flex items-center justify-center border border-indigo-500/10'>
+                    <SearchX className='w-20 h-20 text-indigo-500' />
+                  </div>
+                </motion.div>
+
+                {/* Title */}
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5, delay: 0.4 }}
+                >
+                  <div className='relative inline-block'>
+                    <h1 className='text-5xl md:text-6xl font-bold mb-6 h-16 bg-clip-text text-transparent bg-gradient-to-r from-indigo-500 via-indigo-400 to-indigo-300'>
+                      Không tìm thấy trang
+                    </h1>
+                  </div>
+                  <p className='text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed'>
+                    Rất tiếc, trang bạn đang tìm kiếm không tồn tại hoặc đã được di chuyển đi nơi khác.
+                  </p>
+                </motion.div>
+
+                {/* Buttons */}
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5, delay: 0.6 }}
+                  className='flex flex-col sm:flex-row gap-6 justify-center pt-4'
+                >
+                  <Button
+                    onClick={() => window.history.back()}
+                    size='lg'
+                    variant='outline'
+                    className='h-16 px-10 text-lg rounded-full border-2 border-gray-200 hover:bg-gray-50 hover:border-gray-300 transition-all duration-300'
+                  >
+                    <ArrowLeft className='w-6 h-6 mr-2' />
+                    Quay lại
+                  </Button>
+                  <Button
+                    asChild
+                    size='lg'
+                    className='h-16 px-10 text-lg rounded-full bg-gradient-to-r from-indigo-500 to-indigo-600 hover:from-indigo-600 hover:to-indigo-700 text-white shadow-lg shadow-indigo-500/20 hover:shadow-indigo-500/30 transition-all duration-300 group'
+                  >
+                    <Link href='/'>
+                      <Home className='w-6 h-6 mr-2' />
+                      Về trang chủ
+                    </Link>
+                  </Button>
+                </motion.div>
+              </div>
+            </div>
+          </div>
+        </motion.div>
+      </div>
+    </div>
   )
 }
-
-export default NotFoundPage

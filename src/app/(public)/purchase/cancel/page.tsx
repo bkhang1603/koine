@@ -8,6 +8,7 @@ import Link from 'next/link'
 import configRoute from '@/config/route'
 import { useRePurchaseOrderMutation } from '@/queries/useOrder'
 import { useAppStore } from '@/components/app-provider'
+import { handleErrorApi } from '@/lib/utils'
 
 function CancelPurchasePage() {
   const orderId = useAppStore((state) => state.orderId)
@@ -32,12 +33,17 @@ function CancelPurchasePage() {
 
   const handleRePurchaseOrder = async () => {
     if (!orderId) return
-    if (rePurchaseOrderMutation.isPending) return
 
     try {
-      await rePurchaseOrderMutation.mutateAsync({ id: orderId })
+      if (rePurchaseOrderMutation.isPending) return
+
+      const res = await rePurchaseOrderMutation.mutateAsync({ id: orderId })
+
+      router.push(res.payload.data)
     } catch (error) {
-      console.error(error)
+      handleErrorApi({
+        error
+      })
     }
   }
 
@@ -68,7 +74,7 @@ function CancelPurchasePage() {
           </Button>
 
           <Button variant='outline' className='w-full gap-2' asChild>
-            <Link href={configRoute.setting.order}>
+            <Link href={`${configRoute.setting.order}/${orderId}`}>
               <ShoppingBag className='h-4 w-4' />
               Về trang đơn hàng
             </Link>

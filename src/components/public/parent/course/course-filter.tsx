@@ -9,8 +9,8 @@ import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { Button } from '@/components/ui/button'
 import { Slider } from '@/components/ui/slider'
-import { useGetCategoryCoursesQuery } from '@/queries/useCourse'
 import { useRouter } from 'next/navigation'
+import { CategoryCoursesResType } from '@/schemaValidations/course.schema'
 
 const formSchema = z.object({
   categories: z.array(z.string()),
@@ -18,11 +18,8 @@ const formSchema = z.object({
   price: z.coerce.number().min(0).max(1000000)
 })
 
-function CourseFilter() {
+function CourseFilter({ categories }: { categories: CategoryCoursesResType['data'] }) {
   const router = useRouter()
-
-  const { data } = useGetCategoryCoursesQuery()
-  const category = data?.payload.data ?? []
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -37,6 +34,9 @@ function CourseFilter() {
     const currentParams = new URLSearchParams(window.location.search)
 
     // Gán các giá trị từ form vào params nếu chúng có giá trị
+    // Luôn set lại page_index = 1
+    currentParams.set('page_index', '1')
+
     if (values.price) {
       currentParams.set('range', values.price.toString())
     } else {
@@ -72,7 +72,7 @@ function CourseFilter() {
                     <FormItem>
                       <FormControl>
                         <div className='flex flex-col justify-center gap-3'>
-                          {category?.map((category) => (
+                          {categories?.map((category) => (
                             <div key={category.id} className='flex items-center gap-3'>
                               <Checkbox
                                 {...field}
@@ -242,7 +242,7 @@ function CourseFilter() {
                     onValueChange={onChange}
                   />
                 </FormControl>
-                <FormDescription>Sản phẩm có giá từ 0 đến {value.toLocaleString()} VNĐ</FormDescription>
+                <FormDescription>Sản phẩm có giá từ 0 đến {value.toLocaleString('vi-VN')} VNĐ</FormDescription>
                 <FormMessage />
               </FormItem>
             )}

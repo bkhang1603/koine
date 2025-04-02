@@ -10,10 +10,10 @@ import { z } from 'zod'
 import { Button } from '@/components/ui/button'
 import { Slider } from '@/components/ui/slider'
 import { useRouter } from 'next/navigation'
-import { useGetCategoryProductsQuery } from '@/queries/useProduct'
 import { useEffect, useState } from 'react'
 import { Badge } from '@/components/ui/badge'
 import { FilterIcon } from 'lucide-react'
+import { CategoryProductsResType } from '@/schemaValidations/product.schema'
 
 const formSchema = z.object({
   categories: z.array(z.string()),
@@ -21,10 +21,9 @@ const formSchema = z.object({
   range: z.coerce.number().min(0).max(1000000)
 })
 
-function Filter() {
+function Filter({ categories }: { categories: CategoryProductsResType['data'] }) {
   const router = useRouter()
-  const { data } = useGetCategoryProductsQuery()
-  const categories = data?.payload.data
+
   const [isFilterActive, setIsFilterActive] = useState(false)
   const [activeFilters, setActiveFilters] = useState(0)
 
@@ -96,6 +95,9 @@ function Filter() {
     const currentParams = new URLSearchParams(window.location.search)
 
     // Gán các giá trị từ form vào params nếu chúng có giá trị
+    // Luôn set lại page_index = 1
+    currentParams.set('page_index', '1')
+
     if (values.range && values.range !== 500000) {
       currentParams.set('range', values.range.toString())
     } else {
@@ -262,7 +264,7 @@ function Filter() {
                     onValueChange={(vals) => onChange(vals[0])}
                   />
                 </FormControl>
-                <FormDescription>Sản phẩm có giá từ 0 đến {value.toLocaleString()} VNĐ</FormDescription>
+                <FormDescription>Sản phẩm có giá từ 0 đến {value.toLocaleString('vi-VN')} VNĐ</FormDescription>
                 <FormMessage />
               </FormItem>
             )}

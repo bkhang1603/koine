@@ -12,15 +12,17 @@ import { AddCartDetailReq, AddCartDetailReqType } from '@/schemaValidations/cart
 import { ProductResType } from '@/schemaValidations/product.schema'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Minus, Plus } from 'lucide-react'
-import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
+import { useAuthModal } from '@/components/auth/auth-modal-provider'
+import { handleErrorApi } from '@/lib/utils'
 
 function AddToCartButton({ product }: { product: ProductResType['data'] }) {
-  const role = useAppStore((state) => state.role)
+  const isAuth = useAppStore((state) => state.isAuth)
   const setCheckoutBuyNow = useAppStore((state) => state.setCheckoutBuyNow)
   const router = useRouter()
+  const { showLoginModal } = useAuthModal()
 
   const addToCartMutation = useCartDetailCreateMutation()
   const [quantity, setQuantity] = useState(1)
@@ -35,6 +37,11 @@ function AddToCartButton({ product }: { product: ProductResType['data'] }) {
 
   const onSubmit = async (data: AddCartDetailReqType) => {
     try {
+      if (!isAuth) {
+        showLoginModal()
+        return
+      }
+
       if (addToCartMutation.isPending) {
         return
       }
@@ -54,7 +61,7 @@ function AddToCartButton({ product }: { product: ProductResType['data'] }) {
         description: 'Sản phẩm đã được thêm vào giỏ hàng'
       })
     } catch (error) {
-      console.log(error)
+      handleErrorApi({ error })
     }
   }
 
@@ -66,6 +73,11 @@ function AddToCartButton({ product }: { product: ProductResType['data'] }) {
   }
 
   const handleCheckoutBuyNow = () => {
+    if (!isAuth) {
+      showLoginModal()
+      return
+    }
+
     setCheckoutBuyNow({
       id: product.id,
       productId: product.id,
@@ -152,44 +164,18 @@ function AddToCartButton({ product }: { product: ProductResType['data'] }) {
         />
 
         <div className='flex justify-between gap-4'>
-          {!role && (
-            <Button type='button' variant={'outlineSecondary'} className='w-full mb-6' asChild>
-              <Link href={configRoute.login} className='w-full'>
-                Thêm vào giỏ hàng
-              </Link>
-            </Button>
-          )}
+          <Button
+            type='submit'
+            variant={'outlineSecondary'}
+            className='w-full mb-6'
+            disabled={addToCartMutation.isPending}
+          >
+            {addToCartMutation.isPending ? <Loading color='bg-secondary' /> : 'Thêm vào giỏ hàng'}
+          </Button>
 
-          {/* {role && (
-            <Button type='submit' variant={'outlineSecondary'} className='w-full mb-6'>
-              Thêm vào giỏ hàng
-            </Button>
-          )} */}
-
-          {role && (
-            <Button
-              type='submit'
-              variant={'outlineSecondary'}
-              className='w-full mb-6'
-              disabled={addToCartMutation.isPending}
-            >
-              {addToCartMutation.isPending ? <Loading color='bg-secondary' /> : 'Thêm vào giỏ hàng'}
-            </Button>
-          )}
-
-          {!role && (
-            <Button type='button' variant={'secondary'} className='w-full mb-6' asChild>
-              <Link href={configRoute.login} className='w-full'>
-                Mua ngay
-              </Link>
-            </Button>
-          )}
-
-          {role && (
-            <Button type='button' variant={'secondary'} className='w-full mb-6' onClick={handleCheckoutBuyNow}>
-              Mua ngay
-            </Button>
-          )}
+          <Button type='button' variant={'secondary'} className='w-full mb-6' onClick={handleCheckoutBuyNow}>
+            Mua ngay
+          </Button>
         </div>
       </form>
     </Form>

@@ -24,6 +24,7 @@ import RefreshToken from '@/components/refresh-token'
 import { AccountOneAddressResType, AccountResType, ProfileChildResType } from '@/schemaValidations/account.schema'
 import { CartDetailResType } from '@/schemaValidations/cart-detail.schema'
 import { OrderBuyNowResType } from '@/schemaValidations/order.schema'
+import { AuthModalProvider } from './auth/auth-modal-provider'
 
 // Default
 // staleTime: 0
@@ -213,9 +214,11 @@ export default function AppProvider({ children }: { children: React.ReactNode })
     //   value={{ role, setRole, isAuth, socket, setSocket, disconnectSocket }}
     // >
     <QueryClientProvider client={queryClient}>
-      {children}
-      <RefreshToken />
-      {/* <ListenLogoutSocket /> */}
+      <AuthModalProvider>
+        {children}
+        <RefreshToken />
+        {/* <ListenLogoutSocket /> */}
+      </AuthModalProvider>
       <ReactQueryDevtools initialIsOpen={false} />
     </QueryClientProvider>
     // </AppContext.Provider>

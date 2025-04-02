@@ -62,7 +62,7 @@ const itemVariants = {
 
 export default function Achievement() {
   return (
-    <section className='relative py-24 overflow-hidden'>
+    <section className='relative py-24 overflow-hidden bg-muted/30'>
       <div className='container relative'>
         <motion.div
           initial={{ opacity: 0, y: 20 }}

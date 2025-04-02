@@ -4,10 +4,21 @@ import { use } from 'react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Separator } from '@/components/ui/separator'
-import { Package, ArrowLeft, Clock, BookOpen, AlertCircle, Package2, Tag, ShoppingCart } from 'lucide-react'
+import {
+  Package,
+  Clock,
+  BookOpen,
+  AlertCircle,
+  Package2,
+  Tag,
+  ShoppingCart,
+  CreditCard,
+  Wallet,
+  BanknoteIcon
+} from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
-import { useGetOrder, useUpdatePaymentMethodMutation } from '@/queries/useOrder'
+import { useGetOrder, useUpdatePaymentMethodMutation, useRePurchaseOrderMutation } from '@/queries/useOrder'
 import { format } from 'date-fns'
 import { vi } from 'date-fns/locale'
 import { OrderDetailSkeleton } from '@/components/public/parent/setting/order/OrderDetailSkeleton'
@@ -16,18 +27,38 @@ import { CancelOrderDialog } from '@/components/public/parent/setting/order/Canc
 import { toast } from '@/components/ui/use-toast'
 import configRoute from '@/config/route'
 import { SettingBreadcrumb } from '@/components/public/parent/setting/SettingBreadcrumb'
+import { handleErrorApi, translateOrderStatus } from '@/lib/utils'
+import { RefundOrderDialog } from '@/components/public/parent/setting/order/RefundOrderDialog'
+import { OrderStatus } from '@/constants/type'
+import { OrderStatusValues } from '@/constants/type'
 
 // Helper để lấy màu và văn bản cho trạng thái đơn hàng
-const getOrderStatusConfig = (status: string) => {
+const getOrderStatusConfig = (status: (typeof OrderStatusValues)[number]) => {
   switch (status) {
-    case 'PROCESSING':
-      return { color: 'bg-blue-100 text-blue-800', label: 'Đang xử lý' }
-    case 'COMPLETED':
-      return { color: 'bg-green-100 text-green-800', label: 'Hoàn thành' }
-    case 'CANCELLED':
-      return { color: 'bg-red-100 text-red-800', label: 'Đã hủy' }
+    case OrderStatus.PROCESSING:
+      return { color: 'bg-blue-100 text-blue-800 hover:bg-blue-200', label: 'Đang xử lý' }
+    case OrderStatus.COMPLETED:
+      return { color: 'bg-green-100 text-green-800 hover:bg-green-200', label: 'Hoàn thành' }
+    case OrderStatus.CANCELLED:
+      return { color: 'bg-red-100 text-red-800 hover:bg-red-200', label: 'Đã hủy' }
+    case OrderStatus.FAILED:
+      return { color: 'bg-red-100 text-red-800 hover:bg-red-200', label: 'Thất bại' }
+    case OrderStatus.FAILED_PAYMENT:
+      return { color: 'bg-red-100 text-red-800 hover:bg-red-200', label: 'Thất bại' }
+    case OrderStatus.REFUND_REQUEST:
+      return { color: 'bg-red-100 text-red-800 hover:bg-red-200', label: 'Yêu cầu hoàn tiền' }
+    case OrderStatus.REFUNDING:
+      return { color: 'bg-red-100 text-red-800 hover:bg-red-200', label: 'Đang hoàn tiền' }
+    case OrderStatus.REFUNDED:
+      return { color: 'bg-green-100 text-green-800 hover:bg-green-200', label: 'Đã hoàn tiền' }
+    case OrderStatus.PENDING:
+      return { color: 'bg-yellow-100 text-yellow-800 hover:bg-yellow-200', label: 'Chờ xác nhận' }
+    case OrderStatus.DELIVERING:
+      return { color: 'bg-blue-100 text-blue-800 hover:bg-blue-200', label: 'Đang giao hàng' }
+    case OrderStatus.DELIVERED:
+      return { color: 'bg-green-100 text-green-800 hover:bg-green-200', label: 'Đã giao hàng' }
     default:
-      return { color: 'bg-gray-100 text-gray-800', label: status }
+      return { color: 'bg-gray-100 text-gray-800 hover:bg-gray-200', label: status }
   }
 }
 
@@ -35,6 +66,7 @@ export default function OrderDetailPage(props: { params: Promise<{ id: string }>
   const params = use(props.params)
   const { isLoading, error, data } = useGetOrder({ id: params.id })
   const updatePaymentMethodMutation = useUpdatePaymentMethodMutation({ id: params.id })
+  const rePurchaseOrderMutation = useRePurchaseOrderMutation()
 
   const order = data?.payload.data
 
@@ -58,17 +90,23 @@ export default function OrderDetailPage(props: { params: Promise<{ id: string }>
   }
 
   // Group order details by type
-  const courseItems = order.orderDetails.filter(
-    (item) => item.courseId && item.course
-  ) as ((typeof order.orderDetails)[0] & { course: NonNullable<(typeof order.orderDetails)[0]['course']> })[]
+  const courseItems = order.orderDetails
+    ? (order.orderDetails.filter((item) => item.courseId && item.course) as ((typeof order.orderDetails)[0] & {
+        course: NonNullable<(typeof order.orderDetails)[0]['course']>
+      })[])
+    : []
 
-  const productItems = order.orderDetails.filter(
-    (item) => item.productId && item.product
-  ) as ((typeof order.orderDetails)[0] & { product: NonNullable<(typeof order.orderDetails)[0]['product']> })[]
+  const productItems = order.orderDetails
+    ? (order.orderDetails.filter((item) => item.productId && item.product) as ((typeof order.orderDetails)[0] & {
+        product: NonNullable<(typeof order.orderDetails)[0]['product']>
+      })[])
+    : []
 
-  const comboItems = order.orderDetails.filter(
-    (item) => item.comboId && item.combo
-  ) as ((typeof order.orderDetails)[0] & { combo: NonNullable<(typeof order.orderDetails)[0]['combo']> })[]
+  const comboItems = order.orderDetails
+    ? (order.orderDetails.filter((item) => item.comboId && item.combo) as ((typeof order.orderDetails)[0] & {
+        combo: NonNullable<(typeof order.orderDetails)[0]['combo']>
+      })[])
+    : []
 
   const statusConfig = getOrderStatusConfig(order.status)
   const canCancel = order.status === 'PROCESSING'
@@ -79,16 +117,38 @@ export default function OrderDetailPage(props: { params: Promise<{ id: string }>
 
       await updatePaymentMethodMutation.mutateAsync({
         id: order.id,
-        body: { payMethod: order.payMethod === 'COD' ? 'BANKING' : 'COD' }
+        body: { payMethod: order.payment.payMethod === 'COD' ? 'BANKING' : 'COD' }
       })
 
       toast({
         description: 'Phương thức thanh toán đã được cập nhật'
       })
     } catch (error) {
-      console.log(error)
+      handleErrorApi({
+        error
+      })
     }
   }
+
+  const handleRePurchase = async () => {
+    try {
+      if (rePurchaseOrderMutation.isPending) return
+
+      const res = await rePurchaseOrderMutation.mutateAsync({
+        id: order.id
+      })
+
+      if (res?.payload?.data) {
+        window.location.href = res.payload.data
+      }
+    } catch (error) {
+      handleErrorApi({
+        error
+      })
+    }
+  }
+
+  const hasOnlyCourses = order.orderDetails ? order.orderDetails.every((item) => item.courseId && item.course) : false
 
   const orderBreadcrumbItems = [
     { label: 'Đơn hàng', href: configRoute.setting.order },
@@ -97,31 +157,13 @@ export default function OrderDetailPage(props: { params: Promise<{ id: string }>
 
   return (
     <div className='container max-w-7xl mx-auto py-6 space-y-8'>
-      {/* Back button */}
-      {/* <Button variant='ghost' asChild className='gap-2 hover:bg-gray-100'>
-        <Link href='/setting/order'>
-          <ArrowLeft className='h-4 w-4' />
-          Quay lại danh sách đơn hàng
-        </Link>
-      </Button> */}
-      <SettingBreadcrumb
-        items={orderBreadcrumbItems}
-        isLoading={isLoading}
-        backButton={
-          <Link href={configRoute.setting.order}>
-            <Button variant='outline' size='sm' className='gap-2'>
-              <ArrowLeft className='h-4 w-4' />
-              Quay lại danh sách đơn hàng
-            </Button>
-          </Link>
-        }
-      />
+      <SettingBreadcrumb items={orderBreadcrumbItems} isLoading={isLoading} />
 
       {/* Header */}
       <div>
         <div className='flex items-center justify-between mb-4'>
           <h1 className='text-2xl font-bold text-gray-900'>Chi tiết đơn hàng #{order.orderCode}</h1>
-          <Badge className={`px-2.5 py-1 ${statusConfig.color}`}>{statusConfig.label}</Badge>
+          <Badge className={`px-2.5 py-1 ${statusConfig.color}`}>{translateOrderStatus(order.status)}</Badge>
         </div>
         <div className='flex flex-wrap items-center gap-6 text-sm text-gray-500'>
           <div className='flex items-center gap-2'>
@@ -130,7 +172,7 @@ export default function OrderDetailPage(props: { params: Promise<{ id: string }>
           </div>
           <div className='flex items-center gap-2'>
             <ShoppingCart className='h-4 w-4' />
-            {order.orderDetails.length} sản phẩm
+            {order.orderDetails ? order.orderDetails.length : 0} sản phẩm
           </div>
           <div className='flex items-center gap-2'>
             <Tag className='h-4 w-4' />
@@ -243,6 +285,41 @@ export default function OrderDetailPage(props: { params: Promise<{ id: string }>
               </CardContent>
             </Card>
           )}
+
+          {/* Add Order History/Journey */}
+          <Card>
+            <CardHeader>
+              <CardTitle className='flex items-center gap-2'>
+                <Clock className='w-5 h-5' />
+                Quá trình đơn hàng
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className='space-y-4'>
+                {order.orderStatusHistory && order.orderStatusHistory.length > 0 ? (
+                  order.orderStatusHistory
+                    .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
+                    .map((history, index) => (
+                      <div key={index} className='flex items-start gap-4'>
+                        <div className='flex h-8 w-8 items-center justify-center rounded-full bg-primary/10'>
+                          <Clock className='h-4 w-4 text-primary' />
+                        </div>
+                        <div className='space-y-1 flex-1'>
+                          <div className='flex items-center justify-between'>
+                            <p className='font-medium'>{translateOrderStatus(history.status)}</p>
+                            <time className='text-sm text-muted-foreground'>
+                              {format(new Date(history.timestamp), 'HH:mm - dd/MM/yyyy', { locale: vi })}
+                            </time>
+                          </div>
+                        </div>
+                      </div>
+                    ))
+                ) : (
+                  <p className='text-muted-foreground'>Không có lịch sử trạng thái</p>
+                )}
+              </div>
+            </CardContent>
+          </Card>
         </div>
 
         {/* Order Summary */}
@@ -276,7 +353,7 @@ export default function OrderDetailPage(props: { params: Promise<{ id: string }>
                 </div>
                 <div className='flex justify-between'>
                   <span className='text-muted-foreground'>Phương thức</span>
-                  <span className='font-medium'>{order.payMethod === 'COD' ? 'COD' : 'Banking'}</span>
+                  <span className='font-medium'>{order.payment.payMethod === 'COD' ? 'COD' : 'Banking'}</span>
                 </div>
                 <div className='flex justify-between'>
                   <span className='text-muted-foreground'>Ngày tạo</span>
@@ -310,69 +387,102 @@ export default function OrderDetailPage(props: { params: Promise<{ id: string }>
 
               {canCancel && (
                 <div className='pt-2 space-y-3'>
-                  {/* Thêm button đổi phương thức thanh toán */}
-                  <Button
-                    className='w-full border border-primary/30 bg-primary/5 hover:bg-primary/10 hover:text-primary/80 text-primary flex items-center justify-center gap-2'
-                    variant='outline'
-                    onClick={handleUpdatePaymentMethod}
-                    disabled={updatePaymentMethodMutation.isPending}
-                  >
-                    {updatePaymentMethodMutation.isPending ? (
-                      <>
-                        <span className='h-4 w-4 animate-spin rounded-full border-2 border-primary border-r-transparent'></span>
-                        <span>Đang cập nhật...</span>
-                      </>
-                    ) : (
-                      <>
-                        {order.payMethod === 'COD' ? (
+                  {/* Nút thanh toán ngay khi phương thức là Banking */}
+                  {order.payment.payMethod === 'BANKING' && (
+                    <>
+                      <Button
+                        className='w-full'
+                        onClick={handleRePurchase}
+                        disabled={rePurchaseOrderMutation.isPending}
+                      >
+                        {rePurchaseOrderMutation.isPending ? (
                           <>
-                            <svg
-                              xmlns='http://www.w3.org/2000/svg'
-                              width='16'
-                              height='16'
-                              viewBox='0 0 24 24'
-                              fill='none'
-                              stroke='currentColor'
-                              strokeWidth='2'
-                              strokeLinecap='round'
-                              strokeLinejoin='round'
-                              className='lucide lucide-credit-card'
-                            >
-                              <rect width='20' height='14' x='2' y='5' rx='2' />
-                              <line x1='2' x2='22' y1='10' y2='10' />
-                            </svg>
-                            <span>Đổi sang chuyển khoản</span>
+                            <span className='h-4 w-4 animate-spin rounded-full border-2 border-white border-r-transparent mr-2'></span>
+                            <span>Đang xử lý...</span>
                           </>
                         ) : (
                           <>
-                            <svg
-                              xmlns='http://www.w3.org/2000/svg'
-                              width='16'
-                              height='16'
-                              viewBox='0 0 24 24'
-                              fill='none'
-                              stroke='currentColor'
-                              strokeWidth='2'
-                              strokeLinecap='round'
-                              strokeLinejoin='round'
-                              className='lucide lucide-wallet'
-                            >
-                              <path d='M21 12V7H5a2 2 0 0 1 0-4h14v4' />
-                              <path d='M3 5v14a2 2 0 0 0 2 2h16v-5' />
-                              <path d='M18 12a2 2 0 0 0 0 4h4v-4Z' />
-                            </svg>
-                            <span>Đổi sang thanh toán COD</span>
+                            <BanknoteIcon className='w-4 h-4 mr-2' />
+                            Thanh toán ngay
                           </>
                         )}
-                      </>
-                    )}
-                  </Button>
+                      </Button>
+
+                      <div className='relative flex items-center w-full gap-3'>
+                        <div className='h-[1px] flex-1 bg-gray-200'></div>
+                        <span className='text-sm text-gray-500 flex-shrink-0'>hoặc</span>
+                        <div className='h-[1px] flex-1 bg-gray-200'></div>
+                      </div>
+                    </>
+                  )}
+
+                  {/* Nút đổi phương thức thanh toán */}
+                  {/* Chỉ cho phép đổi sang COD nếu đơn hàng có product */}
+                  {(!hasOnlyCourses || (hasOnlyCourses && order.payment.payMethod === 'COD')) && (
+                    <Button
+                      className='w-full border border-primary/30 bg-primary/5 hover:bg-primary/10 hover:text-primary/80 text-primary flex items-center justify-center gap-2'
+                      variant='outline'
+                      onClick={handleUpdatePaymentMethod}
+                      disabled={updatePaymentMethodMutation.isPending}
+                    >
+                      {updatePaymentMethodMutation.isPending ? (
+                        <>
+                          <span className='h-4 w-4 animate-spin rounded-full border-2 border-primary border-r-transparent'></span>
+                          <span>Đang cập nhật...</span>
+                        </>
+                      ) : (
+                        <>
+                          {order.payment.payMethod === 'COD' ? (
+                            <>
+                              <CreditCard className='w-4 h-4 mr-2' />
+                              <span>Đổi sang chuyển khoản</span>
+                            </>
+                          ) : (
+                            <>
+                              <Wallet className='w-4 h-4 mr-2' />
+                              <span>Đổi sang thanh toán COD</span>
+                            </>
+                          )}
+                        </>
+                      )}
+                    </Button>
+                  )}
 
                   <CancelOrderDialog orderId={order.id} orderCode={order.orderCode} onCancelSuccess={() => {}} />
                 </div>
               )}
+
+              {/* Nút yêu cầu hoàn tiền khi đơn hàng đã hoàn thành */}
+              {order.status === 'COMPLETED' && (
+                <div className='pt-2'>
+                  <RefundOrderDialog orderId={order.id} orderCode={order.orderCode} />
+                </div>
+              )}
             </CardContent>
           </Card>
+
+          {/* Add recipient information if it exists */}
+          {order.deliveryInfo && (
+            <Card>
+              <CardHeader>
+                <CardTitle className='flex items-center gap-2'>Thông tin giao hàng</CardTitle>
+              </CardHeader>
+              <CardContent className='space-y-4'>
+                <div className='space-y-1 text-sm'>
+                  <p className='text-muted-foreground'>Người nhận</p>
+                  <p className=''>{order.deliveryInfo.name}</p>
+                </div>
+                <div className='space-y-1 text-sm'>
+                  <p className='text-muted-foreground'>Số điện thoại</p>
+                  <p>{order.deliveryInfo.phone}</p>
+                </div>
+                <div className='space-y-1 text-sm'>
+                  <p className='text-muted-foreground'>Địa chỉ</p>
+                  <p>{order.deliveryInfo.address}</p>
+                </div>
+              </CardContent>
+            </Card>
+          )}
         </div>
       </div>
     </div>

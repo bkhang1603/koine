@@ -1,8 +1,6 @@
 'use client'
 
 import { Button } from '@/components/ui/button'
-import { Card } from '@/components/ui/card'
-import { Skeleton } from '@/components/ui/skeleton'
 import { useGetCourseProgressQuery, useGetLessonQuery, useUpdateCourseProgressMutation } from '@/queries/useCourse'
 import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
@@ -10,11 +8,8 @@ import { handleErrorApi } from '@/lib/utils'
 import { use, useCallback, useEffect } from 'react'
 import { UserCourseProgressResType } from '@/schemaValidations/course.schema'
 import { Breadcrumb } from '@/components/learn/Breadcrumb'
-import { Sidebar } from '@/components/learn/Sidebar'
-import { NavigationButtons } from '@/components/learn/NavigationButtons'
-import { LessonContent } from '@/components/learn/LessonContent'
-import { WelcomeScreen } from '@/components/learn/WelcomeScreen'
 import { LoadingSkeletonForKid } from '@/components/learn/LoadingSkeletonForKid'
+import { LearnPageContent } from '@/components/learn/LearnPageContent'
 
 type Lesson = UserCourseProgressResType['data']['chapters'][0]['lessons'][0]
 
@@ -34,6 +29,12 @@ const canAccessLesson = (lesson: any, course: any) => {
   }
 
   return false
+}
+
+// Thêm helper function để kiểm tra quiz của chapter
+const canAccessNextChapter = (currentChapter: any) => {
+  if (!currentChapter.questions || currentChapter.questions.length === 0) return true
+  return currentChapter.questions.every((q: any) => q.status === 'COMPLETED')
 }
 
 function LearnPage(props: { params: Promise<{ courseId: string }> }) {
@@ -76,6 +77,7 @@ function LearnPage(props: { params: Promise<{ courseId: string }> }) {
     }
   }, [lessonId, courseLoading, course, courseId, router, getFirstAccessibleLesson])
 
+  // Cập nhật getNextLesson để hỗ trợ quiz
   const getNextLesson = useCallback(() => {
     if (!course || !lessonData?.payload.data) return null
 
@@ -89,10 +91,24 @@ function LearnPage(props: { params: Promise<{ courseId: string }> }) {
         return currentChapter.lessons[currentLessonIndex + 1]
       }
 
+      // Nếu là bài cuối cùng của chapter và chapter có quiz chưa hoàn thành
+      if (
+        currentLessonIndex === currentChapter.lessons.length - 1 &&
+        currentChapter.questions &&
+        currentChapter.questions.length > 0 &&
+        !currentChapter.questions.every((q: any) => q.status === 'COMPLETED')
+      ) {
+        return 'QUIZ'
+      }
+
       const nextChapterIndex = course.chapters.findIndex((c) => c.id === currentChapter.id) + 1
       if (nextChapterIndex < course.chapters.length) {
         const nextChapter = course.chapters[nextChapterIndex]
-        return nextChapter.lessons[0]
+
+        // Chỉ cho phép truy cập chapter tiếp theo nếu đã hoàn thành quiz của chapter hiện tại
+        if (canAccessNextChapter(currentChapter)) {
+          return nextChapter.lessons[0]
+        }
       }
     }
     return null
@@ -169,64 +185,22 @@ function LearnPage(props: { params: Promise<{ courseId: string }> }) {
     <div className='pt-6 pb-14'>
       <Breadcrumb courseTitle={course.title} courseId={courseId} />
 
-      <div className='grid lg:grid-cols-[340px_1fr] gap-8'>
-        <Sidebar
-          course={course}
-          courseId={courseId}
-          lessonId={lessonId}
-          onLessonClick={handleLessonClick}
-          canAccessLesson={canAccessLesson}
-        />
-
-        <Card className='bg-white backdrop-blur-sm border-none shadow-lg flex flex-col overflow-hidden'>
-          <div className='flex-1 overflow-y-auto'>
-            <div className='p-8'>
-              <div className='max-w-4xl mx-auto'>
-                {lessonLoading ? (
-                  <div className='space-y-6'>
-                    <Skeleton className='h-10 w-2/3' />
-                    <Skeleton className='h-4 w-full' />
-                    <Skeleton className='h-4 w-3/4' />
-                    <div className='aspect-video'>
-                      <Skeleton className='h-full w-full rounded-2xl' />
-                    </div>
-                  </div>
-                ) : lessonData?.payload.data ? (
-                  <LessonContent lesson={lessonData.payload.data} />
-                ) : (
-                  <WelcomeScreen />
-                )}
-              </div>
-            </div>
-          </div>
-
-          {/* Navigation Footer - Fixed at bottom */}
-          {lessonData?.payload.data && (
-            <div className='flex-shrink-0 bg-white py-6'>
-              <NavigationButtons
-                course={course}
-                lesson={lessonData.payload.data}
-                prevLesson={getPreviousLesson()}
-                nextLesson={getNextLesson()}
-                canAccessNext={!!getNextLesson() && canAccessLesson(getNextLesson(), course)}
-                onPrevClick={() => {
-                  const prevLesson = getPreviousLesson()
-                  if (prevLesson) handleLessonClick(prevLesson)
-                }}
-                onNextClick={() => {
-                  const nextLesson = getNextLesson()
-                  if (nextLesson) handleLessonClick(nextLesson)
-                }}
-                onComplete={() =>
-                  handleUpdate({ lessonId: lessonData.payload.data.id, status: lessonData.payload.data.status })
-                }
-                isUpdating={updateCourseMutation.isPending}
-                canAccessLesson={canAccessLesson}
-              />
-            </div>
-          )}
-        </Card>
-      </div>
+      <LearnPageContent
+        course={course}
+        lesson={lessonData?.payload.data}
+        lessonId={lessonId}
+        courseId={courseId}
+        isLoading={lessonLoading}
+        onLessonClick={handleLessonClick}
+        canAccessLesson={canAccessLesson}
+        handleUpdate={handleUpdate}
+        getNextLesson={getNextLesson}
+        getPreviousLesson={getPreviousLesson}
+        isUpdating={updateCourseMutation.isPending}
+        forKid
+        backUrl='/kid/course'
+        backLabel='Quay lại danh sách khóa học'
+      />
     </div>
   )
 }

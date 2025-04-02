@@ -64,7 +64,7 @@ const itemVariants = {
 
 export default function Sharing() {
   return (
-    <section className='py-24 overflow-hidden'>
+    <section className='py-24 overflow-hidden bg-muted/30'>
       <div className='container'>
         <motion.div
           initial={{ opacity: 0, y: 20 }}

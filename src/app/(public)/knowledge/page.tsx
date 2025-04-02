@@ -5,36 +5,33 @@ import configRoute from '@/config/route'
 import Image from 'next/image'
 import Link from 'next/link'
 import blogApiRequest from '@/apiRequests/blog'
-import { BlogsResType } from '@/schemaValidations/blog.schema'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { wrapServerApi } from '@/lib/server-utils'
+import { searchParams } from '@/types/query'
+import { Suspense } from 'react'
+import DynamicData from '@/components/public/parent/knowledge/dynamic-data'
+import { EmptyState } from '@/components/ui/empty-state'
 
-const categories = [
-  { id: 'all', name: 'Tất cả', featured: true },
-  { id: 'new', name: 'Mới nhất' },
-  { id: 'popular', name: 'Phổ biến' },
-  { id: 'teen', name: 'Thanh thiếu niên' },
-  { id: 'children', name: 'Trẻ em' },
-  { id: 'girls', name: 'Bé gái' },
-  { id: 'boys', name: 'Bé trai' }
-]
+async function KnowledgePage(props: { searchParams?: Promise<searchParams> }) {
+  const searchParams = await props.searchParams
+  const currentPage = Number(searchParams?.page) || 1
+  const selectedCategory = searchParams?.category || ''
+  const pageSize = 9 // 3 columns x 3 rows looks nice on desktop
 
-async function KnowledgePage() {
-  let blogs: BlogsResType['data'] = []
-
-  try {
-    const { payload } = await blogApiRequest.getBlogs({
-      page_index: 1,
-      page_size: 10,
-      search: ''
+  const data = await wrapServerApi(() =>
+    blogApiRequest.getBlogsCache({
+      page_index: currentPage,
+      page_size: pageSize,
+      search: '',
+      categoryId: selectedCategory
     })
-    blogs = payload.data
-  } catch (error) {
-    console.log(error)
-  }
+  )
 
-  if (!blogs) {
-    return <div>No blogs available</div>
-  }
+  const blogs = data?.payload?.data || []
+  const totalPages = data?.payload?.pagination?.totalPage
+
+  const categoryData = await wrapServerApi(() => blogApiRequest.getCategoryBlogCache())
+  const categories = categoryData?.payload?.data || []
 
   return (
     <main>
@@ -64,18 +61,28 @@ async function KnowledgePage() {
           <div className='relative mb-8'>
             <ScrollArea className='w-full bg-white rounded-xl shadow-sm border border-gray-100/80 py-1'>
               <div className='flex items-center gap-2 p-3 sm:p-4'>
+                <Link
+                  href={configRoute.knowledge}
+                  className={`whitespace-nowrap px-4 sm:px-6 py-2 sm:py-2.5 rounded-lg sm:rounded-xl text-xs sm:text-sm font-medium transition-colors ${
+                    !selectedCategory
+                      ? 'bg-primary text-white hover:bg-primary/90'
+                      : 'bg-gray-50 text-gray-700 hover:bg-gray-100'
+                  }`}
+                >
+                  Tất cả
+                </Link>
                 {categories.map((category) => (
-                  <button
+                  <Link
                     key={category.id}
-                    className={`whitespace-nowrap px-4 sm:px-6 py-2 sm:py-2.5 rounded-lg sm:rounded-xl text-xs sm:text-sm font-medium transition-colors
-            ${
-              category.featured
-                ? 'bg-primary text-white hover:bg-primary/90'
-                : 'bg-gray-50 text-gray-700 hover:bg-gray-100'
-            }`}
+                    href={`${configRoute.knowledge}?category=${category.id}`}
+                    className={`whitespace-nowrap px-4 sm:px-6 py-2 sm:py-2.5 rounded-lg sm:rounded-xl text-xs sm:text-sm font-medium transition-colors ${
+                      selectedCategory === category.id
+                        ? 'bg-primary text-white hover:bg-primary/90'
+                        : 'bg-gray-50 text-gray-700 hover:bg-gray-100'
+                    }`}
                   >
                     {category.name}
-                  </button>
+                  </Link>
                 ))}
               </div>
               <ScrollBar orientation='horizontal' className='h-2' />
@@ -88,7 +95,7 @@ async function KnowledgePage() {
               <Link key={blog.id || index} href={`${configRoute.knowledge}/${blog?.slug}`} className='group'>
                 <div
                   className='bg-white rounded-2xl overflow-hidden border border-gray-100
-                  hover:shadow-xl transition-all duration-300'
+                  hover:shadow-xl transition-all duration-300 flex flex-col h-full'
                 >
                   {/* Image */}
                   <div className='relative aspect-[16/9] overflow-hidden'>
@@ -102,15 +109,18 @@ async function KnowledgePage() {
                   </div>
 
                   {/* Content */}
-                  <div className='p-6'>
+                  <div className='p-6 flex flex-col flex-grow'>
                     {/* Date & Stats */}
                     <div className='flex items-center gap-4 mb-4'>
                       <span className='text-primary text-sm font-medium'>
                         {new Date(blog.createdAt).toLocaleDateString('vi-VN')}
                       </span>
-                      <span className='text-gray-500 text-sm'>
+                      {/* <span className='text-gray-500 text-sm'>
                         {blog.totalReact} lượt thích • {blog.totalComment} bình luận
-                      </span>
+                      </span> */}
+                      <Suspense fallback={<div className='w-32 h-4 bg-gray-200 animate-pulse rounded'></div>}>
+                        <DynamicData id={blog.id} />
+                      </Suspense>
                     </div>
 
                     {/* Title & Description */}
@@ -120,7 +130,9 @@ async function KnowledgePage() {
                     >
                       {blog.title}
                     </h3>
-                    <p className='text-gray-600 line-clamp-3'>{blog.description}</p>
+                    <div className='text-gray-600 h-[4.5rem] overflow-hidden mb-auto'>
+                      <p className='line-clamp-3'>{blog.description}</p>
+                    </div>
 
                     {/* Author */}
                     <div className='flex items-center gap-3 mt-6 pt-6 border-t border-gray-100'>
@@ -137,6 +149,51 @@ async function KnowledgePage() {
               </Link>
             ))}
           </div>
+
+          {/* Thiết kế UI cho trường hợp không có bài viết */}
+          {blogs.length === 0 && (
+            <EmptyState
+              title='Chưa có bài viết nào'
+              description='Hiện tại chưa có bài viết nào trong danh mục này. Vui lòng quay lại sau nhé!'
+            />
+          )}
+
+          {/* Pagination */}
+          {totalPages && totalPages > 1 && (
+            <div className='flex justify-center mt-12'>
+              <div className='flex items-center gap-2'>
+                {currentPage > 1 && (
+                  <Link
+                    href={`/knowledge?page=${currentPage - 1}`}
+                    className='px-4 py-2 rounded-lg bg-gray-100 hover:bg-gray-200 transition-colors'
+                  >
+                    Trước
+                  </Link>
+                )}
+
+                {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                  <Link
+                    key={page}
+                    href={`/knowledge?page=${page}`}
+                    className={`px-4 py-2 rounded-lg transition-colors ${
+                      currentPage === page ? 'bg-primary text-white' : 'bg-gray-100 hover:bg-gray-200'
+                    }`}
+                  >
+                    {page}
+                  </Link>
+                ))}
+
+                {currentPage < totalPages && (
+                  <Link
+                    href={`/knowledge?page=${currentPage + 1}`}
+                    className='px-4 py-2 rounded-lg bg-gray-100 hover:bg-gray-200 transition-colors'
+                  >
+                    Tiếp
+                  </Link>
+                )}
+              </div>
+            </div>
+          )}
         </div>
       </section>
 

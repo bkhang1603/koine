@@ -67,7 +67,7 @@ export default function CartPopover({ data }: { data: CartDetailResType['data'] 
         )}
       </div>
 
-      <ScrollArea className='max-h-[320px]'>
+      <ScrollArea className='h-[320px]'>
         {data['cartDetails'].length === 0 ? (
           <div className='flex flex-col items-center justify-center py-12 px-4 text-center'>
             <div className='bg-gray-100 rounded-full p-4 mb-3'>

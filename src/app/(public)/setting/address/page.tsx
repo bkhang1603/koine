@@ -14,7 +14,7 @@ import { AccountAddressBodyType, AccountOneAddressResType } from '@/schemaValida
 import { toast } from '@/components/ui/use-toast'
 import { EmptyAddress } from '@/components/public/parent/setting/empty-address'
 import { AddressSkeleton } from '@/components/public/parent/setting/address-skeleton'
-import { AddressCard } from '@/components/public/parent/setting/address/AddressCard'
+import { AddressCard } from '@/components/public/parent/setting/address/address-card'
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Input } from '@/components/ui/input'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'

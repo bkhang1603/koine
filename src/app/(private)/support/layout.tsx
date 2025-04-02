@@ -42,15 +42,15 @@ export default function SupportLayout({
         },
         {
           id: 'users',
-          href: '/support/users',
+          href: '/support/user',
           icon: <Users className='h-5 w-5' />,
           label: 'Người dùng'
         },
         {
-          id: 'reports',
-          href: '/support/reports',
+          id: 'orders',
+          href: '/support/order',
           icon: <BarChart className='h-5 w-5' />,
-          label: 'Báo cáo'
+          label: 'Đơn hàng'
         }
       ]
     },

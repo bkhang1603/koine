@@ -172,6 +172,50 @@ export const blogUpdateBody = z.object({
   categoryIds: z.array(z.string()).default([])
 })
 
+export const getMyBlogsRes = z.object({
+  statusCode: z.number(),
+  info: z.string(),
+  message: z.string(),
+  data: z.array(
+    z.object({
+      isDeleted: z.boolean(),
+      createdAt: z.string(),
+      updatedAt: z.string(),
+      id: z.string(),
+      creatorId: z.string(),
+      title: z.string(),
+      titleNoTone: z.string(),
+      slug: z.string(),
+      description: z.string(),
+      content: z.string(),
+      imageUrl: z.string(),
+      status: z.enum(['VISIBLE', 'INVISIBLE']),
+      createdAtFormatted: z.string(),
+      updatedAtFormatted: z.string(),
+      creatorInfo: z.object({
+        id: z.string(),
+        firstName: z.string(),
+        avatarUrl: z.string()
+      }),
+      totalReact: z.number(),
+      totalComment: z.number(),
+      categories: z.array(
+        z.object({
+          id: z.string(),
+          name: z.string()
+        })
+      )
+    })
+  ),
+  pagination: z.object({
+    pageSize: z.number(),
+    totalItem: z.number(),
+    currentPage: z.number(),
+    maxPageSize: z.number(),
+    totalPage: z.number()
+  })
+})
+
 export type BlogsResType = z.TypeOf<typeof BlogsRes>
 
 export type BlogResType = z.TypeOf<typeof BlogRes>
@@ -195,3 +239,5 @@ export type CategoryBlogDetailResType = z.TypeOf<typeof CategoryBlogDetailRes>
 export type CategoryBlogCreateReqType = z.TypeOf<typeof CategoryBlogCreateReq>
 
 export type BlogUpdateBodyType = z.TypeOf<typeof blogUpdateBody>
+
+export type GetMyBlogsResType = z.TypeOf<typeof getMyBlogsRes>
