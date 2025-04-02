@@ -187,12 +187,21 @@ export default function Checkout() {
         <>
           {/* Breadcrumb */}
           <div className='mb-4'>
-            <Breadcrumb
-              items={[
-                { title: 'Giỏ hàng', href: configRoute.cart },
-                { title: 'Thanh toán', href: configRoute.checkout }
-              ]}
-            />
+            {type === 'checkoutBuyNow' ? (
+              <Breadcrumb
+                items={[
+                  { title: 'Cửa hàng', href: configRoute.product },
+                  { title: 'Mua ngay', href: configRoute.checkout }
+                ]}
+              />
+            ) : (
+              <Breadcrumb
+                items={[
+                  { title: 'Giỏ hàng', href: configRoute.cart },
+                  { title: 'Thanh toán', href: configRoute.checkout }
+                ]}
+              />
+            )}
           </div>
 
           <div className='grid grid-cols-1 lg:grid-cols-4 gap-4'>

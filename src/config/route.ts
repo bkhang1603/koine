@@ -12,6 +12,7 @@ const configRoute = {
   login: '/login',
   register: '/register',
   forgotPassword: '/forgot-password',
+  customCourse: '/custom-course',
   setting: {
     profile: '/setting',
     myCourse: '/setting/my-course',
