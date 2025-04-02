@@ -5,28 +5,13 @@ import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { useEvent } from '@/queries/useEvent'
-import { Event, EventStatus } from './types'
-import { format } from 'date-fns'
-import { vi } from 'date-fns/locale'
+import { EventStatus } from './types'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import { useState, useMemo } from 'react'
-import {
-  Calendar,
-  MapPin,
-  Search,
-  Filter,
-  Sparkles,
-  Users,
-  ArrowRight,
-  Clock,
-  Mic,
-  PlayCircle,
-  Video
-} from 'lucide-react'
+import { Calendar, Search, Filter, Sparkles, Users, Clock, Video } from 'lucide-react'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 import { cn } from '@/lib/utils'
-import { WherebyMeeting } from './ui'
 import { EventCardSkeleton } from './components/EventCardSkeleton'
 import images from '@/assets/images'
 
@@ -52,16 +37,16 @@ const eventStatusConfig: Record<EventStatus, { label: string; color: string }> =
 export default function EventPage() {
   const { data: events, isLoading } = useEvent()
   const [searchQuery, setSearchQuery] = useState('')
-  const [selectedTab, setSelectedTab] = useState<EventStatus>('PENDING')
+  const [selectedTab, setSelectedTab] = useState<EventStatus>('OPENING')
   const router = useRouter()
 
-  const isOpenable = (eventStartAt: string, duration: number): boolean => {
-    const now = new Date()
-    const localTime = new Date(now.getTime() + 7 * 60 * 60 * 1000)
-    const startTime = new Date(eventStartAt)
-    const endDate = new Date(startTime.getTime() + duration * 1000)
-    return localTime.getTime() >= startTime.getTime() && localTime.getTime() < endDate.getTime()
-  }
+  // const isOpenable = (eventStartAt: string, duration: number): boolean => {
+  //   const now = new Date()
+  //   const localTime = new Date(now.getTime() + 7 * 60 * 60 * 1000)
+  //   const startTime = new Date(eventStartAt)
+  //   const endDate = new Date(startTime.getTime() + duration * 1000)
+  //   return localTime.getTime() >= startTime.getTime() && localTime.getTime() < endDate.getTime()
+  // }
 
   const filteredEvents = useMemo(() => {
     if (!events?.payload?.data) return []
@@ -85,7 +70,7 @@ export default function EventPage() {
   }, [events?.payload?.data, selectedTab, searchQuery])
 
   return (
-    <main className='min-h-screen bg-gray-50/50 pb-32'>
+    <main className='min-h-screen pb-32'>
       {/* Hero Section */}
       <section className='relative h-[40vh] bg-black'>
         <div className='absolute inset-0'>
@@ -146,13 +131,17 @@ export default function EventPage() {
             <h2 className='text-2xl font-bold mb-2'>Tất cả sự kiện</h2>
             <p className='text-gray-500'>Khám phá các sự kiện phù hợp với bạn</p>
           </div>
+          {/* Tôi muốn không hiện tab đã hủy */}
           <Tabs value={selectedTab} onValueChange={(value) => setSelectedTab(value as EventStatus)}>
             <TabsList>
-              {Object.entries(eventStatusConfig).map(([status, config]) => (
-                <TabsTrigger key={status} value={status} className='min-w-[120px]'>
-                  {config.label}
-                </TabsTrigger>
-              ))}
+              {Object.entries(eventStatusConfig).map(
+                ([status, config]) =>
+                  status !== 'CANCELLED' && (
+                    <TabsTrigger key={status} value={status} className='min-w-[120px]'>
+                      {config.label}
+                    </TabsTrigger>
+                  )
+              )}
             </TabsList>
           </Tabs>
         </div>
@@ -171,7 +160,7 @@ export default function EventPage() {
                 className='group bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300 cursor-pointer flex flex-col h-full'
                 onClick={() => {
                   const encodedData = encodeURIComponent(JSON.stringify(event))
-                  router.push(`/event-user/${event.id}?data=${encodedData}`)
+                  router.push(`/event/${event.id}?data=${encodedData}`)
                 }}
               >
                 <div className='relative h-48'>
@@ -226,7 +215,7 @@ export default function EventPage() {
                       </div>
                     </div>
 
-                    {isOpenable(event.startedAt, event.durations) && event.status === 'OPENING' && (
+                    {/* {isOpenable(event.startedAt, event.durations) && event.status === 'OPENING' && (
                       <Button
                         className='w-full mt-4'
                         onClick={(e) => {
@@ -236,7 +225,7 @@ export default function EventPage() {
                         <PlayCircle className='h-4 w-4 mr-2' />
                         Tham gia ngay
                       </Button>
-                    )}
+                    )} */}
                   </div>
                 </div>
               </div>

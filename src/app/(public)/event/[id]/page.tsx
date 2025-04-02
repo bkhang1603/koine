@@ -2,16 +2,14 @@
 
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import { useEvent } from '@/queries/useEvent'
 import { EventStatus } from '../types'
 import Image from 'next/image'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useState } from 'react'
-import { Calendar, Users, Clock, PlayCircle, ArrowLeft, Share2, Bookmark } from 'lucide-react'
+import { Calendar, Users, Clock, PlayCircle } from 'lucide-react'
 import { cn, handleErrorApi } from '@/lib/utils'
-import { WherebyMeeting } from '../ui'
-import { EventDetailSkeleton } from '../components/EventDetailSkeleton'
 import { Breadcrumb } from '@/components/public/parent/setting/Breadcrumb'
+import { WherebyMeeting } from '@/app/(public)/event/ui'
 
 const eventStatusConfig: Record<EventStatus, { label: string; color: string }> = {
   OPENING: {
@@ -46,7 +44,7 @@ export default function EventDetailPage() {
       <div className='min-h-screen flex items-center justify-center bg-gray-50/50'>
         <div className='text-center'>
           <h1 className='text-2xl font-bold mb-4'>Không tìm thấy sự kiện</h1>
-          <Button onClick={() => router.push('/event-user')}>Quay lại</Button>
+          <Button onClick={() => router.push('/event')}>Quay lại</Button>
         </div>
       </div>
     )
@@ -75,7 +73,7 @@ export default function EventDetailPage() {
   }
 
   return (
-    <main className='min-h-screen bg-gray-50/50'>
+    <main className='min-h-screen'>
       {/* Hero Section */}
       <section className='relative h-[40vh] bg-black'>
         <div className='absolute inset-0'>
@@ -91,9 +89,8 @@ export default function EventDetailPage() {
         <div className='relative h-full container flex flex-col justify-end pb-16'>
           <Breadcrumb
             items={[
-              { title: 'Trang chủ', href: '/' },
-              { title: 'Sự kiện', href: '/event-user' },
-              { title: event.title, href: `/event-user/${event.id}` }
+              { title: 'Sự kiện', href: '/event' },
+              { title: event.title, href: `/event/${event.id}` }
             ]}
             className='absolute top-8 left-0 ml-8 text-primary'
             colorForLink='text-white hover:text-white/80'
