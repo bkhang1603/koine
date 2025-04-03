@@ -152,21 +152,18 @@ export default function Checkout() {
 
           router.push(res.payload.data.paymentLink)
           toast({
-            title: 'Đặt hàng thành công',
             description: 'Đơn hàng của bạn đã được tạo'
           })
         } else {
           // Nếu không có link thanh toán, chuyển hướng đến trang lịch sử đơn hàng
           router.push(`${configRoute.setting.order}/${res.payload.data.orderId}`)
           toast({
-            title: 'Đặt hàng thành công',
             description: 'Đơn hàng của bạn đã được tạo'
           })
         }
       } else {
         // Xử lý khi không có res hoặc data không đúng format
         toast({
-          title: 'Đặt hàng thành công',
           description: 'Đơn hàng của bạn đã được tạo',
           variant: 'success'
         })

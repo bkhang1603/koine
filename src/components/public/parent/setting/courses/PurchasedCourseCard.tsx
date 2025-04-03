@@ -1,23 +1,12 @@
 /* eslint-disable no-unused-vars */
-import { useState, useMemo } from 'react'
+import { useState } from 'react'
 import { Card } from '@/components/ui/card'
 import { Clock, BarChart3, Users, Gift } from 'lucide-react'
 import Image from 'next/image'
-import Link from 'next/link'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { Avatar, AvatarImage } from '@/components/ui/avatar'
 import { AvatarGroup } from '@/components/ui/avatar-group'
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger
-} from '@/components/ui/dialog'
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
-import { Label } from '@/components/ui/label'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -28,16 +17,9 @@ import {
   AlertDialogHeader,
   AlertDialogTitle
 } from '@/components/ui/alert-dialog'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { Select, SelectContent, SelectItem, SelectTrigger } from '@/components/ui/select'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 import { useAppStore } from '@/components/app-provider'
-
-interface AccountOption {
-  id: string
-  name: string
-  imageUrl?: string
-  isAssigned?: boolean
-}
 
 interface PurchasedCourseCardProps {
   courseData: {
@@ -130,51 +112,49 @@ export function PurchasedCourseCard({ courseData, listChildAccount = [], onActiv
 
   return (
     <Card className='group relative overflow-hidden border-0 bg-white transition-all hover:shadow-lg hover:shadow-gray-200/80'>
-      <Link href={`/learn/${course.id}`} className='block'>
-        {/* Course Image Container */}
-        <div className='relative'>
-          <div className='aspect-[4/3] relative overflow-hidden'>
-            <Image
-              src={course.imageUrl || '/placeholder.png'}
-              alt={course.title}
-              fill
-              className='object-cover transition-transform duration-300 group-hover:scale-105'
-            />
-            <div className='absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-80' />
-          </div>
+      {/* Course Image Container */}
+      <div className='relative'>
+        <div className='aspect-[4/3] relative overflow-hidden'>
+          <Image
+            src={course.imageUrl || '/placeholder.png'}
+            alt={course.title}
+            fill
+            className='object-cover transition-transform duration-300 group-hover:scale-105'
+          />
+          <div className='absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-80' />
+        </div>
 
-          {/* Course Info Overlay */}
-          <div className='absolute inset-x-0 bottom-0 p-4 text-white'>
-            <h3 className='line-clamp-2 text-lg font-semibold leading-tight tracking-tight'>{course.title}</h3>
+        {/* Course Info Overlay */}
+        <div className='absolute inset-x-0 bottom-0 p-4 text-white'>
+          <h3 className='line-clamp-2 text-lg font-semibold leading-tight tracking-tight'>{course.title}</h3>
 
-            <div className='mt-3 flex items-center gap-3 text-white/90'>
-              <div className='flex items-center gap-1.5'>
-                <Clock className='h-4 w-4' />
-                <span className='text-sm'>{course.durationDisplay}</span>
-              </div>
-              <div className='flex items-center gap-1.5'>
-                <Users className='h-4 w-4' />
-                <span className='text-sm'>
-                  {usedQuantity}/{quantityAtPurchase} đã gán
-                </span>
-              </div>
+          <div className='mt-3 flex items-center gap-3 text-white/90'>
+            <div className='flex items-center gap-1.5'>
+              <Clock className='h-4 w-4' />
+              <span className='text-sm'>{course.durationDisplay}</span>
+            </div>
+            <div className='flex items-center gap-1.5'>
+              <Users className='h-4 w-4' />
+              <span className='text-sm'>
+                {usedQuantity}/{quantityAtPurchase} đã gán
+              </span>
             </div>
           </div>
-
-          {/* Level Badge */}
-          <div
-            className={cn(
-              'absolute right-3 top-3 px-2.5 py-1 rounded-full text-xs font-medium',
-              'flex items-center gap-1.5 backdrop-blur-sm',
-              levelConfig.color,
-              levelConfig.textColor
-            )}
-          >
-            <BarChart3 className='h-3.5 w-3.5' />
-            {levelConfig.label}
-          </div>
         </div>
-      </Link>
+
+        {/* Level Badge */}
+        <div
+          className={cn(
+            'absolute right-3 top-3 px-2.5 py-1 rounded-full text-xs font-medium',
+            'flex items-center gap-1.5 backdrop-blur-sm',
+            levelConfig.color,
+            levelConfig.textColor
+          )}
+        >
+          <BarChart3 className='h-3.5 w-3.5' />
+          {levelConfig.label}
+        </div>
+      </div>
 
       {/* Course Details Section */}
       <div className='p-4 space-y-4'>

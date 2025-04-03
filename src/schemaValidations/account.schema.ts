@@ -67,32 +67,30 @@ export const accountProfileBody = z
   .object({
     firstName: z.string().min(1, 'Họ và tên đệm không được để trống').max(50, 'Họ và tên đệm không được quá 50 ký tự'),
     lastName: z.string().min(1, 'Tên không được để trống').max(50, 'Tên không được quá 50 ký tự'),
-    // dob: z.union([
-    //   z
-    //     .string()
-    //     .min(1, 'Năm sinh không được để trống')
-    //     .refine(
-    //       (val) => {
-    //         const date = new Date(val)
-    //         return !isNaN(date.getTime())
-    //       },
-    //       {
-    //         message: 'Năm sinh không hợp lệ'
-    //       }
-    //     ),
-    //   z.date().refine((val) => !isNaN(val.getTime()), {
-    //     message: 'Năm sinh không hợp lệ'
-    //   })
-    // ]),
     dob: z
       .string()
-      .min(1, 'Năm sinh không được để trống')
+      .optional()
       .refine(
         (value) => {
           if (!value) return true
 
-          // Định dạng mm/dd/yyyy
-          const [month, day, year] = value.split('/').map(Number)
+          // Kiểm tra định dạng dd/MM/yyyy hoặc MM/dd/yyyy
+          if (!value.match(/^\d{1,2}\/\d{1,2}\/\d{4}$/)) {
+            return false
+          }
+
+          // Thử parse theo cả hai định dạng
+          const parts = value.split('/')
+          let day: number, month: number, year: number
+
+          // Thử parse theo định dạng dd/MM/yyyy
+          if (parseInt(parts[0]) > 12) {
+            // Nếu số đầu tiên > 12, coi như là ngày
+            ;[day, month, year] = parts.map(Number)
+          } else {
+            // Nếu số đầu tiên <= 12, coi như là tháng
+            ;[month, day, year] = parts.map(Number)
+          }
 
           // Kiểm tra tính hợp lệ của ngày tháng năm
           if (month < 1 || month > 12 || day < 1 || day > 31 || year < 1900 || year > new Date().getFullYear()) {
@@ -111,7 +109,7 @@ export const accountProfileBody = z
           )
         },
         {
-          message: 'Ngày sinh không hợp lệ'
+          message: 'Ngày sinh không hợp lệ. Vui lòng nhập theo định dạng DD/MM/YYYY hoặc MM/DD/YYYY'
         }
       ),
     avatarUrl: z.string(),
@@ -407,17 +405,16 @@ export const accountNotifications = z.object({
 })
 
 export const accountNotificationsRes = z.object({
-  data: z.object({
-    response: z.array(accountNotifications),
-    pagination: z.object({
-      pageSize: z.number(),
-      totalItem: z.number(),
-      currentPage: z.number(),
-      totalPage: z.number(),
-      maxPageSize: z.number()
-    })
+  data: z.array(accountNotifications),
+  message: z.string(),
+  pagination: z.object({
+    pageSize: z.number(),
+    totalItem: z.number(),
+    currentPage: z.number(),
+    totalPage: z.number(),
+    maxPageSize: z.number()
   }),
-  message: z.string()
+  statusCode: z.number()
 })
 
 export const listChildAccount = z.object({

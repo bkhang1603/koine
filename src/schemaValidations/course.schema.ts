@@ -481,7 +481,10 @@ export const deleteCategoryCourseRes = z.object({
 })
 
 export const createCourseCustomBody = z.object({
-  chapterIds: z.array(z.string())
+  chapterIds: z.array(z.string()),
+  customTitle: z.string(),
+  customDescription: z.string(),
+  customImageUrl: z.string()
 })
 
 export const createCourseCustomRes = z.object({

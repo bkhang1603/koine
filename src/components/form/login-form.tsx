@@ -7,7 +7,6 @@ import { useForm } from 'react-hook-form'
 import { Button } from '@/components/ui/button'
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
-import { useToast } from '@/components/ui/use-toast'
 import { cn, handleErrorApi } from '@/lib/utils'
 import { LoginBody, LoginBodyType } from '@/schemaValidations/auth.schema'
 import Link from 'next/link'
@@ -18,12 +17,12 @@ import { useEffect } from 'react'
 import { useAppStore } from '@/components/app-provider'
 import { useGetIpMutation } from '@/queries/useIp'
 import { Loader2 } from 'lucide-react'
+import { toast } from '@/components/ui/use-toast'
 
 export default function LoginForm({ className, onSuccess }: { className?: string; onSuccess?: () => void }) {
   const { data } = useGetIpMutation()
   const ipAddress = data?.payload.data.clientIp ?? ''
 
-  const { toast } = useToast()
   const router = useRouter()
   const loginMutation = useLoginMutation()
   const searchParams = useSearchParams()

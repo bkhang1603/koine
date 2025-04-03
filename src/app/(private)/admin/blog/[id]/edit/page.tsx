@@ -103,7 +103,6 @@ export default function EditBlogPage(props: { params: Promise<{ id: string }> })
         formData.append('images', file)
 
         toast({
-          title: 'Đang tải ảnh lên',
           description: 'Vui lòng đợi trong giây lát...'
         })
 
@@ -123,7 +122,6 @@ export default function EditBlogPage(props: { params: Promise<{ id: string }> })
           }
         } catch (uploadError) {
           toast({
-            title: 'Lỗi tải ảnh',
             description: 'Không thể tải ảnh lên. Vui lòng thử lại.',
             variant: 'destructive'
           })
@@ -136,7 +134,6 @@ export default function EditBlogPage(props: { params: Promise<{ id: string }> })
       })
 
       toast({
-        title: 'Cập nhật thành công',
         description: 'Bài viết đã được cập nhật',
         variant: 'default'
       })

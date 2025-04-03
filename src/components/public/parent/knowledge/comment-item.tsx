@@ -128,7 +128,6 @@ export default function CommentItem({
       await deleteCommentMutation.mutateAsync(comment.id)
 
       toast({
-        title: 'Thành công',
         description: 'Xóa bình luận thành công'
       })
     } catch (error) {
@@ -148,7 +147,6 @@ export default function CommentItem({
       })
       setIsEditing(false)
       toast({
-        title: 'Thành công',
         description: 'Cập nhật bình luận thành công'
       })
     } catch (error) {
@@ -171,7 +169,6 @@ export default function CommentItem({
           })
           setIsEditing(false)
           toast({
-            title: 'Thành công',
             description: 'Cập nhật bình luận thành công'
           })
         } catch (error) {

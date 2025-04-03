@@ -6,8 +6,8 @@ import { Button } from '@/components/ui/button'
 import configRoute from '@/config/route'
 import Image from 'next/image'
 import Link from 'next/link'
-import envConfig from '@/config'
 import { motion } from 'framer-motion'
+import { GoogleLoginButton } from '@/components/public/auth/google-login-button'
 
 function LoginPage() {
   return (
@@ -42,12 +42,14 @@ function LoginPage() {
             Đăng nhập với Facebook
           </Button>
 
-          <Button variant='outline' className='w-full md:w-[600px] text-base h-10 mt-5'>
-            <Link href={envConfig.NEXT_PUBLIC_GOOGLE_URL_LOCAL} className='flex items-center justify-center'>
+          {/* <Button variant='outline' className='w-full md:w-[600px] text-base h-10 mt-5'>
+            <Link href={envConfig.NEXT_PUBLIC_GOOGLE_URL} className='flex items-center justify-center'>
               <Image src={icons.google} alt='Google' width={24} height={24} className='mr-3' />
               Đăng nhập với Google
             </Link>
-          </Button>
+          </Button> */}
+
+          <GoogleLoginButton />
 
           <p className='text-secondary font-semibold mt-4 text-center text-sm sm:text-base'>
             Bạn chưa có tài khoản? {''}

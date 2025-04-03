@@ -6,7 +6,6 @@ import { useForm } from 'react-hook-form'
 import { Button } from '@/components/ui/button'
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
-import { useToast } from '@/components/ui/use-toast'
 import { cn, handleErrorApi } from '@/lib/utils'
 import { RegisterBody, RegisterBodyType } from '@/schemaValidations/auth.schema'
 import { Checkbox } from '@/components/ui/checkbox'
@@ -17,9 +16,9 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { CalendarIcon, Loader2 } from 'lucide-react'
 import { format } from 'date-fns'
 import { Calendar } from '@/components/ui/calendar'
+import { toast } from '@/components/ui/use-toast'
 
 export default function RegisterForm({ className, onSuccess }: { className?: string; onSuccess?: () => void }) {
-  const { toast } = useToast()
   const router = useRouter()
   const registerMutation = useRegisterMutation()
 

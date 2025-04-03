@@ -57,7 +57,6 @@ function AddToCartButton({ product }: { product: ProductResType['data'] }) {
       })
 
       toast({
-        title: 'Thành công',
         description: 'Sản phẩm đã được thêm vào giỏ hàng'
       })
     } catch (error) {

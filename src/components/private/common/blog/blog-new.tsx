@@ -60,7 +60,6 @@ export default function NewBlogPage({ localDraft, baseUrl }: NewBlogPageProps) {
     const values = form.getValues()
     localStorage.setItem(BLOG_DRAFT_KEY, JSON.stringify(values))
     toast({
-      title: 'Đã lưu',
       description: 'Bài viết của bạn đã được lưu vào bộ nhớ cục bộ'
     })
   }
@@ -75,7 +74,6 @@ export default function NewBlogPage({ localDraft, baseUrl }: NewBlogPageProps) {
         formData.append('images', file)
 
         toast({
-          title: 'Đang tải ảnh lên',
           description: 'Vui lòng đợi trong giây lát...'
         })
 
@@ -95,7 +93,6 @@ export default function NewBlogPage({ localDraft, baseUrl }: NewBlogPageProps) {
           }
         } catch (uploadError) {
           toast({
-            title: 'Lỗi tải ảnh',
             description: 'Không thể tải ảnh lên. Vui lòng thử lại.',
             variant: 'destructive'
           })
@@ -116,7 +113,6 @@ export default function NewBlogPage({ localDraft, baseUrl }: NewBlogPageProps) {
       localStorage.removeItem(BLOG_DRAFT_KEY)
 
       toast({
-        title: 'Bài viết đã được tạo',
         description: 'Bài viết của bạn đã được xuất bản thành công'
       })
 

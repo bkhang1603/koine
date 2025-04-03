@@ -3,7 +3,7 @@
 import { motion } from 'framer-motion'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
-import { ShoppingCart, Package, CreditCard, Truck, ArrowRight } from 'lucide-react'
+import { ShoppingCart, Package, CreditCard, Truck } from 'lucide-react'
 import Link from 'next/link'
 import configRoute from '@/config/route'
 

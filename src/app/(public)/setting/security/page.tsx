@@ -1,6 +1,5 @@
 'use client'
 
-import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Separator } from '@/components/ui/separator'
@@ -16,15 +15,12 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger
 } from '@/components/ui/alert-dialog'
-import { useToast } from '@/components/ui/use-toast'
 import { Switch } from '@/components/ui/switch'
 import { SecurityForm } from '@/components/public/parent/setting/security-form'
 import { Badge } from '@/components/ui/badge'
+import { toast } from '@/components/ui/use-toast'
 
 export default function SecurityPage() {
-  const { toast } = useToast()
-  const [, setIsLoading] = useState(false)
-
   // Giả lập danh sách thiết bị
   const devices = [
     {
@@ -86,11 +82,8 @@ export default function SecurityPage() {
 
   // Xử lý đăng xuất thiết bị
   const handleLogoutDevice = () => {
-    setIsLoading(true)
-
     // Giả lập API call
     setTimeout(() => {
-      setIsLoading(false)
       toast({
         description: 'Đã đăng xuất khỏi thiết bị'
       })
@@ -99,11 +92,8 @@ export default function SecurityPage() {
 
   // Xử lý đăng xuất tất cả
   const handleLogoutAllDevices = () => {
-    setIsLoading(true)
-
     // Giả lập API call
     setTimeout(() => {
-      setIsLoading(false)
       toast({
         description: 'Đã đăng xuất khỏi tất cả thiết bị'
       })

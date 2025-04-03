@@ -6,7 +6,7 @@ import { z } from 'zod'
 import { Button } from '@/components/ui/button'
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
-import { useToast } from '@/components/ui/use-toast'
+import { toast } from '@/components/ui/use-toast'
 import { Lock } from 'lucide-react'
 import { useState } from 'react'
 
@@ -29,7 +29,6 @@ const securityFormSchema = z
 type SecurityFormValues = z.infer<typeof securityFormSchema>
 
 export function SecurityForm() {
-  const { toast } = useToast()
   const [isLoading, setIsLoading] = useState(false)
 
   const form = useForm<SecurityFormValues>({

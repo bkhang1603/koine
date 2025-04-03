@@ -68,7 +68,7 @@ export function PasswordForm() {
   async function onSubmit() {
     try {
       // Your logic here
-      toast({ title: 'Thành công', description: 'Mật khẩu của bạn đã được cập nhật.' })
+      toast({ description: 'Mật khẩu của bạn đã được cập nhật.' })
       router.push('/profile')
     } catch (error: any) {
       handleErrorApi(error)

@@ -49,7 +49,6 @@ export default function CourseButton({ course, variant = 'default', className }:
       })
 
       toast({
-        title: 'Thành công',
         description: 'Khóa học đã được thêm vào giỏ hàng'
       })
     } catch (error) {

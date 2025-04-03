@@ -63,17 +63,19 @@ export function ProfileForm() {
 
   const onSubmit = async (values: AccountProfileBodyType) => {
     try {
-      const isValid = await form.trigger()
-      if (!isValid) return
-
       const isChanged = Object.keys(values).some(
         (key) => values[key as keyof AccountProfileBodyType] !== profile?.[key as keyof AccountProfileBodyType]
       )
       if (!isChanged) {
         return toast({
-          title: 'Lỗi',
           description: 'Vui lòng cập nhật thông tin mới để thực hiện thay đổi'
         })
+      }
+
+      // Format dob to MM/dd/yyyy if it exists
+      if (values.dob) {
+        const [day, month, year] = values.dob.split('/')
+        values.dob = `${month}/${day}/${year}`
       }
 
       if (file) {
@@ -90,7 +92,6 @@ export function ProfileForm() {
 
       await updateAccountProfileMutation.mutateAsync(values)
       toast({
-        title: 'Thành công',
         description: 'Cập nhật thông tin thành công'
       })
     } catch (error) {
@@ -177,13 +178,24 @@ export function ProfileForm() {
                     name='dob'
                     render={({ field }) => {
                       // Hỗ trợ xử lý 2 kiểu định dạng
-                      const getDateObject = (value: string) => {
+                      const getDateObject = (value: string | undefined) => {
                         if (!value) return undefined
 
-                        // Nếu là định dạng mm/dd/yyyy (từ backend)
+                        // Nếu là định dạng dd/MM/yyyy hoặc MM/dd/yyyy
                         if (value.match(/^\d{1,2}\/\d{1,2}\/\d{4}$/)) {
                           try {
-                            const [month, day, year] = value.split('/').map(Number)
+                            const parts = value.split('/')
+                            let day: number, month: number, year: number
+
+                            // Thử parse theo định dạng dd/MM/yyyy
+                            if (parseInt(parts[0]) > 12) {
+                              // Nếu số đầu tiên > 12, coi như là ngày
+                              ;[day, month, year] = parts.map(Number)
+                            } else {
+                              // Nếu số đầu tiên <= 12, coi như là tháng
+                              ;[month, day, year] = parts.map(Number)
+                            }
+
                             // Tạo Date với tháng - 1 (vì JavaScript tháng từ 0-11)
                             return new Date(year, month - 1, day)
                           } catch (error) {
@@ -197,16 +209,15 @@ export function ProfileForm() {
 
                       // Định dạng để hiển thị trên giao diện người dùng
                       const formatDateForDisplay = (date: Date) => {
-                        // format theo tiếng việt hoặc số không chứ không để tiếng anh
                         return format(date, 'dd/MM/yyyy')
                       }
 
-                      // Định dạng để gửi về backend (mm/dd/yyyy)
+                      // Định dạng để gửi về backend (dd/MM/yyyy)
                       const formatDateForBackend = (date: Date) => {
-                        return format(date, 'MM/dd/yyyy')
+                        return format(date, 'dd/MM/yyyy')
                       }
 
-                      const dateValue = typeof field.value === 'string' ? getDateObject(field.value) : field.value
+                      const dateValue = getDateObject(field.value)
 
                       return (
                         <FormItem>
@@ -232,8 +243,11 @@ export function ProfileForm() {
                                 <Calendar
                                   selected={dateValue}
                                   onSelect={(date) => {
-                                    // Khi chọn ngày, gửi định dạng mm/dd/yyyy về backend
-                                    field.onChange(date ? formatDateForBackend(date) : '')
+                                    if (!date) {
+                                      field.onChange(undefined)
+                                      return
+                                    }
+                                    field.onChange(formatDateForBackend(date))
                                   }}
                                   disabled={(date) => date > new Date() || date < new Date('1900-01-01')}
                                   initialFocus
