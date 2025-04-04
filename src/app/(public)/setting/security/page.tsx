@@ -52,34 +52,6 @@ export default function SecurityPage() {
     }
   ]
 
-  // Giả lập lịch sử hoạt động
-  const activities = [
-    {
-      id: '1',
-      type: 'login',
-      device: 'Chrome trên Windows',
-      time: '20/06/2023 15:30',
-      location: 'Hà Nội, Việt Nam',
-      ip: '192.168.1.xxx'
-    },
-    {
-      id: '2',
-      type: 'password_change',
-      device: 'Chrome trên Windows',
-      time: '15/06/2023 10:15',
-      location: 'Hà Nội, Việt Nam',
-      ip: '192.168.1.xxx'
-    },
-    {
-      id: '3',
-      type: 'login_fail',
-      device: 'Unknown',
-      time: '10/06/2023 23:45',
-      location: 'TP.HCM, Việt Nam',
-      ip: '192.168.4.xxx'
-    }
-  ]
-
   // Xử lý đăng xuất thiết bị
   const handleLogoutDevice = () => {
     // Giả lập API call

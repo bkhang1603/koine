@@ -5,9 +5,11 @@ import { EventStatus } from '../types'
 import Image from 'next/image'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { Calendar, Users, Clock, Video } from 'lucide-react'
-import { cn } from '@/lib/utils'
+import { cn, formatAvatarFallback, formatDateEvent, formatDuration } from '@/lib/utils'
 import configRoute from '@/config/route'
 import { useMemo } from 'react'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import Link from 'next/link'
 
 const eventStatusConfig: Record<EventStatus, { label: string; color: string }> = {
   OPENING: {
@@ -51,7 +53,6 @@ interface EventListProps {
 }
 
 export function EventList({ events }: EventListProps) {
-  const router = useRouter()
   const searchParams = useSearchParams()
 
   // Lấy các param từ URL
@@ -117,16 +118,14 @@ export function EventList({ events }: EventListProps) {
   return (
     <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'>
       {filteredEvents.map((event) => (
-        <div
+        <Link
           key={event.id}
+          href={`${configRoute.event}/${event.slug}`}
           className='group bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300 cursor-pointer flex flex-col h-full'
-          onClick={() => {
-            router.push(`${configRoute.event}/${event.slug}`)
-          }}
         >
           <div className='relative h-48'>
             <Image
-              src={event.imageUrl || '/placeholder.svg'}
+              src={event.imageUrl ?? '/placeholder.svg'}
               alt={event.title}
               fill
               className='object-cover transition-transform duration-500 group-hover:scale-105'
@@ -138,15 +137,10 @@ export function EventList({ events }: EventListProps) {
 
           <div className='p-6 flex flex-col flex-1'>
             <div className='flex items-center gap-2 mb-3'>
-              <div className='h-8 w-8 rounded-full overflow-hidden'>
-                <Image
-                  src={event.hostInfo.avatarUrl}
-                  alt={event.hostInfo.fullName}
-                  width={32}
-                  height={32}
-                  className='object-cover'
-                />
-              </div>
+              <Avatar className='w-8 h-8'>
+                <AvatarImage src={event.hostInfo.avatarUrl ?? '/placeholder-avatar.svg'} />
+                <AvatarFallback>{formatAvatarFallback(event.hostInfo.email)}</AvatarFallback>
+              </Avatar>
               <div>
                 <p className='text-sm font-medium'>{event.hostInfo.fullName}</p>
                 <p className='text-xs text-gray-500'>{event.hostInfo.email}</p>
@@ -163,11 +157,11 @@ export function EventList({ events }: EventListProps) {
                 <div className='flex items-center gap-4 text-gray-500'>
                   <div className='flex items-center gap-1.5'>
                     <Calendar className='h-4 w-4' />
-                    <span>{new Date(event.startedAt).toLocaleDateString('vi-VN')}</span>
+                    <span>{formatDateEvent(event.startedAt)}</span>
                   </div>
                   <div className='flex items-center gap-1.5'>
                     <Clock className='h-4 w-4' />
-                    <span>{Math.floor(event.durations / 60)} phút</span>
+                    <span>{formatDuration(event.durations)}</span>
                   </div>
                 </div>
                 <div className='flex items-center gap-1.5 text-primary font-medium'>
@@ -177,7 +171,7 @@ export function EventList({ events }: EventListProps) {
               </div>
             </div>
           </div>
-        </div>
+        </Link>
       ))}
     </div>
   )

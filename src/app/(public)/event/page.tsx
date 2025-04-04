@@ -7,7 +7,7 @@ import { Filter, Sparkles } from 'lucide-react'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 import images from '@/assets/images'
 import { wrapServerApi } from '@/lib/server-utils'
-import eventRequestApi from '@/apiRequests/event'
+import eventApiRequest from '@/apiRequests/event'
 import { EventList } from '@/app/(public)/event/components/event-list'
 import Link from 'next/link'
 import { cn } from '@/lib/utils'
@@ -62,7 +62,7 @@ export default async function EventPage({
   }
 
   // Lấy toàn bộ dữ liệu sự kiện, không filter hay sort
-  const data = await wrapServerApi(() => eventRequestApi.getAllEvent())
+  const data = await wrapServerApi(() => eventApiRequest.getAllEvent())
   const events = data?.payload?.data || []
 
   return (
@@ -130,7 +130,7 @@ export default async function EventPage({
             <h2 className='text-2xl font-bold mb-2'>Tất cả sự kiện</h2>
             <p className='text-gray-500'>Khám phá các sự kiện phù hợp với bạn</p>
           </div>
-          <Tabs defaultValue={status} className='w-full md:w-auto'>
+          <Tabs defaultValue={status ?? 'ALL'} className='w-full md:w-auto'>
             <TabsList className='w-full md:w-auto justify-start md:justify-center overflow-x-auto'>
               <TabsTrigger value='ALL' className='min-w-[100px]' asChild>
                 <Link

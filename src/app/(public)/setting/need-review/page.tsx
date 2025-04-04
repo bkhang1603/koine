@@ -109,7 +109,6 @@ function NeedReviewPage() {
 
   const [activeTab, setActiveTab] = useState('all')
   const [searchTerm, setSearchTerm] = useState('')
-  const [expandedProduct, setExpandedProduct] = useState<string | null>(null)
 
   const getFilteredList = () => {
     // Xác định danh sách cần lọc dựa trên tab
@@ -134,14 +133,6 @@ function NeedReviewPage() {
   }
 
   const filteredList = getFilteredList()
-
-  const toggleProductExpansion = (productId: string) => {
-    if (expandedProduct === productId) {
-      setExpandedProduct(null)
-    } else {
-      setExpandedProduct(productId)
-    }
-  }
 
   if (isLoading || isLoadingReviews) {
     return <NeedReviewSkeleton />

@@ -395,3 +395,29 @@ export const translateOrderStatus = (status: (typeof OrderStatusValues)[number])
       return status
   }
 }
+
+export const formatDuration = (duration: number): string => {
+  const hours = Math.floor(duration / 3600)
+  const minutes = Math.floor((duration % 3600) / 60)
+  return `${hours} giờ ${minutes} phút`
+}
+
+export const formatDateEvent = (date: string): string => {
+  // Múi giờ đang bị lệch 7 giờ, cần trừ đi 7 giờ
+  const localTime = new Date(date).getTime() - 7 * 60 * 60 * 1000
+  const options: Intl.DateTimeFormatOptions = {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+    timeZone: 'Asia/Ho_Chi_Minh'
+  }
+  return new Date(localTime).toLocaleString('vi-VN', options)
+}
+
+export const formatAvatarFallback = (email: string): string => {
+  // Uppercase first letter of each part
+  if (!email) return ''
+  return `${email.slice(0, 2).toUpperCase()}`
+}

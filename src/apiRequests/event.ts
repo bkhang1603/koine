@@ -8,7 +8,7 @@ import {
   UpdateEventRequestType
 } from '@/schemaValidations/event.schema'
 
-const eventRequestApi = {
+const eventApiRequest = {
   createEvent: (body: CreateEventMeetingRequestType) => http.post<any>('/events', body),
   // get event with caching
   getAllEvent: () =>
@@ -28,4 +28,4 @@ const eventRequestApi = {
   cancelEvent: (body: CancelEventRequestType) => http.put<any>('/events/cancel', body)
 }
 
-export default eventRequestApi
+export default eventApiRequest

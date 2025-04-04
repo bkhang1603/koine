@@ -3,6 +3,7 @@ import BlogComments from '@/components/public/parent/knowledge/blog-comments'
 import { CalendarDays } from 'lucide-react'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { wrapServerApi } from '@/lib/server-utils'
+import { Breadcrumb } from '@/components/public/parent/setting/Breadcrumb'
 
 async function BlogDetailPage(props: { params: Promise<{ id: string }> }) {
   const params = await props.params
@@ -21,6 +22,15 @@ async function BlogDetailPage(props: { params: Promise<{ id: string }> }) {
       {/* Blog Header */}
       <header className='relative bg-gradient-to-b from-gray-50/50'>
         <div className='container max-w-4xl pt-10 pb-12'>
+          {/* Breadcrumb */}
+          <Breadcrumb
+            className='mb-8'
+            items={[
+              { title: 'Tin tức', href: '/knowledge' },
+              { title: blog.title, href: `/knowledge/${id}` }
+            ]}
+          />
+
           {/* Author & Date */}
           <div className='flex items-center gap-4 mb-8'>
             <div className='relative w-14 h-14 rounded-full overflow-hidden border-4 border-white shadow-md'>

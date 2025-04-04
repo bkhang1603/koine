@@ -1,42 +1,42 @@
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import { EventStatus } from '../types'
 import Image from 'next/image'
-import { Calendar, Users, Clock, MapPin, User, Info, ExternalLink } from 'lucide-react'
-import { cn } from '@/lib/utils'
+import { Calendar, Users, Clock, Info, ExternalLink } from 'lucide-react'
+import { cn, formatAvatarFallback, formatDateEvent, formatDuration } from '@/lib/utils'
 import { Breadcrumb } from '@/components/public/parent/setting/Breadcrumb'
 import { wrapServerApi } from '@/lib/server-utils'
-import eventRequestApi from '@/apiRequests/event'
+import eventApiRequest from '@/apiRequests/event'
 import { EventContent } from '@/app/(public)/event/components/event-content'
 import { EventMeeting } from '@/app/(public)/event/components/event-meeting'
 import MeetingWrapper from '@/app/(public)/event/components/meeting-wrapper'
 import Link from 'next/link'
 import configRoute from '@/config/route'
-import { Metadata } from 'next'
+import { EventStatus } from '@/app/(public)/event/types'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 
 const eventStatusConfig: Record<EventStatus, { label: string; color: string }> = {
   OPENING: {
     label: 'Đang diễn ra',
-    color: 'bg-green-50 text-green-600'
+    color: 'bg-green-50 text-green-600 hover:bg-green-100'
   },
   PENDING: {
     label: 'Sắp diễn ra',
-    color: 'bg-blue-50 text-blue-600'
+    color: 'bg-blue-50 text-blue-600 hover:bg-blue-100'
   },
   DONE: {
     label: 'Đã kết thúc',
-    color: 'bg-gray-50 text-gray-600'
+    color: 'bg-gray-50 text-gray-600 hover:bg-gray-100'
   },
   CANCELLED: {
     label: 'Đã hủy',
-    color: 'bg-red-50 text-red-600'
+    color: 'bg-red-50 text-red-600 hover:bg-red-100'
   }
 }
 
 export default async function EventDetailPage(props: { params: Promise<{ id: string }> }) {
   const { id } = await props.params
 
-  const data = await wrapServerApi(() => eventRequestApi.getEventById({ id }))
+  const data = await wrapServerApi(() => eventApiRequest.getEventById({ id }))
   const event = data?.payload?.data
 
   if (!event) {
@@ -88,7 +88,7 @@ export default async function EventDetailPage(props: { params: Promise<{ id: str
           <div className='max-w-4xl'>
             <Badge
               className={cn(
-                'px-3 py-1 text-sm mb-4 inline-flex items-center gap-1.5',
+                'px-3 py-1 text-sm mb-4 inline-flex items-center gap-1.5 cursor-pointer',
                 eventStatusConfig[event.status as EventStatus].color
               )}
             >
@@ -97,14 +97,14 @@ export default async function EventDetailPage(props: { params: Promise<{ id: str
             </Badge>
             <h1 className='text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-6 leading-tight'>{event.title}</h1>
 
-            <div className='flex flex-wrap items-center gap-x-6 gap-y-3 text-white/90 mb-6'>
+            <div className='flex flex-wrap items-center gap-x-6 gap-y-3 text-white/90 mb-2'>
               <div className='flex items-center gap-2'>
                 <Calendar className='h-5 w-5' />
-                <span className='text-base'>{event.startAtFormatted}</span>
+                <span className='text-base'>{formatDateEvent(event.startedAt)}</span>
               </div>
               <div className='flex items-center gap-2'>
                 <Clock className='h-5 w-5' />
-                <span className='text-base'>{event.durationsDisplay}</span>
+                <span className='text-base'>{formatDuration(event.durations)}</span>
               </div>
               <div className='flex items-center gap-2'>
                 <Users className='h-5 w-5' />
@@ -131,15 +131,11 @@ export default async function EventDetailPage(props: { params: Promise<{ id: str
             <div className='bg-white rounded-xl shadow-sm overflow-hidden'>
               <div className='p-6 sm:p-8'>
                 <div className='flex items-center gap-4'>
-                  <div className='h-14 w-14 rounded-full overflow-hidden bg-gray-100 border border-gray-200 flex-shrink-0'>
-                    <Image
-                      src={event.hostInfo.avatarUrl || '/placeholder-avatar.svg'}
-                      alt={event.hostInfo.fullName}
-                      width={56}
-                      height={56}
-                      className='object-cover'
-                    />
-                  </div>
+                  <Avatar className='w-14 h-14'>
+                    <AvatarImage src={event.hostInfo.avatarUrl ?? '/placeholder-avatar.svg'} />
+                    <AvatarFallback>{formatAvatarFallback(event.hostInfo.email)}</AvatarFallback>
+                  </Avatar>
+
                   <div>
                     <h3 className='text-lg font-semibold'>Người tổ chức</h3>
                     <p className='font-medium text-gray-800'>{event.hostInfo.fullName}</p>
@@ -175,7 +171,7 @@ export default async function EventDetailPage(props: { params: Promise<{ id: str
                     <Calendar className='h-5 w-5 text-primary mt-0.5' />
                     <div>
                       <p className='font-medium text-gray-900'>Thời gian</p>
-                      <p className='text-gray-600'>{event.startAtFormatted}</p>
+                      <p className='text-gray-600'>{formatDateEvent(event.startedAt)}</p>
                     </div>
                   </div>
 
@@ -183,7 +179,7 @@ export default async function EventDetailPage(props: { params: Promise<{ id: str
                     <Clock className='h-5 w-5 text-primary mt-0.5' />
                     <div>
                       <p className='font-medium text-gray-900'>Thời lượng</p>
-                      <p className='text-gray-600'>{event.durationsDisplay}</p>
+                      <p className='text-gray-600'>{formatDuration(event.durations)}</p>
                     </div>
                   </div>
 
