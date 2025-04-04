@@ -96,7 +96,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // Xử lý sitemap cho blog
   const blogSiteMap: MetadataRoute.Sitemap = blogList.map((blog) => ({
     url: `${envConfig.NEXT_PUBLIC_URL}/knowledge/${blog.slug}`,
-    lastModified: blog.updatedAt,
     changeFrequency: 'weekly',
     priority: 0.9
   }))
@@ -104,7 +103,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // Xử lý sitemap cho sản phẩm
   const productSiteMap: MetadataRoute.Sitemap = productList.map((product) => ({
     url: `${envConfig.NEXT_PUBLIC_URL}/product/${product.slug}`,
-    lastModified: product.updatedAt,
     changeFrequency: 'weekly',
     priority: 0.8
   }))
@@ -112,7 +110,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // Xử lý sitemap cho khóa học
   const courseSiteMap: MetadataRoute.Sitemap = courseList.map((course) => ({
     url: `${envConfig.NEXT_PUBLIC_URL}/course/${course.slug}`,
-    lastModified: course.updatedAt,
     changeFrequency: 'weekly',
     priority: 0.8
   }))
@@ -120,7 +117,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // Xử lý sitemap cho sự kiện
   const eventSiteMap: MetadataRoute.Sitemap = eventList.map((event) => ({
     url: `${envConfig.NEXT_PUBLIC_URL}/event/${event.id}`,
-    lastModified: event.updateAt,
     changeFrequency: 'daily',
     priority: 0.7
   }))
