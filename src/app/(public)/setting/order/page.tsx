@@ -109,13 +109,13 @@ const statusGroups = [
       'ALL' as const, // Add "ALL" option at the beginning
       OrderStatus.PENDING,
       OrderStatus.PROCESSING,
-      OrderStatus.DELIVERING,
-      OrderStatus.COMPLETED
+      OrderStatus.DELIVERING
     ]
   },
   {
     name: 'Khác',
     statuses: [
+      OrderStatus.COMPLETED,
       OrderStatus.DELIVERED,
       OrderStatus.FAILED_PAYMENT,
       OrderStatus.REFUND_REQUEST,

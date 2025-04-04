@@ -17,6 +17,7 @@ import {
   ListChildAccountResType,
   MyChildAccountByIdResType,
   MyChildAccountResType,
+  MyOrdersReviewsResType,
   ProfileChildResType,
   RegisterChildAccountBodyType,
   RegisterChildAccountResType,
@@ -67,7 +68,8 @@ const accountApiRequest = {
     http.put<OnlyMessageResType>(`/course-visibilities`, body),
   getCourseDetailForChild: ({ courseId, childId }: { courseId: string; childId: string }) =>
     http.get<CourseDetailForChildResType>(`/users/my-child-course-progress/${childId}/course/${courseId}`),
-  getChildProfile: () => http.get<ProfileChildResType>('users/profile-child')
+  getChildProfile: () => http.get<ProfileChildResType>('users/profile-child'),
+  getMyOrdersReviews: () => http.get<MyOrdersReviewsResType>('/orders/my-reviews')
 }
 
 export default accountApiRequest

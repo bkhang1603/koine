@@ -1,9 +1,9 @@
-"use client"
+'use client'
 
-import type React from "react"
-import { useEffect, useState } from "react"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
+import type React from 'react'
+import { useEffect, useState } from 'react'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
 
 interface TimePickerInputProps {
   value?: number
@@ -14,11 +14,11 @@ interface TimePickerInputProps {
 }
 
 export function TimePickerInput({ value, onChange, min = 0, max = 59, placeholder }: TimePickerInputProps) {
-  const [stringValue, setStringValue] = useState(value?.toString() || "")
+  const [stringValue, setStringValue] = useState(value?.toString() || '')
 
   useEffect(() => {
     if (value !== undefined) {
-      setStringValue(value.toString().padStart(2, "0"))
+      setStringValue(value.toString().padStart(2, '0'))
     }
   }, [value])
 
@@ -37,8 +37,8 @@ export function TimePickerInput({ value, onChange, min = 0, max = 59, placeholde
       value={stringValue}
       onChange={handleChange}
       placeholder={placeholder}
-      className="w-16 text-center"
-      inputMode="numeric"
+      className='w-16 text-center'
+      inputMode='numeric'
       maxLength={2}
     />
   )
@@ -74,20 +74,19 @@ export function TimePickerDemo({ setHours, setMinutes, initHours, initMinutes, o
   }
 
   return (
-    <div className="flex items-center space-x-2">
-      <div className="grid gap-1 text-center">
-        <Label htmlFor="hours" className="text-xs">
+    <div className='flex items-center space-x-2'>
+      <div className='grid gap-1 text-center'>
+        <Label htmlFor='hours' className='text-xs'>
           Giờ
         </Label>
-        <TimePickerInput value={hours} onChange={handleHoursChange} min={0} max={23} placeholder="00" />
+        <TimePickerInput value={hours} onChange={handleHoursChange} min={0} max={23} placeholder='00' />
       </div>
-      <div className="grid gap-1 text-center">
-        <Label htmlFor="minutes" className="text-xs">
+      <div className='grid gap-1 text-center'>
+        <Label htmlFor='minutes' className='text-xs'>
           Phút
         </Label>
-        <TimePickerInput value={minutes} onChange={handleMinutesChange} min={0} max={59} placeholder="00" />
+        <TimePickerInput value={minutes} onChange={handleMinutesChange} min={0} max={59} placeholder='00' />
       </div>
     </div>
   )
 }
-

@@ -1,19 +1,18 @@
-'use client'
-
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { useEvent } from '@/queries/useEvent'
 import { EventStatus } from './types'
 import Image from 'next/image'
-import { useRouter } from 'next/navigation'
-import { useState, useMemo } from 'react'
-import { Calendar, Search, Filter, Sparkles, Users, Clock, Video } from 'lucide-react'
+import { Filter, Sparkles } from 'lucide-react'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
-import { cn } from '@/lib/utils'
-import { EventCardSkeleton } from './components/EventCardSkeleton'
 import images from '@/assets/images'
+import { wrapServerApi } from '@/lib/server-utils'
+import eventRequestApi from '@/apiRequests/event'
+import { EventList } from '@/app/(public)/event/components/event-list'
+import Link from 'next/link'
+import { cn } from '@/lib/utils'
+import configRoute from '@/config/route'
+import { SearchBar } from '@/app/(public)/event/components/search-bar'
 
 const eventStatusConfig: Record<EventStatus, { label: string; color: string }> = {
   OPENING: {
@@ -34,40 +33,37 @@ const eventStatusConfig: Record<EventStatus, { label: string; color: string }> =
   }
 }
 
-export default function EventPage() {
-  const { data: events, isLoading } = useEvent()
-  const [searchQuery, setSearchQuery] = useState('')
-  const [selectedTab, setSelectedTab] = useState<EventStatus>('OPENING')
-  const router = useRouter()
+const sortOptions = [
+  { label: 'Mới nhất', value: 'newest' },
+  { label: 'Sắp diễn ra', value: 'upcoming' },
+  { label: 'Số người tham gia', value: 'participants' }
+]
 
-  // const isOpenable = (eventStartAt: string, duration: number): boolean => {
-  //   const now = new Date()
-  //   const localTime = new Date(now.getTime() + 7 * 60 * 60 * 1000)
-  //   const startTime = new Date(eventStartAt)
-  //   const endDate = new Date(startTime.getTime() + duration * 1000)
-  //   return localTime.getTime() >= startTime.getTime() && localTime.getTime() < endDate.getTime()
-  // }
+export default async function EventPage({
+  searchParams
+}: {
+  searchParams: Promise<{ status?: string; sort?: string; q?: string }>
+}) {
+  // Lấy các giá trị từ searchParams
+  const { status, sort, q } = await searchParams
 
-  const filteredEvents = useMemo(() => {
-    if (!events?.payload?.data) return []
+  // Chuyển đổi searchParams thành object thường để tránh lỗi "Only plain objects can be passed"
+  const createQueryObject = (overrides: Record<string, string>) => {
+    // Tạo một object mới chỉ với các thuộc tính cần thiết
+    const query: Record<string, string> = {}
 
-    let result = events.payload.data
+    // Thêm các searchParams hiện tại (nếu có giá trị)
+    if (q) query.q = q
+    if (sort) query.sort = sort
+    if (status) query.status = status
 
-    // Filter by status
-    if (selectedTab) {
-      result = result.filter((event) => event.status === selectedTab)
-    }
+    // Áp dụng các override
+    return { ...query, ...overrides }
+  }
 
-    // Filter by search query
-    if (searchQuery) {
-      const query = searchQuery.toLowerCase()
-      result = result.filter(
-        (event) => event.title.toLowerCase().includes(query) || event.description.toLowerCase().includes(query)
-      )
-    }
-
-    return result
-  }, [events?.payload?.data, selectedTab, searchQuery])
+  // Lấy toàn bộ dữ liệu sự kiện, không filter hay sort
+  const data = await wrapServerApi(() => eventRequestApi.getAllEvent())
+  const events = data?.payload?.data || []
 
   return (
     <main className='min-h-screen pb-32'>
@@ -96,30 +92,33 @@ export default function EventPage() {
       <section className='container -mt-16 relative'>
         <div className='bg-white rounded-2xl shadow-lg p-6 md:p-8'>
           <div className='flex flex-col md:flex-row gap-4 items-stretch md:items-center'>
-            <div className='flex-1 relative'>
-              <Search className='absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400' />
-              <Input
-                placeholder='Tìm kiếm sự kiện...'
-                className='pl-10'
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-              />
-            </div>
-            <div className='flex gap-4'>
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant='outline' className='gap-2'>
-                    <Filter className='h-4 w-4' />
-                    Bộ lọc
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align='end' className='w-56'>
-                  <DropdownMenuItem>Sắp xếp theo ngày</DropdownMenuItem>
-                  <DropdownMenuItem>Sắp xếp theo số người tham gia</DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-              <Button>Tạo sự kiện</Button>
-            </div>
+            <SearchBar initialValue={q} />
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant='outline' className='gap-2'>
+                  <Filter className='h-4 w-4' />
+                  {sortOptions.find((option) => option.value === sort)?.label || 'Sắp xếp theo'}
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align='end' className='w-56'>
+                {sortOptions.map((option) => (
+                  <DropdownMenuItem key={option.value} asChild>
+                    <Link
+                      href={{
+                        pathname: configRoute.event,
+                        query: createQueryObject({ sort: option.value })
+                      }}
+                      className={cn(
+                        'cursor-pointer w-full',
+                        sort === option.value && 'bg-primary/10 text-primary font-medium'
+                      )}
+                    >
+                      {option.label}
+                    </Link>
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         </div>
       </section>
@@ -131,14 +130,30 @@ export default function EventPage() {
             <h2 className='text-2xl font-bold mb-2'>Tất cả sự kiện</h2>
             <p className='text-gray-500'>Khám phá các sự kiện phù hợp với bạn</p>
           </div>
-          {/* Tôi muốn không hiện tab đã hủy */}
-          <Tabs value={selectedTab} onValueChange={(value) => setSelectedTab(value as EventStatus)}>
-            <TabsList>
+          <Tabs defaultValue={status} className='w-full md:w-auto'>
+            <TabsList className='w-full md:w-auto justify-start md:justify-center overflow-x-auto'>
+              <TabsTrigger value='ALL' className='min-w-[100px]' asChild>
+                <Link
+                  href={{
+                    pathname: configRoute.event,
+                    query: createQueryObject({ status: 'ALL' })
+                  }}
+                >
+                  Tất cả
+                </Link>
+              </TabsTrigger>
               {Object.entries(eventStatusConfig).map(
-                ([status, config]) =>
-                  status !== 'CANCELLED' && (
-                    <TabsTrigger key={status} value={status} className='min-w-[120px]'>
-                      {config.label}
+                ([statusKey, config]) =>
+                  statusKey !== 'CANCELLED' && (
+                    <TabsTrigger key={statusKey} value={statusKey} className='min-w-[120px]' asChild>
+                      <Link
+                        href={{
+                          pathname: configRoute.event,
+                          query: createQueryObject({ status: statusKey })
+                        }}
+                      >
+                        {config.label}
+                      </Link>
                     </TabsTrigger>
                   )
               )}
@@ -146,102 +161,8 @@ export default function EventPage() {
           </Tabs>
         </div>
 
-        {isLoading ? (
-          <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'>
-            {Array.from({ length: 6 }).map((_, index) => (
-              <EventCardSkeleton key={index} />
-            ))}
-          </div>
-        ) : filteredEvents.length > 0 ? (
-          <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'>
-            {filteredEvents.map((event) => (
-              <div
-                key={event.id}
-                className='group bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300 cursor-pointer flex flex-col h-full'
-                onClick={() => {
-                  const encodedData = encodeURIComponent(JSON.stringify(event))
-                  router.push(`/event/${event.id}?data=${encodedData}`)
-                }}
-              >
-                <div className='relative h-48'>
-                  <Image
-                    src={event.imageUrl || '/placeholder.svg'}
-                    alt={event.title}
-                    fill
-                    className='object-cover transition-transform duration-500 group-hover:scale-105'
-                  />
-                  <Badge className={cn('absolute top-4 right-4', eventStatusConfig[event.status as EventStatus].color)}>
-                    {eventStatusConfig[event.status as EventStatus].label}
-                  </Badge>
-                </div>
-
-                <div className='p-6 flex flex-col flex-1'>
-                  <div className='flex items-center gap-2 mb-3'>
-                    <div className='h-8 w-8 rounded-full overflow-hidden'>
-                      <Image
-                        src={event.hostInfo.avatarUrl}
-                        alt={event.hostInfo.fullName}
-                        width={32}
-                        height={32}
-                        className='object-cover'
-                      />
-                    </div>
-                    <div>
-                      <p className='text-sm font-medium'>{event.hostInfo.fullName}</p>
-                      <p className='text-xs text-gray-500'>{event.hostInfo.email}</p>
-                    </div>
-                  </div>
-
-                  <h3 className='text-lg font-semibold mb-2 line-clamp-1 group-hover:text-primary transition-colors'>
-                    {event.title}
-                  </h3>
-                  <p className='text-gray-500 text-sm mb-4 line-clamp-2 flex-1'>{event.description}</p>
-
-                  <div className='border-t pt-4 mt-auto'>
-                    <div className='flex items-center justify-between text-sm'>
-                      <div className='flex items-center gap-4 text-gray-500'>
-                        <div className='flex items-center gap-1.5'>
-                          <Calendar className='h-4 w-4' />
-                          <span>{event.startAtFormatted}</span>
-                        </div>
-                        <div className='flex items-center gap-1.5'>
-                          <Clock className='h-4 w-4' />
-                          <span>{event.durationsDisplay}</span>
-                        </div>
-                      </div>
-                      <div className='flex items-center gap-1.5 text-primary font-medium'>
-                        <Users className='h-4 w-4' />
-                        <span>{event.totalParticipants}</span>
-                      </div>
-                    </div>
-
-                    {/* {isOpenable(event.startedAt, event.durations) && event.status === 'OPENING' && (
-                      <Button
-                        className='w-full mt-4'
-                        onClick={(e) => {
-                          e.stopPropagation()
-                        }}
-                      >
-                        <PlayCircle className='h-4 w-4 mr-2' />
-                        Tham gia ngay
-                      </Button>
-                    )} */}
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        ) : (
-          <div className='flex flex-col items-center justify-center py-16 bg-white rounded-3xl'>
-            <div className='bg-emerald-50 p-6 rounded-full mb-6'>
-              <Video className='h-8 w-8 text-emerald-600' />
-            </div>
-            <h3 className='text-xl font-semibold text-gray-900 mb-2'>Chưa có sự kiện</h3>
-            <p className='text-gray-500 text-center max-w-md'>
-              Hiện tại chưa có sự kiện nào đang diễn ra. Vui lòng quay lại sau để xem các sự kiện mới.
-            </p>
-          </div>
-        )}
+        {/* Truyền tất cả sự kiện mà không thực hiện filter/sort */}
+        <EventList events={events} />
       </section>
     </main>
   )

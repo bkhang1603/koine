@@ -15,7 +15,9 @@ export const getAllEventResType = z.object({
     z.object({
       id: z.string(),
       title: z.string(),
+      slug: z.string(),
       description: z.string(),
+      content: z.string(),
       startedAt: z.string(),
       startAtFormatted: z.string(),
       durations: z.number(),
@@ -40,6 +42,37 @@ export const getAllEventResType = z.object({
 })
 
 export type GetAllEventResType = z.infer<typeof getAllEventResType>
+
+export const getEventByIdResType = z.object({
+  data: z.object({
+    id: z.string(),
+    title: z.string(),
+    slug: z.string(),
+    description: z.string(),
+    content: z.string(),
+    startedAt: z.string(),
+    startAtFormatted: z.string(),
+    durations: z.number(),
+    durationsDisplay: z.string(),
+    imageUrl: z.string(),
+    roomHostUrl: z.string(),
+    roomName: z.string(),
+    roomUrl: z.string(),
+    recordUrl: z.string(),
+    status: z.string(),
+    totalParticipants: z.number(),
+    createdAt: z.string(),
+    updateAt: z.string(),
+    hostInfo: z.object({
+      id: z.string(),
+      fullName: z.string(),
+      email: z.string(),
+      avatarUrl: z.string()
+    })
+  })
+})
+
+export type GetEventByIdResType = z.infer<typeof getEventByIdResType>
 
 //cancel
 export const cancelEventRequest = z.object({

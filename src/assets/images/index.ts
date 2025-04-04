@@ -111,7 +111,7 @@ const images = {
   courseSkinCareBanner,
   productPoster,
   toy,
-  eventBanner,
+  eventBanner
 }
 
 export default images

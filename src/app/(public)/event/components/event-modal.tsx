@@ -1,9 +1,7 @@
 'use client'
-import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
-import { X } from 'lucide-react'
 
-interface WherebyMeetingProps {
+type WherebyMeetingProps = {
   url: string
   isOpen: boolean
   onClose: () => void

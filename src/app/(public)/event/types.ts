@@ -9,7 +9,7 @@ export type EventCategory = {
   iconUrl?: string
 }
 
-export interface EventHost {
+export type EventHost = {
   id: string
   fullName: string
   email: string
@@ -49,7 +49,7 @@ export type EventLocation = {
   meetingPlatform?: string
 }
 
-export interface ApiEvent {
+export type ApiEvent = {
   id: string
   title: string
   description: string
@@ -85,10 +85,12 @@ export interface ApiEvent {
   }>
 }
 
-export interface Event {
+export type Event = {
   id: string
   title: string
+  slug: string
   description: string
+  content: string
   startedAt: string
   startAtFormatted: string
   durations: number

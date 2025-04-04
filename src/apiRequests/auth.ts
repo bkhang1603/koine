@@ -57,7 +57,9 @@ const authApiRequest = {
     http.post<LoginResType>('/api/auth/otp', { id, code }, { baseUrl: '' }),
   sSendOTP: ({ id, code }: { id: string; code: string }) => http.post<LoginResType>('/auth/active', { id, code }),
   resendOTP: (id: string) => http.post<ResendOTPResType>(`/auth/retry-active/${id}`, null),
-  requestResetPassword: (email: string) => http.post<OnlyMessageResType>('/auth/forgot-password/request', { email })
+  requestResetPassword: (email: string) => http.post<OnlyMessageResType>('/auth/forgot-password/request', { email }),
+  changePassword: (body: { oldPassword: string; newPassword: string; confirmPassword: string }) =>
+    http.post<OnlyMessageResType>('/auth/change-password', body)
 }
 
 export default authApiRequest

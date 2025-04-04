@@ -530,6 +530,28 @@ export const profileChildRes = z.object({
   statusCode: z.number()
 })
 
+export const myOrdersReviews = z.object({
+  itemId: z.string(),
+  itemTitle: z.string(),
+  itemType: z.enum(OrderTypeValues),
+  orderId: z.string(),
+  orderDetailId: z.string(),
+  rating: z.number(),
+  review: z.string(),
+  createdAt: z.boolean(),
+  updatedAt: z.string(),
+  createdAtFormatted: z.string(),
+  imageUrl: z.string(),
+  orderDate: z.string(),
+  orderCode: z.string()
+})
+
+export const myOrdersReviewsRes = z.object({
+  data: z.array(myOrdersReviews),
+  message: z.string(),
+  statusCode: z.number()
+})
+
 export type AccountResType = z.TypeOf<typeof accountRes>
 
 export type CourseByAccountResType = z.TypeOf<typeof courseByAccountRes>
@@ -571,3 +593,5 @@ export type CourseDetailForChildResType = z.TypeOf<typeof courseDetailForChildRe
 export type CreateOrderNeedReviewBodyType = z.TypeOf<typeof createOrderNeedReviewBody>
 
 export type ProfileChildResType = z.TypeOf<typeof profileChildRes>
+
+export type MyOrdersReviewsResType = z.TypeOf<typeof myOrdersReviewsRes>

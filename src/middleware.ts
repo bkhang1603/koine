@@ -229,6 +229,8 @@ export const config = {
     '/admin/:path*',
     '/content-creator/:path*',
     '/kid/:path*',
-    '/unauthorized'
+    '/unauthorized',
+    '/cart',
+    '/checkout'
   ]
 }

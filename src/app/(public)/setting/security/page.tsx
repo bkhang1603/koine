@@ -3,7 +3,7 @@
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Separator } from '@/components/ui/separator'
-import { Shield, ShieldCheck, Lock, Laptop, Smartphone, AlertTriangle, LogOut, Clock } from 'lucide-react'
+import { Shield, ShieldCheck, Lock, Laptop, Smartphone, AlertTriangle, LogOut } from 'lucide-react'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -271,97 +271,6 @@ export default function SecurityPage() {
                 </div>
               </div>
             ))}
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Recent Activities */}
-      <Card className='shadow-sm border-gray-100'>
-        <CardContent className='p-6'>
-          <div className='flex items-center gap-2 mb-1'>
-            <Clock className='h-5 w-5 text-primary' />
-            <h3 className='text-lg font-medium text-gray-900'>Lịch sử hoạt động</h3>
-          </div>
-          <p className='text-sm text-gray-500 md:ml-7 mb-6'>Các hoạt động gần đây trên tài khoản của bạn</p>
-
-          <Separator className='mb-6' />
-
-          <div className='space-y-4'>
-            {activities.map((activity) => {
-              // Xác định icon và màu dựa vào loại hoạt động
-              let icon, bgColor, textColor
-
-              switch (activity.type) {
-                case 'login':
-                  icon = <Laptop className='h-4 w-4 text-green-500' />
-                  bgColor = 'bg-green-50'
-                  textColor = 'text-green-700'
-                  break
-                case 'login_fail':
-                  icon = <AlertTriangle className='h-4 w-4 text-red-500' />
-                  bgColor = 'bg-red-50'
-                  textColor = 'text-red-700'
-                  break
-                case 'password_change':
-                  icon = <Lock className='h-4 w-4 text-blue-500' />
-                  bgColor = 'bg-blue-50'
-                  textColor = 'text-blue-700'
-                  break
-                default:
-                  icon = <Clock className='h-4 w-4 text-gray-500' />
-                  bgColor = 'bg-gray-100'
-                  textColor = 'text-gray-700'
-              }
-
-              // Xác định tiêu đề hoạt động
-              let title
-
-              switch (activity.type) {
-                case 'login':
-                  title = 'Đăng nhập thành công'
-                  break
-                case 'login_fail':
-                  title = 'Đăng nhập thất bại'
-                  break
-                case 'password_change':
-                  title = 'Thay đổi mật khẩu'
-                  break
-                default:
-                  title = 'Hoạt động không xác định'
-              }
-
-              return (
-                <div key={activity.id} className='p-4 border border-gray-100 rounded-lg'>
-                  <div className='flex items-start gap-3'>
-                    <div className={`p-2 rounded-full ${bgColor}`}>{icon}</div>
-
-                    <div>
-                      <div className='flex items-center gap-2'>
-                        <h4 className='font-medium text-gray-900'>{title}</h4>
-                        <Badge className={`${bgColor} ${textColor} hover:${bgColor} px-1.5 text-xs font-normal`}>
-                          {activity.type === 'login_fail' ? 'Cảnh báo' : 'Thông tin'}
-                        </Badge>
-                      </div>
-
-                      <div className='mt-1 space-y-1 text-xs text-gray-500'>
-                        <p>Thời gian: {activity.time}</p>
-                        <p>Thiết bị: {activity.device}</p>
-                        <p>
-                          Vị trí: {activity.location} • IP: {activity.ip}
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              )
-            })}
-
-            <div className='text-center pt-2'>
-              <Button variant='outline' size='sm' className='text-xs'>
-                <Clock className='h-3.5 w-3.5 mr-1.5' />
-                Xem thêm lịch sử
-              </Button>
-            </div>
           </div>
         </CardContent>
       </Card>

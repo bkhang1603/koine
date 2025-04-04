@@ -22,7 +22,8 @@ const configRoute = {
     payment: '/setting/payment',
     notifications: '/setting/notifications',
     security: '/setting/security',
-    childAccount: '/setting/child-account'
+    childAccount: '/setting/child-account',
+    review: '/setting/need-review'
   },
   profile: '/profile',
   contentCreator: {
