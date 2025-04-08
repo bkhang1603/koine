@@ -84,12 +84,14 @@ export const cancelEventRequest = z.object({
 export type CancelEventRequestType = z.infer<typeof cancelEventRequest>
 
 //update thông tin lúc tạo phòng
-export const createEventRoomRequest = z.object({
-  roomUrl: z.string(),
-  roomHostUrl: z.string(),
-  roomName: z.string()
+export const createEventRoomRes = z.object({
+  data: z.object({
+    roomUrl: z.string(),
+    roomHostUrl: z.string(),
+    roomName: z.string()
+  })
 })
-export type CreateEventRoomRequestType = z.infer<typeof createEventRoomRequest>
+export type CreateEventRoomResType = z.infer<typeof createEventRoomRes>
 
 //update thông tin khác
 export const updateEventRequest = z.object({
@@ -107,6 +109,7 @@ export const updateEventRequest = z.object({
   imageUrl: z.string().optional(),
   roomUrl: z.string().optional(),
   status: z.string().optional(),
+  content: z.string().optional(),
   roomHostUrl: z.string().optional(),
   roomName: z.string().optional(),
   recordUrl: z.string().optional(),
@@ -115,3 +118,9 @@ export const updateEventRequest = z.object({
 })
 
 export type UpdateEventRequestType = z.infer<typeof updateEventRequest>
+
+export const reportEventBodyType = z.object({
+  eventId: z.string(),
+  roomName: z.string()
+})
+export type ReportEventBodyType = z.infer<typeof reportEventBodyType>

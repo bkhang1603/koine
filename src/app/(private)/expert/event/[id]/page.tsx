@@ -6,9 +6,9 @@ import { Textarea } from '@/components/ui/textarea'
 import Image from 'next/image'
 import {
   useCancelEventMutation,
+  useCreateRoomMutation,
   useGetEventByIdWithoutCaching,
-  useUpdateEventMutation,
-  useUpdateEventWhenCreateRoomMutation
+  useReportEventParticipationMutation
 } from '@/queries/useEvent'
 import { Calendar, Clock, Mic, Trash2, Video, Users, AlertCircle, RefreshCw } from 'lucide-react'
 import { use, useState } from 'react'
@@ -22,6 +22,7 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { cn } from '@/lib/utils'
 import { Breadcrumb } from '@/components/public/parent/setting/Breadcrumb'
+import { resolveSoa } from 'dns'
 
 // Constants
 const EVENT_STATUS = {
@@ -55,36 +56,35 @@ const formatEventTime = (startAt: string, duration: number) => {
 
 const isEventOpenable = (startAt: string, duration: number) => {
   const now = new Date()
-  const localTime = new Date(now.getTime() + 7 * 60 * 60 * 1000)
   const startTime = new Date(startAt)
   const endTime = new Date(startTime.getTime() + duration * 1000)
-  return localTime.getTime() >= startTime.getTime() && localTime.getTime() < endTime.getTime()
+  return now.getTime() >= startTime.getTime() && now.getTime() < endTime.getTime()
 }
 
 const isEventCancelable = (startAt: string) => {
   const now = new Date()
-  const localTime = new Date(now.getTime() + 7 * 60 * 60 * 1000)
   const startTime = new Date(startAt)
-  return startTime.getTime() - localTime.getTime() >= 2 * 3600 * 1000
+  return startTime.getTime() - now.getTime() >= 2 * 3600 * 1000
 }
 
-const getInsightsRoom = async (roomName: string) => {
-  try {
-    const response = await fetch(`https://api.whereby.dev/v1/insights/rooms?roomName=${encodeURIComponent(roomName)}`, {
-      method: 'GET',
-      headers: {
-        Authorization: `Bearer ${process.env.NEXT_PUBLIC_WHEREBY_API_KEY}`,
-        'Content-Type': 'application/json'
-      }
-    })
-    if (!response.ok) {
-      throw new Error(`HTTP error! Status: ${response.status}`)
-    }
-    return await response.json()
-  } catch (error) {
-    handleErrorApi({ error })
-    return null
-  }
+const isEventClosed = (eventStartAt: string, duration: number): boolean => {
+  const now = new Date()
+  const startTime = new Date(eventStartAt)
+  const endDate = new Date(startTime.getTime() + duration * 1000) // duration tính theo giây
+  return now.getTime() >= endDate.getTime() // chỉ mở khi trong khoảng startTime -> endDate
+}
+
+const isEventReportable = (
+  startAt: string,
+  totalParticipants: number,
+  duration: number,
+  eventStatus: string
+): boolean => {
+  if (eventStatus == 'DONE' || eventStatus == 'CANCELLED') return false
+  const startTime = new Date(startAt)
+  const endTime = new Date(startTime.getTime() + duration * 1000)
+  const now = new Date()
+  return now.getTime() >= endTime.getTime() && totalParticipants == 0
 }
 
 export default function EventDetailPage(props: { params: Promise<{ id: string }> }) {
@@ -97,9 +97,9 @@ export default function EventDetailPage(props: { params: Promise<{ id: string }>
 
   // Queries
   const { data: eventData, isLoading, refetch } = useGetEventByIdWithoutCaching({ id })
-  const updateRoomInfo = useUpdateEventWhenCreateRoomMutation()
-  const updateEventInfo = useUpdateEventMutation()
+  const createRoom = useCreateRoomMutation()
   const cancelEvent = useCancelEventMutation()
+  const reportEvent = useReportEventParticipationMutation()
 
   const event = eventData?.payload?.data
 
@@ -115,25 +115,25 @@ export default function EventDetailPage(props: { params: Promise<{ id: string }>
     }
   }
 
-  const handleUpdateEventInfo = async (roomName: string | null) => {
+  const handleReportEventInfo = async (roomName: string | null) => {
     try {
       if (isProcessing) return
       setIsProcessing(true)
 
       if (!roomName) return
-      const res = await getInsightsRoom(roomName)
-      if (!res || res.results[0].length == 0) {
-        //alert hay prompt cho ngta thấy này lỗi bên whereby k phải BE
-        //k biết hiện thế nào đâu
-        // Alert.alert('Thông báo', `Chưa có dữ liệu phòng họp`)
-        return
+      const body = {
+        eventId: id,
+        roomName: roomName
       }
 
-      await updateEventInfo.mutateAsync({
-        body: { totalParticipants: res.results[0].totalUniqueParticipants, status: 'DONE' },
-        eventId: id
+      const res = await reportEvent.mutateAsync({
+        body: body
       })
-      refetch()
+      if (res) {
+        refetch()
+      } else {
+        throw new Error('Lỗi khi báo cáo')
+      }
     } catch (error) {
       handleErrorApi({ error })
     } finally {
@@ -141,65 +141,32 @@ export default function EventDetailPage(props: { params: Promise<{ id: string }>
     }
   }
 
-  const handleCreateRoom = async (eventStartAt: string, duration: number) => {
+  const handleCreateRoom = async () => {
     try {
-      const now = new Date(eventStartAt)
-      const endDate = new Date(now.getTime() + duration * 1000)
-      const endDateISO = endDate.toISOString()
-
-      const response = await fetch('https://api.whereby.dev/v1/meetings', {
-        method: 'POST',
-        headers: {
-          Authorization: `Bearer ${process.env.NEXT_PUBLIC_WHEREBY_API_KEY}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          isLocked: true,
-          roomMode: 'group',
-          endDate: endDateISO,
-          fields: ['hostRoomUrl'],
-          templateType: 'viewerMode',
-          roomAccess: 'viewer'
-        })
-      })
-
-      const data = await response.json()
-      const body = {
-        roomHostUrl: data.hostRoomUrl.toString().trim(),
-        roomName: data.roomName.toString().trim(),
-        roomUrl: data.roomUrl.toString().trim()
+      const res = await createRoom.mutateAsync({ eventId: id })
+      console.log(res)
+      if (res && res.payload.data.roomHostUrl) {
+        window.open(res.payload.data.roomHostUrl, '_blank')
+        refetch()
+      } else {
+        throw new Error('Lỗi khi tạo phòng')
       }
-
-      await updateRoomInfo.mutateAsync({ body, eventId: id })
-      window.open(data.hostRoomUrl, '_blank')
-      refetch()
     } catch (error) {
       handleErrorApi({ error })
     }
   }
 
-  const handleOpenMeet = async (roomHostUrl: string | null, eventStartAt: string, duration: number) => {
+  const handleOpenMeet = async (roomHostUrl: string | null) => {
     try {
       if (isProcessing) return
       setIsProcessing(true)
 
       if (!roomHostUrl || roomHostUrl.length == 0) {
-        await handleCreateRoom(eventStartAt, duration)
+        await handleCreateRoom()
       } else {
         window.open(roomHostUrl, '_blank')
+        refetch()
       }
-    } catch (error) {
-      handleErrorApi({ error })
-    } finally {
-      setIsProcessing(false)
-    }
-  }
-
-  const handleUpdateInfo = async () => {
-    try {
-      if (isProcessing) return
-      setIsProcessing(true)
-      await handleUpdateEventInfo(event?.roomName || null)
     } catch (error) {
       handleErrorApi({ error })
     } finally {
@@ -249,11 +216,12 @@ export default function EventDetailPage(props: { params: Promise<{ id: string }>
   const eventTime = formatEventTime(event.startedAt, event.durations)
   const isOpenable = isEventOpenable(event.startedAt, event.durations)
   const isCancelable = isEventCancelable(event.startedAt)
+  const isClosed = isEventClosed(event.startedAt, event.durations)
+  const isReportable = isEventReportable(event.startedAt, event.totalParticipants, event.durations, event.status)
 
   const canJoinEvent = (event.status === 'OPENING' || event.status === 'PENDING') && isOpenable
-  const canCreateRoom = event.status === 'PENDING' && !event.roomUrl
-  const canUpdateInfo = event.status === 'OPENING' && event.roomName
-
+  const canCreateRoom = event.status === 'PENDING' && !event.roomUrl && isOpenable
+  const canUpdateInfo = event.status === 'OPENING' && event.roomName && isReportable
   return (
     <div className='container mx-auto py-8 space-y-8'>
       {/* Breadcrumb */}
@@ -276,29 +244,25 @@ export default function EventDetailPage(props: { params: Promise<{ id: string }>
           <p className='text-muted-foreground text-lg'>{event.description}</p>
         </div>
         <div className='flex gap-2'>
-          {canJoinEvent && (
-            <Button
-              size='lg'
-              disabled={isProcessing}
-              onClick={() => handleOpenMeet(event.roomHostUrl, event.startedAt, event.durations)}
-            >
+          {canJoinEvent && event.roomHostUrl && (
+            <Button size='lg' disabled={isProcessing} onClick={() => handleOpenMeet(event.roomHostUrl)}>
               <Video className='w-4 h-4 mr-2' />
               Tham dự
             </Button>
           )}
           {canCreateRoom && (
-            <Button
-              size='lg'
-              variant='outline'
-              disabled={isProcessing}
-              onClick={() => handleCreateRoom(event.startedAt, event.durations)}
-            >
+            <Button size='lg' variant='outline' disabled={isProcessing} onClick={() => handleCreateRoom()}>
               <Video className='w-4 h-4 mr-2' />
               Tạo phòng
             </Button>
           )}
           {canUpdateInfo && (
-            <Button size='lg' variant='outline' disabled={isProcessing} onClick={handleUpdateInfo}>
+            <Button
+              size='lg'
+              variant='outline'
+              disabled={isProcessing}
+              onClick={() => handleReportEventInfo(event.roomName)}
+            >
               <RefreshCw className='w-4 h-4 mr-2' />
               Cập nhật
             </Button>
@@ -384,14 +348,22 @@ export default function EventDetailPage(props: { params: Promise<{ id: string }>
                 <div className='space-y-4'>
                   <div className='flex items-center justify-between p-3 bg-primary/5 rounded-lg'>
                     <div className='flex items-center gap-2'>
-                      <div className='w-2 h-2 rounded-full bg-primary animate-pulse' />
-                      <span className='font-medium'>Phòng đã sẵn sàng</span>
+                      <div
+                        className={`w-2 h-2 rounded-full ${isClosed ? 'bg-gray-400' : 'bg-primary'}  animate-pulse`}
+                      />
+                      <span className='font-medium'>{isClosed ? 'Phòng đã đóng' : 'Phòng đã sẵn sàng'}</span>
                     </div>
                     <Badge variant='secondary'>{event.totalParticipants} người tham dự</Badge>
                   </div>
-                  <Button variant='default' className='w-full' onClick={() => window.open(event.roomUrl, '_blank')}>
+                  <Button
+                    variant='default'
+                    className={`w-full 
+    ${isClosed ? 'bg-gray-400 hover:bg-gray-400 cursor-default' : 'bg-primary hover:bg-primary/90'} 
+    text-white`}
+                    onClick={() => (isClosed ? null : handleOpenMeet(event.roomHostUrl))}
+                  >
                     <Video className='w-4 h-4 mr-2' />
-                    Mở phòng
+                    {!isClosed ? 'Mở phòng' : 'Phòng đã đóng'}
                   </Button>
                 </div>
               ) : (
