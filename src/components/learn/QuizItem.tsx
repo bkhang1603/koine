@@ -6,9 +6,10 @@ interface QuizItemProps {
   index: number
   isAccessible: boolean
   onClick: () => void
+  isActive: boolean
 }
 
-export const QuizItem = ({ chapter, index, isAccessible, onClick }: QuizItemProps) => {
+export const QuizItem = ({ chapter, index, isAccessible, onClick, isActive }: QuizItemProps) => {
   const renderStatus = () => {
     if (!isAccessible) return <LockKeyhole className='w-4 h-4 text-gray-400' />
     if (chapter.quizCompleted) return <CheckCircle2 className='w-4 h-4 text-emerald-500' />
@@ -21,7 +22,8 @@ export const QuizItem = ({ chapter, index, isAccessible, onClick }: QuizItemProp
       disabled={!isAccessible}
       className={cn(
         'w-full px-4 py-3 flex items-start gap-3 hover:bg-gray-50 transition-colors',
-        !isAccessible && 'opacity-60 cursor-not-allowed'
+        !isAccessible && 'opacity-60 cursor-not-allowed',
+        isActive && 'bg-primary/5 hover:bg-primary/5'
       )}
     >
       {/* Type Icon */}

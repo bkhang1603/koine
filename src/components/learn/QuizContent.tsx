@@ -1,24 +1,37 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { AlertCircle, CheckCircle2, XCircle } from 'lucide-react'
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Label } from '@/components/ui/label'
+import { UserCourseProgressResType } from '@/schemaValidations/course.schema'
+import { useUpdateScoreQuizMutation } from '@/queries/useCourse'
+import { handleErrorApi } from '@/lib/utils'
+import { toast } from '@/components/ui/use-toast'
 
 interface QuizContentProps {
-  chapter: any
-  // eslint-disable-next-line no-unused-vars
-  onComplete: (score: number) => void
-  onRetry: () => void
+  chapter: UserCourseProgressResType['data']['chapters'][0]
 }
 
-export function QuizContent({ chapter, onComplete, onRetry }: QuizContentProps) {
+export function QuizContent({ chapter }: QuizContentProps) {
   const [selectedAnswers, setSelectedAnswers] = useState<Record<string, string[]>>({})
   const [showResults, setShowResults] = useState(false)
   const [score, setScore] = useState(0)
 
-  const totalQuestions = chapter.questions.length
+  const totalQuestions = chapter.questions?.length || 0
+
+  const updateScoreQuizMutation = useUpdateScoreQuizMutation()
+
+  // Tự động scroll lên đầu trang khi hiển thị kết quả
+  useEffect(() => {
+    if (showResults) {
+      window.scrollTo({
+        top: 0,
+        behavior: 'smooth'
+      })
+    }
+  }, [showResults])
 
   const handleSingleAnswerSelect = (questionId: string, optionId: string) => {
     setSelectedAnswers((prev) => ({
@@ -41,7 +54,7 @@ export function QuizContent({ chapter, onComplete, onRetry }: QuizContentProps) 
 
   const calculateScore = () => {
     let correct = 0
-    chapter.questions.forEach((question: any) => {
+    chapter.questions?.forEach((question: any) => {
       const selectedAnswer = selectedAnswers[question.id] || []
       const correctOptions = question.questionOptions.filter((opt: any) => opt.isCorrect)
       const correctOptionIds = correctOptions.map((opt: any) => opt.id)
@@ -56,18 +69,33 @@ export function QuizContent({ chapter, onComplete, onRetry }: QuizContentProps) 
     return (correct / totalQuestions) * 100
   }
 
-  const handleSubmit = () => {
-    const finalScore = calculateScore()
-    setScore(finalScore)
-    setShowResults(true)
-    onComplete(finalScore)
+  const handleSubmit = async () => {
+    try {
+      if (updateScoreQuizMutation.isPending) return
+
+      const finalScore = calculateScore()
+      setScore(finalScore)
+      setShowResults(true)
+
+      if (finalScore >= 70) {
+        await updateScoreQuizMutation.mutateAsync({
+          chapterId: chapter.id,
+          score: finalScore
+        })
+
+        toast({
+          description: 'Bạn đã đạt được ' + finalScore.toFixed(1) + '%'
+        })
+      }
+    } catch (error) {
+      handleErrorApi({ error })
+    }
   }
 
   const handleRetry = () => {
     setSelectedAnswers({})
     setShowResults(false)
     setScore(0)
-    onRetry()
   }
 
   if (showResults) {
@@ -121,7 +149,7 @@ export function QuizContent({ chapter, onComplete, onRetry }: QuizContentProps) 
       </Card>
 
       <div className='space-y-6'>
-        {chapter.questions.map((question: any, index: number) => {
+        {chapter.questions?.map((question: any, index: number) => {
           const correctOptions = question.questionOptions.filter((opt: any) => opt.isCorrect)
           const isMultipleChoice = correctOptions.length > 1
           const currentAnswers = selectedAnswers[question.id] || []

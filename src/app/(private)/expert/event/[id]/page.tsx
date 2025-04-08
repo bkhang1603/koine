@@ -53,14 +53,6 @@ const formatEventTime = (startAt: string, duration: number) => {
   }
 }
 
-const isEventOpenable = (startAt: string, duration: number) => {
-  const now = new Date()
-  const localTime = new Date(now.getTime() + 7 * 60 * 60 * 1000)
-  const startTime = new Date(startAt)
-  const endTime = new Date(startTime.getTime() + duration * 1000)
-  return localTime.getTime() >= startTime.getTime() && localTime.getTime() < endTime.getTime()
-}
-
 const isEventCancelable = (startAt: string) => {
   const now = new Date()
   const localTime = new Date(now.getTime() + 7 * 60 * 60 * 1000)
@@ -174,23 +166,6 @@ export default function EventDetailPage(props: { params: Promise<{ id: string }>
     }
   }
 
-  const handleOpenMeet = async (roomHostUrl: string | null, eventStartAt: string, duration: number) => {
-    try {
-      if (isProcessing) return
-      setIsProcessing(true)
-
-      if (!roomHostUrl) {
-        await handleCreateRoom(eventStartAt, duration)
-      } else {
-        window.open(roomHostUrl, '_blank')
-      }
-    } catch (error) {
-      handleErrorApi({ error })
-    } finally {
-      setIsProcessing(false)
-    }
-  }
-
   const handleUpdateInfo = async () => {
     try {
       if (isProcessing) return
@@ -243,10 +218,8 @@ export default function EventDetailPage(props: { params: Promise<{ id: string }>
   }
 
   const eventTime = formatEventTime(event.startedAt, event.durations)
-  const isOpenable = isEventOpenable(event.startedAt, event.durations)
   const isCancelable = isEventCancelable(event.startedAt)
 
-  const canJoinEvent = (event.status === 'OPENING' || event.status === 'PENDING') && isOpenable
   const canCreateRoom = event.status === 'PENDING' && !event.roomUrl
   const canUpdateInfo = event.status === 'OPENING' && event.roomName
 
@@ -272,16 +245,6 @@ export default function EventDetailPage(props: { params: Promise<{ id: string }>
           <p className='text-muted-foreground text-lg'>{event.description}</p>
         </div>
         <div className='flex gap-2'>
-          {canJoinEvent && (
-            <Button
-              size='lg'
-              disabled={isProcessing}
-              onClick={() => handleOpenMeet(event.roomHostUrl, event.startedAt, event.durations)}
-            >
-              <Video className='w-4 h-4 mr-2' />
-              Tham dự
-            </Button>
-          )}
           {canCreateRoom && (
             <Button
               size='lg'

@@ -294,3 +294,9 @@ export const useGetCourses = ({
     queryFn: () => courseApiRequest.getCourses({ page_index, page_size, category, range, sort, keyword })
   })
 }
+
+export const useUpdateScoreQuizMutation = () => {
+  return useMutation({
+    mutationFn: courseApiRequest.updateScoreQuiz
+  })
+}

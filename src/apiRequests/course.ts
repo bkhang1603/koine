@@ -21,7 +21,9 @@ import {
   DeleteCategoryCourseResType,
   GetCategoryCourseDetailResType,
   UpdateCategoryCourseBodyType,
-  UpdateCategoryCourseResType
+  UpdateCategoryCourseResType,
+  UpdateScoreQuizResType,
+  UpdateScoreQuizBodyType
 } from '@/schemaValidations/course.schema'
 import { OnlyMessageResType } from '@/schemaValidations/special.schema'
 
@@ -123,7 +125,8 @@ const courseApiRequest = {
   getCategoryCourseDetail: (id: string) => http.get<GetCategoryCourseDetailResType>(`/category-courses/${id}`),
   updateCategoryCourse: (id: string, data: UpdateCategoryCourseBodyType) =>
     http.put<UpdateCategoryCourseResType>(`/category-courses/${id}`, data),
-  deleteCategoryCourse: (id: string) => http.delete<DeleteCategoryCourseResType>(`/category-courses/${id}`)
+  deleteCategoryCourse: (id: string) => http.delete<DeleteCategoryCourseResType>(`/category-courses/${id}`),
+  updateScoreQuiz: (data: UpdateScoreQuizBodyType) => http.put<UpdateScoreQuizResType>('/chapters/update-score', data)
 }
 
 export default courseApiRequest

@@ -1,49 +1,32 @@
 /* eslint-disable no-unused-vars */
+import { LessonItem } from '@/components/learn/LessonItem'
+import { QuizItem } from '@/components/learn/QuizItem'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { Progress } from '@/components/ui/progress'
-import { ArrowLeft, BookOpen, HelpCircle, Lock, CheckCircle2 } from 'lucide-react'
+import { ArrowLeft, BookOpen } from 'lucide-react'
 import Link from 'next/link'
-import { LessonItem } from './LessonItem'
-import { QuizItem } from './QuizItem'
-import { cn } from '@/lib/utils'
 
 type SidebarProps = {
+  quizId?: string | null
   course: any
   courseId: string
   lessonId?: string | null
   onLessonClick: (lesson: any) => void
   canAccessLesson: (lesson: any, course: any) => boolean
+  canAccessQuiz: (chapter: any, course: any) => boolean
   forKid?: boolean
   onQuizClick: (chapter: any) => void
 }
 
-// Thêm helper function để check quiz có thể truy cập
-const canAccessQuiz = (chapter: any, course: any) => {
-  // Kiểm tra xem tất cả bài học trong chapter hiện tại đã hoàn thành chưa
-  const allLessonsCompleted = chapter.lessons.every((lesson: any) => lesson.status === 'DONE')
-
-  // Nếu là chapter đầu tiên, chỉ cần kiểm tra các bài học trong chapter đó
-  const isFirstChapter = course.chapters[0].id === chapter.id
-  if (isFirstChapter) return allLessonsCompleted
-
-  // Nếu không phải chapter đầu tiên, cần kiểm tra cả chapter trước đó
-  const currentChapterIndex = course.chapters.findIndex((c: any) => c.id === chapter.id)
-  const previousChapter = course.chapters[currentChapterIndex - 1]
-
-  // Kiểm tra xem tất cả bài học và quiz của chapter trước đã hoàn thành chưa
-  const previousChapterCompleted = previousChapter.lessons.every((lesson: any) => lesson.status === 'DONE')
-  const previousQuizCompleted = !previousChapter.questions || previousChapter.questions.length === 0
-
-  return allLessonsCompleted && (previousChapterCompleted || previousQuizCompleted)
-}
-
 export const Sidebar = ({
+  quizId,
   course,
   courseId,
   lessonId,
   onLessonClick,
   canAccessLesson,
+  canAccessQuiz,
   forKid,
   onQuizClick
 }: SidebarProps) => {
@@ -103,6 +86,7 @@ export const Sidebar = ({
                     <QuizItem
                       chapter={chapter}
                       index={index}
+                      isActive={chapter.id === quizId}
                       isAccessible={canAccessQuiz(chapter, course)}
                       onClick={() => onQuizClick(chapter)}
                     />

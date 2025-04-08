@@ -31,6 +31,11 @@ const canAccessLesson = (lesson: any, course: any) => {
   return false
 }
 
+const canAccessQuiz = (chapter: any, course: any) => {
+  if (chapter.isQuestion) return true
+  return false
+}
+
 // Thêm helper function để kiểm tra quiz của chapter
 const canAccessNextChapter = (currentChapter: any) => {
   if (!currentChapter.questions || currentChapter.questions.length === 0) return true
@@ -43,6 +48,7 @@ function LearnPage(props: { params: Promise<{ courseId: string }> }) {
   const router = useRouter()
   const searchParams = useSearchParams()
   const lessonId = searchParams.get('lessonId')
+  const quizId = searchParams.get('quizId')
 
   const updateCourseMutation = useUpdateCourseProgressMutation()
   const { data: courseData, isLoading: courseLoading } = useGetCourseProgressQuery({ id: courseId })
@@ -69,11 +75,19 @@ function LearnPage(props: { params: Promise<{ courseId: string }> }) {
 
   // Auto redirect to first lesson if no lessonId
   useEffect(() => {
+    if (quizId) {
+      const chapter = course?.chapters.find((c: any) => c.id === quizId)
+      if (chapter) {
+        router.push(`/kid/course/${courseId}/learn?lessonId=${chapter.lessons[0].id}`)
+      }
+      return
+    }
     if (!lessonId && !courseLoading && course) {
       const firstLesson = getFirstAccessibleLesson()
       if (firstLesson) {
         router.push(`/kid/course/${courseId}/learn?lessonId=${firstLesson.id}`)
       }
+      return
     }
   }, [lessonId, courseLoading, course, courseId, router, getFirstAccessibleLesson])
 
@@ -164,6 +178,13 @@ function LearnPage(props: { params: Promise<{ courseId: string }> }) {
     [courseId, router, course]
   )
 
+  const handleQuizClick = useCallback(
+    (chapter: any) => {
+      router.push(`/kid/course/${courseId}/learn?quizId=${chapter.id}`)
+    },
+    [courseId, router]
+  )
+
   if (courseLoading) return <LoadingSkeletonForKid />
 
   if (!course) {
@@ -186,13 +207,16 @@ function LearnPage(props: { params: Promise<{ courseId: string }> }) {
       <Breadcrumb courseTitle={course.title} courseId={courseId} />
 
       <LearnPageContent
+        quizId={quizId}
         course={course}
         lesson={lessonData?.payload.data}
         lessonId={lessonId}
         courseId={courseId}
         isLoading={lessonLoading}
         onLessonClick={handleLessonClick}
+        onQuizClick={handleQuizClick}
         canAccessLesson={canAccessLesson}
+        canAccessQuiz={canAccessQuiz}
         handleUpdate={handleUpdate}
         getNextLesson={getNextLesson}
         getPreviousLesson={getPreviousLesson}
