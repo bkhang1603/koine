@@ -16,11 +16,14 @@ const eventApiRequest = {
       cache: 'force-cache',
       next: { revalidate: 4 * 60 * 60 }
     }),
+  // Caching
   getEventById: (body: { id: string }) =>
     http.get<GetEventByIdResType>(`/events/${body.id}`, {
       cache: 'force-cache',
       next: { revalidate: 4 * 60 * 60 }
     }),
+  // Without caching
+  getEventByIdWithoutCaching: (body: { id: string }) => http.get<GetEventByIdResType>(`/events/${body.id}`),
   getAllEventForHost: () => http.get<GetAllEventResType>('/events/host'),
   updateEventWhenCreateRoom: (body: CreateEventRoomRequestType, eventId: string) =>
     http.put<any>(`/events/${eventId}/room`, body),

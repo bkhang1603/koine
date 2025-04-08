@@ -15,6 +15,9 @@ export default function CartPopover({ data }: { data: CartDetailResType['data'] 
   const deleteMutation = useCartDetailDeleteListMutation()
   const deleteMultipleMutation = useCartDetailDeleteMultipleMutation()
 
+  // Tính tổng giá trị sản phẩm trong giỏ hàng
+  const totalPrice = data.cartDetails.reduce((acc, item) => acc + item.totalPrice, 0)
+
   const handleDelete = async (id: string) => {
     if (deleteMutation.isPending) return
 
@@ -121,7 +124,7 @@ export default function CartPopover({ data }: { data: CartDetailResType['data'] 
         <>
           <div className='px-4 pt-3 bg-white flex justify-between items-center'>
             <span className='text-sm font-medium'>Tổng cộng:</span>
-            <span className='font-semibold text-secondary'>{data.totalAmount.toLocaleString()} đ</span>
+            <span className='font-semibold text-secondary'>{totalPrice.toLocaleString()} đ</span>
           </div>
           <div className='px-4 pb-4 pt-2'>
             <Button className='w-full justify-between' size='sm' asChild>

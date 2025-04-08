@@ -86,3 +86,10 @@ export const useCancelEventMutation = () => {
     }
   })
 }
+
+export const useGetEventByIdWithoutCaching = ({ id }: { id: string }) => {
+  return useQuery({
+    queryKey: ['events-host', id],
+    queryFn: () => eventApiRequest.getEventByIdWithoutCaching({ id })
+  })
+}

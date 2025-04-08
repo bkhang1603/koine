@@ -6,7 +6,8 @@ export const createEventMeetingRequest = z.object({
   description: z.string(),
   startedAt: z.string(),
   imageUrl: z.string(),
-  durations: z.number()
+  durations: z.number(),
+  content: z.string()
 })
 export type CreateEventMeetingRequestType = z.infer<typeof createEventMeetingRequest>
 
@@ -85,7 +86,8 @@ export type CancelEventRequestType = z.infer<typeof cancelEventRequest>
 export const createEventRoomRequest = z.object({
   roomUrl: z.string(),
   roomHostUrl: z.string(),
-  roomName: z.string()
+  roomName: z.string(),
+  roomContent: z.string()
 })
 export type CreateEventRoomRequestType = z.infer<typeof createEventRoomRequest>
 
