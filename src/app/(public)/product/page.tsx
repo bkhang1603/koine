@@ -4,9 +4,16 @@ import images from '@/assets/images'
 import { searchParams } from '@/types/query'
 import Image from 'next/image'
 import MobileFilter from '@/components/public/parent/product/mobile-filter'
+import { wrapServerApi } from '@/lib/server-utils'
+import productApiRequest from '@/apiRequests/product'
 
 async function ProductPage(props: { searchParams?: Promise<searchParams> }) {
   const searchParams = await props.searchParams
+
+  const data = await wrapServerApi(() => productApiRequest.getCategoryProductsCache())
+
+  const categories = data?.payload?.data || []
+
   return (
     <main className='pb-28'>
       <div className='h-[15vh] md:h-[20vh] lg:h-[30vh] w-full'>
@@ -22,14 +29,10 @@ async function ProductPage(props: { searchParams?: Promise<searchParams> }) {
       </div>
 
       <div className='container mt-8'>
-        <div className='flex md:hidden justify-end mb-4'>
-          <MobileFilter />
-        </div>
+        <div className='flex md:hidden justify-end mb-4'>{categories && <MobileFilter categories={categories} />}</div>
 
         <div className='grid grid-cols-1 md:grid-cols-4 gap-6'>
-          <div className='hidden md:block'>
-            <Filter />
-          </div>
+          <div className='hidden md:block'>{categories && <Filter categories={categories} />}</div>
           <div className='col-span-1 md:col-span-3'>
             <List searchParams={searchParams} />
           </div>

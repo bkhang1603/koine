@@ -6,7 +6,8 @@ export const createEventMeetingRequest = z.object({
   description: z.string(),
   startedAt: z.string(),
   imageUrl: z.string(),
-  durations: z.number()
+  durations: z.number(),
+  content: z.string()
 })
 export type CreateEventMeetingRequestType = z.infer<typeof createEventMeetingRequest>
 
@@ -15,7 +16,9 @@ export const getAllEventResType = z.object({
     z.object({
       id: z.string(),
       title: z.string(),
+      slug: z.string(),
       description: z.string(),
+      content: z.string(),
       startedAt: z.string(),
       startAtFormatted: z.string(),
       durations: z.number(),
@@ -41,6 +44,37 @@ export const getAllEventResType = z.object({
 
 export type GetAllEventResType = z.infer<typeof getAllEventResType>
 
+export const getEventByIdResType = z.object({
+  data: z.object({
+    id: z.string(),
+    title: z.string(),
+    slug: z.string(),
+    description: z.string(),
+    content: z.string(),
+    note: z.string(),
+    startedAt: z.string(),
+    startAtFormatted: z.string(),
+    durations: z.number(),
+    durationsDisplay: z.string(),
+    imageUrl: z.string(),
+    roomHostUrl: z.string(),
+    roomName: z.string(),
+    roomUrl: z.string(),
+    recordUrl: z.string(),
+    status: z.string(),
+    totalParticipants: z.number(),
+    createdAt: z.string(),
+    updateAt: z.string(),
+    hostInfo: z.object({
+      id: z.string(),
+      fullName: z.string(),
+      email: z.string(),
+      avatarUrl: z.string()
+    })
+  })
+})
+
+export type GetEventByIdResType = z.infer<typeof getEventByIdResType>
 
 //cancel
 export const cancelEventRequest = z.object({
@@ -49,15 +83,14 @@ export const cancelEventRequest = z.object({
 })
 export type CancelEventRequestType = z.infer<typeof cancelEventRequest>
 
-
 //update thông tin lúc tạo phòng
 export const createEventRoomRequest = z.object({
   roomUrl: z.string(),
   roomHostUrl: z.string(),
-  roomName: z.string()
+  roomName: z.string(),
+  roomContent: z.string()
 })
 export type CreateEventRoomRequestType = z.infer<typeof createEventRoomRequest>
-
 
 //update thông tin khác
 export const updateEventRequest = z.object({
@@ -66,7 +99,7 @@ export const updateEventRequest = z.object({
   startedAt: z
     .union([
       z.string().refine((val) => !isNaN(new Date(val).getTime()), {
-        message:"Thời gian bắt đầu không hợp lệ, sử dụng định dạng ISO: YYYY-MM-DDTHH:MM:SS"
+        message: 'Thời gian bắt đầu không hợp lệ, sử dụng định dạng ISO: YYYY-MM-DDTHH:MM:SS'
       }),
       z.date()
     ])
@@ -83,4 +116,3 @@ export const updateEventRequest = z.object({
 })
 
 export type UpdateEventRequestType = z.infer<typeof updateEventRequest>
-

@@ -1,7 +1,6 @@
 /* eslint-disable no-unused-vars */
 'use client'
 
-import * as React from 'react'
 import DatePicker from 'react-datepicker'
 import { vi } from 'date-fns/locale'
 import { format } from 'date-fns'
@@ -94,8 +93,9 @@ function Calendar({ selected, onSelect, disabled, className, initialFocus = fals
           color: white;
         }
         .react-datepicker__day--today {
+          background-color: #000;
           font-weight: 600;
-          color: #000;
+          color: #fff;
         }
       `}</style>
 

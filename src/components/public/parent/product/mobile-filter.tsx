@@ -5,7 +5,7 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/co
 import { SlidersHorizontal } from 'lucide-react'
 import Filter from './filter'
 
-function MobileFilter() {
+function MobileFilter({ categories }: { categories: any[] }) {
   return (
     <Sheet>
       <SheetTrigger asChild>
@@ -19,7 +19,7 @@ function MobileFilter() {
           <SheetTitle>Bộ lọc sản phẩm</SheetTitle>
         </SheetHeader>
         <div className='p-4 overflow-y-auto max-h-[calc(100vh-80px)]'>
-          <Filter />
+          {categories && <Filter categories={categories} />}
         </div>
       </SheetContent>
     </Sheet>

@@ -1,9 +1,8 @@
-import eventRequestApi from '@/apiRequests/event'
+import eventApiRequest from '@/apiRequests/event'
 import {
   CancelEventRequestType,
   CreateEventMeetingRequestType,
   CreateEventRoomRequestType,
-  GetAllEventResType,
   UpdateEventRequestType
 } from '@/schemaValidations/event.schema'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
@@ -11,21 +10,21 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 export const useEvent = () => {
   return useQuery({
     queryKey: ['events'],
-    queryFn: eventRequestApi.getAllEvent
+    queryFn: eventApiRequest.getAllEvent
   })
 }
 
 export const useEventForHost = () => {
   return useQuery({
     queryKey: ['events-host'],
-    queryFn: eventRequestApi.getAllEventForHost
+    queryFn: eventApiRequest.getAllEventForHost
   })
 }
 
 export const useCreateEventMutation = () => {
   const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: ({ body }: { body: CreateEventMeetingRequestType }) => eventRequestApi.createEvent(body),
+    mutationFn: ({ body }: { body: CreateEventMeetingRequestType }) => eventApiRequest.createEvent(body),
     onSuccess: () => {
       // Invalidate queries liên quan đến giỏ hàng sau khi update
       queryClient.invalidateQueries({
@@ -42,7 +41,7 @@ export const useUpdateEventWhenCreateRoomMutation = () => {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: ({ body, eventId }: { body: CreateEventRoomRequestType; eventId: string }) =>
-      eventRequestApi.updateEventWhenCreateRoom(body, eventId),
+      eventApiRequest.updateEventWhenCreateRoom(body, eventId),
     onSuccess: () => {
       // Invalidate queries liên quan đến giỏ hàng sau khi update
       queryClient.invalidateQueries({
@@ -59,7 +58,7 @@ export const useUpdateEventMutation = () => {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: ({ body, eventId }: { body: UpdateEventRequestType; eventId: string }) =>
-      eventRequestApi.updateEvent(body, eventId),
+      eventApiRequest.updateEvent(body, eventId),
     onSuccess: () => {
       // Invalidate queries liên quan đến giỏ hàng sau khi update
       queryClient.invalidateQueries({
@@ -75,7 +74,7 @@ export const useUpdateEventMutation = () => {
 export const useCancelEventMutation = () => {
   const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: ({ body }: { body: CancelEventRequestType }) => eventRequestApi.cancelEvent(body),
+    mutationFn: ({ body }: { body: CancelEventRequestType }) => eventApiRequest.cancelEvent(body),
     onSuccess: () => {
       // Invalidate queries liên quan đến giỏ hàng sau khi update
       queryClient.invalidateQueries({
@@ -85,5 +84,12 @@ export const useCancelEventMutation = () => {
         queryKey: ['events-host']
       })
     }
+  })
+}
+
+export const useGetEventByIdWithoutCaching = ({ id }: { id: string }) => {
+  return useQuery({
+    queryKey: ['events-host', id],
+    queryFn: () => eventApiRequest.getEventByIdWithoutCaching({ id })
   })
 }

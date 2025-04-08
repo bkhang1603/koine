@@ -3,7 +3,6 @@ import CustomInput from '@/components/public/parent/home/custom-input'
 import ProductSort from '@/components/public/parent/product/sort'
 import configRoute from '@/config/route'
 import { wrapServerApi } from '@/lib/server-utils'
-import { ProductsResType } from '@/schemaValidations/product.schema'
 import { searchParams } from '@/types/query'
 import Image from 'next/image'
 import Link from 'next/link'
@@ -12,7 +11,6 @@ import { ShoppingBag, RefreshCw } from 'lucide-react'
 import PaginationCustom from '@/components/pagination-custom'
 
 async function List({ searchParams }: { searchParams: searchParams | undefined }) {
-  let products: ProductsResType['data'] = []
   const page_index = isNaN(Number(searchParams?.page_index)) ? 1 : Number(searchParams?.page_index)
   const search = searchParams?.search ?? ''
   const page_size = 8
@@ -26,10 +24,10 @@ async function List({ searchParams }: { searchParams: searchParams | undefined }
     .join('a%a')
 
   const data = await wrapServerApi(() =>
-    productApiRequest.getProducts({ page_index, page_size, search, range, category, sort })
+    productApiRequest.getProductsCache({ page_index, page_size, search, range, category, sort })
   )
 
-  products = data?.payload?.data ?? []
+  const products = data?.payload?.data ?? []
 
   const changeCategoriesToString = (categories: string[]) => {
     return categories.join(', ')

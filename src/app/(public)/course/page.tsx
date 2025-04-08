@@ -9,9 +9,16 @@ import Link from 'next/link'
 import { Plus, Sparkles } from 'lucide-react'
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet'
 import { SlidersHorizontal } from 'lucide-react'
+import { wrapServerApi } from '@/lib/server-utils'
+import courseApiRequest from '@/apiRequests/course'
+import configRoute from '@/config/route'
 
 export default async function CoursePage(props: { searchParams?: Promise<searchParams> }) {
   const searchParams = await props.searchParams
+
+  const data = await wrapServerApi(() => courseApiRequest.getCategoryCoursesCache())
+  const categories = data?.payload?.data ?? []
+
   return (
     <main>
       <Image
@@ -59,7 +66,7 @@ export default async function CoursePage(props: { searchParams?: Promise<searchP
                 <SheetTitle>Bộ lọc khóa học</SheetTitle>
               </SheetHeader>
               <div className='p-4 overflow-y-auto max-h-[calc(100vh-80px)]'>
-                <CourseFilter />
+                {categories && <CourseFilter categories={categories} />}
               </div>
             </SheetContent>
           </Sheet>
@@ -68,7 +75,7 @@ export default async function CoursePage(props: { searchParams?: Promise<searchP
       <div className='grid grid-cols-1 md:grid-cols-4 gap-4 md:gap-6 mt-4 md:mt-8 container'>
         {/* Desktop: Sidebar with Filter */}
         <div className='md:col-span-1 hidden md:block'>
-          <CourseFilter />
+          {categories && <CourseFilter categories={categories} />}
 
           {/* Custom Course Card - Desktop Version */}
           <Card className='p-4 mt-6'>
@@ -78,7 +85,7 @@ export default async function CoursePage(props: { searchParams?: Promise<searchP
             </div>
             <p className='text-sm text-muted-foreground mb-4'>Tự do thiết kế nội dung học tập theo nhu cầu của bạn</p>
             <Button asChild className='w-full'>
-              <Link href='/custom-course'>
+              <Link href={configRoute.customCourse}>
                 <Plus className='w-4 h-4 mr-2' />
                 Bắt đầu ngay
               </Link>

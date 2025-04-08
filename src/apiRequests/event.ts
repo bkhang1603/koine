@@ -4,12 +4,26 @@ import {
   CreateEventMeetingRequestType,
   CreateEventRoomRequestType,
   GetAllEventResType,
+  GetEventByIdResType,
   UpdateEventRequestType
 } from '@/schemaValidations/event.schema'
 
-const eventRequestApi = {
+const eventApiRequest = {
   createEvent: (body: CreateEventMeetingRequestType) => http.post<any>('/events', body),
-  getAllEvent: () => http.get<GetAllEventResType>('/events'),
+  // get event with caching
+  getAllEvent: () =>
+    http.get<GetAllEventResType>('/events', {
+      cache: 'force-cache',
+      next: { revalidate: 4 * 60 * 60 }
+    }),
+  // Caching
+  getEventById: (body: { id: string }) =>
+    http.get<GetEventByIdResType>(`/events/${body.id}`, {
+      cache: 'force-cache',
+      next: { revalidate: 4 * 60 * 60 }
+    }),
+  // Without caching
+  getEventByIdWithoutCaching: (body: { id: string }) => http.get<GetEventByIdResType>(`/events/${body.id}`),
   getAllEventForHost: () => http.get<GetAllEventResType>('/events/host'),
   updateEventWhenCreateRoom: (body: CreateEventRoomRequestType, eventId: string) =>
     http.put<any>(`/events/${eventId}/room`, body),
@@ -17,4 +31,4 @@ const eventRequestApi = {
   cancelEvent: (body: CancelEventRequestType) => http.put<any>('/events/cancel', body)
 }
 
-export default eventRequestApi
+export default eventApiRequest

@@ -31,13 +31,11 @@ export default function ShareButton() {
       .writeText(shareUrl)
       .then(() => {
         toast({
-          title: 'Link đã được sao chép!',
           description: 'Bạn có thể dán link vào bất kỳ đâu bạn muốn.'
         })
       })
       .catch(() => {
         toast({
-          title: 'Không thể sao chép link',
           description: 'Có lỗi xảy ra khi sao chép link.',
           variant: 'destructive'
         })

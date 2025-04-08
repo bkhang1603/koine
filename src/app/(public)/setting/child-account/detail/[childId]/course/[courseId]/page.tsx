@@ -31,7 +31,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/
 import { Switch } from '@/components/ui/switch'
 import { Label } from '@/components/ui/label'
 import { toast } from '@/components/ui/use-toast'
-import { CoursesDetailSkeleton } from '@/components/public/parent/setting/child-account/detail/course/CoursesDetailSkeleton'
+import { CoursesDetailSkeleton } from '@/components/public/parent/setting/child-account/detail/course/course-detail-skeleton'
 import { cn } from '@/lib/utils'
 import { useGetCourseDetailForChild } from '@/queries/useAccount'
 
@@ -159,7 +159,6 @@ export default function ChildCourseDetailPage(props: { params: Promise<{ childId
           alt={courseData.courseTitle}
           fill
           className='object-cover'
-          priority
         />
         <div className='absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-black/10'></div>
 

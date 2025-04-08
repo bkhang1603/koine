@@ -149,9 +149,8 @@ export default function MyCoursesPage() {
                   <SelectContent>
                     <SelectItem value='all'>Tất cả danh mục</SelectItem>
                     {/* Populate with your categories */}
-                    <SelectItem value='1'>Ngoại ngữ</SelectItem>
-                    <SelectItem value='2'>Khoa học</SelectItem>
-                    <SelectItem value='3'>Kỹ năng mềm</SelectItem>
+                    <SelectItem value='1'>Đã hoàn thành</SelectItem>
+                    <SelectItem value='2'>Đang học</SelectItem>
                   </SelectContent>
                 </Select>
               </div>

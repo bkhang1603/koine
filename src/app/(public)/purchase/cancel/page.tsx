@@ -39,9 +39,7 @@ function CancelPurchasePage() {
 
       const res = await rePurchaseOrderMutation.mutateAsync({ id: orderId })
 
-      if (res?.payload?.data?.paymentLink) {
-        window.location.href = res.payload.data.paymentLink
-      }
+      router.push(res.payload.data)
     } catch (error) {
       handleErrorApi({
         error

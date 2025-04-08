@@ -31,7 +31,8 @@ function ProductImage({
         width={800}
         height={800}
         className='w-full h-96 object-cover rounded-lg'
-        priority={true}
+        quality={70}
+        unoptimized={true}
       />
 
       {/* Grid hiển thị tối đa 3 ô, có thể giới hạn số ảnh hiển thị */}
@@ -45,8 +46,9 @@ function ProductImage({
               width={800}
               height={800}
               className='w-full h-full object-cover hover:opacity-80 transition-opacity duration-200'
-              priority={true}
               onClick={() => setMainImage(image)}
+              quality={70}
+              unoptimized={true}
             />
           </div>
         ))}

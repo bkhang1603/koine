@@ -7,6 +7,7 @@ import configRoute from '@/config/route'
 import Image from 'next/image'
 import Link from 'next/link'
 import { motion } from 'framer-motion'
+import { GoogleLoginButton } from '@/components/public/auth/google-login-button'
 
 function ForgotPasswordPage() {
   return (
@@ -40,15 +41,12 @@ function ForgotPasswordPage() {
             <div className='border-t border-sixth/80 w-full' />
           </div>
 
-          <Button variant='outline' className='w-full md:w-[600px] text-base h-10'>
+          <Button variant='outline' className='w-full md:w-[600px] text-base h-10' disabled>
             <Image src={icons.facebook} alt='Google' width={24} height={24} className='mr-3' />
             Đăng nhập với Facebook
           </Button>
 
-          <Button variant='outline' className='w-full md:w-[600px] text-base h-10 mt-5'>
-            <Image src={icons.google} alt='Google' width={24} height={24} className='mr-3' />
-            Đăng nhập với Google
-          </Button>
+          <GoogleLoginButton />
 
           <p className='text-secondary font-semibold mt-4 text-center text-sm sm:text-base max-sm:max-w-[260px]'>
             Bạn đã nhớ ra tài khoản của mình? {''}

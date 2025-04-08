@@ -8,7 +8,8 @@ export const orderBody = z
     deliMethod: z.enum(DeliveryMethodValues),
     itemId: z.string().nullable(),
     quantity: z.number().nullable(),
-    itemType: z.enum(OrderTypeValues).nullable()
+    itemType: z.enum(OrderTypeValues).nullable(),
+    payMethod: z.enum(PaymentMethodValues)
   })
   .strict()
 
@@ -24,7 +25,6 @@ export const orderDetail = z
   .object({
     id: z.string(),
     status: z.enum(OrderStatusValues),
-    payMethod: z.enum(PaymentMethodValues),
     deliMethod: z.enum(DeliveryMethodValues),
     deliAmount: z.number(),
     note: z.string().nullable(),
@@ -67,7 +67,25 @@ export const orderDetail = z
           description: z.string()
         })
       })
-    )
+    ),
+    orderStatusHistory: z.array(
+      z.object({
+        status: z.enum(OrderStatusValues),
+        timestamp: z.string()
+      })
+    ),
+    deliveryInfo: z.object({
+      name: z.string(),
+      address: z.string(),
+      phone: z.string(),
+      status: z.enum(OrderStatusValues)
+    }),
+    payment: z.object({
+      payMethod: z.enum(PaymentMethodValues),
+      payDate: z.string(),
+      payAmount: z.number(),
+      payStatus: z.enum(OrderStatusValues)
+    })
   })
   .strict()
 
@@ -139,10 +157,7 @@ export const updatePaymentMethodBodyRes = z.object({
 })
 
 export const rePurchaseOrderRes = z.object({
-  data: z.object({
-    paymentLink: z.string(),
-    orderId: z.string()
-  }),
+  data: z.string(),
   message: z.string()
 })
 
@@ -171,6 +186,15 @@ export const refundOrderRes = z.object({
   })
 })
 
+export const createRefundOrderBody = z.object({
+  reason: z.string()
+})
+
+export const createRefundOrderBodyRes = z.object({
+  message: z.string(),
+  statusCode: z.number()
+})
+
 export type OrderBody = z.infer<typeof orderBody>
 
 export type OrderBodyResType = z.TypeOf<typeof orderBodyRes>
@@ -194,3 +218,7 @@ export type UpdatePaymentMethodBodyRes = z.TypeOf<typeof updatePaymentMethodBody
 export type RePurchaseOrderRes = z.TypeOf<typeof rePurchaseOrderRes>
 
 export type RefundOrderResType = z.TypeOf<typeof refundOrderRes>
+
+export type CreateRefundOrderBody = z.TypeOf<typeof createRefundOrderBody>
+
+export type CreateRefundOrderBodyRes = z.TypeOf<typeof createRefundOrderBodyRes>

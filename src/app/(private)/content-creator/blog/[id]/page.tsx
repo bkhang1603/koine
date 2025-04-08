@@ -117,7 +117,7 @@ export default function BlogPostDetail(props: { params: Promise<{ id: string }> 
               </Link>
             </Button>
             <Button variant='outline' asChild>
-              <Link href={`/preview/blog/${post.slug}`} target='_blank'>
+              <Link href={`/knowledge/${post.slug}`} target='_blank'>
                 <ExternalLink className='mr-2 h-4 w-4' />
                 Xem trước
               </Link>

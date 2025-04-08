@@ -98,7 +98,7 @@ const roleBasedPaths = {
 }
 
 // Đường dẫn cần xác thực nhưng không ràng buộc role
-const commonPrivatePaths = ['/setting', '/setting/:path*', '/learn', '/learn/:path*']
+const commonPrivatePaths = ['/setting', '/setting/:path*', '/learn', '/learn/:path*', '/cart', '/checkout']
 
 // Kết hợp tất cả đường dẫn cần xác thực
 const privatePaths = [...commonPrivatePaths, ...Object.values(roleBasedPaths).flat()]
@@ -229,6 +229,8 @@ export const config = {
     '/admin/:path*',
     '/content-creator/:path*',
     '/kid/:path*',
-    '/unauthorized'
+    '/unauthorized',
+    '/cart',
+    '/checkout'
   ]
 }

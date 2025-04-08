@@ -6,15 +6,47 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Badge } from '@/components/ui/badge'
 import { NeedReviewSkeleton } from '@/components/public/parent/setting/need-review/NeedReviewSkeleton'
 import { EmptyReview } from '@/components/public/parent/setting/need-review/EmptyReview'
-import { BookOpen, CalendarIcon, ChevronDownIcon, ChevronUpIcon, Package2, SearchIcon, Star } from 'lucide-react'
+import { BookOpen, CalendarIcon, Package2, SearchIcon, Star } from 'lucide-react'
 import Image from 'next/image'
 import { ReviewProductDialog } from '@/components/public/parent/setting/need-review/ReviewProductDialog'
 import { formatCurrency, formatDate, cn } from '@/lib/utils'
-import { useGetListOrderNeedReview } from '@/queries/useAccount'
-import { Separator } from '@/components/ui/separator'
+import { useGetListOrderNeedReview, useGetMyOrdersReviews } from '@/queries/useAccount'
 import { Input } from '@/components/ui/input'
+import { Button } from '@/components/ui/button'
+import Link from 'next/link'
 
-// Helper function để xác định icon và màu sắc dựa trên item type
+interface BaseReviewItem {
+  orderDetailId: string
+  itemId: string
+  itemType: 'COURSE' | 'PRODUCT' | 'COMBO'
+  itemTitle: string
+  imageUrl: string | null
+  description?: string
+  orderId: string
+  orderCode: string
+  orderDate: string
+}
+
+interface NeedReviewItem extends BaseReviewItem {
+  type: 'need-review'
+  unitPrice: number
+  quantity: number
+  discount: number
+  totalPrice: number
+}
+
+interface ReviewedItem extends BaseReviewItem {
+  type: 'reviewed'
+  rating: number
+  review: string
+  comment?: string
+  createdAt: string | boolean
+  updatedAt: string
+  createdAtFormatted: string
+}
+
+type ReviewItem = NeedReviewItem | ReviewedItem
+
 const getItemTypeConfig = (itemType: string) => {
   switch (itemType.toUpperCase()) {
     case 'COURSE':
@@ -40,50 +72,85 @@ const getItemTypeConfig = (itemType: string) => {
 
 function NeedReviewPage() {
   const { data, isLoading } = useGetListOrderNeedReview()
-  const reviewList = data?.payload.data || []
+  const reviewList = (data?.payload.data || []).map((item) => ({
+    type: 'need-review' as const,
+    orderDetailId: item.orderDetailId ?? '',
+    itemId: item.itemId ?? '',
+    itemType: (item.itemType ?? 'COURSE') as 'COURSE' | 'PRODUCT' | 'COMBO',
+    itemTitle: item.itemTitle ?? '',
+    imageUrl: item.imageUrl,
+    description: item.description,
+    orderId: item.orderId ?? '',
+    orderCode: item.orderCode ?? '',
+    orderDate: item.orderDate ?? '',
+    unitPrice: Number(item.unitPrice ?? 0),
+    quantity: Number(item.quantity ?? 1),
+    discount: Number(item.discount ?? 0),
+    totalPrice: Number(item.totalPrice ?? 0)
+  })) satisfies NeedReviewItem[]
+
+  const { data: reviews, isLoading: isLoadingReviews } = useGetMyOrdersReviews()
+  const reviewedList = (reviews?.payload.data || []).map((item) => ({
+    type: 'reviewed' as const,
+    orderDetailId: item.orderDetailId ?? '',
+    itemId: item.itemId ?? '',
+    itemType: (item.itemType ?? 'COURSE') as 'COURSE' | 'PRODUCT' | 'COMBO',
+    itemTitle: item.itemTitle ?? '',
+    imageUrl: item.imageUrl,
+    orderId: item.orderId ?? '',
+    orderCode: item.orderCode ?? '',
+    orderDate: item.orderDate ?? '',
+    rating: Number(item.rating ?? 0),
+    review: item.review ?? '',
+    createdAt: item.createdAt ?? '',
+    updatedAt: item.updatedAt ?? '',
+    createdAtFormatted: item.createdAtFormatted ?? ''
+  })) satisfies ReviewedItem[]
 
   const [activeTab, setActiveTab] = useState('all')
   const [searchTerm, setSearchTerm] = useState('')
-  const [expandedProduct, setExpandedProduct] = useState<string | null>(null)
 
-  // Lọc danh sách theo tab và tìm kiếm
   const getFilteredList = () => {
-    let filtered = reviewList
+    // Xác định danh sách cần lọc dựa trên tab
+    const sourceList = activeTab === 'reviewed' ? reviewedList : reviewList
 
-    // Lọc theo tab
-    if (activeTab !== 'all') {
-      filtered = filtered.filter((item) => item.itemType.toUpperCase() === activeTab.toUpperCase())
+    // Lọc theo loại item (trừ tab đã đánh giá)
+    const filteredByType =
+      activeTab === 'all' || activeTab === 'reviewed'
+        ? sourceList
+        : sourceList.filter((item) => item.itemType.toUpperCase() === activeTab.toUpperCase())
+
+    // Lọc theo từ khóa tìm kiếm
+    if (!searchTerm) {
+      return filteredByType
     }
 
-    // Lọc theo tìm kiếm
-    if (searchTerm) {
-      filtered = filtered.filter(
-        (item) =>
-          item.itemTitle.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          item.orderCode.toLowerCase().includes(searchTerm.toLowerCase())
-      )
-    }
-
-    return filtered
-  }
-
-  const toggleProductExpansion = (productId: string) => {
-    if (expandedProduct === productId) {
-      setExpandedProduct(null)
-    } else {
-      setExpandedProduct(productId)
-    }
+    return filteredByType.filter(
+      (item) =>
+        item.itemTitle.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        item.orderCode.toLowerCase().includes(searchTerm.toLowerCase())
+    )
   }
 
   const filteredList = getFilteredList()
 
-  if (isLoading) {
+  if (isLoading || isLoadingReviews) {
     return <NeedReviewSkeleton />
   }
 
   // Thống kê số lượng từng loại
   const courseCount = reviewList.filter((item) => item.itemType.toUpperCase() === 'COURSE').length
   const productCount = reviewList.filter((item) => item.itemType.toUpperCase() === 'PRODUCT').length
+  const reviewedCount = reviewedList.length
+
+  // Trong phần render của item
+  const isNeedReview = (item: ReviewItem): item is NeedReviewItem => {
+    return item.type === 'need-review'
+  }
+
+  const isReviewed = (item: ReviewItem): item is ReviewedItem => {
+    return item.type === 'reviewed'
+  }
 
   return (
     <div className='container max-w-6xl mx-auto py-6 space-y-6'>
@@ -119,7 +186,7 @@ function NeedReviewPage() {
 
       {/* Main Content with Tabs */}
       <Tabs defaultValue='all' value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className='grid w-full sm:w-auto grid-cols-3 h-10'>
+        <TabsList className='grid w-full sm:w-auto grid-cols-4 h-10'>
           <TabsTrigger value='all' className='text-xs sm:text-sm'>
             Tất cả <span className='ml-1 text-xs font-medium text-gray-500'>({reviewList.length})</span>
           </TabsTrigger>
@@ -129,6 +196,9 @@ function NeedReviewPage() {
           <TabsTrigger value='product' className='text-xs sm:text-sm'>
             Sản phẩm <span className='ml-1 text-xs font-medium text-gray-500'>({productCount})</span>
           </TabsTrigger>
+          <TabsTrigger value='reviewed' className='text-xs sm:text-sm'>
+            Đã đánh giá <span className='ml-1 text-xs font-medium text-gray-500'>({reviewedCount})</span>
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value={activeTab} className='mt-4 space-y-4'>
@@ -136,7 +206,25 @@ function NeedReviewPage() {
             <>
               {filteredList.map((item, index) => {
                 const typeConfig = getItemTypeConfig(item.itemType)
-                const hasDiscount = item.discount > 0
+                const hasDiscount = isNeedReview(item) && item.discount > 0
+                const isReviewedItem = isReviewed(item)
+
+                let displayPrice = 0
+                let displayQuantity = 1
+                let displayDiscount = 0
+                let displayUnitPrice = 0
+                let displayRating = 0
+                let displayComment = ''
+
+                if (isNeedReview(item)) {
+                  displayPrice = item.totalPrice
+                  displayQuantity = item.quantity
+                  displayDiscount = item.discount
+                  displayUnitPrice = item.unitPrice
+                } else if (isReviewed(item)) {
+                  displayRating = item.rating
+                  displayComment = item.review
+                }
 
                 return (
                   <Card
@@ -192,15 +280,12 @@ function NeedReviewPage() {
 
                             <div className='mt-2 sm:mt-0 flex items-end'>
                               <div className='text-right'>
-                                <div className='text-lg font-medium text-gray-900'>
-                                  {formatCurrency(item.totalPrice)}
-                                </div>
+                                <div className='text-lg font-medium text-gray-900'>{formatCurrency(displayPrice)}</div>
                                 <div className='text-sm text-gray-500'>
-                                  {item.quantity > 1 &&
-                                    `${item.quantity} × ${formatCurrency(item.totalPrice / item.quantity)}`}
+                                  {displayQuantity > 1 && `${displayQuantity} × ${formatCurrency(displayUnitPrice)}`}
                                   {hasDiscount && (
                                     <span className='text-emerald-600 ml-1'>
-                                      (Giảm {formatCurrency(item.discount)})
+                                      (Giảm {formatCurrency(displayDiscount)})
                                     </span>
                                   )}
                                 </div>
@@ -212,89 +297,55 @@ function NeedReviewPage() {
                           <div className='mt-4 bg-gray-50 rounded-lg border border-gray-100 p-4'>
                             <div className='flex items-center gap-3'>
                               <div className='text-sm text-gray-700'>Đánh giá:</div>
-                              <div className='flex gap-1'>
-                                {Array(5)
-                                  .fill(0)
-                                  .map((_, i) => (
-                                    <Star key={i} className='h-4 w-4 text-gray-200' strokeWidth={1.5} />
-                                  ))}
-                              </div>
-                              <div className='text-xs text-gray-500'>Chưa đánh giá</div>
+                              {isReviewedItem ? (
+                                <div className='flex items-center gap-2'>
+                                  <div className='flex gap-1'>
+                                    {Array(5)
+                                      .fill(0)
+                                      .map((_, i) => (
+                                        <Star
+                                          key={i}
+                                          className={cn(
+                                            'h-4 w-4',
+                                            i < displayRating ? 'text-amber-500 fill-amber-500' : 'text-gray-200'
+                                          )}
+                                          strokeWidth={1.5}
+                                        />
+                                      ))}
+                                  </div>
+                                  <div className='text-sm text-gray-600'>{displayComment}</div>
+                                </div>
+                              ) : (
+                                <>
+                                  <div className='flex gap-1'>
+                                    {Array(5)
+                                      .fill(0)
+                                      .map((_, i) => (
+                                        <Star key={i} className='h-4 w-4 text-gray-200' strokeWidth={1.5} />
+                                      ))}
+                                  </div>
+                                  <div className='text-xs text-gray-500'>Chưa đánh giá</div>
+                                </>
+                              )}
                             </div>
                           </div>
 
                           {/* Footer with buttons */}
                           <div className='mt-4 pt-3 border-t border-gray-100 flex justify-between items-center'>
-                            <div>
-                              <button
-                                type='button'
-                                onClick={() => toggleProductExpansion(`${item.itemId}-${index}`)}
-                                className='text-sm text-gray-600 hover:text-gray-900 transition-colors flex items-center group'
-                              >
-                                {expandedProduct === `${item.itemId}-${index}` ? (
-                                  <>
-                                    <ChevronUpIcon className='mr-1.5 h-4 w-4 text-gray-400 group-hover:text-gray-600' />
-                                    <span className='text-sm'>Ẩn chi tiết</span>
-                                  </>
-                                ) : (
-                                  <>
-                                    <ChevronDownIcon className='mr-1.5 h-4 w-4 text-gray-400 group-hover:text-gray-600' />
-                                    <span className='text-sm'>Xem chi tiết</span>
-                                  </>
-                                )}
-                              </button>
-                            </div>
+                            <Button variant='outline' size='sm' asChild>
+                              <Link href={`/setting/need-review/${item.orderId}`}>Xem chi tiết</Link>
+                            </Button>
 
-                            <ReviewProductDialog
-                              itemId={item.itemId}
-                              itemType={item.itemType}
-                              orderDetailId={item.orderDetailId}
-                            />
+                            {!isReviewedItem && (
+                              <ReviewProductDialog
+                                itemId={item.itemId}
+                                itemType={item.itemType}
+                                orderDetailId={item.orderDetailId}
+                              />
+                            )}
                           </div>
                         </div>
                       </div>
-
-                      {/* Expanded details section */}
-                      {expandedProduct === `${item.itemId}-${index}` && (
-                        <>
-                          <Separator className='my-4' />
-                          <div className='bg-gray-50 p-4 rounded-lg'>
-                            <h4 className='font-medium mb-2'>Thông tin đơn hàng</h4>
-                            <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
-                              <div>
-                                <div className='flex justify-between py-1'>
-                                  <span className='text-gray-500'>Mã đơn hàng:</span>
-                                  <span className='font-medium'>#{item.orderCode}</span>
-                                </div>
-                                <div className='flex justify-between py-1'>
-                                  <span className='text-gray-500'>Ngày đặt:</span>
-                                  <span>{formatDate(item.orderDate)}</span>
-                                </div>
-                              </div>
-                              <div>
-                                <div className='flex justify-between py-1'>
-                                  <span className='text-gray-500'>Đơn giá:</span>
-                                  <span>{formatCurrency(item.totalPrice / item.quantity)}</span>
-                                </div>
-                                <div className='flex justify-between py-1'>
-                                  <span className='text-gray-500'>Số lượng:</span>
-                                  <span>{item.quantity}</span>
-                                </div>
-                                {hasDiscount && (
-                                  <div className='flex justify-between py-1'>
-                                    <span className='text-gray-500'>Giảm giá:</span>
-                                    <span className='text-emerald-600'>{formatCurrency(item.discount)}</span>
-                                  </div>
-                                )}
-                                <div className='flex justify-between py-1 font-medium'>
-                                  <span>Thành tiền:</span>
-                                  <span>{formatCurrency(item.totalPrice)}</span>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        </>
-                      )}
                     </CardContent>
                   </Card>
                 )
@@ -302,7 +353,9 @@ function NeedReviewPage() {
 
               {/* Pagination info */}
               <div className='mt-4 text-sm text-gray-500'>
-                Hiển thị {filteredList.length} trên tổng số {reviewList.length} sản phẩm cần đánh giá
+                Hiển thị {filteredList.length} trên tổng số{' '}
+                {activeTab === 'reviewed' ? reviewedList.length : reviewList.length} sản phẩm
+                {activeTab === 'reviewed' ? ' đã đánh giá' : ' cần đánh giá'}
               </div>
             </>
           ) : (

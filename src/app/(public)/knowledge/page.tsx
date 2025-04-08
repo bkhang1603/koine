@@ -8,36 +8,30 @@ import blogApiRequest from '@/apiRequests/blog'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { wrapServerApi } from '@/lib/server-utils'
 import { searchParams } from '@/types/query'
-
-const categories = [
-  { id: 'all', name: 'Tất cả', featured: true },
-  { id: 'new', name: 'Mới nhất' },
-  { id: 'popular', name: 'Phổ biến' },
-  { id: 'teen', name: 'Thanh thiếu niên' },
-  { id: 'children', name: 'Trẻ em' },
-  { id: 'girls', name: 'Bé gái' },
-  { id: 'boys', name: 'Bé trai' }
-]
+import { Suspense } from 'react'
+import DynamicData from '@/components/public/parent/knowledge/dynamic-data'
+import { EmptyState } from '@/components/ui/empty-state'
 
 async function KnowledgePage(props: { searchParams?: Promise<searchParams> }) {
   const searchParams = await props.searchParams
   const currentPage = Number(searchParams?.page) || 1
+  const selectedCategory = searchParams?.category || ''
   const pageSize = 9 // 3 columns x 3 rows looks nice on desktop
 
   const data = await wrapServerApi(() =>
-    blogApiRequest.getBlogs({
+    blogApiRequest.getBlogsCache({
       page_index: currentPage,
       page_size: pageSize,
-      search: ''
+      search: '',
+      categoryId: selectedCategory
     })
   )
 
   const blogs = data?.payload?.data || []
   const totalPages = data?.payload?.pagination?.totalPage
 
-  if (!blogs || blogs.length === 0) {
-    return <div className='container py-20 text-center'>Không có bài viết nào</div>
-  }
+  const categoryData = await wrapServerApi(() => blogApiRequest.getCategoryBlogCache())
+  const categories = categoryData?.payload?.data || []
 
   return (
     <main>
@@ -67,18 +61,28 @@ async function KnowledgePage(props: { searchParams?: Promise<searchParams> }) {
           <div className='relative mb-8'>
             <ScrollArea className='w-full bg-white rounded-xl shadow-sm border border-gray-100/80 py-1'>
               <div className='flex items-center gap-2 p-3 sm:p-4'>
+                <Link
+                  href={configRoute.knowledge}
+                  className={`whitespace-nowrap px-4 sm:px-6 py-2 sm:py-2.5 rounded-lg sm:rounded-xl text-xs sm:text-sm font-medium transition-colors ${
+                    !selectedCategory
+                      ? 'bg-primary text-white hover:bg-primary/90'
+                      : 'bg-gray-50 text-gray-700 hover:bg-gray-100'
+                  }`}
+                >
+                  Tất cả
+                </Link>
                 {categories.map((category) => (
-                  <button
+                  <Link
                     key={category.id}
-                    className={`whitespace-nowrap px-4 sm:px-6 py-2 sm:py-2.5 rounded-lg sm:rounded-xl text-xs sm:text-sm font-medium transition-colors
-            ${
-              category.featured
-                ? 'bg-primary text-white hover:bg-primary/90'
-                : 'bg-gray-50 text-gray-700 hover:bg-gray-100'
-            }`}
+                    href={`${configRoute.knowledge}?category=${category.id}`}
+                    className={`whitespace-nowrap px-4 sm:px-6 py-2 sm:py-2.5 rounded-lg sm:rounded-xl text-xs sm:text-sm font-medium transition-colors ${
+                      selectedCategory === category.id
+                        ? 'bg-primary text-white hover:bg-primary/90'
+                        : 'bg-gray-50 text-gray-700 hover:bg-gray-100'
+                    }`}
                   >
                     {category.name}
-                  </button>
+                  </Link>
                 ))}
               </div>
               <ScrollBar orientation='horizontal' className='h-2' />
@@ -111,9 +115,12 @@ async function KnowledgePage(props: { searchParams?: Promise<searchParams> }) {
                       <span className='text-primary text-sm font-medium'>
                         {new Date(blog.createdAt).toLocaleDateString('vi-VN')}
                       </span>
-                      <span className='text-gray-500 text-sm'>
+                      {/* <span className='text-gray-500 text-sm'>
                         {blog.totalReact} lượt thích • {blog.totalComment} bình luận
-                      </span>
+                      </span> */}
+                      <Suspense fallback={<div className='w-32 h-4 bg-gray-200 animate-pulse rounded'></div>}>
+                        <DynamicData id={blog.id} />
+                      </Suspense>
                     </div>
 
                     {/* Title & Description */}
@@ -142,6 +149,14 @@ async function KnowledgePage(props: { searchParams?: Promise<searchParams> }) {
               </Link>
             ))}
           </div>
+
+          {/* Thiết kế UI cho trường hợp không có bài viết */}
+          {blogs.length === 0 && (
+            <EmptyState
+              title='Chưa có bài viết nào'
+              description='Hiện tại chưa có bài viết nào trong danh mục này. Vui lòng quay lại sau nhé!'
+            />
+          )}
 
           {/* Pagination */}
           {totalPages && totalPages > 1 && (

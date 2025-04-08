@@ -1,142 +1,201 @@
 'use client'
 
-import { Button } from '@/components/ui/button'
+import { use, useEffect, useMemo } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Plus, Settings } from 'lucide-react'
-import { useState, useEffect } from 'react'
-import { useRouter } from 'next/navigation'
+import { BookOpen, Users, Star, GraduationCap, Settings, Plus } from 'lucide-react'
+import { TableCustom, dataListType } from '@/components/table-custom'
+import { SearchParams } from '@/types/query'
+import { useRouter, usePathname } from 'next/navigation'
 import Link from 'next/link'
-import { CourseFilters } from '@/components/private/content-creator/course/course-filters'
-import { EmptyCourses } from '@/components/private/content-creator/course/empty-courses'
-import { DeleteCourseDialog } from '@/components/private/content-creator/course/delete-course-dialog'
-import { CourseCard } from '@/components/private/content-creator/course/course-card'
-import { useGetCoursesQuery, useDeleteCourseMutation } from '@/queries/useCourse'
+import { Badge } from '@/components/ui/badge'
+import { format } from 'date-fns'
+import { vi } from 'date-fns/locale'
+import { Input } from '@/components/ui/input'
+import { MoreOptions } from '@/components/private/common/more-options'
+import { useCoursesAdminQuery } from '@/queries/useCourse'
 import { Skeleton } from '@/components/ui/skeleton'
-import { toast } from '@/components/ui/use-toast'
-import { handleErrorApi } from '@/lib/utils'
+import Image from 'next/image'
+import { Button } from '@/components/ui/button'
 
-// Component cho Skeleton loading
-const CourseCardSkeleton = () => (
-  <div className='rounded-lg border bg-card shadow-sm overflow-hidden'>
-    <Skeleton className='h-[200px] w-full' />
-    <div className='p-6'>
-      <div className='flex gap-1.5 mb-4'>
-        <Skeleton className='h-5 w-16' />
-        <Skeleton className='h-5 w-20' />
-      </div>
-      <Skeleton className='h-6 w-full mb-2' />
-      <Skeleton className='h-4 w-full mb-2' />
-      <Skeleton className='h-4 w-3/4 mb-6' />
-      <div className='flex items-center justify-between mt-6'>
-        <Skeleton className='h-6 w-20' />
-        <Skeleton className='h-5 w-24' />
-      </div>
-    </div>
-    <div className='px-6 py-4 border-t'>
-      <div className='flex justify-between'>
-        <div className='flex items-center gap-4'>
-          <Skeleton className='h-4 w-32' />
-        </div>
-        <Skeleton className='h-8 w-8 rounded-full' />
-      </div>
-    </div>
-  </div>
-)
-
-// Custom hook cho debounce
-function useDebounce<T>(value: T, delay: number): T {
-  const [debouncedValue, setDebouncedValue] = useState<T>(value)
-
-  useEffect(() => {
-    const handler = setTimeout(() => {
-      setDebouncedValue(value)
-    }, delay)
-
-    return () => {
-      clearTimeout(handler)
-    }
-  }, [value, delay])
-
-  return debouncedValue
-}
-
-export default function CoursesPage() {
-  const [selectedCategory, setSelectedCategory] = useState<string>('all')
-  const [searchQuery, setSearchQuery] = useState('')
-  const [statusFilter, setStatusFilter] = useState('all')
-  const [priceFilter, setPriceFilter] = useState('all')
-  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
-  const [selectedCourse, setSelectedCourse] = useState<string | undefined>(undefined)
-  const [pageIndex, setPageIndex] = useState(1)
-  const [pageSize] = useState(9) // Hiển thị 9 khóa học mỗi trang
+function ContentCreatorCourse(props: { searchParams: SearchParams }) {
+  const searchParams = use(props.searchParams)
   const router = useRouter()
-  const [ageFilter, setAgeFilter] = useState('all')
+  const pathname = usePathname()
 
-  // Áp dụng debounce cho searchQuery
-  const debouncedSearchQuery = useDebounce(searchQuery, 500)
+  // Lấy giá trị từ searchParams hoặc sử dụng giá trị mặc định
+  const currentKeyword = (searchParams.keyword as string) || ''
+  const currentPageSize = Number(searchParams.page_size) || 10
+  const currentPageIndex = Number(searchParams.page_index) || 1
 
-  // Lấy danh sách khóa học từ API
-  const { data: coursesResponse, isLoading } = useGetCoursesQuery({
-    page_index: pageIndex,
-    page_size: pageSize,
-    keyword: debouncedSearchQuery ?? '',
-    sort: 'pa',
-    category: '',
-    range: 0
-    // Có thể bổ sung thêm các params khác như category, status nếu API hỗ trợ
+  // Hàm để cập nhật URL khi thay đổi các giá trị
+  const updateSearchParams = (newParams: { keyword?: string; page_size?: number; page_index?: number }) => {
+    const params = new URLSearchParams(searchParams as Record<string, string>)
+
+    if (newParams.keyword !== undefined) {
+      if (newParams.keyword === '') {
+        params.delete('keyword')
+      } else {
+        params.set('keyword', newParams.keyword)
+      }
+    }
+
+    if (newParams.page_size !== undefined) {
+      params.set('page_size', newParams.page_size.toString())
+    }
+
+    if (newParams.page_index !== undefined) {
+      params.set('page_index', newParams.page_index.toString())
+    }
+
+    router.push(`${pathname}?${params.toString()}`)
+  }
+
+  // Gọi API với giá trị từ URL
+  const {
+    data: responseData,
+    isLoading,
+    error
+  } = useCoursesAdminQuery({
+    keyword: currentKeyword,
+    page_size: currentPageSize,
+    page_index: currentPageIndex
   })
 
-  const deleteMutation = useDeleteCourseMutation()
-
-  // Dữ liệu từ API
-  const courses = coursesResponse?.payload?.data || []
-  const totalCourses = coursesResponse?.payload?.pagination?.totalItem || 0
-  const totalPages = Math.ceil(totalCourses / pageSize)
-
-  // Xử lý xóa khóa học
-  const handleDelete = (courseId: string) => {
-    setSelectedCourse(courseId)
-    setTimeout(() => setDeleteDialogOpen(true), 100)
-  }
-
-  // Xác nhận xóa khóa học
-  const confirmDelete = async () => {
-    if (!selectedCourse) return
-
-    try {
-      await deleteMutation.mutateAsync(selectedCourse)
-      toast({
-        description: 'Xóa khóa học thành công'
-      })
-      // Refresh dữ liệu sau khi xóa
-    } catch (error) {
-      handleErrorApi({
-        error
-      })
-    } finally {
-      setDeleteDialogOpen(false)
-      setTimeout(() => setSelectedCourse(undefined), 300)
-    }
-  }
-
-  // Xử lý chuyển trang
-  const handlePageChange = (page: number) => {
-    setPageIndex(page)
-  }
-
-  // Xử lý khi thay đổi bộ lọc
   useEffect(() => {
-    // Reset về trang 1 khi thay đổi bất kỳ bộ lọc nào
-    setPageIndex(1)
-  }, [debouncedSearchQuery, selectedCategory, statusFilter, priceFilter])
+    if (responseData) {
+      console.log('Dữ liệu khóa học từ content creator:', responseData)
+    }
+    if (error) {
+      console.error('Lỗi khi tải khóa học:', error)
+    }
+  }, [responseData, error])
+
+  const data = responseData?.payload.data || []
+  const pagination = responseData?.payload.pagination || {
+    pageSize: 0,
+    totalItem: 0,
+    currentPage: 0,
+    totalPage: 0,
+    maxPageSize: 0
+  }
+
+  // Cấu hình cột cho bảng
+  const headerColumn = [
+    { id: 1, name: 'Tên khóa học' },
+    { id: 2, name: 'Đánh giá' },
+    { id: 3, name: 'Số người học' },
+    { id: 4, name: 'Trạng thái' },
+    { id: 5, name: 'Ngày tạo' },
+    { id: 6, name: '' }
+  ]
+
+  const bodyColumn = useMemo(
+    () => [
+      {
+        id: 1,
+        render: (course: any) => (
+          <div className='flex items-center gap-3 min-w-[300px] max-w-[400px]'>
+            <div className='relative h-12 w-12 flex-shrink-0'>
+              <Image
+                src={course.imageUrl}
+                alt={course.title}
+                fill
+                className='rounded-md object-cover'
+                sizes='48px'
+                priority={false}
+              />
+            </div>
+            <div className='space-y-0.5 overflow-hidden'>
+              <div className='font-medium truncate'>{course.title}</div>
+              <div className='text-xs text-muted-foreground line-clamp-1'>{course.description}</div>
+            </div>
+          </div>
+        )
+      },
+      {
+        id: 2,
+        render: (course: any) => (
+          <div className='flex items-center min-w-[80px]'>
+            <span className='text-sm font-medium'>
+              {course.aveRating.toFixed(1) == 0 ? 5 : course.aveRating.toFixed(1)}
+            </span>
+          </div>
+        )
+      },
+      {
+        id: 3,
+        render: (course: any) => (
+          <div className='flex items-center min-w-[100px]'>
+            <span className='text-sm font-medium'>{course.totalEnrollment}</span>
+          </div>
+        )
+      },
+      {
+        id: 4,
+        render: (course: any) => (
+          <div className='flex items-center min-w-[100px]'>
+            <Badge variant={course.isBanned ? 'destructive' : 'green'} className='w-fit'>
+              {course.isBanned ? 'Đã khóa' : 'Hoạt động'}
+            </Badge>
+          </div>
+        )
+      },
+      {
+        id: 5,
+        render: (course: any) => (
+          <div className='min-w-[120px]'>
+            <div className='text-sm'>{format(new Date(course.createdAt), 'dd/MM/yyyy', { locale: vi })}</div>
+            <div className='text-xs text-muted-foreground'>
+              {format(new Date(course.createdAt), 'HH:mm', { locale: vi })}
+            </div>
+          </div>
+        )
+      },
+      {
+        id: 6,
+        render: (course: any) => (
+          <div className='flex justify-end min-w-[40px]'>
+            <MoreOptions
+              item={{
+                id: course.id,
+                title: course.title,
+                status: course.isBanned ? 'Đã khóa' : 'Hoạt động',
+                slug: course.slug
+              }}
+              itemType='course'
+              onView={() => router.push(`/content-creator/course/${course.id}`)}
+              onEdit={() => router.push(`/content-creator/course/${course.id}/edit`)}
+              onPreview={() => router.push(`/course/${course.slug}`)}
+            />
+          </div>
+        )
+      }
+    ],
+    [router]
+  )
+
+  const tableData: dataListType = {
+    data,
+    message: responseData?.payload.message || '',
+    pagination
+  }
+
+  // Tính toán thống kê
+  const totalCourses = pagination.totalItem || 0
+  const totalEnrollments = data.reduce((sum: number, course: any) => sum + course.totalEnrollment, 0)
+  const averageRating =
+    data.length > 0
+      ? (data.reduce((sum: number, course: any) => sum + course.aveRating, 0) / data.length).toFixed(1)
+      : 0
+  const bannedCourses = data.filter((course: any) => course.isBanned).length
 
   return (
-    <div className='container mx-auto px-4 py-6'>
+    <div className='container mx-auto px-4 py-6 space-y-6'>
       {/* Header */}
-      <div className='flex items-center justify-between mb-8'>
+      <div className='flex items-center justify-between'>
         <div>
-          <h1 className='text-2xl font-bold'>Khóa học của bạn</h1>
-          <p className='text-sm text-muted-foreground mt-1'>Quản lý và tạo mới các khóa học</p>
+          <h1 className='text-2xl font-bold'>Quản lý khóa học</h1>
+          <p className='text-muted-foreground mt-1'>Quản lý và theo dõi tất cả khóa học của bạn</p>
         </div>
         <div className='flex items-center gap-4'>
           <Button variant='outline' asChild>
@@ -148,101 +207,95 @@ export default function CoursesPage() {
           <Button asChild>
             <Link href='/content-creator/course/new'>
               <Plus className='w-4 h-4 mr-2' />
-              Tạo khóa học
+              Tạo khóa học mới
             </Link>
           </Button>
         </div>
       </div>
 
-      {/* Filters - Trong Card */}
-      <Card className='mb-6'>
-        <CardHeader>
-          <CardTitle>Tìm kiếm và lọc</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <CourseFilters
-            searchQuery={searchQuery}
-            selectedCategory={selectedCategory}
-            ageFilter={ageFilter}
-            statusFilter={statusFilter}
-            priceFilter={priceFilter}
-            onSearchChange={setSearchQuery}
-            onCategoryChange={setSelectedCategory}
-            onAgeFilterChange={setAgeFilter}
-            onStatusFilterChange={setStatusFilter}
-            onPriceFilterChange={setPriceFilter}
-          />
-        </CardContent>
-      </Card>
+      {/* Stats Cards với Skeleton */}
+      <div className='grid grid-cols-1 md:grid-cols-4 gap-4'>
+        {isLoading ? (
+          // Stats Cards Skeleton
+          [...Array(4)].map((_, i) => (
+            <Card key={i}>
+              <CardHeader className='flex flex-row items-center justify-between pb-2'>
+                <Skeleton className='h-5 w-[120px]' />
+                <Skeleton className='h-5 w-5 rounded-full' />
+              </CardHeader>
+              <CardContent>
+                <Skeleton className='h-9 w-[80px] mb-2' />
+                <Skeleton className='h-4 w-[160px]' />
+              </CardContent>
+            </Card>
+          ))
+        ) : (
+          // Actual Stats Cards
+          <>
+            <Card>
+              <CardHeader className='flex flex-row items-center justify-between pb-2'>
+                <CardTitle className='text-sm font-medium'>Tổng khóa học</CardTitle>
+                <BookOpen className='h-4 w-4 text-muted-foreground' />
+              </CardHeader>
+              <CardContent>
+                <div className='text-2xl font-bold'>{totalCourses}</div>
+                <p className='text-xs text-muted-foreground'>Số lượng khóa học của bạn</p>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardHeader className='flex flex-row items-center justify-between pb-2'>
+                <CardTitle className='text-sm font-medium'>Tổng lượt đăng ký</CardTitle>
+                <Users className='h-4 w-4 text-muted-foreground' />
+              </CardHeader>
+              <CardContent>
+                <div className='text-2xl font-bold'>{totalEnrollments}</div>
+                <p className='text-xs text-muted-foreground'>Số lượt đăng ký khóa học</p>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardHeader className='flex flex-row items-center justify-between pb-2'>
+                <CardTitle className='text-sm font-medium'>Đánh giá trung bình</CardTitle>
+                <Star className='h-4 w-4 text-muted-foreground' />
+              </CardHeader>
+              <CardContent>
+                <div className='text-2xl font-bold'>{averageRating}</div>
+                <p className='text-xs text-muted-foreground'>Điểm đánh giá trung bình</p>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardHeader className='flex flex-row items-center justify-between pb-2'>
+                <CardTitle className='text-sm font-medium'>Khóa học bị khóa</CardTitle>
+                <GraduationCap className='h-4 w-4 text-muted-foreground' />
+              </CardHeader>
+              <CardContent>
+                <div className='text-2xl font-bold'>{bannedCourses}</div>
+                <p className='text-xs text-muted-foreground'>Số khóa học đang bị khóa</p>
+              </CardContent>
+            </Card>
+          </>
+        )}
+      </div>
 
-      {/* Course List - Trong Card */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Danh sách khóa học</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'>
-            {isLoading ? (
-              // Hiển thị skeleton cards khi đang tải
-              Array(6)
-                .fill(0)
-                .map((_, index) => <CourseCardSkeleton key={index} />)
-            ) : courses.length > 0 ? (
-              // Hiển thị course cards khi có dữ liệu
-              courses.map((course) => (
-                <CourseCard
-                  key={course.id}
-                  course={course}
-                  onDelete={handleDelete}
-                  onNavigate={(url) => router.push(url)}
-                />
-              ))
-            ) : (
-              // Hiển thị trạng thái trống khi không có dữ liệu
-              <div className='col-span-full'>
-                <EmptyCourses />
-              </div>
-            )}
-          </div>
-        </CardContent>
-      </Card>
+      {/* Search */}
+      <div className='flex flex-col sm:flex-row gap-4'>
+        <Input
+          placeholder='Tìm kiếm khóa học...'
+          className='w-full sm:w-[300px]'
+          value={currentKeyword}
+          onChange={(e) => updateSearchParams({ keyword: e.target.value, page_index: 1 })}
+        />
+      </div>
 
-      {/* Pagination */}
-      {totalPages > 1 && (
-        <div className='flex justify-center mt-8'>
-          <div className='flex space-x-2'>
-            <Button
-              variant='outline'
-              onClick={() => handlePageChange(pageIndex - 1)}
-              disabled={pageIndex === 1 || isLoading}
-            >
-              Trước
-            </Button>
-
-            {Array.from({ length: totalPages }).map((_, i) => (
-              <Button
-                key={i}
-                variant={pageIndex === i + 1 ? 'default' : 'outline'}
-                onClick={() => handlePageChange(i + 1)}
-                disabled={isLoading}
-              >
-                {i + 1}
-              </Button>
-            ))}
-
-            <Button
-              variant='outline'
-              onClick={() => handlePageChange(pageIndex + 1)}
-              disabled={pageIndex === totalPages || isLoading}
-            >
-              Sau
-            </Button>
-          </div>
-        </div>
-      )}
-
-      {/* Delete Dialog */}
-      <DeleteCourseDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen} onConfirm={confirmDelete} />
+      {/* Table */}
+      <TableCustom
+        data={tableData}
+        headerColumn={headerColumn}
+        bodyColumn={bodyColumn}
+        href='/content-creator/course'
+        loading={isLoading}
+      />
     </div>
   )
 }
+
+export default ContentCreatorCourse

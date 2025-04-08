@@ -16,11 +16,13 @@ import Link from 'next/link'
 import configRoute from '@/config/route'
 import { toast } from '@/components/ui/use-toast'
 import { getAccessTokenFromLocalStorage, handleErrorApi } from '@/lib/utils'
+import { useCartDetailQuery } from '@/queries/useCartDetail'
 
 function BellNotification() {
   const user = useAppStore((state) => state.user)
   const { data, isLoading, refetch } = useGetAccountNotifications({ page_index: 1, page_size: 100 })
-  const notifications = data?.payload.data.response || []
+  const { refetch: refetchCart } = useCartDetailQuery()
+  const notifications = data?.payload.data || []
   const updateNotificationsMutation = useUpdateAccountNotificationsMutation()
   const token = getAccessTokenFromLocalStorage()
 
@@ -43,6 +45,7 @@ function BellNotification() {
     function getNotifications() {
       console.log('get notifications')
       refetch()
+      refetchCart()
     }
 
     function login() {
@@ -68,7 +71,7 @@ function BellNotification() {
 
       socket.off('disconnect', onDisconnect)
     }
-  }, [user, refetch, token])
+  }, [user, refetch, token, refetchCart])
 
   // Count unread notifications
   const unreadCount = notifications.filter((notification) => !notification.isRead).length

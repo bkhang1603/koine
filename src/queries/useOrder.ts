@@ -70,3 +70,31 @@ export const useGetRefundOrders = ({ page_size, page_index }: { page_size: numbe
     queryFn: () => orderApiRequest.getRefundOrders({ page_size, page_index })
   })
 }
+
+export const useCreateRefundOrderMutation = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: orderApiRequest.createRefundOrder,
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ['orders']
+      })
+    }
+  })
+}
+
+// get order cho admin
+export const useGetAdminOrdersQuery = (pageSize: number, pageIndex: number, status: string) => {
+  return useQuery({
+    queryKey: ['adminOrders', status, pageSize, pageIndex],
+    queryFn: () => orderApiRequest.getAdminOrders(pageSize, pageIndex, status)
+  })
+}
+
+export const useGetAdminOrderQuery = ({ id }: { id: string }) => {
+  return useQuery({
+    queryKey: ['order', id],
+    queryFn: () => orderApiRequest.getAdminOrderById(id)
+  })
+}

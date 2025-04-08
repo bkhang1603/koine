@@ -16,13 +16,22 @@ function PaginationTable({ totalPage, href }: { totalPage: number; href: string 
   const searchParams = useSearchParams()
   const currentPage = Number(searchParams.get('page_index')) || 1
   const search = searchParams.get('search') || ''
+  const status = searchParams.get('status') || ''
 
   return (
     <Pagination>
       <PaginationContent>
         {currentPage > 1 && (
           <PaginationItem>
-            <PaginationPrevious href={href + '?page_index=' + (currentPage - 1) + (search && `&search=${search}`)} />
+            <PaginationPrevious
+              href={
+                href +
+                '?page_index=' +
+                (currentPage - 1) +
+                (search && `&search=${search}`) +
+                (status && `&status=${status}`)
+              }
+            />
           </PaginationItem>
         )}
         {totalPage > 1 &&
@@ -30,7 +39,12 @@ function PaginationTable({ totalPage, href }: { totalPage: number; href: string 
             if (page === currentPage) {
               return (
                 <PaginationItem key={page}>
-                  <PaginationLink href={href + '?page_index=' + page + (search && `&search=${search}`)} isActive>
+                  <PaginationLink
+                    href={
+                      href + '?page_index=' + page + (search && `&search=${search}`) + (status && `&status=${status}`)
+                    }
+                    isActive
+                  >
                     {page}
                   </PaginationLink>
                 </PaginationItem>
@@ -40,7 +54,11 @@ function PaginationTable({ totalPage, href }: { totalPage: number; href: string 
             if (page === 1 || page === totalPage || (page >= currentPage - 1 && page <= currentPage + 1)) {
               return (
                 <PaginationItem key={page}>
-                  <PaginationLink href={href + '?page_index=' + page + (search && `&search=${search}`)}>
+                  <PaginationLink
+                    href={
+                      href + '?page_index=' + page + (search && `&search=${search}`) + (status && `&status=${status}`)
+                    }
+                  >
                     {page}
                   </PaginationLink>
                 </PaginationItem>
@@ -53,7 +71,15 @@ function PaginationTable({ totalPage, href }: { totalPage: number; href: string 
           })}
         {currentPage < totalPage && (
           <PaginationItem>
-            <PaginationNext href={href + '?page_index=' + (currentPage + 1) + (search && `&search=${search}`)} />
+            <PaginationNext
+              href={
+                href +
+                '?page_index=' +
+                (currentPage + 1) +
+                (search && `&search=${search}`) +
+                (status && `&status=${status}`)
+              }
+            />
           </PaginationItem>
         )}
       </PaginationContent>

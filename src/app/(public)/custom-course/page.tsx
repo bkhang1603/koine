@@ -2,30 +2,60 @@
 
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { useState, useMemo } from 'react'
-import { Plus, ArrowLeft, BookOpen, Trash2 } from 'lucide-react'
+import { useState, useMemo, useRef } from 'react'
+import { Plus, ArrowLeft, BookOpen, Trash2, Upload, ImageIcon } from 'lucide-react'
 import Link from 'next/link'
 import { CustomChapterList } from '@/components/public/parent/custom-course/custom-chapter-list'
 import { ChapterPickerDialog } from '@/components/public/parent/custom-course/chapter-picker-dialog'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { CoursesResType } from '@/schemaValidations/course.schema'
 import { useCreateCourseCustomMutation, useGetAllCoursesForCustomQuery } from '@/queries/useCourse'
-import { useToast } from '@/components/ui/use-toast'
+import { toast } from '@/components/ui/use-toast'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { useAppStore } from '@/components/app-provider'
 import { handleErrorApi } from '@/lib/utils'
+import { Input } from '@/components/ui/input'
+import { Textarea } from '@/components/ui/textarea'
+import { useForm } from 'react-hook-form'
+import { useUploadImageMutation } from '@/queries/useUpload'
+import { Avatar, AvatarImage } from '@/components/ui/avatar'
+import configRoute from '@/config/route'
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { z } from 'zod'
+import { Breadcrumb } from '@/components/public/parent/setting/Breadcrumb'
 
 type Chapter = CoursesResType['data'][0]['chapters'][0]
 
+// Thêm schema validation
+const customCourseSchema = z.object({
+  customTitle: z.string().min(1, 'Vui lòng nhập tên khóa học'),
+  customDescription: z.string().min(1, 'Vui lòng nhập mô tả khóa học'),
+  customImageUrl: z.string().optional()
+})
+
+type CustomCourseFormValues = z.infer<typeof customCourseSchema>
+
 export default function CustomCoursePage() {
-  const { toast } = useToast()
   const [openChapterPicker, setOpenChapterPicker] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [file, setFile] = useState<File | null>(null)
+  const inputRef = useRef<HTMLInputElement | null>(null)
 
   // Query data once
   const { data, isLoading } = useGetAllCoursesForCustomQuery()
+  const uploadImageMutation = useUploadImageMutation()
 
   const createCourseCustomMutation = useCreateCourseCustomMutation()
+
+  const form = useForm<CustomCourseFormValues>({
+    resolver: zodResolver(customCourseSchema),
+    defaultValues: {
+      customTitle: '',
+      customDescription: '',
+      customImageUrl: ''
+    }
+  })
 
   // Get Zustand state with guaranteed initialization
   const chapters = useAppStore((state) => state.customCourse.chapters || [])
@@ -40,6 +70,14 @@ export default function CustomCoursePage() {
     () => chapters.reduce((sum, chapter) => sum + (chapter.lessons?.length || 0), 0),
     [chapters]
   )
+
+  // Preview image from file or form value
+  const previewImage = useMemo(() => {
+    if (file) {
+      return URL.createObjectURL(file)
+    }
+    return form.getValues('customImageUrl')
+  }, [file, form])
 
   // Apply default alphabetical sorting to chapters
   const formattedChaptersForList = useMemo(() => {
@@ -74,7 +112,6 @@ export default function CustomCoursePage() {
   const handleClearAll = () => {
     setCustomCourse({ chapters: [] })
     toast({
-      title: 'Đã xóa tất cả các chương',
       description: 'Danh sách các chương đã được làm trống'
     })
   }
@@ -110,7 +147,6 @@ export default function CustomCoursePage() {
   const handleSubmit = async () => {
     if (!chapters.length) {
       toast({
-        title: 'Vui lòng chọn ít nhất một chương',
         description: 'Bạn cần chọn nội dung cho khóa học của mình',
         variant: 'destructive'
       })
@@ -121,8 +157,26 @@ export default function CustomCoursePage() {
 
     try {
       if (createCourseCustomMutation.isPending) return
+
+      let imageUrl = form.getValues('customImageUrl')
+
+      if (file) {
+        const formData = new FormData()
+        formData.append('images', file)
+        const result = await uploadImageMutation.mutateAsync(formData)
+
+        if (Array.isArray(result.payload.data)) {
+          imageUrl = result.payload.data[0]
+        } else {
+          imageUrl = result.payload.data
+        }
+      }
+
       const res = await createCourseCustomMutation.mutateAsync({
-        chapterIds: chapters.map((chapter) => chapter.id)
+        chapterIds: chapters.map((chapter) => chapter.id),
+        customTitle: form.getValues('customTitle'),
+        customDescription: form.getValues('customDescription'),
+        customImageUrl: imageUrl ?? ''
       })
 
       toast({
@@ -130,9 +184,12 @@ export default function CustomCoursePage() {
       })
 
       setCustomCourse({ chapters: [] })
+      form.reset()
+      setFile(null)
     } catch (error) {
       handleErrorApi({
-        error
+        error,
+        setError: form.setError
       })
     } finally {
       setIsSubmitting(false)
@@ -143,7 +200,7 @@ export default function CustomCoursePage() {
     <main className='container py-8 space-y-6'>
       <div className='flex items-center gap-4'>
         <Button variant='ghost' size='icon' asChild>
-          <Link href='/course'>
+          <Link href={configRoute.course}>
             <ArrowLeft className='w-4 h-4' />
           </Link>
         </Button>
@@ -153,8 +210,16 @@ export default function CustomCoursePage() {
         </div>
       </div>
 
-      <Alert>
-        <BookOpen className='h-4 w-4' />
+      <Breadcrumb
+        className='pt-2'
+        items={[
+          { title: 'Khóa học', href: configRoute.course },
+          { title: 'Tạo khóa học theo yêu cầu', href: configRoute.customCourse }
+        ]}
+      />
+
+      <Alert variant='notification'>
+        {/* <BookOpen className='h-4 w-4' /> */}
         <AlertTitle>Hướng dẫn sử dụng</AlertTitle>
         <AlertDescription>
           Chọn các chương từ các khóa học hiện có để tạo khóa học riêng của bạn. Hệ thống sẽ tự động tạo tên và hình ảnh
@@ -163,7 +228,91 @@ export default function CustomCoursePage() {
       </Alert>
 
       <div className='grid md:grid-cols-3 gap-6'>
-        <div className='md:col-span-2'>
+        <div className='md:col-span-2 space-y-6'>
+          <Card>
+            <CardHeader>
+              <CardTitle>Thông tin khóa học</CardTitle>
+            </CardHeader>
+            <CardContent className='space-y-6'>
+              <Form {...form}>
+                <form onSubmit={form.handleSubmit(handleSubmit)} className='space-y-6'>
+                  <div className='flex items-center gap-8 pb-8 mb-8 border-b'>
+                    <div className='relative group'>
+                      {previewImage ? (
+                        <Avatar className='w-28 h-28 rounded-2xl border-2 border-primary/10 ring-4 ring-primary/5'>
+                          <AvatarImage src={previewImage} className='object-cover' />
+                        </Avatar>
+                      ) : (
+                        <div className='w-28 h-28 rounded-2xl border-2 border-dashed border-primary/20 flex flex-col items-center justify-center gap-2 bg-primary/5'>
+                          <ImageIcon className='w-8 h-8 text-primary/40' />
+                        </div>
+                      )}
+                      <Button
+                        type='button'
+                        size='sm'
+                        onClick={() => inputRef.current?.click()}
+                        className='absolute -bottom-2 -right-2 rounded-xl w-9 h-9 p-0 
+                          bg-white shadow-lg border-2 border-primary/10 text-primary 
+                          hover:bg-primary/5 hover:scale-105 transition-all duration-200'
+                      >
+                        <Upload className='w-4 h-4' />
+                      </Button>
+                      <Input
+                        className='hidden'
+                        type='file'
+                        accept='image/*'
+                        ref={inputRef}
+                        onChange={(e) => {
+                          const file = e.target.files?.[0]
+                          if (file) {
+                            setFile(file)
+                            form.setValue('customImageUrl', 'http://localhost:3000/' + file.name)
+                          }
+                        }}
+                      />
+                    </div>
+                    <div>
+                      <h4 className='text-xl font-semibold text-gray-900'>Hình ảnh khóa học</h4>
+                      <p className='text-sm text-gray-500 mt-1.5 leading-relaxed'>
+                        Thêm hình ảnh để tạo ấn tượng cho khóa học của bạn.
+                        <br />
+                        Nên là ảnh vuông, định dạng PNG hoặc JPG và không quá 1MB.
+                      </p>
+                    </div>
+                  </div>
+
+                  <FormField
+                    control={form.control}
+                    name='customTitle'
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Tên khóa học</FormLabel>
+                        <FormControl>
+                          <Input placeholder='Nhập tên khóa học' {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name='customDescription'
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Mô tả khóa học</FormLabel>
+                        <FormControl>
+                          <Textarea placeholder='Nhập mô tả khóa học' className='min-h-[100px]' {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </form>
+              </Form>
+            </CardContent>
+          </Card>
+
           <Card>
             <CardHeader className='flex flex-row items-center justify-between'>
               <CardTitle>Nội dung khóa học</CardTitle>
@@ -245,7 +394,11 @@ export default function CustomCoursePage() {
               </ScrollArea>
             </div>
 
-            <Button className='w-full' onClick={handleSubmit} disabled={isSubmitting || chapters.length === 0}>
+            <Button
+              className='w-full'
+              onClick={form.handleSubmit(handleSubmit)}
+              disabled={isSubmitting || chapters.length === 0}
+            >
               {isSubmitting ? (
                 <span className='flex items-center'>
                   <svg
