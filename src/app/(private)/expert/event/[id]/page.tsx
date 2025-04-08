@@ -122,7 +122,12 @@ export default function EventDetailPage(props: { params: Promise<{ id: string }>
 
       if (!roomName) return
       const res = await getInsightsRoom(roomName)
-      if (!res?.results?.[0]?.totalUniqueParticipants) return
+      if (!res || res.results[0].length == 0) {
+        //alert hay prompt cho ngta thấy này lỗi bên whereby k phải BE
+        //k biết hiện thế nào đâu
+        // Alert.alert('Thông báo', `Chưa có dữ liệu phòng họp`)
+        return
+      }
 
       await updateEventInfo.mutateAsync({
         body: { totalParticipants: res.results[0].totalUniqueParticipants, status: 'DONE' },
@@ -160,10 +165,9 @@ export default function EventDetailPage(props: { params: Promise<{ id: string }>
 
       const data = await response.json()
       const body = {
-        roomHostUrl: data.hostRoomUrl,
-        roomName: data.roomName,
-        roomUrl: data.roomUrl,
-        roomContent: data.roomContent
+        roomHostUrl: data.hostRoomUrl.toString().trim(),
+        roomName: data.roomName.toString().trim(),
+        roomUrl: data.roomUrl.toString().trim()
       }
 
       await updateRoomInfo.mutateAsync({ body, eventId: id })
@@ -179,7 +183,7 @@ export default function EventDetailPage(props: { params: Promise<{ id: string }>
       if (isProcessing) return
       setIsProcessing(true)
 
-      if (!roomHostUrl) {
+      if (!roomHostUrl || roomHostUrl.length == 0) {
         await handleCreateRoom(eventStartAt, duration)
       } else {
         window.open(roomHostUrl, '_blank')
@@ -299,7 +303,7 @@ export default function EventDetailPage(props: { params: Promise<{ id: string }>
               Cập nhật
             </Button>
           )}
-          {isCancelable && (
+          {isCancelable && event.status == 'PENDING' && (
             <Button size='lg' variant='destructive' onClick={() => setCancelModal({ isOpen: true })}>
               <Trash2 className='w-4 h-4 mr-2' />
               Hủy sự kiện

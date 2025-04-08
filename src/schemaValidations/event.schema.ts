@@ -87,8 +87,7 @@ export type CancelEventRequestType = z.infer<typeof cancelEventRequest>
 export const createEventRoomRequest = z.object({
   roomUrl: z.string(),
   roomHostUrl: z.string(),
-  roomName: z.string(),
-  roomContent: z.string()
+  roomName: z.string()
 })
 export type CreateEventRoomRequestType = z.infer<typeof createEventRoomRequest>
 

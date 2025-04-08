@@ -38,9 +38,27 @@ const eventSchema = z.object({
   description: z.string().min(30, 'Mô tả phải có ít nhất 30 ký tự'),
   content: z.string().min(100, 'Nội dung phải có ít nhất 100 ký tự'),
   imageUrl: z.string().optional(),
-  startedAt: z.date({
-    required_error: 'Vui lòng chọn thời gian bắt đầu'
-  }),
+  startedAt: z
+    .date({
+      required_error: 'Vui lòng chọn thời gian bắt đầu'
+    })
+    .refine(
+      (val) => {
+        // Lấy thời gian hiện tại theo GMT+7
+        const now = new Date()
+        const gmt7Offset = 7 * 60 // phút
+        const localOffset = now.getTimezoneOffset() // phút
+        const diffMinutes = gmt7Offset + localOffset
+
+        const nowInGMT7 = new Date(now.getTime() + diffMinutes * 60 * 1000)
+        const nowPlus7hFromGMT7 = new Date(nowInGMT7.getTime() + 7 * 60 * 60 * 1000)
+
+        return val > nowPlus7hFromGMT7
+      },
+      {
+        message: 'Sự kiện phải cách hiện tại ít nhất 7 giờ'
+      }
+    ),
   durations: z.string().refine((val) => {
     const num = parseFloat(val)
     return !isNaN(num) && num >= 0.5 && num <= 3
