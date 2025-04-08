@@ -3,7 +3,7 @@
 import { Badge } from '@/components/ui/badge'
 import { EventStatus } from '../types'
 import Image from 'next/image'
-import { useRouter, useSearchParams } from 'next/navigation'
+import { useSearchParams } from 'next/navigation'
 import { Calendar, Users, Clock, Video } from 'lucide-react'
 import { cn, formatAvatarFallback, formatDateEvent, formatDuration } from '@/lib/utils'
 import configRoute from '@/config/route'

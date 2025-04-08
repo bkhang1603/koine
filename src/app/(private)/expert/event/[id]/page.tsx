@@ -1,40 +1,27 @@
 'use client'
 
-import { use, useState } from 'react'
-import { useRouter } from 'next/navigation'
-import Image from 'next/image'
 import { Button } from '@/components/ui/button'
-import { Calendar, Clock, Mic, ArrowLeft, FileVideo, Upload, Users } from 'lucide-react'
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog'
+import { Textarea } from '@/components/ui/textarea'
+import Image from 'next/image'
 import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger
-} from '@/components/ui/alert-dialog'
-import { useUploadRecordMutation } from '@/queries/useUpload'
-import { useGetEventByIdWithoutCaching, useUpdateEventMutation } from '@/queries/useEvent'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+  useCancelEventMutation,
+  useGetEventByIdWithoutCaching,
+  useUpdateEventMutation,
+  useUpdateEventWhenCreateRoomMutation
+} from '@/queries/useEvent'
+import { Calendar, Clock, Mic, Trash2, Video, Users, AlertCircle, RefreshCw } from 'lucide-react'
+import { use, useState } from 'react'
 import { Badge } from '@/components/ui/badge'
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
+import { handleErrorApi } from '@/lib/utils'
 import { format } from 'date-fns'
 import { vi } from 'date-fns/locale'
-import { cn } from '@/lib/utils'
-import { handleErrorApi } from '@/lib/utils'
-import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbList,
-  BreadcrumbPage,
-  BreadcrumbSeparator
-} from '@/components/ui/breadcrumb'
-import { ChevronRight } from 'lucide-react'
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Skeleton } from '@/components/ui/skeleton'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { cn } from '@/lib/utils'
+import { Breadcrumb } from '@/components/public/parent/setting/Breadcrumb'
 
 // Constants
 const EVENT_STATUS = {
@@ -56,376 +43,437 @@ const EVENT_STATUS = {
   }
 } as const
 
+// Utility functions
+const formatEventTime = (startAt: string, duration: number) => {
+  const startTime = new Date(startAt)
+  const endTime = new Date(startTime.getTime() + duration * 1000)
+  return {
+    start: format(startTime, 'HH:mm, dd/MM/yyyy', { locale: vi }),
+    end: format(endTime, 'HH:mm, dd/MM/yyyy', { locale: vi })
+  }
+}
+
+const isEventOpenable = (startAt: string, duration: number) => {
+  const now = new Date()
+  const localTime = new Date(now.getTime() + 7 * 60 * 60 * 1000)
+  const startTime = new Date(startAt)
+  const endTime = new Date(startTime.getTime() + duration * 1000)
+  return localTime.getTime() >= startTime.getTime() && localTime.getTime() < endTime.getTime()
+}
+
+const isEventCancelable = (startAt: string) => {
+  const now = new Date()
+  const localTime = new Date(now.getTime() + 7 * 60 * 60 * 1000)
+  const startTime = new Date(startAt)
+  return startTime.getTime() - localTime.getTime() >= 2 * 3600 * 1000
+}
+
+const getInsightsRoom = async (roomName: string) => {
+  try {
+    const response = await fetch(`https://api.whereby.dev/v1/insights/rooms?roomName=${encodeURIComponent(roomName)}`, {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${process.env.NEXT_PUBLIC_WHEREBY_API_KEY}`,
+        'Content-Type': 'application/json'
+      }
+    })
+    if (!response.ok) {
+      throw new Error(`HTTP error! Status: ${response.status}`)
+    }
+    return await response.json()
+  } catch (error) {
+    handleErrorApi({ error })
+    return null
+  }
+}
+
 export default function EventDetailPage(props: { params: Promise<{ id: string }> }) {
   const params = use(props.params)
-  const router = useRouter()
-  const { data, isLoading } = useGetEventByIdWithoutCaching({ id: params.id })
-  const eventData = data?.payload?.data ?? null
+  const { id } = params
+  const [isProcessing, setIsProcessing] = useState(false)
+  const [cancelModal, setCancelModal] = useState<{ isOpen: boolean }>({ isOpen: false })
+  const [cancelNote, setCancelNote] = useState('')
+  const [cancelError, setCancelError] = useState('')
 
-  const uploadRecord = useUploadRecordMutation()
+  // Queries
+  const { data: eventData, isLoading, refetch } = useGetEventByIdWithoutCaching({ id })
+  const updateRoomInfo = useUpdateEventWhenCreateRoomMutation()
   const updateEventInfo = useUpdateEventMutation()
+  const cancelEvent = useCancelEventMutation()
 
-  const [processing, setProcessing] = useState(false)
-  const [error, setError] = useState<string | null>(null)
-  const [uploaded, setUploaded] = useState(eventData?.recordUrl ? true : false)
+  const event = eventData?.payload?.data
 
-  // Check if event is closed
-  const isClosed = (eventStartAt: string, duration: number): boolean => {
-    const now = new Date()
-    const localTime = new Date(now.getTime() + 7 * 60 * 60 * 1000)
-    const startTime = new Date(eventStartAt)
-    const endTime = new Date(startTime.getTime() + duration * 1000)
-    return localTime.getTime() >= endTime.getTime()
+  // Handlers
+  const handleCancelEvent = async (note: string) => {
+    try {
+      await cancelEvent.mutateAsync({ body: { eventId: id, note } })
+      setCancelModal({ isOpen: false })
+      setCancelNote('')
+      refetch()
+    } catch (error) {
+      handleErrorApi({ error })
+    }
   }
 
-  // Handle video upload
-  const handleVideoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (processing) return
-    if (!e.target.files || e.target.files.length === 0) return
-
+  const handleUpdateEventInfo = async (roomName: string | null) => {
     try {
-      setProcessing(true)
-      setError(null)
+      if (isProcessing) return
+      setIsProcessing(true)
 
-      const file = e.target.files[0]
-      if (file.size > 500 * 1024 * 1024) {
-        setError('Kích thước file không được vượt quá 500MB')
-        return
-      }
+      if (!roomName) return
+      const res = await getInsightsRoom(roomName)
+      if (!res?.results?.[0]?.totalUniqueParticipants) return
 
-      const allowedVideoTypes = ['video/mp4', 'video/avi', 'video/mov', 'video/webm']
-      if (!allowedVideoTypes.includes(file.type)) {
-        setError('Vui lòng chọn file video hợp lệ (MP4, AVI, MOV, WEBM)')
-        return
-      }
+      await updateEventInfo.mutateAsync({
+        body: { totalParticipants: res.results[0].totalUniqueParticipants, status: 'DONE' },
+        eventId: id
+      })
+      refetch()
+    } catch (error) {
+      handleErrorApi({ error })
+    } finally {
+      setIsProcessing(false)
+    }
+  }
 
-      const newFileName = `${eventData?.title}-record-${new Date().getTime()}.mp4`
-      const formData = new FormData()
-      formData.append('file', new File([file], newFileName, { type: file.type }))
+  const handleCreateRoom = async (eventStartAt: string, duration: number) => {
+    try {
+      const now = new Date(eventStartAt)
+      const endDate = new Date(now.getTime() + duration * 1000)
+      const endDateISO = endDate.toISOString()
 
-      const videoUrl = await uploadRecord.mutateAsync(formData)
-      if (eventData?.id) {
-        await updateEventInfo.mutateAsync({
-          body: { recordUrl: videoUrl.payload.data },
-          eventId: eventData.id
+      const response = await fetch('https://api.whereby.dev/v1/meetings', {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${process.env.NEXT_PUBLIC_WHEREBY_API_KEY}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          isLocked: true,
+          roomMode: 'group',
+          endDate: endDateISO,
+          fields: ['hostRoomUrl'],
+          templateType: 'viewerMode',
+          roomAccess: 'viewer'
         })
-        setUploaded(true)
+      })
+
+      const data = await response.json()
+      const body = {
+        roomHostUrl: data.hostRoomUrl,
+        roomName: data.roomName,
+        roomUrl: data.roomUrl,
+        roomContent: data.roomContent
+      }
+
+      await updateRoomInfo.mutateAsync({ body, eventId: id })
+      window.open(data.hostRoomUrl, '_blank')
+      refetch()
+    } catch (error) {
+      handleErrorApi({ error })
+    }
+  }
+
+  const handleOpenMeet = async (roomHostUrl: string | null, eventStartAt: string, duration: number) => {
+    try {
+      if (isProcessing) return
+      setIsProcessing(true)
+
+      if (!roomHostUrl) {
+        await handleCreateRoom(eventStartAt, duration)
+      } else {
+        window.open(roomHostUrl, '_blank')
       }
     } catch (error) {
       handleErrorApi({ error })
-      setError('Không thể tải lên video. Vui lòng thử lại.')
     } finally {
-      setProcessing(false)
+      setIsProcessing(false)
+    }
+  }
+
+  const handleUpdateInfo = async () => {
+    try {
+      if (isProcessing) return
+      setIsProcessing(true)
+      await handleUpdateEventInfo(event?.roomName || null)
+    } catch (error) {
+      handleErrorApi({ error })
+    } finally {
+      setIsProcessing(false)
     }
   }
 
   if (isLoading) {
     return (
       <div className='container mx-auto py-8 space-y-6'>
-        {/* Breadcrumb Skeleton */}
-        <div className='flex items-center gap-2'>
-          <Skeleton className='h-4 w-24' />
-          <ChevronRight className='h-4 w-4 text-muted-foreground' />
-          <Skeleton className='h-4 w-32' />
-        </div>
+        {/* Breadcrum skeleton */}
+        <Skeleton className='h-8 w-64' />
 
-        {/* Header Skeleton */}
-        <div className='flex items-center gap-4'>
-          <Skeleton className='h-10 w-10 rounded-full' />
+        <div className='flex justify-between items-center'>
           <div className='space-y-2'>
             <Skeleton className='h-8 w-64' />
-            <Skeleton className='h-4 w-32' />
+            <Skeleton className='h-4 w-96' />
           </div>
+          <Skeleton className='h-10 w-32' />
         </div>
-
         <div className='grid grid-cols-1 lg:grid-cols-3 gap-6'>
-          {/* Left Column Skeleton */}
-          <div className='lg:col-span-2 space-y-6'>
-            <Card>
-              <CardHeader>
-                <div className='flex items-center justify-between'>
-                  <Skeleton className='h-6 w-32' />
-                  <Skeleton className='h-6 w-24' />
-                </div>
-              </CardHeader>
-              <CardContent>
-                <Skeleton className='aspect-video w-full rounded-lg' />
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <Skeleton className='h-6 w-32' />
-              </CardHeader>
-              <CardContent>
-                <div className='space-y-2'>
-                  <Skeleton className='h-4 w-full' />
-                  <Skeleton className='h-4 w-3/4' />
-                  <Skeleton className='h-4 w-2/3' />
-                </div>
-              </CardContent>
-            </Card>
+          <div className='lg:col-span-2'>
+            <Skeleton className='aspect-video w-full rounded-lg' />
           </div>
-
-          {/* Right Column Skeleton */}
-          <div className='space-y-6'>
-            <Card>
-              <CardHeader>
-                <Skeleton className='h-6 w-32' />
-              </CardHeader>
-              <CardContent className='space-y-6'>
-                <div className='space-y-4'>
-                  <div className='flex items-center gap-2'>
-                    <Skeleton className='h-5 w-5 rounded-full' />
-                    <div className='space-y-1'>
-                      <Skeleton className='h-4 w-24' />
-                      <Skeleton className='h-5 w-32' />
-                    </div>
-                  </div>
-
-                  <div className='flex items-center gap-2'>
-                    <Skeleton className='h-5 w-5 rounded-full' />
-                    <div className='space-y-1'>
-                      <Skeleton className='h-4 w-24' />
-                      <Skeleton className='h-5 w-32' />
-                    </div>
-                  </div>
-
-                  <div className='space-y-2'>
-                    <div className='flex items-center gap-2'>
-                      <Skeleton className='h-5 w-5 rounded-full' />
-                      <div className='space-y-1'>
-                        <Skeleton className='h-4 w-24' />
-                        <Skeleton className='h-5 w-32' />
-                      </div>
-                    </div>
-                    <div className='flex items-center gap-2'>
-                      <Skeleton className='h-5 w-5 rounded-full' />
-                      <div className='space-y-1'>
-                        <Skeleton className='h-4 w-24' />
-                        <Skeleton className='h-5 w-32' />
-                      </div>
-                    </div>
-                    <div className='flex items-center gap-2'>
-                      <Skeleton className='h-5 w-5 rounded-full' />
-                      <div className='space-y-1'>
-                        <Skeleton className='h-4 w-24' />
-                        <Skeleton className='h-5 w-32' />
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <div className='space-y-4 pt-4 border-t'>
-                  <div className='flex items-center gap-2'>
-                    <Skeleton className='h-5 w-5 rounded-full' />
-                    <div className='space-y-1'>
-                      <Skeleton className='h-4 w-24' />
-                      <Skeleton className='h-5 w-32' />
-                    </div>
-                  </div>
-                  <Skeleton className='h-10 w-full' />
-                </div>
-              </CardContent>
-            </Card>
+          <div className='space-y-4'>
+            <Skeleton className='h-6 w-3/4' />
+            <Skeleton className='h-4 w-full' />
+            <Skeleton className='h-4 w-1/2' />
           </div>
         </div>
       </div>
     )
   }
 
-  if (!eventData) {
+  if (!event) {
     return (
-      <div className='container mx-auto py-8 space-y-6'>
+      <div className='container mx-auto py-8'>
         <Alert variant='destructive'>
-          <AlertTitle>Lỗi</AlertTitle>
-          <AlertDescription>Không tìm thấy thông tin sự kiện</AlertDescription>
+          <AlertCircle className='h-4 w-4' />
+          <AlertTitle>Không tìm thấy sự kiện</AlertTitle>
+          <AlertDescription>Sự kiện bạn đang tìm kiếm không tồn tại hoặc đã bị xóa.</AlertDescription>
         </Alert>
       </div>
     )
   }
 
-  const eventTime = {
-    start: format(new Date(eventData.startedAt), 'HH:mm, dd/MM/yyyy', { locale: vi }),
-    end: format(new Date(new Date(eventData.startedAt).getTime() + eventData.durations * 1000), 'HH:mm, dd/MM/yyyy', {
-      locale: vi
-    })
-  }
+  const eventTime = formatEventTime(event.startedAt, event.durations)
+  const isOpenable = isEventOpenable(event.startedAt, event.durations)
+  const isCancelable = isEventCancelable(event.startedAt)
 
-  const isEventClosed = isClosed(eventData.startedAt, eventData.durations)
+  const canJoinEvent = (event.status === 'OPENING' || event.status === 'PENDING') && isOpenable
+  const canCreateRoom = event.status === 'PENDING' && !event.roomUrl
+  const canUpdateInfo = event.status === 'OPENING' && event.roomName
 
   return (
-    <div className='container mx-auto py-8 space-y-6'>
+    <div className='container mx-auto py-8 space-y-8'>
       {/* Breadcrumb */}
-      <Breadcrumb>
-        <BreadcrumbList>
-          <BreadcrumbItem>
-            <BreadcrumbLink href='/expert/event'>Sự kiện</BreadcrumbLink>
-          </BreadcrumbItem>
-          <BreadcrumbSeparator>
-            <ChevronRight className='h-4 w-4' />
-          </BreadcrumbSeparator>
-          <BreadcrumbItem>
-            <BreadcrumbPage>{eventData.title}</BreadcrumbPage>
-          </BreadcrumbItem>
-        </BreadcrumbList>
-      </Breadcrumb>
+      <Breadcrumb
+        items={[
+          { title: 'Sự kiện', href: '/expert/event' },
+          { title: event.title, href: `/expert/event/${id}` }
+        ]}
+      />
 
-      {error && (
-        <Alert variant='destructive'>
-          <AlertTitle>Lỗi</AlertTitle>
-          <AlertDescription>{error}</AlertDescription>
-        </Alert>
-      )}
+      {/* Event Header */}
+      <div className='flex flex-col md:flex-row justify-between items-start md:items-center gap-4'>
+        <div className='space-y-2'>
+          <div className='flex items-center gap-3'>
+            <h1 className='text-3xl font-bold'>{event.title}</h1>
+            <Badge variant={EVENT_STATUS[event.status as keyof typeof EVENT_STATUS].variant}>
+              {EVENT_STATUS[event.status as keyof typeof EVENT_STATUS].text}
+            </Badge>
+          </div>
+          <p className='text-muted-foreground text-lg'>{event.description}</p>
+        </div>
+        <div className='flex gap-2'>
+          {canJoinEvent && (
+            <Button
+              size='lg'
+              disabled={isProcessing}
+              onClick={() => handleOpenMeet(event.roomHostUrl, event.startedAt, event.durations)}
+            >
+              <Video className='w-4 h-4 mr-2' />
+              Tham dự
+            </Button>
+          )}
+          {canCreateRoom && (
+            <Button
+              size='lg'
+              variant='outline'
+              disabled={isProcessing}
+              onClick={() => handleCreateRoom(event.startedAt, event.durations)}
+            >
+              <Video className='w-4 h-4 mr-2' />
+              Tạo phòng
+            </Button>
+          )}
+          {canUpdateInfo && (
+            <Button size='lg' variant='outline' disabled={isProcessing} onClick={handleUpdateInfo}>
+              <RefreshCw className='w-4 h-4 mr-2' />
+              Cập nhật
+            </Button>
+          )}
+          {isCancelable && (
+            <Button size='lg' variant='destructive' onClick={() => setCancelModal({ isOpen: true })}>
+              <Trash2 className='w-4 h-4 mr-2' />
+              Hủy sự kiện
+            </Button>
+          )}
+        </div>
+      </div>
 
+      {/* Event Content */}
       <div className='grid grid-cols-1 lg:grid-cols-3 gap-6'>
-        {/* Left Column - Event Image and Basic Info */}
         <div className='lg:col-span-2 space-y-6'>
-          <Card>
-            <CardHeader>
-              <div className='flex items-center justify-between'>
-                <CardTitle>Ảnh bìa sự kiện</CardTitle>
-                <Badge variant={EVENT_STATUS[eventData.status as keyof typeof EVENT_STATUS].variant}>
-                  {eventData.status === 'OPENING' && isEventClosed
-                    ? 'Đã kết thúc'
-                    : EVENT_STATUS[eventData.status as keyof typeof EVENT_STATUS].text}
-                </Badge>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className='relative aspect-video w-full rounded-lg overflow-hidden'>
-                <Image
-                  src={eventData.imageUrl || '/placeholder.svg'}
-                  alt={eventData.title}
-                  fill
-                  className='object-cover'
-                />
-              </div>
-            </CardContent>
-          </Card>
+          <div className='relative aspect-video rounded-lg overflow-hidden shadow-lg'>
+            <Image
+              src={event.imageUrl || '/placeholder.svg'}
+              alt={event.title}
+              fill
+              className='object-cover'
+              priority
+            />
+          </div>
 
-          <Card>
-            <CardHeader>
-              <CardTitle>Mô tả sự kiện</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className='text-muted-foreground whitespace-pre-wrap'>{eventData.description}</p>
-            </CardContent>
-          </Card>
+          <Tabs defaultValue='content' className='w-full'>
+            <TabsList className='grid w-full grid-cols-2'>
+              <TabsTrigger value='content'>Nội dung</TabsTrigger>
+              <TabsTrigger value='details'>Chi tiết</TabsTrigger>
+            </TabsList>
+            <TabsContent value='content' className='mt-6'>
+              <Card>
+                <CardHeader>
+                  <CardTitle>Nội dung sự kiện</CardTitle>
+                  <CardDescription>Thông tin chi tiết về nội dung sự kiện</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className='prose max-w-none' dangerouslySetInnerHTML={{ __html: event.content }} />
+                </CardContent>
+              </Card>
+            </TabsContent>
+            <TabsContent value='details' className='mt-6'>
+              <Card>
+                <CardHeader>
+                  <CardTitle>Thông tin sự kiện</CardTitle>
+                  <CardDescription>Thông tin cơ bản về sự kiện</CardDescription>
+                </CardHeader>
+                <CardContent className='space-y-4'>
+                  <div className='flex items-center gap-2'>
+                    <Mic className='w-4 h-4 text-muted-foreground' />
+                    <span>Host: {event.hostInfo.fullName}</span>
+                  </div>
+                  <div className='flex items-center gap-2'>
+                    <Calendar className='w-4 h-4 text-muted-foreground' />
+                    <span>Bắt đầu: {eventTime.start}</span>
+                  </div>
+                  <div className='flex items-center gap-2'>
+                    <Clock className='w-4 h-4 text-muted-foreground' />
+                    <span>Thời lượng: {event.durationsDisplay}</span>
+                  </div>
+                  <div className='flex items-center gap-2'>
+                    <Users className='w-4 h-4 text-muted-foreground' />
+                    <span>Số người tham dự: {event.totalParticipants}</span>
+                  </div>
+                </CardContent>
+              </Card>
+            </TabsContent>
+          </Tabs>
         </div>
 
-        {/* Right Column - Event Details */}
         <div className='space-y-6'>
-          <Card>
+          <Card className={cn('border-2', event.roomUrl ? 'border-primary/20' : 'border-muted')}>
             <CardHeader>
-              <CardTitle>Thông tin sự kiện</CardTitle>
+              <CardTitle className='flex items-center gap-2'>
+                <Video className='w-5 h-5 text-primary' />
+                Thông tin phòng
+              </CardTitle>
+              <CardDescription>Thông tin về phòng họp trực tuyến</CardDescription>
             </CardHeader>
-            <CardContent className='space-y-6'>
-              <div className='space-y-4'>
-                <div className='flex items-center gap-2'>
-                  <Mic className='h-5 w-5 text-muted-foreground' />
-                  <div>
-                    <p className='text-sm text-muted-foreground'>Người tổ chức</p>
-                    <p className='font-medium'>{eventData.hostInfo?.fullName || 'Unknown Host'}</p>
+            <CardContent className='space-y-4'>
+              {event.roomUrl ? (
+                <div className='space-y-4'>
+                  <div className='flex items-center justify-between p-3 bg-primary/5 rounded-lg'>
+                    <div className='flex items-center gap-2'>
+                      <div className='w-2 h-2 rounded-full bg-primary animate-pulse' />
+                      <span className='font-medium'>Phòng đã sẵn sàng</span>
+                    </div>
+                    <Badge variant='secondary'>{event.totalParticipants} người tham dự</Badge>
                   </div>
+                  <Button variant='default' className='w-full' onClick={() => window.open(event.roomUrl, '_blank')}>
+                    <Video className='w-4 h-4 mr-2' />
+                    Mở phòng
+                  </Button>
                 </div>
-
-                <div className='flex items-center gap-2'>
-                  <Users className='h-5 w-5 text-muted-foreground' />
-                  <div>
-                    <p className='text-sm text-muted-foreground'>Số người tham gia</p>
-                    <p className='font-medium'>{eventData.totalParticipants || 0} người</p>
-                  </div>
-                </div>
-
-                <div className='space-y-2'>
-                  <div className='flex items-center gap-2'>
-                    <Calendar className='h-5 w-5 text-muted-foreground' />
-                    <div>
-                      <p className='text-sm text-muted-foreground'>Thời gian bắt đầu</p>
-                      <p className='font-medium'>{eventTime.start}</p>
+              ) : (
+                <div className='space-y-4'>
+                  <div className='flex items-center justify-between p-3 bg-muted/50 rounded-lg'>
+                    <div className='flex items-center gap-2'>
+                      <div className='w-2 h-2 rounded-full bg-muted-foreground' />
+                      <span className='font-medium'>Chưa có phòng</span>
                     </div>
+                    <Badge variant='outline'>Chờ tạo</Badge>
                   </div>
-                  <div className='flex items-center gap-2'>
-                    <Calendar className='h-5 w-5 text-muted-foreground' />
-                    <div>
-                      <p className='text-sm text-muted-foreground'>Thời gian kết thúc</p>
-                      <p className='font-medium'>{eventTime.end}</p>
-                    </div>
+                  <div className='text-sm text-muted-foreground space-y-2'>
+                    <p>Phòng họp sẽ được tạo tự động khi:</p>
+                    <ul className='list-disc list-inside space-y-1'>
+                      <li>Sự kiện bắt đầu</li>
+                      <li>Bạn nhấn nút &quot;Tham dự&quot;</li>
+                    </ul>
                   </div>
-                  <div className='flex items-center gap-2'>
-                    <Clock className='h-5 w-5 text-muted-foreground' />
-                    <div>
-                      <p className='text-sm text-muted-foreground'>Thời lượng</p>
-                      <p className='font-medium'>{eventData.durationsDisplay}</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {isEventClosed && (
-                <div className='space-y-4 pt-4 border-t'>
-                  <div className='flex items-center gap-2'>
-                    <FileVideo className='h-5 w-5 text-muted-foreground' />
-                    <div>
-                      <p className='text-sm text-muted-foreground'>Bản ghi sự kiện</p>
-                      <p className={cn('font-medium', uploaded ? 'text-green-600' : 'text-muted-foreground')}>
-                        {uploaded ? 'Đã tải lên' : 'Chưa tải lên'}
-                      </p>
-                    </div>
-                  </div>
-
-                  {uploaded ? (
-                    <AlertDialog>
-                      <AlertDialogTrigger asChild>
-                        <Button variant='outline' className='w-full' disabled={processing}>
-                          <Upload className='mr-2 h-4 w-4' />
-                          Tải lên bản ghi mới
-                        </Button>
-                      </AlertDialogTrigger>
-                      <AlertDialogContent>
-                        <AlertDialogHeader>
-                          <AlertDialogTitle>Xác nhận tải lên</AlertDialogTitle>
-                          <AlertDialogDescription>
-                            Bản ghi cũ sẽ bị thay thế bằng bản ghi mới. Bạn có chắc chắn muốn tiếp tục?
-                          </AlertDialogDescription>
-                        </AlertDialogHeader>
-                        <AlertDialogFooter>
-                          <AlertDialogCancel>Hủy</AlertDialogCancel>
-                          <AlertDialogAction asChild>
-                            <label className='inline-flex h-10 items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground ring-offset-background transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 cursor-pointer'>
-                              Tải lên
-                              <input
-                                type='file'
-                                accept='video/*'
-                                className='hidden'
-                                onChange={handleVideoUpload}
-                                disabled={processing}
-                              />
-                            </label>
-                          </AlertDialogAction>
-                        </AlertDialogFooter>
-                      </AlertDialogContent>
-                    </AlertDialog>
-                  ) : (
-                    <label className='inline-flex h-10 w-full items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground ring-offset-background transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 cursor-pointer'>
-                      <Upload className='mr-2 h-4 w-4' />
-                      Tải lên bản ghi
-                      <input
-                        type='file'
-                        accept='video/*'
-                        className='hidden'
-                        onChange={handleVideoUpload}
-                        disabled={processing}
-                      />
-                    </label>
-                  )}
                 </div>
               )}
             </CardContent>
           </Card>
+
+          {event.note && (
+            <Card>
+              <CardHeader>
+                <CardTitle>Ghi chú</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className='text-muted-foreground'>{event.note}</p>
+              </CardContent>
+            </Card>
+          )}
         </div>
       </div>
+
+      {/* Cancel Event Dialog */}
+      <Dialog open={cancelModal.isOpen} onOpenChange={(open) => setCancelModal({ isOpen: open })}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Xác nhận hủy sự kiện</DialogTitle>
+          </DialogHeader>
+
+          <div className='space-y-4 py-4'>
+            <p>Bạn có chắc chắn muốn hủy sự kiện này không?</p>
+
+            <div className='space-y-2'>
+              <Textarea
+                placeholder='Nhập lí do hủy sự kiện'
+                value={cancelNote}
+                onChange={(e) => {
+                  setCancelNote(e.target.value)
+                  setCancelError('')
+                }}
+              />
+              {cancelError && <p className='text-destructive text-sm'>{cancelError}</p>}
+            </div>
+          </div>
+
+          <DialogFooter className='sm:justify-between'>
+            <Button
+              variant='outline'
+              onClick={() => {
+                setCancelNote('')
+                setCancelError('')
+                setCancelModal({ isOpen: false })
+              }}
+            >
+              Hủy
+            </Button>
+            <Button
+              variant='destructive'
+              disabled={isProcessing}
+              onClick={async () => {
+                if (!cancelNote.trim()) {
+                  setCancelError('Vui lòng nhập lí do hủy sự kiện')
+                  return
+                }
+                await handleCancelEvent(cancelNote)
+              }}
+            >
+              Xác nhận hủy
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

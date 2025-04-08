@@ -51,6 +51,7 @@ export const getEventByIdResType = z.object({
     slug: z.string(),
     description: z.string(),
     content: z.string(),
+    note: z.string(),
     startedAt: z.string(),
     startAtFormatted: z.string(),
     durations: z.number(),
