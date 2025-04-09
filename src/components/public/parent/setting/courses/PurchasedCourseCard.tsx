@@ -111,7 +111,7 @@ export function PurchasedCourseCard({ courseData, listChildAccount = [], onActiv
   }
 
   return (
-    <Card className='group relative overflow-hidden border-0 bg-white transition-all hover:shadow-lg hover:shadow-gray-200/80'>
+    <Card className='group relative flex h-full flex-col overflow-hidden border-0 bg-white transition-all hover:shadow-lg hover:shadow-gray-200/80'>
       {/* Course Image Container */}
       <div className='relative'>
         <div className='aspect-[4/3] relative overflow-hidden'>
@@ -157,22 +157,28 @@ export function PurchasedCourseCard({ courseData, listChildAccount = [], onActiv
       </div>
 
       {/* Course Details Section */}
-      <div className='p-4 space-y-4'>
+      <div className='flex flex-1 flex-col p-4'>
         {/* Categories */}
         <div className='flex flex-wrap gap-2'>
-          {course.categories.map((category) => (
-            <span
-              key={category.id}
-              className='inline-flex items-center rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-medium text-gray-600'
-            >
-              {category.name}
+          {course.categories && course.categories.length > 0 ? (
+            course.categories.map((category) => (
+              <span
+                key={category.id}
+                className='inline-flex items-center rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-medium text-gray-600'
+              >
+                {category.name}
+              </span>
+            ))
+          ) : (
+            <span className='inline-flex items-center rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-medium text-gray-600'>
+              Cá nhân hóa
             </span>
-          ))}
+          )}
         </div>
 
         {/* Assigned Students */}
         {assignedTo.length > 0 && (
-          <div className='flex items-center justify-between'>
+          <div className='mt-4 flex items-center justify-between'>
             <span className='text-sm text-gray-500'>Học viên được gán:</span>
             <AvatarGroup>
               {assignedTo.map((student) => (
@@ -184,62 +190,65 @@ export function PurchasedCourseCard({ courseData, listChildAccount = [], onActiv
           </div>
         )}
 
-        {unusedQuantity > 0 ? (
-          <div className='flex gap-2'>
-            <Button className='flex-1' onClick={() => handleActivateSelf()} disabled={isSelfAssigned}>
-              {isSelfAssigned ? 'Đã kích hoạt' : 'Kích hoạt cho bản thân'}
+        {/* Buttons - Always at bottom */}
+        <div className='mt-auto pt-4'>
+          {unusedQuantity > 0 ? (
+            <div className='flex gap-2'>
+              <Button className='flex-1' onClick={() => handleActivateSelf()} disabled={isSelfAssigned}>
+                {isSelfAssigned ? 'Đã kích hoạt' : 'Kích hoạt cho bản thân'}
+              </Button>
+
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Select
+                      value={selectedChild}
+                      onValueChange={(value) => {
+                        setSelectedChild(value)
+                        setShowAlert(true)
+                      }}
+                      disabled={availableChildren.length === 0}
+                    >
+                      <SelectTrigger className='w-[50px] px-2'>
+                        <Gift className='h-4 w-4' />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {availableChildren.map((child) => (
+                          <SelectItem key={child.id} value={child.id}>
+                            {child.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Tặng khóa học{availableChildren.length === 0 ? ' (Đã gán hết)' : ''}</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+
+              <AlertDialog open={showAlert} onOpenChange={setShowAlert}>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>Xác nhận kích hoạt khóa học</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      Bạn có chắc chắn muốn kích hoạt khóa học này cho{' '}
+                      {listChildAccount.find((c) => c.id === selectedChild)?.name}?
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel onClick={() => setSelectedChild(undefined)}>Hủy</AlertDialogCancel>
+                    <AlertDialogAction onClick={handleActivateChild}>Xác nhận</AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
+            </div>
+          ) : (
+            <Button variant='outline' className='w-full' disabled>
+              Đã gán hết
             </Button>
-
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Select
-                    value={selectedChild}
-                    onValueChange={(value) => {
-                      setSelectedChild(value)
-                      setShowAlert(true)
-                    }}
-                    disabled={availableChildren.length === 0}
-                  >
-                    <SelectTrigger className='w-[50px] px-2'>
-                      <Gift className='h-4 w-4' />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {availableChildren.map((child) => (
-                        <SelectItem key={child.id} value={child.id}>
-                          {child.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>Tặng khóa học{availableChildren.length === 0 ? ' (Đã gán hết)' : ''}</p>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-
-            <AlertDialog open={showAlert} onOpenChange={setShowAlert}>
-              <AlertDialogContent>
-                <AlertDialogHeader>
-                  <AlertDialogTitle>Xác nhận kích hoạt khóa học</AlertDialogTitle>
-                  <AlertDialogDescription>
-                    Bạn có chắc chắn muốn kích hoạt khóa học này cho{' '}
-                    {listChildAccount.find((c) => c.id === selectedChild)?.name}?
-                  </AlertDialogDescription>
-                </AlertDialogHeader>
-                <AlertDialogFooter>
-                  <AlertDialogCancel onClick={() => setSelectedChild(undefined)}>Hủy</AlertDialogCancel>
-                  <AlertDialogAction onClick={handleActivateChild}>Xác nhận</AlertDialogAction>
-                </AlertDialogFooter>
-              </AlertDialogContent>
-            </AlertDialog>
-          </div>
-        ) : (
-          <Button variant='outline' className='w-full' disabled>
-            Đã gán hết
-          </Button>
-        )}
+          )}
+        </div>
       </div>
     </Card>
   )

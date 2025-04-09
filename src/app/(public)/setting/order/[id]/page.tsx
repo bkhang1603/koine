@@ -334,9 +334,13 @@ export default function OrderDetailPage(props: { params: Promise<{ id: string }>
                   <span className='text-muted-foreground'>Tổng tiền hàng</span>
                   <span>{order.totalAmount.toLocaleString()}đ</span>
                 </div>
+                <div className='flex justify-between text-sm'>
+                  <span className='text-muted-foreground'>Phí vận chuyển</span>
+                  <span>{order.deliAmount.toLocaleString()}đ</span>
+                </div>
                 <div className='flex justify-between text-sm font-medium'>
                   <span>Tổng thanh toán</span>
-                  <span className='text-red-600'>{order.totalAmount.toLocaleString()}đ</span>
+                  <span className='text-red-600'>{(order.totalAmount + order.deliAmount).toLocaleString()}đ</span>
                 </div>
               </div>
 
@@ -455,11 +459,7 @@ export default function OrderDetailPage(props: { params: Promise<{ id: string }>
               {/* Nút yêu cầu hoàn tiền khi đơn hàng đã hoàn thành */}
               {order.status === 'COMPLETED' && (
                 <div className='pt-2'>
-                  <RefundOrderDialog
-                    orderId={order.id}
-                    orderCode={order.orderCode}
-                    orderDetails={order.orderDetails || []}
-                  />
+                  <RefundOrderDialog orderId={order.id} orderDetails={order.orderDetails || []} />
                 </div>
               )}
             </CardContent>

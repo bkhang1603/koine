@@ -13,33 +13,27 @@ import { LearnPageContent } from '@/components/learn/LearnPageContent'
 
 type Lesson = UserCourseProgressResType['data']['chapters'][0]['lessons'][0]
 
-// Thêm helper function để check bài học có thể truy cập
-const canAccessLesson = (lesson: any, course: any) => {
-  if (lesson.status === 'YET') return true
+const findFirstAccessibleLesson = (course: any) => {
+  if (!course || !course.chapters || course.chapters.length === 0) return null
 
-  // Nếu là NOTYET, kiểm tra xem có phải là bài NOTYET đầu tiên không
-  if (lesson.status === 'NOTYET') {
-    // Tìm bài NOTYET đầu tiên trong tất cả các chương
-    for (const chapter of course.chapters) {
-      const firstNotyetLesson = chapter.lessons.find((l: any) => l.status === 'NOTYET')
-      if (firstNotyetLesson) {
-        return lesson.id === firstNotyetLesson.id
-      }
-    }
+  // First look for lessons with 'YET' status
+  for (const chapter of course.chapters) {
+    if (!chapter.lessons || chapter.lessons.length === 0) continue
+
+    const yetLesson = chapter.lessons.find((l: any) => l.status === 'YET')
+    if (yetLesson) return yetLesson
   }
 
-  return false
-}
+  // If no 'YET' lessons, look for the first 'NOTYET' lesson
+  for (const chapter of course.chapters) {
+    if (!chapter.lessons || chapter.lessons.length === 0) continue
 
-const canAccessQuiz = (chapter: any, course: any) => {
-  if (chapter.isQuestion) return true
-  return false
-}
+    const notYetLesson = chapter.lessons.find((l: any) => l.status === 'NOTYET')
+    if (notYetLesson) return notYetLesson
+  }
 
-// Thêm helper function để kiểm tra quiz của chapter
-const canAccessNextChapter = (currentChapter: any) => {
-  if (!currentChapter.questions || currentChapter.questions.length === 0) return true
-  return currentChapter.questions.every((q: any) => q.status === 'COMPLETED')
+  // If no lessons found with those statuses, return the very first lesson
+  return course.chapters[0]?.lessons[0] || null
 }
 
 function LearnPage(props: { params: Promise<{ courseId: string }> }) {
@@ -59,19 +53,24 @@ function LearnPage(props: { params: Promise<{ courseId: string }> }) {
 
   const course = courseData?.payload.data || null
 
-  // Get first accessible lesson
-  const getFirstAccessibleLesson = useCallback(() => {
-    if (!course) return null
-
-    for (const chapter of course.chapters) {
-      for (const lesson of chapter.lessons) {
-        if (canAccessLesson(lesson, course)) {
-          return lesson
-        }
+  // Auto-select first lesson when course data is loaded and no lessonId is provided
+  useEffect(() => {
+    if (quizId) {
+      const chapter = course?.chapters.find((c: any) => c.id === quizId)
+      if (chapter) {
+        router.push(`/kid/course/${courseId}/learn?quizId=${chapter.id}`)
       }
+      return
     }
-    return null
-  }, [course])
+
+    if (!lessonId && course && !courseLoading) {
+      const firstLesson = findFirstAccessibleLesson(course)
+      if (firstLesson) {
+        router.push(`/kid/course/${courseId}/learn?lessonId=${firstLesson.id}`)
+      }
+      return
+    }
+  }, [course, courseLoading, lessonId, router, quizId, courseId])
 
   // Auto redirect to first lesson if no lessonId
   useEffect(() => {
@@ -83,50 +82,13 @@ function LearnPage(props: { params: Promise<{ courseId: string }> }) {
       return
     }
     if (!lessonId && !courseLoading && course) {
-      const firstLesson = getFirstAccessibleLesson()
+      const firstLesson = findFirstAccessibleLesson(course)
       if (firstLesson) {
         router.push(`/kid/course/${courseId}/learn?lessonId=${firstLesson.id}`)
       }
       return
     }
-  }, [lessonId, courseLoading, course, courseId, router, getFirstAccessibleLesson])
-
-  // Cập nhật getNextLesson để hỗ trợ quiz
-  const getNextLesson = useCallback(() => {
-    if (!course || !lessonData?.payload.data) return null
-
-    const currentChapter = course.chapters.find((chapter) =>
-      chapter.lessons.some((l) => l.id === lessonData.payload.data.id)
-    )
-    const currentLessonIndex = currentChapter?.lessons.findIndex((l) => l.id === lessonData.payload.data.id)
-
-    if (currentChapter && currentLessonIndex !== undefined) {
-      if (currentLessonIndex < currentChapter.lessons.length - 1) {
-        return currentChapter.lessons[currentLessonIndex + 1]
-      }
-
-      // Nếu là bài cuối cùng của chapter và chapter có quiz chưa hoàn thành
-      if (
-        currentLessonIndex === currentChapter.lessons.length - 1 &&
-        currentChapter.questions &&
-        currentChapter.questions.length > 0 &&
-        !currentChapter.questions.every((q: any) => q.status === 'COMPLETED')
-      ) {
-        return 'QUIZ'
-      }
-
-      const nextChapterIndex = course.chapters.findIndex((c) => c.id === currentChapter.id) + 1
-      if (nextChapterIndex < course.chapters.length) {
-        const nextChapter = course.chapters[nextChapterIndex]
-
-        // Chỉ cho phép truy cập chapter tiếp theo nếu đã hoàn thành quiz của chapter hiện tại
-        if (canAccessNextChapter(currentChapter)) {
-          return nextChapter.lessons[0]
-        }
-      }
-    }
-    return null
-  }, [course, lessonData])
+  }, [lessonId, courseLoading, course, courseId, router, quizId])
 
   const handleUpdate = useCallback(
     async ({ lessonId, status }: { lessonId: string; status: Lesson['status'] }) => {
@@ -147,35 +109,11 @@ function LearnPage(props: { params: Promise<{ courseId: string }> }) {
     [updateCourseMutation]
   )
 
-  const getPreviousLesson = useCallback(() => {
-    if (!course || !lessonData?.payload.data) return null
-
-    const currentChapter = course.chapters.find((chapter) =>
-      chapter.lessons.some((l) => l.id === lessonData.payload.data.id)
-    )
-    const currentLessonIndex = currentChapter?.lessons.findIndex((l) => l.id === lessonData.payload.data.id)
-
-    if (currentChapter && currentLessonIndex !== undefined) {
-      if (currentLessonIndex > 0) {
-        return currentChapter.lessons[currentLessonIndex - 1]
-      }
-
-      const prevChapterIndex = course.chapters.findIndex((c) => c.id === currentChapter.id) - 1
-      if (prevChapterIndex >= 0) {
-        const prevChapter = course.chapters[prevChapterIndex]
-        return prevChapter.lessons[prevChapter.lessons.length - 1]
-      }
-    }
-    return null
-  }, [course, lessonData])
-
   const handleLessonClick = useCallback(
     (lesson: any) => {
-      if (canAccessLesson(lesson, course)) {
-        router.push(`/kid/course/${courseId}/learn?lessonId=${lesson.id}`)
-      }
+      router.push(`/kid/course/${courseId}/learn?lessonId=${lesson.id}`)
     },
-    [courseId, router, course]
+    [courseId, router]
   )
 
   const handleQuizClick = useCallback(
@@ -215,11 +153,7 @@ function LearnPage(props: { params: Promise<{ courseId: string }> }) {
         isLoading={lessonLoading}
         onLessonClick={handleLessonClick}
         onQuizClick={handleQuizClick}
-        canAccessLesson={canAccessLesson}
-        canAccessQuiz={canAccessQuiz}
         handleUpdate={handleUpdate}
-        getNextLesson={getNextLesson}
-        getPreviousLesson={getPreviousLesson}
         isUpdating={updateCourseMutation.isPending}
         forKid
         backUrl='/kid/course'

@@ -21,7 +21,7 @@ const VideoUpload: React.FC<VideoUploadProps> = ({ initialPreview, disabled = fa
   const [isUploading, setIsUploading] = useState(false) // State theo dõi trạng thái upload
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    console.log("aloaloalo")
+    console.log('aloaloalo')
     const selectedFile = e.target.files?.[0]
     if (selectedFile) {
       if (selectedFile.size > 50 * 1024 * 1024) {

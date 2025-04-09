@@ -96,3 +96,11 @@ export const PaymentMethod = {
 } as const
 
 export const PaymentMethodValues = [PaymentMethod.BANKING, PaymentMethod.COD] as const
+
+export const RefundStatus = {
+  REFUND_REQUEST: 'REFUND_REQUEST',
+  REFUNDING: 'REFUNDING',
+  REFUNDED: 'REFUNDED'
+} as const
+
+export const RefundStatusValues = [RefundStatus.REFUND_REQUEST, RefundStatus.REFUNDING, RefundStatus.REFUNDED] as const

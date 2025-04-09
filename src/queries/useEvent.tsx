@@ -100,7 +100,6 @@ export const useCancelEventMutation = () => {
       queryClient.invalidateQueries({
         queryKey: ['events-host']
       })
-      
     }
   })
 }

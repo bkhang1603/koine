@@ -11,9 +11,15 @@ export const useCreateOrderMutation = () => {
   //       })
   //     }
   //   })
+  const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: orderApiRequest.createOrder
+    mutationFn: orderApiRequest.createOrder,
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ['cartDetails']
+      })
+    }
   })
 }
 

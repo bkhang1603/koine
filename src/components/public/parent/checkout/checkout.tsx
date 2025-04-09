@@ -113,7 +113,7 @@ export default function Checkout() {
     const orderData: OrderBody = {
       arrayCartDetailIds: checkoutData?.cartDetails?.map((item) => item.id) ?? [],
       deliveryInfoId: pickAddress.id,
-      deliMethod: checkoutBuyNow?.course !== null ? DeliveryMethod.NONESHIP : shippingMethod,
+      deliMethod: hasPhysicalItems ? shippingMethod : DeliveryMethod.NONESHIP,
       itemId: null,
       quantity: null,
       itemType: null,

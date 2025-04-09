@@ -12,7 +12,7 @@ interface QuizItemProps {
 export const QuizItem = ({ chapter, index, isAccessible, onClick, isActive }: QuizItemProps) => {
   const renderStatus = () => {
     if (!isAccessible) return <LockKeyhole className='w-4 h-4 text-gray-400' />
-    if (chapter.quizCompleted) return <CheckCircle2 className='w-4 h-4 text-emerald-500' />
+    if (chapter.isTakeQuiz) return <CheckCircle2 className='w-4 h-4 text-emerald-500' />
     return null
   }
 
