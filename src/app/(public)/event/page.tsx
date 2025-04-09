@@ -45,7 +45,12 @@ export default async function EventPage({
   searchParams: Promise<{ status?: string; sort?: string; q?: string }>
 }) {
   // Lấy các giá trị từ searchParams
-  const { status, sort, q } = await searchParams
+  const params = await searchParams
+  const { status, sort, q } = params ?? {
+    status: 'ALL',
+    sort: 'newest',
+    q: ''
+  }
 
   // Chuyển đổi searchParams thành object thường để tránh lỗi "Only plain objects can be passed"
   const createQueryObject = (overrides: Record<string, string>) => {
