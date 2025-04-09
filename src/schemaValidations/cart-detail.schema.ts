@@ -24,7 +24,8 @@ export const CartDetailData = z
       .object({
         title: z.string(),
         description: z.string(),
-        imageUrl: z.string()
+        imageUrl: z.string(),
+        isCustom: z.boolean()
       })
       .nullable(),
     combo: z

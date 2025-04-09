@@ -222,7 +222,6 @@ export default function OTPPage() {
 
         // Thay alert bằng toast
         toast({
-          title: 'Thành công',
           description: 'Mã OTP mới đã được gửi đến email của bạn',
           variant: 'default'
         })
@@ -232,7 +231,6 @@ export default function OTPPage() {
 
         // Thay alert bằng toast
         toast({
-          title: 'Thành công',
           description: 'Mã OTP mới đã được gửi đến email của bạn',
           variant: 'default'
         })
@@ -240,7 +238,6 @@ export default function OTPPage() {
     } catch (error: any) {
       // Thay alert bằng toast
       toast({
-        title: 'Lỗi',
         description: 'Không thể gửi lại OTP: ' + (error.message || 'Lỗi không xác định'),
         variant: 'destructive'
       })

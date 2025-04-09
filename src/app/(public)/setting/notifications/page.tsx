@@ -8,16 +8,15 @@ import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Badge } from '@/components/ui/badge'
 import { useGetAccountNotifications, useUpdateAccountNotificationsMutation } from '@/queries/useAccount'
 import { Skeleton } from '@/components/ui/skeleton'
-import { useToast } from '@/components/ui/use-toast'
 import { formatDistanceToNow } from 'date-fns'
 import { vi } from 'date-fns/locale'
+import { toast } from '@/components/ui/use-toast'
 
 export default function NotificationsPage() {
   const { data, isLoading } = useGetAccountNotifications({ page_index: 1, page_size: 100 })
   const updateNotificationsMutation = useUpdateAccountNotificationsMutation()
-  const notifications = useMemo(() => data?.payload.data.response || [], [data])
+  const notifications = useMemo(() => data?.payload.data || [], [data])
   const [activeTab, setActiveTab] = useState('all')
-  const { toast } = useToast()
 
   // Đếm số thông báo chưa đọc
   const unreadCount = useMemo(

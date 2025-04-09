@@ -93,7 +93,9 @@ const publicPaths = ['/', '/course', '/knowledge', '/about', '/contact', '/help/
 // Phân chia rõ ràng các đường dẫn theo role
 const roleBasedPaths = {
   ADMIN: ['/admin', '/admin/:path*'],
+  MANAGER: ['/manager', '/manager/:path*'],
   CONTENT_CREATOR: ['/content-creator', '/content-creator/:path*'],
+  EXPERT: ['/expert', '/expert/:path*'],
   CHILD: ['/kid', '/kid/:path*']
 }
 
@@ -181,9 +183,13 @@ export function middleware(request: NextRequest) {
     const isPrivatePath = privatePaths.some((path) => pathname.startsWith(path.split('/:')[0]))
 
     if (isPrivatePath && !hasPermission(pathname, userRole)) {
-      // Chuyển hướng đến trang không có quyền
-      // return NextResponse.redirect(new URL('/unauthorized', request.url))
       return NextResponse.rewrite(new URL('/unauthorized', request.url))
+    }
+
+    // 2.1 Nếu là role khác ADULT và cố truy cập trang chủ
+    if (pathname === '/' && userRole && userRole !== 'ADULT') {
+      const redirectPath = roleBasedPaths[userRole as keyof typeof roleBasedPaths]?.[0] || '/'
+      return NextResponse.redirect(new URL(redirectPath, request.url))
     }
   }
 
@@ -229,6 +235,8 @@ export const config = {
     '/admin/:path*',
     '/content-creator/:path*',
     '/kid/:path*',
-    '/unauthorized'
+    '/unauthorized',
+    '/cart',
+    '/checkout'
   ]
 }

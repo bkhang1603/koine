@@ -37,7 +37,7 @@ export default function NewProduct() {
     }
   })
 
-  const { data: categoryData } = useGetCategoryProductsQuery()
+  const { data: categoryData } = useGetCategoryProductsQuery({ page_index: 1, page_size: 99 })
   const categories = categoryData?.payload.data || []
 
   const createProduct = useCreateProductMutation()

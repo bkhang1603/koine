@@ -9,7 +9,7 @@ import { useCreateOrderNeedReviewMutation } from '@/queries/useAccount'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { handleErrorApi } from '@/lib/utils'
 
-interface ReviewProductDialogProps {
+type ReviewProductDialogProps = {
   itemId: string
   itemType: string
   orderDetailId: string
@@ -26,8 +26,8 @@ export function ReviewProductDialog({ itemId, itemType, orderDetailId }: ReviewP
   const handleReview = async () => {
     if (rating === 0) {
       toast({
-        title: 'Vui lòng chọn số sao đánh giá',
-        variant: 'destructive'
+        variant: 'destructive',
+        description: 'Vui lòng chọn số sao đánh giá'
       })
       return
     }
@@ -49,7 +49,6 @@ export function ReviewProductDialog({ itemId, itemType, orderDetailId }: ReviewP
       })
 
       toast({
-        title: 'Đánh giá thành công',
         description: 'Cảm ơn bạn đã chia sẻ ý kiến về sản phẩm!'
       })
 

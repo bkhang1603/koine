@@ -15,6 +15,9 @@ export default function CartPopover({ data }: { data: CartDetailResType['data'] 
   const deleteMutation = useCartDetailDeleteListMutation()
   const deleteMultipleMutation = useCartDetailDeleteMultipleMutation()
 
+  // Tính tổng giá trị sản phẩm trong giỏ hàng
+  const totalPrice = data.cartDetails.reduce((acc, item) => acc + item.totalPrice, 0)
+
   const handleDelete = async (id: string) => {
     if (deleteMutation.isPending) return
 
@@ -67,7 +70,7 @@ export default function CartPopover({ data }: { data: CartDetailResType['data'] 
         )}
       </div>
 
-      <ScrollArea className='max-h-[320px]'>
+      <ScrollArea className='h-[320px]'>
         {data['cartDetails'].length === 0 ? (
           <div className='flex flex-col items-center justify-center py-12 px-4 text-center'>
             <div className='bg-gray-100 rounded-full p-4 mb-3'>
@@ -106,7 +109,7 @@ export default function CartPopover({ data }: { data: CartDetailResType['data'] 
                     </div>
                     <p className='text-xs text-muted-foreground'>Số lượng: {item.quantity}</p>
                     <p className='text-sm font-medium text-secondary'>
-                      {item.totalPrice === 0 ? 'Miễn phí' : `${item.totalPrice.toLocaleString()} đ`}
+                      {item.totalPrice === 0 ? 'Miễn phí' : `${item.unitPrice.toLocaleString()} đ`}
                     </p>
                   </div>
                 </div>
@@ -121,7 +124,7 @@ export default function CartPopover({ data }: { data: CartDetailResType['data'] 
         <>
           <div className='px-4 pt-3 bg-white flex justify-between items-center'>
             <span className='text-sm font-medium'>Tổng cộng:</span>
-            <span className='font-semibold text-secondary'>{data.totalAmount.toLocaleString()} đ</span>
+            <span className='font-semibold text-secondary'>{totalPrice.toLocaleString()} đ</span>
           </div>
           <div className='px-4 pb-4 pt-2'>
             <Button className='w-full justify-between' size='sm' asChild>

@@ -71,7 +71,8 @@ export const metadata: Metadata = {
       'de-DE': '/de-DE'
     }
   },
-  metadataBase: new URL('https://koine.id.vn')
+  metadataBase: new URL('https://koine.id.vn'),
+  applicationName: 'Koine'
 }
 
 export default async function RootLayout({

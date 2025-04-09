@@ -5,17 +5,7 @@ import Link from 'next/link'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import {
-  ArrowLeft,
-  Calendar,
-  Clock,
-  User,
-  ThumbsUp,
-  MessageSquare,
-  Edit,
-  ExternalLink,
-  ChevronRight
-} from 'lucide-react'
+import { ArrowLeft, Calendar, Clock, User, ThumbsUp, MessageSquare, Edit, ExternalLink } from 'lucide-react'
 import Image from 'next/image'
 import { useBlogDetailQuery } from '@/queries/useBlog'
 import { Skeleton } from '@/components/ui/skeleton'

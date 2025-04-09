@@ -3,14 +3,12 @@ import images from '@/assets/images'
 import Image from 'next/image'
 import CourseFilter from '@/components/public/parent/course/course-filter'
 import { searchParams } from '@/types/query'
-import { Card } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import Link from 'next/link'
-import { Plus, Sparkles } from 'lucide-react'
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet'
 import { SlidersHorizontal } from 'lucide-react'
 import { wrapServerApi } from '@/lib/server-utils'
 import courseApiRequest from '@/apiRequests/course'
+import { CustomCourseCard } from '@/components/public/parent/course/custom-course-card'
 
 export default async function CoursePage(props: { searchParams?: Promise<searchParams> }) {
   const searchParams = await props.searchParams
@@ -30,27 +28,10 @@ export default async function CoursePage(props: { searchParams?: Promise<searchP
         priority
       />
 
-      {/* Mobile: Filter Trigger & Custom Course Card - Enhanced Design */}
+      {/* Mobile: Filter Trigger & Custom Course Card */}
       <div className='container mt-6'>
         <div className='md:hidden space-y-3'>
-          {/* Custom Course Card - Redesigned */}
-          <div className='flex items-center justify-between bg-white p-4 rounded-lg border'>
-            <div className='flex items-center gap-3'>
-              <div className='bg-primary/10 p-2 rounded-full'>
-                <Sparkles className='w-5 h-5 text-primary' />
-              </div>
-              <div>
-                <h3 className='font-medium text-sm'>Tạo khóa học riêng</h3>
-                <p className='text-xs text-muted-foreground mt-0.5'>Tùy chỉnh nội dung theo nhu cầu</p>
-              </div>
-            </div>
-            <Button asChild size='sm' variant='outline' className='whitespace-nowrap'>
-              <Link href='/custom-course'>
-                <Plus className='w-3 h-3 mr-1' />
-                Bắt đầu
-              </Link>
-            </Button>
-          </div>
+          <CustomCourseCard variant='mobile' />
 
           {/* Filter Button */}
           <Sheet>
@@ -75,21 +56,7 @@ export default async function CoursePage(props: { searchParams?: Promise<searchP
         {/* Desktop: Sidebar with Filter */}
         <div className='md:col-span-1 hidden md:block'>
           {categories && <CourseFilter categories={categories} />}
-
-          {/* Custom Course Card - Desktop Version */}
-          <Card className='p-4 mt-6'>
-            <div className='flex items-center gap-2 text-primary mb-2'>
-              <Sparkles className='w-5 h-5' />
-              <h3 className='font-medium'>Tạo khóa học riêng</h3>
-            </div>
-            <p className='text-sm text-muted-foreground mb-4'>Tự do thiết kế nội dung học tập theo nhu cầu của bạn</p>
-            <Button asChild className='w-full'>
-              <Link href='/custom-course'>
-                <Plus className='w-4 h-4 mr-2' />
-                Bắt đầu ngay
-              </Link>
-            </Button>
-          </Card>
+          <CustomCourseCard />
         </div>
 
         {/* Course List spans all columns on mobile, 3 columns on desktop */}

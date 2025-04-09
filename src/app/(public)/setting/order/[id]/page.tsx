@@ -6,7 +6,6 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Separator } from '@/components/ui/separator'
 import {
   Package,
-  ArrowLeft,
   Clock,
   BookOpen,
   AlertCircle,
@@ -15,7 +14,12 @@ import {
   ShoppingCart,
   CreditCard,
   Wallet,
-  BanknoteIcon
+  BanknoteIcon,
+  CheckCircle,
+  XCircle,
+  Truck,
+  FileEdit,
+  RefreshCcw
 } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
@@ -28,20 +32,38 @@ import { CancelOrderDialog } from '@/components/public/parent/setting/order/Canc
 import { toast } from '@/components/ui/use-toast'
 import configRoute from '@/config/route'
 import { SettingBreadcrumb } from '@/components/public/parent/setting/SettingBreadcrumb'
-import { handleErrorApi } from '@/lib/utils'
+import { handleErrorApi, translateOrderStatus } from '@/lib/utils'
 import { RefundOrderDialog } from '@/components/public/parent/setting/order/RefundOrderDialog'
+import { OrderStatus } from '@/constants/type'
+import { OrderStatusValues } from '@/constants/type'
 
 // Helper để lấy màu và văn bản cho trạng thái đơn hàng
-const getOrderStatusConfig = (status: string) => {
+const getOrderStatusConfig = (status: (typeof OrderStatusValues)[number]) => {
   switch (status) {
-    case 'PROCESSING':
-      return { color: 'bg-blue-100 text-blue-800', label: 'Đang xử lý' }
-    case 'COMPLETED':
-      return { color: 'bg-green-100 text-green-800', label: 'Hoàn thành' }
-    case 'CANCELLED':
-      return { color: 'bg-red-100 text-red-800', label: 'Đã hủy' }
+    case OrderStatus.PROCESSING:
+      return { color: 'bg-blue-100 text-blue-800 hover:bg-blue-200', label: 'Đang xử lý' }
+    case OrderStatus.COMPLETED:
+      return { color: 'bg-green-100 text-green-800 hover:bg-green-200', label: 'Hoàn thành' }
+    case OrderStatus.CANCELLED:
+      return { color: 'bg-red-100 text-red-800 hover:bg-red-200', label: 'Đã hủy' }
+    case OrderStatus.FAILED:
+      return { color: 'bg-red-100 text-red-800 hover:bg-red-200', label: 'Thất bại' }
+    case OrderStatus.FAILED_PAYMENT:
+      return { color: 'bg-red-100 text-red-800 hover:bg-red-200', label: 'Thất bại' }
+    case OrderStatus.REFUND_REQUEST:
+      return { color: 'bg-red-100 text-red-800 hover:bg-red-200', label: 'Yêu cầu hoàn tiền' }
+    case OrderStatus.REFUNDING:
+      return { color: 'bg-red-100 text-red-800 hover:bg-red-200', label: 'Đang hoàn tiền' }
+    case OrderStatus.REFUNDED:
+      return { color: 'bg-green-100 text-green-800 hover:bg-green-200', label: 'Đã hoàn tiền' }
+    case OrderStatus.PENDING:
+      return { color: 'bg-yellow-100 text-yellow-800 hover:bg-yellow-200', label: 'Chờ xác nhận' }
+    case OrderStatus.DELIVERING:
+      return { color: 'bg-blue-100 text-blue-800 hover:bg-blue-200', label: 'Đang giao hàng' }
+    case OrderStatus.DELIVERED:
+      return { color: 'bg-green-100 text-green-800 hover:bg-green-200', label: 'Đã giao hàng' }
     default:
-      return { color: 'bg-gray-100 text-gray-800', label: status }
+      return { color: 'bg-gray-100 text-gray-800 hover:bg-gray-200', label: status }
   }
 }
 
@@ -73,17 +95,23 @@ export default function OrderDetailPage(props: { params: Promise<{ id: string }>
   }
 
   // Group order details by type
-  const courseItems = order.orderDetails.filter(
-    (item) => item.courseId && item.course
-  ) as ((typeof order.orderDetails)[0] & { course: NonNullable<(typeof order.orderDetails)[0]['course']> })[]
+  const courseItems = order.orderDetails
+    ? (order.orderDetails.filter((item) => item.courseId && item.course) as ((typeof order.orderDetails)[0] & {
+        course: NonNullable<(typeof order.orderDetails)[0]['course']>
+      })[])
+    : []
 
-  const productItems = order.orderDetails.filter(
-    (item) => item.productId && item.product
-  ) as ((typeof order.orderDetails)[0] & { product: NonNullable<(typeof order.orderDetails)[0]['product']> })[]
+  const productItems = order.orderDetails
+    ? (order.orderDetails.filter((item) => item.productId && item.product) as ((typeof order.orderDetails)[0] & {
+        product: NonNullable<(typeof order.orderDetails)[0]['product']>
+      })[])
+    : []
 
-  const comboItems = order.orderDetails.filter(
-    (item) => item.comboId && item.combo
-  ) as ((typeof order.orderDetails)[0] & { combo: NonNullable<(typeof order.orderDetails)[0]['combo']> })[]
+  const comboItems = order.orderDetails
+    ? (order.orderDetails.filter((item) => item.comboId && item.combo) as ((typeof order.orderDetails)[0] & {
+        combo: NonNullable<(typeof order.orderDetails)[0]['combo']>
+      })[])
+    : []
 
   const statusConfig = getOrderStatusConfig(order.status)
   const canCancel = order.status === 'PROCESSING'
@@ -125,7 +153,7 @@ export default function OrderDetailPage(props: { params: Promise<{ id: string }>
     }
   }
 
-  const hasOnlyCourses = order.orderDetails.every((item) => item.courseId && item.course)
+  const hasOnlyCourses = order.orderDetails ? order.orderDetails.every((item) => item.courseId && item.course) : false
 
   const orderBreadcrumbItems = [
     { label: 'Đơn hàng', href: configRoute.setting.order },
@@ -134,31 +162,13 @@ export default function OrderDetailPage(props: { params: Promise<{ id: string }>
 
   return (
     <div className='container max-w-7xl mx-auto py-6 space-y-8'>
-      {/* Back button */}
-      {/* <Button variant='ghost' asChild className='gap-2 hover:bg-gray-100'>
-        <Link href='/setting/order'>
-          <ArrowLeft className='h-4 w-4' />
-          Quay lại danh sách đơn hàng
-        </Link>
-      </Button> */}
-      <SettingBreadcrumb
-        items={orderBreadcrumbItems}
-        isLoading={isLoading}
-        backButton={
-          <Link href={configRoute.setting.order}>
-            <Button variant='outline' size='sm' className='gap-2'>
-              <ArrowLeft className='h-4 w-4' />
-              Quay lại danh sách đơn hàng
-            </Button>
-          </Link>
-        }
-      />
+      <SettingBreadcrumb items={orderBreadcrumbItems} isLoading={isLoading} />
 
       {/* Header */}
       <div>
         <div className='flex items-center justify-between mb-4'>
           <h1 className='text-2xl font-bold text-gray-900'>Chi tiết đơn hàng #{order.orderCode}</h1>
-          <Badge className={`px-2.5 py-1 ${statusConfig.color}`}>{statusConfig.label}</Badge>
+          <Badge className={`px-2.5 py-1 ${statusConfig.color}`}>{translateOrderStatus(order.status)}</Badge>
         </div>
         <div className='flex flex-wrap items-center gap-6 text-sm text-gray-500'>
           <div className='flex items-center gap-2'>
@@ -167,7 +177,7 @@ export default function OrderDetailPage(props: { params: Promise<{ id: string }>
           </div>
           <div className='flex items-center gap-2'>
             <ShoppingCart className='h-4 w-4' />
-            {order.orderDetails.length} sản phẩm
+            {order.orderDetails ? order.orderDetails.length : 0} sản phẩm
           </div>
           <div className='flex items-center gap-2'>
             <Tag className='h-4 w-4' />
@@ -280,6 +290,122 @@ export default function OrderDetailPage(props: { params: Promise<{ id: string }>
               </CardContent>
             </Card>
           )}
+
+          {/* Add Order History/Journey */}
+          <Card>
+            <CardHeader>
+              <CardTitle className='flex items-center gap-2'>
+                <Clock className='w-5 h-5' />
+                Quá trình đơn hàng
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              {order.orderStatusHistory && order.orderStatusHistory.length > 0 ? (
+                <div className='space-y-6'>
+                  {order.orderStatusHistory
+                    .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
+                    .map((history, index) => {
+                      // Choose icon and color based on status
+                      let statusIconColor = 'text-blue-500'
+                      let StatusIcon = Clock
+
+                      switch (history.status) {
+                        case OrderStatus.COMPLETED:
+                          statusIconColor = 'text-green-500'
+                          StatusIcon = CheckCircle
+                          break
+                        case OrderStatus.DELIVERED:
+                          statusIconColor = 'text-green-500'
+                          StatusIcon = Truck
+                          break
+                        case OrderStatus.REFUNDED:
+                          statusIconColor = 'text-green-500'
+                          StatusIcon = CheckCircle
+                          break
+                        case OrderStatus.CANCELLED:
+                          statusIconColor = 'text-red-500'
+                          StatusIcon = XCircle
+                          break
+                        case OrderStatus.FAILED:
+                          statusIconColor = 'text-red-500'
+                          StatusIcon = XCircle
+                          break
+                        case OrderStatus.FAILED_PAYMENT:
+                          statusIconColor = 'text-red-500'
+                          StatusIcon = XCircle
+                          break
+                        case OrderStatus.PENDING:
+                          statusIconColor = 'text-yellow-500'
+                          StatusIcon = Clock
+                          break
+                        case OrderStatus.DELIVERING:
+                          statusIconColor = 'text-blue-500'
+                          StatusIcon = Truck
+                          break
+                        case OrderStatus.PROCESSING:
+                          statusIconColor = 'text-indigo-500'
+                          StatusIcon = FileEdit
+                          break
+                        case OrderStatus.REFUNDING:
+                          statusIconColor = 'text-purple-500'
+                          StatusIcon = RefreshCcw
+                          break
+                        case OrderStatus.REFUND_REQUEST:
+                          statusIconColor = 'text-red-500'
+                          StatusIcon = RefreshCcw
+                          break
+                        default:
+                          break
+                      }
+
+                      return (
+                        <div key={index} className='relative'>
+                          {/* Status card */}
+                          <div className='bg-white rounded-xl border border-gray-100 p-4 shadow-sm hover:shadow-md transition-shadow'>
+                            <div className='flex items-start gap-3'>
+                              <div
+                                className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-${statusIconColor.split('-')[1]}-50`}
+                              >
+                                <StatusIcon className={`h-5 w-5 ${statusIconColor}`} />
+                              </div>
+
+                              <div className='flex-1 space-y-1'>
+                                <div className='flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1'>
+                                  <p className='font-medium text-base'>{translateOrderStatus(history.status)}</p>
+                                  <time className='text-sm text-muted-foreground'>
+                                    {format(new Date(history.timestamp), 'HH:mm - dd/MM/yyyy', { locale: vi })}
+                                  </time>
+                                </div>
+
+                                {/* Add status-specific messages */}
+                                <p className='text-sm text-muted-foreground'>
+                                  {history.status === OrderStatus.PROCESSING && 'Đơn hàng của bạn đang được xử lý'}
+                                  {history.status === OrderStatus.COMPLETED && 'Đơn hàng đã được hoàn thành thành công'}
+                                  {history.status === OrderStatus.CANCELLED && 'Đơn hàng đã bị hủy'}
+                                  {history.status === OrderStatus.PENDING && 'Đơn hàng đang chờ xử lý'}
+                                  {history.status === OrderStatus.DELIVERING && 'Đơn hàng đang được giao đến bạn'}
+                                  {history.status === OrderStatus.DELIVERED && 'Đơn hàng đã được giao thành công'}
+                                  {history.status === OrderStatus.REFUND_REQUEST && 'Yêu cầu hoàn tiền đã được gửi'}
+                                  {history.status === OrderStatus.REFUNDING && 'Đơn hàng đang được hoàn tiền'}
+                                  {history.status === OrderStatus.REFUNDED && 'Đơn hàng đã được hoàn tiền thành công'}
+                                </p>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      )
+                    })}
+                </div>
+              ) : (
+                <div className='flex flex-col items-center justify-center py-8 text-center'>
+                  <div className='h-12 w-12 rounded-full bg-gray-100 flex items-center justify-center mb-3'>
+                    <Clock className='h-6 w-6 text-gray-400' />
+                  </div>
+                  <p className='text-muted-foreground'>Không có lịch sử trạng thái</p>
+                </div>
+              )}
+            </CardContent>
+          </Card>
         </div>
 
         {/* Order Summary */}
@@ -294,9 +420,17 @@ export default function OrderDetailPage(props: { params: Promise<{ id: string }>
                   <span className='text-muted-foreground'>Tổng tiền hàng</span>
                   <span>{order.totalAmount.toLocaleString()}đ</span>
                 </div>
+                {!hasOnlyCourses && (
+                  <div className='flex justify-between text-sm'>
+                    <span className='text-muted-foreground'>Phí vận chuyển</span>
+                    <span>{order.deliAmount.toLocaleString()}đ</span>
+                  </div>
+                )}
                 <div className='flex justify-between text-sm font-medium'>
                   <span>Tổng thanh toán</span>
-                  <span className='text-red-600'>{order.totalAmount.toLocaleString()}đ</span>
+                  <span className='text-red-600'>
+                    {(order.totalAmount + (hasOnlyCourses ? 0 : order.deliAmount)).toLocaleString()}đ
+                  </span>
                 </div>
               </div>
 
@@ -415,11 +549,34 @@ export default function OrderDetailPage(props: { params: Promise<{ id: string }>
               {/* Nút yêu cầu hoàn tiền khi đơn hàng đã hoàn thành */}
               {order.status === 'COMPLETED' && (
                 <div className='pt-2'>
-                  <RefundOrderDialog orderId={order.id} orderCode={order.orderCode} />
+                  <RefundOrderDialog orderId={order.id} orderDetails={order.orderDetails || []} />
                 </div>
               )}
             </CardContent>
           </Card>
+
+          {/* Add recipient information if it exists */}
+          {order.deliveryInfo && (
+            <Card>
+              <CardHeader>
+                <CardTitle className='flex items-center gap-2'>Thông tin giao hàng</CardTitle>
+              </CardHeader>
+              <CardContent className='space-y-4'>
+                <div className='space-y-1 text-sm'>
+                  <p className='text-muted-foreground'>Người nhận</p>
+                  <p className=''>{order.deliveryInfo.name}</p>
+                </div>
+                <div className='space-y-1 text-sm'>
+                  <p className='text-muted-foreground'>Số điện thoại</p>
+                  <p>{order.deliveryInfo.phone}</p>
+                </div>
+                <div className='space-y-1 text-sm'>
+                  <p className='text-muted-foreground'>Địa chỉ</p>
+                  <p>{order.deliveryInfo.address}</p>
+                </div>
+              </CardContent>
+            </Card>
+          )}
         </div>
       </div>
     </div>

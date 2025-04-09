@@ -47,7 +47,7 @@ export function PaymentForm() {
   async function onSubmit() {
     try {
       // Your logic here
-      toast({ title: 'Thành công', description: 'Thông tin thanh toán của bạn đã được cập nhật.' })
+      toast({ description: 'Thông tin thanh toán của bạn đã được cập nhật.' })
       router.push('/profile')
     } catch (error: any) {
       handleErrorApi(error)

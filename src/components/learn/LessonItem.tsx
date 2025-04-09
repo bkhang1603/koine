@@ -30,7 +30,7 @@ export const LessonItem = ({ lesson, isActive, isAccessible, onClick }: LessonIt
 
   const renderStatus = () => {
     if (!isAccessible) return <LockKeyhole className='w-4 h-4 text-gray-400' />
-    if (lesson.status === 'COMPLETED') return <CheckCircle2 className='w-4 h-4 text-emerald-500' />
+    if (lesson.status === 'YET') return <CheckCircle2 className='w-4 h-4 text-emerald-500' />
     return null
   }
 

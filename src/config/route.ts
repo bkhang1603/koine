@@ -5,6 +5,7 @@ const configRoute = {
   course: '/course',
   learn: '/learn',
   knowledge: '/knowledge',
+  event: '/event',
   service: '/service',
   product: '/product',
   cart: '/cart',
@@ -12,6 +13,7 @@ const configRoute = {
   login: '/login',
   register: '/register',
   forgotPassword: '/forgot-password',
+  customCourse: '/custom-course',
   setting: {
     profile: '/setting',
     myCourse: '/setting/my-course',
@@ -20,7 +22,8 @@ const configRoute = {
     payment: '/setting/payment',
     notifications: '/setting/notifications',
     security: '/setting/security',
-    childAccount: '/setting/child-account'
+    childAccount: '/setting/child-account',
+    review: '/setting/need-review'
   },
   profile: '/profile',
   contentCreator: {

@@ -1,19 +1,16 @@
 const baseOpenGraphConfig = {
-  openGraph: {
-    locale: 'vi_VN',
-    type: 'website',
-    siteName: 'Koine',
-    title: 'Nền tảng giáo dục giới tính cho trẻ em | Koine',
-    description:
-      'Koine là nền tảng giáo dục giới tính cho trẻ em với các khóa học chất lượng cao từ các chuyên gia hàng đầu.',
-    url: 'https://koine.id.vn',
-    images: [
-      {
-        // url: `${envConfig.NEXT_PUBLIC_URL}/images/welcome.png`
-        url: 'https://koine-bucket-v4.s3.ap-southeast-2.amazonaws.com/image_8318c5f6-5945-4e9a-8d0a-a7841bf139b4_png'
-      }
-    ]
-  }
+  locale: 'vi_VN',
+  type: 'website',
+  siteName: 'Koine',
+  url: 'https://koine.id.vn',
+  images: [
+    {
+      url: '/images/og-image.jpg',
+      width: 1200,
+      height: 630,
+      alt: 'Koine - Nền tảng giáo dục giới tính cho trẻ em'
+    }
+  ]
 }
 
 export default baseOpenGraphConfig

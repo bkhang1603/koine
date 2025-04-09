@@ -1,5 +1,5 @@
-function ExpertDashboard() {
-  return <div>ExpertDashboard</div>
+function page() {
+  return <div>page</div>
 }
 
-export default ExpertDashboard
+export default page

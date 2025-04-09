@@ -190,6 +190,7 @@ export function OrderStatusChart({ data, colors }: OrderStatusChartProps) {
                   layout='horizontal'
                   verticalAlign='bottom'
                   align='center'
+                  // eslint-disable-next-line no-unused-vars
                   formatter={(value, entry, index) => <span className='text-xs font-medium'>{value}</span>}
                   wrapperStyle={{ paddingTop: '10px' }}
                 />

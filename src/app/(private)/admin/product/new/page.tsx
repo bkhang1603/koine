@@ -8,7 +8,6 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { CreateProductBody, CreateProductBodyType } from '@/schemaValidations/product.schema'
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import { useCreateProductMutation, useGetCategoryProductsQuery } from '@/queries/useProduct'
-import { useToast } from '@/components/ui/use-toast'
 import { useRouter } from 'next/navigation'
 import configRoute from '@/config/route'
 import { ArrowLeft } from 'lucide-react'
@@ -17,9 +16,9 @@ import { CategorySelect } from '@/components/private/admin/product/create/catego
 import { ContentField } from '@/components/private/admin/product/create/content-field'
 import { ImageUpload } from '@/components/private/admin/product/create/image-upload'
 import { Textarea } from '@/components/ui/textarea'
+import { toast } from '@/components/ui/use-toast'
 
 export default function NewProduct() {
-  const { toast } = useToast()
   const router = useRouter()
 
   const form = useForm<CreateProductBodyType>({
@@ -37,7 +36,7 @@ export default function NewProduct() {
     }
   })
 
-  const { data: categoryData } = useGetCategoryProductsQuery()
+  const { data: categoryData } = useGetCategoryProductsQuery({ page_index: 1, page_size: 99 })
   const categories = categoryData?.payload.data || []
 
   const createProduct = useCreateProductMutation()
@@ -46,14 +45,12 @@ export default function NewProduct() {
     try {
       await createProduct.mutateAsync(data)
       toast({
-        title: 'Thành công',
         description: 'Tạo sản phẩm mới thành công'
       })
       router.push(configRoute.admin.product)
     } catch (error) {
       toast({
         variant: 'destructive',
-        title: 'Lỗi',
         description: 'Có lỗi xảy ra khi tạo sản phẩm'
       })
     }

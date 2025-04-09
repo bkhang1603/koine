@@ -1,37 +1,28 @@
 import courseApiRequest from '@/apiRequests/course'
-import {
-  FileText,
-  Video,
-  MonitorPlay,
-  Clock,
-  Users2,
-  BarChart,
-  PlayCircle,
-  ChevronRight,
-  BookOpen,
-  Eye,
-  HelpCircle
-} from 'lucide-react'
+import { FileText, Video, MonitorPlay, Clock, Users2, BarChart, PlayCircle, HelpCircle } from 'lucide-react'
 import Image from 'next/image'
 import { Card } from '@/components/ui/card'
 import EnrollButton from '@/components/public/parent/course/enroll-button'
 import CourseButton from '@/components/public/parent/course/course-button'
 import CourseReviews from '@/components/public/parent/course/course-reviews'
-import Link from 'next/link'
 import { wrapServerApi } from '@/lib/server-utils'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import RecommendedCourses from '@/components/public/parent/course/recommended-courses'
 import { searchParams } from '@/types/query'
 import BuyNowButton from '@/components/public/parent/course/buy-now-button'
+import { Breadcrumb } from '@/components/public/parent/setting/Breadcrumb'
+import configRoute from '@/config/route'
+import { formatDuration } from '@/lib/utils'
+import PreviewButton from '@/components/public/parent/course/preview-button'
 
-const formatDuration = (minutes: number) => {
-  const hours = Math.floor(minutes / 60)
-  const remainingMinutes = minutes % 60
-  if (hours === 0) return `${remainingMinutes} phút`
-  if (remainingMinutes === 0) return `${hours} giờ`
-  return `${hours} giờ ${remainingMinutes} phút`
-}
+// const formatDuration = (minutes: number) => {
+//   const hours = Math.floor(minutes / 60)
+//   const remainingMinutes = minutes % 60
+//   if (hours === 0) return `${remainingMinutes} phút`
+//   if (remainingMinutes === 0) return `${hours} giờ`
+//   return `${hours} giờ ${remainingMinutes} phút`
+// }
 
 const getLessonIcon = (type: string) => {
   switch (type) {
@@ -78,14 +69,12 @@ export default async function CourseDetail(props: {
             <div className='relative -mt-16 sm:-mt-20 lg:-mt-24'>
               {/* Breadcrumb - Added for navigation */}
               <div className='container pt-3 pb-1 sm:pt-5 sm:pb-3'>
-                <nav className='flex items-center text-sm text-primary-foreground'>
-                  <Link href='/course' className='flex items-center hover:text-primary transition-colors'>
-                    <BookOpen className='w-3.5 h-3.5 mr-1' />
-                    <span>Khóa học</span>
-                  </Link>
-                  <ChevronRight className='w-3.5 h-3.5 mx-2' />
-                  <span className='truncate max-w-[200px]'>{courseData.title}</span>
-                </nav>
+                <Breadcrumb
+                  items={[
+                    { title: 'Khóa học', href: configRoute.course },
+                    { title: courseData.title, href: `${configRoute.course}/${id}` }
+                  ]}
+                />
               </div>
 
               <Card className='p-5 sm:p-6 lg:p-8 bg-white/80 backdrop-blur-md border-none shadow-2xl'>
@@ -272,22 +261,7 @@ export default async function CourseDetail(props: {
 
                                 {/* Chỉ hiển thị nút Học thử cho các bài học đầu của chapter đầu tiên */}
                                 {chapterIndex === 0 && lessonIndex < limit && (
-                                  <TooltipProvider>
-                                    <Tooltip>
-                                      <TooltipTrigger asChild>
-                                        <Link
-                                          href={`/learn/${courseData.id}?lessonId=${lesson.id}&preview=true`}
-                                          className='flex items-center gap-1 px-2.5 py-1 bg-primary/10 text-primary rounded-full text-xs font-medium hover:bg-primary/20 transition-colors'
-                                        >
-                                          <Eye className='w-3.5 h-3.5' />
-                                          <span>Học thử</span>
-                                        </Link>
-                                      </TooltipTrigger>
-                                      <TooltipContent>
-                                        <p>Xem trước nội dung bài học</p>
-                                      </TooltipContent>
-                                    </Tooltip>
-                                  </TooltipProvider>
+                                  <PreviewButton courseId={courseData.id} lessonId={lesson.id} />
                                 )}
                               </div>
                             ))}

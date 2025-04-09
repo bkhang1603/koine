@@ -162,15 +162,60 @@ export const rePurchaseOrderRes = z.object({
 })
 
 export const refundOrder = z.object({
-  orderId: z.string(),
-  orderCode: z.string(),
-  paymentId: z.string(),
-  amount: z.number(),
-  refundReason: z.string(),
-  requestDate: z.string(),
-  customerName: z.string(),
+  isDeleted: z.boolean(),
+  createdAt: z.string(),
+  updatedAt: z.string(),
+  id: z.string(),
+  userId: z.string(),
   orderDate: z.string(),
-  orderStatus: z.enum(OrderStatusValues)
+  orderCode: z.number(),
+  totalAmount: z.number(),
+  deliMethod: z.enum(DeliveryMethodValues),
+  deliAmount: z.number(),
+  status: z.enum(OrderStatusValues),
+  note: z.string(),
+  expiredAt: z.string(),
+  refundRequestDate: z.string(),
+  refundReason: z.string(),
+  refundProcessedDate: z.string(),
+  refundNote: z.string(),
+  orderDetails: z.array(
+    z.object({
+      isDeleted: z.boolean(),
+      createdAt: z.string(),
+      updatedAt: z.string(),
+      id: z.string(),
+      orderId: z.string(),
+      productId: z.string(),
+      courseId: z.string(),
+      comboId: z.string(),
+      quantity: z.number(),
+      unitPrice: z.number(),
+      discount: z.number(),
+      totalPrice: z.number()
+    })
+  ),
+  payment: z.object({
+    isDeleted: z.boolean(),
+    createdAt: z.string(),
+    updatedAt: z.string(),
+    id: z.string(),
+    orderId: z.string(),
+    payMethod: z.enum(PaymentMethodValues),
+    payDate: z.string(),
+    payAmount: z.number(),
+    payStatus: z.enum(OrderStatusValues)
+  }),
+  delivery: z.object({
+    isDeleted: z.boolean(),
+    createdAt: z.string(),
+    updatedAt: z.string(),
+    id: z.string(),
+    orderId: z.string(),
+    name: z.string(),
+    phone: z.string(),
+    address: z.string()
+  })
 })
 
 export const refundOrderRes = z.object({
@@ -187,7 +232,14 @@ export const refundOrderRes = z.object({
 })
 
 export const createRefundOrderBody = z.object({
-  reason: z.string()
+  reason: z.string(),
+  items: z.array(
+    z.object({
+      orderDetailId: z.string(),
+      quantity: z.number(),
+      reason: z.string()
+    })
+  )
 })
 
 export const createRefundOrderBodyRes = z.object({

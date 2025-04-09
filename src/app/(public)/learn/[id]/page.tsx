@@ -12,7 +12,7 @@ import {
 import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { handleErrorApi } from '@/lib/utils'
-import { useCallback, use, useEffect, useRef, useState } from 'react'
+import { useCallback, use, useEffect, useRef } from 'react'
 import { UserCourseProgressResType } from '@/schemaValidations/course.schema'
 import { LessonContent } from '@/components/learn/LessonContent'
 import { LoadingSkeleton } from '@/components/learn/LoadingSkeleton'
@@ -24,24 +24,6 @@ import configRoute from '@/config/route'
 import { LearnPageContent } from '@/components/learn/LearnPageContent'
 
 type Lesson = UserCourseProgressResType['data']['chapters'][0]['lessons'][0]
-
-// Thêm helper function để check bài học có thể truy cập
-const canAccessLesson = (lesson: any, course: any) => {
-  if (lesson.status === 'YET') return true
-
-  // Nếu là NOTYET, kiểm tra xem có phải là bài NOTYET đầu tiên không
-  if (lesson.status === 'NOTYET') {
-    // Tìm bài NOTYET đầu tiên trong tất cả các chương
-    for (const chapter of course.chapters) {
-      const firstNotyetLesson = chapter.lessons.find((l: any) => l.status === 'NOTYET')
-      if (firstNotyetLesson) {
-        return lesson.id === firstNotyetLesson.id
-      }
-    }
-  }
-
-  return false
-}
 
 // Helper function to find the first accessible lesson
 const findFirstAccessibleLesson = (course: any) => {
@@ -73,6 +55,7 @@ function LearnPage(props: { params: Promise<{ id: string }> }) {
   const router = useRouter()
   const searchParams = useSearchParams()
   const lessonId = searchParams.get('lessonId')
+  const quizId = searchParams.get('quizId')
   const isPreviewMode = searchParams.get('preview') === 'true'
 
   const updateCourseMutation = useUpdateCourseProgressMutation()
@@ -108,8 +91,6 @@ function LearnPage(props: { params: Promise<{ id: string }> }) {
   const { refetch: refetchStillLearning, isError } = useGetStillLearningCourse({ enabled: !isPreviewMode })
   const refetchIntervalRef = useRef<NodeJS.Timeout | null>(null)
 
-  const [, setSelectedChapterQuiz] = useState<any>(null)
-
   useEffect(() => {
     // Chỉ setup interval và gọi refetch khi không ở chế độ preview
     if (!isPreviewMode) {
@@ -139,33 +120,22 @@ function LearnPage(props: { params: Promise<{ id: string }> }) {
 
   // Auto-select first lesson when course data is loaded and no lessonId is provided
   useEffect(() => {
+    if (quizId) {
+      const chapter = course?.chapters.find((c: any) => c.id === quizId)
+      if (chapter) {
+        router.push(`/learn/${id}?quizId=${chapter.id}`)
+      }
+      return
+    }
+
     if (!lessonId && course && !isLoading) {
       const firstLesson = findFirstAccessibleLesson(course)
       if (firstLesson) {
         router.push(`/learn/${id}?lessonId=${firstLesson.id}`)
       }
+      return
     }
-  }, [course, isLoading, lessonId, id, router])
-
-  const getNextLesson = useCallback(() => {
-    if (!course || !lesson) return null
-
-    const currentChapter = course.chapters.find((chapter) => chapter.lessons.some((l) => l.id === lesson.id))
-    const currentLessonIndex = currentChapter?.lessons.findIndex((l) => l.id === lesson.id)
-
-    if (currentChapter && currentLessonIndex !== undefined) {
-      if (currentLessonIndex < currentChapter.lessons.length - 1) {
-        return currentChapter.lessons[currentLessonIndex + 1]
-      }
-
-      const nextChapterIndex = course.chapters.findIndex((c) => c.id === currentChapter.id) + 1
-      if (nextChapterIndex < course.chapters.length) {
-        const nextChapter = course.chapters[nextChapterIndex]
-        return nextChapter.lessons[0]
-      }
-    }
-    return null
-  }, [course, lesson])
+  }, [course, isLoading, lessonId, id, router, quizId])
 
   const handleUpdate = useCallback(
     async ({ lessonId, status }: { lessonId: string; status: Lesson['status'] }) => {
@@ -180,35 +150,18 @@ function LearnPage(props: { params: Promise<{ id: string }> }) {
     [updateCourseMutation]
   )
 
-  const getPreviousLesson = useCallback(() => {
-    if (!course || !lesson) return null
-
-    const currentChapter = course.chapters.find((chapter) => chapter.lessons.some((l) => l.id === lesson.id))
-    const currentLessonIndex = currentChapter?.lessons.findIndex((l) => l.id === lesson.id)
-
-    if (currentChapter && currentLessonIndex !== undefined) {
-      if (currentLessonIndex > 0) {
-        return currentChapter.lessons[currentLessonIndex - 1]
-      }
-
-      const prevChapterIndex = course.chapters.findIndex((c) => c.id === currentChapter.id) - 1
-      if (prevChapterIndex >= 0) {
-        const prevChapter = course.chapters[prevChapterIndex]
-        return prevChapter.lessons[prevChapter.lessons.length - 1]
-      }
-    }
-    return null
-  }, [course, lesson])
-
   const handleLessonClick = useCallback(
     (lesson: any) => {
-      if (canAccessLesson(lesson, course)) {
-        // Reset quiz state khi chuyển bài học
-        setSelectedChapterQuiz(null)
-        router.push(`/learn/${id}?lessonId=${lesson.id}`)
-      }
+      router.push(`/learn/${id}?lessonId=${lesson.id}`)
     },
-    [id, router, course]
+    [id, router]
+  )
+
+  const handleQuizClick = useCallback(
+    (chapter: any) => {
+      router.push(`/learn/${id}?quizId=${chapter.id}`)
+    },
+    [id, router]
   )
 
   // Xử lý khi có lỗi
@@ -218,15 +171,8 @@ function LearnPage(props: { params: Promise<{ id: string }> }) {
         description: 'Hiện đang có thiết bị khác đang học khóa học này',
         variant: 'destructive'
       })
-
-      router.push(configRoute.setting.myCourse)
     }
   }, [isError, router])
-
-  // Thêm effect để reset quiz state khi URL thay đổi
-  useEffect(() => {
-    setSelectedChapterQuiz(null)
-  }, [lessonId])
 
   // Render preview UI overlay when in preview mode
   if (isPreviewMode) {
@@ -314,6 +260,7 @@ function LearnPage(props: { params: Promise<{ id: string }> }) {
       <BreadcrumbParent courseTitle={course?.title} />
 
       <LearnPageContent
+        quizId={quizId}
         course={course}
         lesson={lesson}
         lessonId={lessonId}
@@ -321,10 +268,8 @@ function LearnPage(props: { params: Promise<{ id: string }> }) {
         isLoading={isLessonLoading}
         isFetching={lessonFetching}
         onLessonClick={handleLessonClick}
-        canAccessLesson={canAccessLesson}
+        onQuizClick={handleQuizClick}
         handleUpdate={handleUpdate}
-        getNextLesson={getNextLesson}
-        getPreviousLesson={getPreviousLesson}
         isUpdating={updateCourseMutation.isPending}
         backUrl={configRoute.learn}
         backLabel='Quay lại danh sách khóa học'
@@ -332,5 +277,4 @@ function LearnPage(props: { params: Promise<{ id: string }> }) {
     </div>
   )
 }
-
 export default LearnPage

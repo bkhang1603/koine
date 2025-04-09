@@ -7,7 +7,6 @@ import { useForm } from 'react-hook-form'
 import { Button } from '@/components/ui/button'
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
-import { useToast } from '@/components/ui/use-toast'
 import { cn, handleErrorApi } from '@/lib/utils'
 import { LoginBody, LoginBodyType } from '@/schemaValidations/auth.schema'
 import Link from 'next/link'
@@ -18,12 +17,12 @@ import { useEffect } from 'react'
 import { useAppStore } from '@/components/app-provider'
 import { useGetIpMutation } from '@/queries/useIp'
 import { Loader2 } from 'lucide-react'
+import { toast } from '@/components/ui/use-toast'
 
-export default function LoginForm({ className }: { className?: string }) {
+export default function LoginForm({ className, onSuccess }: { className?: string; onSuccess?: () => void }) {
   const { data } = useGetIpMutation()
   const ipAddress = data?.payload.data.clientIp ?? ''
 
-  const { toast } = useToast()
   const router = useRouter()
   const loginMutation = useLoginMutation()
   const searchParams = useSearchParams()
@@ -53,6 +52,12 @@ export default function LoginForm({ className }: { className?: string }) {
 
       setRole(result.payload.data.account.role)
 
+      // Nếu có callback onSuccess từ modal, gọi callback
+      if (onSuccess) {
+        onSuccess()
+        return
+      }
+
       // Kiểm tra xem có redirect parameter từ URL không (khi bị chuyển hướng từ middleware)
       const redirect = searchParams.get('redirect')
 
@@ -69,9 +74,6 @@ export default function LoginForm({ className }: { className?: string }) {
           case 'MANAGER':
             router.push('/manager')
             break
-          case 'ACCOUNTING':
-            router.push('/salesman')
-            break
           case 'SUPPORTER':
             router.push('/support')
             break
@@ -85,13 +87,16 @@ export default function LoginForm({ className }: { className?: string }) {
             router.push('/salesman')
             break
           case 'ADULT':
-            router.push('/')
+            router.back()
             break
           case 'CHILD':
             router.push('/kid')
             break
+          case 'EXPERT':
+            router.push('/expert')
+            break
           default:
-            router.push('/')
+            router.back()
             break
         }
       }
@@ -100,8 +105,6 @@ export default function LoginForm({ className }: { className?: string }) {
         description: result.payload.message || 'Đăng nhập thành công!'
       })
     } catch (error: any) {
-      console.log(error)
-
       handleErrorApi({
         error,
         setError: form.setError

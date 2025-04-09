@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import React, { useState } from 'react'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import {
@@ -34,62 +34,70 @@ import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area'
 import { OrderStatus, OrderStatusValues } from '@/constants/type'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 
+// Define a custom type for our extended status options
+type OrderStatusWithAll = (typeof OrderStatusValues)[number] | 'ALL'
+
 // Cập nhật statusColorMap và statusTextMap để bao gồm tất cả trạng thái từ OrderStatus
-const statusConfig = {
+const statusConfig: Record<OrderStatusWithAll, { color: string; text: string; icon: React.ReactNode }> = {
   [OrderStatus.PENDING]: {
-    color: 'bg-slate-100 text-slate-800',
+    color: 'bg-pink-100 text-pink-800 hover:bg-pink-200',
     text: 'Chờ xác nhận',
     icon: <Clock className='h-4 w-4 mr-1.5' />
   },
   [OrderStatus.PROCESSING]: {
-    color: 'bg-blue-100 text-blue-800',
+    color: 'bg-blue-100 text-blue-800 hover:bg-blue-200',
     text: 'Đang xử lý',
     icon: <Package className='h-4 w-4 mr-1.5' />
   },
   [OrderStatus.DELIVERING]: {
-    color: 'bg-yellow-100 text-yellow-800',
+    color: 'bg-yellow-100 text-yellow-800 hover:bg-yellow-200',
     text: 'Đang giao hàng',
     icon: <Truck className='h-4 w-4 mr-1.5' />
   },
   [OrderStatus.DELIVERED]: {
-    color: 'bg-teal-100 text-teal-800',
+    color: 'bg-teal-100 text-teal-800 hover:bg-teal-200',
     text: 'Đã giao hàng',
     icon: <Truck className='h-4 w-4 mr-1.5' />
   },
   [OrderStatus.COMPLETED]: {
-    color: 'bg-green-100 text-green-800',
+    color: 'bg-green-100 text-green-800 hover:bg-green-200',
     text: 'Hoàn thành',
     icon: <CheckCircle className='h-4 w-4 mr-1.5' />
   },
   [OrderStatus.CANCELLED]: {
-    color: 'bg-red-100 text-red-800',
+    color: 'bg-red-100 text-red-800 hover:bg-red-200',
     text: 'Đã hủy',
     icon: <Trash2 className='h-4 w-4 mr-1.5' />
   },
   [OrderStatus.FAILED_PAYMENT]: {
-    color: 'bg-rose-100 text-rose-800',
+    color: 'bg-rose-100 text-rose-800 hover:bg-rose-200',
     text: 'Thanh toán thất bại',
     icon: <AlertTriangle className='h-4 w-4 mr-1.5' />
   },
   [OrderStatus.REFUND_REQUEST]: {
-    color: 'bg-amber-100 text-amber-800',
+    color: 'bg-amber-100 text-amber-800 hover:bg-amber-200',
     text: 'Yêu cầu hoàn tiền',
     icon: <Banknote className='h-4 w-4 mr-1.5' />
   },
   [OrderStatus.REFUNDING]: {
-    color: 'bg-orange-100 text-orange-800',
+    color: 'bg-orange-100 text-orange-800 hover:bg-orange-200',
     text: 'Đang hoàn tiền',
     icon: <RefreshCcw className='h-4 w-4 mr-1.5' />
   },
   [OrderStatus.REFUNDED]: {
-    color: 'bg-lime-100 text-lime-800',
+    color: 'bg-lime-100 text-lime-800 hover:bg-lime-200',
     text: 'Đã hoàn tiền',
     icon: <Banknote className='h-4 w-4 mr-1.5' />
   },
   [OrderStatus.FAILED]: {
-    color: 'bg-red-100 text-red-800',
+    color: 'bg-red-100 text-red-800 hover:bg-red-200',
     text: 'Thất bại',
     icon: <XCircle className='h-4 w-4 mr-1.5' />
+  },
+  ALL: {
+    color: 'bg-lime-100 text-lime-800 hover:bg-lime-200',
+    text: 'Tất cả đơn hàng',
+    icon: <ShoppingBag className='h-4 w-4 mr-1.5' />
   }
 }
 
@@ -98,33 +106,43 @@ const statusGroups = [
   {
     name: 'Chính',
     statuses: [
+      'ALL' as const, // Add "ALL" option at the beginning
       OrderStatus.PENDING,
       OrderStatus.PROCESSING,
-      OrderStatus.DELIVERING,
-      OrderStatus.COMPLETED,
-      OrderStatus.CANCELLED
+      OrderStatus.DELIVERING
     ]
   },
   {
     name: 'Khác',
     statuses: [
+      OrderStatus.COMPLETED,
       OrderStatus.DELIVERED,
       OrderStatus.FAILED_PAYMENT,
       OrderStatus.REFUND_REQUEST,
       OrderStatus.REFUNDING,
       OrderStatus.REFUNDED,
-      OrderStatus.FAILED
+      OrderStatus.FAILED,
+      OrderStatus.CANCELLED
     ]
   }
 ]
 
 export default function OrderPage() {
-  const [status, setStatus] = useState<(typeof OrderStatusValues)[number]>(OrderStatus.PROCESSING)
+  const [status, setStatus] = useState<OrderStatusWithAll>('ALL')
   const [currentPage, setCurrentPage] = useState(1)
   const pageSize = 10
 
+  // Cải thiện cách xử lý setStatus để đảm bảo state được cập nhật đúng
+  const handleStatusChange = (newStatus: OrderStatusWithAll) => {
+    if (status !== newStatus) {
+      setStatus(newStatus)
+      setCurrentPage(1)
+    }
+  }
+
   const { data, isFetching, isError } = useGetAccountOrders({
-    status,
+    // @ts-ignore - API accepts undefined to return all orders
+    status: status === 'ALL' ? undefined : status,
     page_index: currentPage,
     page_size: pageSize
   })
@@ -137,7 +155,7 @@ export default function OrderPage() {
   }
 
   const handleClearFilters = () => {
-    setStatus(OrderStatus.PROCESSING)
+    handleStatusChange('ALL')
   }
 
   return (
@@ -155,55 +173,70 @@ export default function OrderPage() {
         <ScrollArea className='-mx-1 px-1'>
           <div className='flex flex-wrap gap-2 pb-1'>
             {/* Các trạng thái chính */}
-            {statusGroups[0].statuses.map((statusKey) => (
-              <Button
-                key={statusKey}
-                variant={status === statusKey ? 'default' : 'outline'}
-                onClick={() => {
-                  setStatus(statusKey)
-                  setCurrentPage(1)
-                }}
-                className={cn(
-                  'flex items-center gap-1',
-                  status === statusKey
-                    ? 'bg-primary text-white hover:bg-primary/90'
-                    : `${statusConfig[statusKey].color} hover:opacity-90 border-0`
-                )}
-              >
-                {statusConfig[statusKey].icon}
-                {statusConfig[statusKey].text}
-              </Button>
-            ))}
+            {statusGroups[0].statuses.map((statusKey) => {
+              // Kiểm tra xem button này có phải là trạng thái hiện tại không
+              const isActive = status === statusKey
+
+              return (
+                <Button
+                  key={statusKey}
+                  variant='outline'
+                  onClick={() => {
+                    handleStatusChange(statusKey)
+                  }}
+                  className={cn(
+                    'flex items-center gap-1',
+                    isActive
+                      ? 'bg-primary text-white hover:bg-primary/90 hover:text-white border-primary'
+                      : `${statusConfig[statusKey].color} hover:opacity-90 border-0`
+                  )}
+                >
+                  {statusConfig[statusKey].icon}
+                  {statusConfig[statusKey].text}
+                </Button>
+              )
+            })}
 
             {/* Thay thế dropdown bằng DropdownMenu component từ shadcn/ui */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant='outline' className='border-dashed gap-1 min-w-[130px]'>
+                <Button
+                  variant='outline'
+                  className={cn(
+                    'border-dashed gap-1 min-w-[130px]',
+                    // Highlighting dropdown button if any status in its list is active
+                    statusGroups[1].statuses.some((s) => s === status) ? 'bg-muted' : ''
+                  )}
+                >
                   <FilterX className='h-4 w-4' />
-                  Trạng thái khác
+                  {statusGroups[1].statuses.some((s) => s === status)
+                    ? statusConfig[status]?.text || 'Trạng thái khác'
+                    : 'Trạng thái khác'}
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align='start' className='w-56'>
-                {statusGroups[1].statuses.map((statusKey) => (
-                  <DropdownMenuItem
-                    key={statusKey}
-                    onClick={() => {
-                      setStatus(statusKey)
-                      setCurrentPage(1)
-                    }}
-                    className={cn(status === statusKey ? 'bg-gray-100' : '')}
-                  >
-                    <span
-                      className={cn(
-                        'flex items-center gap-2 rounded-full px-2 py-1 text-xs w-full',
-                        statusConfig[statusKey].color
-                      )}
+                {statusGroups[1].statuses.map((statusKey) => {
+                  const isActive = status === statusKey
+                  return (
+                    <DropdownMenuItem
+                      key={statusKey}
+                      onClick={() => {
+                        handleStatusChange(statusKey)
+                      }}
+                      className={cn(isActive ? 'bg-muted' : '')}
                     >
-                      {statusConfig[statusKey].icon}
-                      {statusConfig[statusKey].text}
-                    </span>
-                  </DropdownMenuItem>
-                ))}
+                      <span
+                        className={cn(
+                          'flex items-center gap-2 rounded-full px-2 py-1 text-xs w-full',
+                          statusConfig[statusKey].color
+                        )}
+                      >
+                        {statusConfig[statusKey].icon}
+                        {statusConfig[statusKey].text}
+                      </span>
+                    </DropdownMenuItem>
+                  )
+                })}
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
@@ -286,7 +319,7 @@ export default function OrderPage() {
         )}
 
         {/* Empty State - No Orders */}
-        {!isFetching && !isError && orders.length === 0 && (
+        {!isFetching && !isError && orders?.length === 0 && status === 'ALL' && (
           <Card className='border-dashed'>
             <CardContent className='p-6 flex flex-col items-center justify-center py-16 text-center'>
               <div className='rounded-full bg-muted p-6 mb-4'>
@@ -307,7 +340,7 @@ export default function OrderPage() {
         )}
 
         {/* No Results From Search/Filter */}
-        {!isFetching && !isError && orders.length > 0 && orders.length === 0 && (
+        {!isFetching && !isError && orders?.length === 0 && status !== 'ALL' && (
           <Card className='border-dashed'>
             <CardContent className='p-6 flex flex-col items-center justify-center py-12 text-center'>
               <div className='rounded-full bg-muted p-4 mb-4'>
@@ -328,39 +361,37 @@ export default function OrderPage() {
         {/* Actual Orders */}
         {!isFetching &&
           !isError &&
-          orders.length > 0 &&
-          orders.map((order) => (
-            <Card key={order.id}>
-              <Link href={`/setting/order/${order.id}`}>
+          orders?.length > 0 &&
+          orders.map((order, idx) => (
+            <Card key={order?.id || `order-${idx}`}>
+              <Link href={`/setting/order/${order?.id}`}>
                 <CardContent className='p-6'>
                   <div className='space-y-6'>
                     {/* Order Header */}
                     <div className='flex justify-between items-start'>
                       <div className='space-y-1'>
                         <div className='flex items-center gap-2'>
-                          <h3 className='font-medium'>Đơn hàng #{order.orderCode}</h3>
+                          <h3 className='font-medium'>Đơn hàng #{order?.orderCode}</h3>
                           <Badge
                             className={
-                              statusConfig[order.status as keyof typeof statusConfig]?.color ||
-                              'bg-gray-100 text-gray-700'
+                              statusConfig[order?.status as OrderStatusWithAll]?.color || 'bg-gray-100 text-gray-700'
                             }
                           >
                             <div className='flex items-center'>
-                              {statusConfig[order.status as keyof typeof statusConfig]?.icon}
-                              <span>
-                                {statusConfig[order.status as keyof typeof statusConfig]?.text || order.status}
-                              </span>
+                              {statusConfig[order?.status as OrderStatusWithAll]?.icon}
+                              <span>{statusConfig[order?.status as OrderStatusWithAll]?.text || order?.status}</span>
                             </div>
                           </Badge>
                         </div>
                         <div className='flex items-center gap-4 text-sm text-muted-foreground'>
                           <div className='flex items-center gap-1'>
                             <Calendar className='h-4 w-4' />
-                            {order.createdAtFormatted}
+                            {order?.createdAtFormatted ||
+                              (order?.orderDate ? new Date(order.orderDate).toLocaleDateString('vi-VN') : '')}
                           </div>
                           <div className='flex items-center gap-1'>
                             <CreditCard className='h-4 w-4' />
-                            {order.paymentMethod === 'COD' ? 'Thanh toán khi nhận hàng' : 'Thanh toán online'}
+                            {order?.paymentMethod === 'COD' ? 'Thanh toán khi nhận hàng' : 'Thanh toán online'}
                           </div>
                         </div>
                       </div>
@@ -375,32 +406,39 @@ export default function OrderPage() {
                     {/* Order Items */}
                     <div className='grid gap-4'>
                       {/* Courses */}
-                      {order.orderDetails.filter((detail) => !!detail.courseId).length > 0 && (
+                      {order?.orderDetails && order.orderDetails.filter((detail) => !!detail?.courseId).length > 0 && (
                         <div className='space-y-3'>
                           <div className='flex items-center gap-2 text-sm font-medium text-muted-foreground'>
                             <BookOpen className='h-4 w-4' />
-                            <span>Khóa học ({order.orderDetails.filter((detail) => !!detail.courseId).length})</span>
+                            <span>Khóa học ({order.orderDetails.filter((detail) => !!detail?.courseId).length})</span>
                           </div>
                           <div className='grid gap-3'>
                             {order.orderDetails
-                              .filter((detail) => !!detail.courseId)
-                              .map((detail) => (
-                                <div key={detail.id} className='flex items-center gap-3'>
-                                  {/* <div className='w-12 h-12 rounded-lg bg-muted' /> */}
+                              .filter((detail) => !!detail?.courseId)
+                              .map((detail, index) => (
+                                <div key={detail?.id || index} className='flex items-center gap-3'>
                                   <div className='w-12 h-12 rounded-lg overflow-hidden'>
                                     <Image
-                                      src={detail.itemImageUrl}
-                                      alt={detail.itemTitle}
+                                      src={detail?.itemImageUrl || '/placeholder.svg'}
+                                      alt={detail?.itemTitle || ''}
                                       width={50}
                                       height={50}
                                       className='object-cover w-full h-full'
                                     />
                                   </div>
-                                  <div>
-                                    <div className='font-medium'>{detail.itemTitle}</div>
-                                    <div className='text-sm text-muted-foreground'>
-                                      {detail.totalPrice.toLocaleString()}đ
+                                  <div className='flex-1'>
+                                    <div className='font-medium'>{detail?.itemTitle}</div>
+                                    <div className='flex items-center text-sm text-muted-foreground mt-1'>
+                                      <span>
+                                        {(detail?.unitPrice || 0).toLocaleString()}đ x {detail?.quantity || 0}
+                                      </span>
                                     </div>
+                                  </div>
+                                  <div className='text-sm font-medium'>
+                                    {(
+                                      detail?.totalPrice || (detail?.unitPrice || 0) * (detail?.quantity || 0)
+                                    ).toLocaleString()}
+                                    đ
                                   </div>
                                 </div>
                               ))}
@@ -409,32 +447,39 @@ export default function OrderPage() {
                       )}
 
                       {/* Products */}
-                      {order.orderDetails.filter((detail) => !!detail.productId).length > 0 && (
+                      {order?.orderDetails && order.orderDetails.filter((detail) => !!detail?.productId).length > 0 && (
                         <div className='space-y-3'>
                           <div className='flex items-center gap-2 text-sm font-medium text-muted-foreground'>
                             <Package className='h-4 w-4' />
-                            <span>Sản phẩm ({order.orderDetails.filter((detail) => !!detail.productId).length})</span>
+                            <span>Sản phẩm ({order.orderDetails.filter((detail) => !!detail?.productId).length})</span>
                           </div>
                           <div className='grid gap-3'>
                             {order.orderDetails
-                              .filter((detail) => !!detail.productId)
-                              .map((detail) => (
-                                <div key={detail.id} className='flex items-center gap-3'>
-                                  {/* <div className='w-12 h-12 rounded-lg bg-muted' /> */}
+                              .filter((detail) => !!detail?.productId)
+                              .map((detail, index) => (
+                                <div key={detail?.id || index} className='flex items-center gap-3'>
                                   <div className='w-12 h-12 rounded-lg overflow-hidden'>
                                     <Image
-                                      src={detail.itemImageUrl}
-                                      alt={detail.itemTitle}
+                                      src={detail?.itemImageUrl || '/placeholder.svg'}
+                                      alt={detail?.itemTitle || ''}
                                       width={50}
                                       height={50}
                                       className='object-cover w-full h-full'
                                     />
                                   </div>
-                                  <div>
-                                    <div className='font-medium'>{detail.itemTitle}</div>
-                                    <div className='text-sm text-muted-foreground'>
-                                      {detail.totalPrice.toLocaleString()}đ
+                                  <div className='flex-1'>
+                                    <div className='font-medium'>{detail?.itemTitle}</div>
+                                    <div className='flex items-center text-sm text-muted-foreground mt-1'>
+                                      <span>
+                                        {(detail?.unitPrice || 0).toLocaleString()}đ x {detail?.quantity || 0}
+                                      </span>
                                     </div>
+                                  </div>
+                                  <div className='text-sm font-medium'>
+                                    {(
+                                      detail?.totalPrice || (detail?.unitPrice || 0) * (detail?.quantity || 0)
+                                    ).toLocaleString()}
+                                    đ
                                   </div>
                                 </div>
                               ))}
@@ -448,7 +493,9 @@ export default function OrderPage() {
                     {/* Order Footer */}
                     <div className='flex items-center justify-between'>
                       <div className='text-sm text-muted-foreground'>Tổng tiền</div>
-                      <div className='text-lg font-bold text-primary'>{order.totalAmount.toLocaleString()}đ</div>
+                      <div className='text-lg font-bold text-primary'>
+                        {(order?.totalAmount || 0).toLocaleString()}đ
+                      </div>
                     </div>
                   </div>
                 </CardContent>
@@ -458,7 +505,7 @@ export default function OrderPage() {
       </div>
 
       {/* Pagination */}
-      {!isFetching && !isError && orders.length > 0 && totalPages > 1 && (
+      {!isFetching && !isError && orders?.length > 0 && totalPages > 1 && (
         <div className='flex justify-center'>
           <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={handlePageChange} />
         </div>

@@ -95,7 +95,6 @@ export default function CourseCategoriesPage() {
     try {
       await createCategoryMutation.mutateAsync(trimmedData)
       toast({
-        title: 'Thành công',
         description: 'Thêm danh mục mới thành công'
       })
       setCreateDialogOpen(false)
@@ -135,7 +134,6 @@ export default function CourseCategoriesPage() {
 
     if (!hasChanges) {
       toast({
-        title: 'Thông báo',
         description: 'Không có thay đổi nào để cập nhật',
         variant: 'default'
       })
@@ -150,7 +148,6 @@ export default function CourseCategoriesPage() {
         data: trimmedData
       })
       toast({
-        title: 'Thành công',
         description: 'Cập nhật danh mục thành công'
       })
       setEditDialogOpen(false)
@@ -168,7 +165,6 @@ export default function CourseCategoriesPage() {
       if (deleteCategoryMutation.isPending) return
       await deleteCategoryMutation.mutateAsync(id)
       toast({
-        title: 'Thành công',
         description: 'Xóa danh mục thành công'
       })
       setDeleteDialogOpen(false)

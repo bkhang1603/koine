@@ -9,6 +9,7 @@ import { TokenPayload } from '@/types/jwt.types'
 import { format, subDays, subMonths, subYears } from 'date-fns'
 import { io } from 'socket.io-client'
 import authApiRequest from '@/apiRequests/auth'
+import { OrderStatus, OrderStatusValues } from '@/constants/type'
 import { DateRange } from 'react-day-picker'
 
 export function cn(...inputs: ClassValue[]) {
@@ -365,6 +366,61 @@ export const formatRole = (role: string) => {
     default:
       return role
   }
+}
+
+export const translateOrderStatus = (status: (typeof OrderStatusValues)[number]) => {
+  switch (status) {
+    case OrderStatus.PENDING:
+      return 'Chờ xác nhận'
+    case OrderStatus.PROCESSING:
+      return 'Đang xử lý'
+    case OrderStatus.DELIVERING:
+      return 'Đang giao hàng'
+    case OrderStatus.DELIVERED:
+      return 'Đã giao hàng'
+    case OrderStatus.CANCELLED:
+      return 'Đã hủy'
+    case OrderStatus.FAILED:
+      return 'Thất bại'
+    case OrderStatus.FAILED_PAYMENT:
+      return 'Thất bại'
+    case OrderStatus.REFUND_REQUEST:
+      return 'Yêu cầu hoàn tiền'
+    case OrderStatus.REFUNDING:
+      return 'Đang hoàn tiền'
+    case OrderStatus.REFUNDED:
+      return 'Đã hoàn tiền'
+    case OrderStatus.COMPLETED:
+      return 'Đã hoàn tất'
+    default:
+      return status
+  }
+}
+
+export const formatDuration = (duration: number): string => {
+  const hours = Math.floor(duration / 3600)
+  const minutes = Math.floor((duration % 3600) / 60)
+  return `${hours} giờ ${minutes} phút`
+}
+
+export const formatDateEvent = (date: string): string => {
+  // Múi giờ đang bị lệch 7 giờ, cần trừ đi 7 giờ
+  const localTime = new Date(date).getTime() - 7 * 60 * 60 * 1000
+  const options: Intl.DateTimeFormatOptions = {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+    timeZone: 'Asia/Ho_Chi_Minh'
+  }
+  return new Date(localTime).toLocaleString('vi-VN', options)
+}
+
+export const formatAvatarFallback = (email: string): string => {
+  // Uppercase first letter of each part
+  if (!email) return ''
+  return `${email.slice(0, 2).toUpperCase()}`
 }
 
 export const formatOrderStatus = (status: string) => {

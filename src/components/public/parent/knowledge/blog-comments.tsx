@@ -12,15 +12,15 @@ import {
   useBlogReactUpdateMutation
 } from '@/queries/useBlog'
 import { handleErrorApi } from '@/lib/utils'
-import { useRouter } from 'next/navigation'
 import CommentModal from '@/components/public/parent/knowledge/comment-modal'
 import Loading from '@/components/loading'
 import ShareButton from '@/components/share-button'
 import { useEffect, useRef, useState } from 'react'
 import EmojiPicker from 'emoji-picker-react'
+import { useAuthModal } from '@/components/auth/auth-modal-provider'
 
 function BlogComments({ id }: { id: string }) {
-  const router = useRouter()
+  const { showLoginModal } = useAuthModal()
 
   const role = useAppStore((state) => state.role)
   const avatar = useAppStore((state) => state.avatar)
@@ -142,13 +142,18 @@ function BlogComments({ id }: { id: string }) {
 
   const handleOpenModal = () => {
     if (!role) {
-      router.push('/login')
+      showLoginModal()
     } else {
       setOpenModal(true)
     }
   }
 
   const handleReact = () => {
+    if (!role) {
+      showLoginModal()
+      return
+    }
+
     if (reactMutation.isPending) return
     setLocalReacted(!localReacted)
     setLocalTotalReacts((prev) => (!localReacted ? prev + 1 : prev - 1))

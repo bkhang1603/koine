@@ -10,7 +10,6 @@ export const Role = {
   ContentCreator: 'CONTENT_CREATOR',
   Expert: 'EXPERT',
   Salesman: 'SALESMAN',
-  Accounting: 'ACCOUNTING',
   Adult: 'ADULT',
   Child: 'CHILD',
   Supporter: 'SUPPORTER'
@@ -22,7 +21,6 @@ export const RoleValues = [
   Role.ContentCreator,
   Role.Expert,
   Role.Salesman,
-  Role.Accounting,
   Role.Adult,
   Role.Child,
   Role.Supporter
@@ -98,3 +96,11 @@ export const PaymentMethod = {
 } as const
 
 export const PaymentMethodValues = [PaymentMethod.BANKING, PaymentMethod.COD] as const
+
+export const RefundStatus = {
+  REFUND_REQUEST: 'REFUND_REQUEST',
+  REFUNDING: 'REFUNDING',
+  REFUNDED: 'REFUNDED'
+} as const
+
+export const RefundStatusValues = [RefundStatus.REFUND_REQUEST, RefundStatus.REFUNDING, RefundStatus.REFUNDED] as const

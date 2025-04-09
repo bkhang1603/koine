@@ -227,3 +227,10 @@ export const useGetChildProfileQuery = ({ enabled }: { enabled?: boolean }) => {
     enabled
   })
 }
+
+export const useGetMyOrdersReviews = () => {
+  return useQuery({
+    queryKey: ['my-orders-reviews'],
+    queryFn: accountApiRequest.getMyOrdersReviews
+  })
+}
