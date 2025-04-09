@@ -24,8 +24,8 @@ interface CourseButtonProps {
 
 export default function CourseButton({ course, variant = 'default', className }: CourseButtonProps) {
   const isAuth = useAppStore((state) => state.isAuth)
-  const addToCartMutation = useCartDetailCreateMutation()
   const { showLoginModal } = useAuthModal()
+  const addToCartMutation = useCartDetailCreateMutation()
 
   const handleAddToCart = async () => {
     try {

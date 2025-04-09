@@ -5,7 +5,6 @@ import { Card } from '@/components/ui/card'
 import EnrollButton from '@/components/public/parent/course/enroll-button'
 import CourseButton from '@/components/public/parent/course/course-button'
 import CourseReviews from '@/components/public/parent/course/course-reviews'
-import Link from 'next/link'
 import { wrapServerApi } from '@/lib/server-utils'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
@@ -15,6 +14,7 @@ import BuyNowButton from '@/components/public/parent/course/buy-now-button'
 import { Breadcrumb } from '@/components/public/parent/setting/Breadcrumb'
 import configRoute from '@/config/route'
 import { formatDuration } from '@/lib/utils'
+import PreviewButton from '@/components/public/parent/course/preview-button'
 
 // const formatDuration = (minutes: number) => {
 //   const hours = Math.floor(minutes / 60)
@@ -261,22 +261,7 @@ export default async function CourseDetail(props: {
 
                                 {/* Chỉ hiển thị nút Học thử cho các bài học đầu của chapter đầu tiên */}
                                 {chapterIndex === 0 && lessonIndex < limit && (
-                                  <TooltipProvider>
-                                    <Tooltip>
-                                      <TooltipTrigger asChild>
-                                        <Link
-                                          href={`/learn/${courseData.id}?lessonId=${lesson.id}&preview=true`}
-                                          className='flex items-center gap-1 px-2.5 py-1 bg-primary/10 text-primary rounded-full text-xs font-medium hover:bg-primary/20 transition-colors'
-                                        >
-                                          <Eye className='w-3.5 h-3.5' />
-                                          <span>Học thử</span>
-                                        </Link>
-                                      </TooltipTrigger>
-                                      <TooltipContent>
-                                        <p>Xem trước nội dung bài học</p>
-                                      </TooltipContent>
-                                    </Tooltip>
-                                  </TooltipProvider>
+                                  <PreviewButton courseId={courseData.id} lessonId={lesson.id} />
                                 )}
                               </div>
                             ))}

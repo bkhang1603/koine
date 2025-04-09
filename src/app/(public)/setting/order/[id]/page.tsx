@@ -14,7 +14,12 @@ import {
   ShoppingCart,
   CreditCard,
   Wallet,
-  BanknoteIcon
+  BanknoteIcon,
+  CheckCircle,
+  XCircle,
+  Truck,
+  FileEdit,
+  RefreshCcw
 } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
@@ -295,29 +300,110 @@ export default function OrderDetailPage(props: { params: Promise<{ id: string }>
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className='space-y-4'>
-                {order.orderStatusHistory && order.orderStatusHistory.length > 0 ? (
-                  order.orderStatusHistory
+              {order.orderStatusHistory && order.orderStatusHistory.length > 0 ? (
+                <div className='space-y-6'>
+                  {order.orderStatusHistory
                     .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
-                    .map((history, index) => (
-                      <div key={index} className='flex items-start gap-4'>
-                        <div className='flex h-8 w-8 items-center justify-center rounded-full bg-primary/10'>
-                          <Clock className='h-4 w-4 text-primary' />
-                        </div>
-                        <div className='space-y-1 flex-1'>
-                          <div className='flex items-center justify-between'>
-                            <p className='font-medium'>{translateOrderStatus(history.status)}</p>
-                            <time className='text-sm text-muted-foreground'>
-                              {format(new Date(history.timestamp), 'HH:mm - dd/MM/yyyy', { locale: vi })}
-                            </time>
+                    .map((history, index) => {
+                      // Choose icon and color based on status
+                      let statusIconColor = 'text-blue-500'
+                      let StatusIcon = Clock
+
+                      switch (history.status) {
+                        case OrderStatus.COMPLETED:
+                          statusIconColor = 'text-green-500'
+                          StatusIcon = CheckCircle
+                          break
+                        case OrderStatus.DELIVERED:
+                          statusIconColor = 'text-green-500'
+                          StatusIcon = Truck
+                          break
+                        case OrderStatus.REFUNDED:
+                          statusIconColor = 'text-green-500'
+                          StatusIcon = CheckCircle
+                          break
+                        case OrderStatus.CANCELLED:
+                          statusIconColor = 'text-red-500'
+                          StatusIcon = XCircle
+                          break
+                        case OrderStatus.FAILED:
+                          statusIconColor = 'text-red-500'
+                          StatusIcon = XCircle
+                          break
+                        case OrderStatus.FAILED_PAYMENT:
+                          statusIconColor = 'text-red-500'
+                          StatusIcon = XCircle
+                          break
+                        case OrderStatus.PENDING:
+                          statusIconColor = 'text-yellow-500'
+                          StatusIcon = Clock
+                          break
+                        case OrderStatus.DELIVERING:
+                          statusIconColor = 'text-blue-500'
+                          StatusIcon = Truck
+                          break
+                        case OrderStatus.PROCESSING:
+                          statusIconColor = 'text-indigo-500'
+                          StatusIcon = FileEdit
+                          break
+                        case OrderStatus.REFUNDING:
+                          statusIconColor = 'text-purple-500'
+                          StatusIcon = RefreshCcw
+                          break
+                        case OrderStatus.REFUND_REQUEST:
+                          statusIconColor = 'text-red-500'
+                          StatusIcon = RefreshCcw
+                          break
+                        default:
+                          break
+                      }
+
+                      return (
+                        <div key={index} className='relative'>
+                          {/* Status card */}
+                          <div className='bg-white rounded-xl border border-gray-100 p-4 shadow-sm hover:shadow-md transition-shadow'>
+                            <div className='flex items-start gap-3'>
+                              <div
+                                className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-${statusIconColor.split('-')[1]}-50`}
+                              >
+                                <StatusIcon className={`h-5 w-5 ${statusIconColor}`} />
+                              </div>
+
+                              <div className='flex-1 space-y-1'>
+                                <div className='flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1'>
+                                  <p className='font-medium text-base'>{translateOrderStatus(history.status)}</p>
+                                  <time className='text-sm text-muted-foreground'>
+                                    {format(new Date(history.timestamp), 'HH:mm - dd/MM/yyyy', { locale: vi })}
+                                  </time>
+                                </div>
+
+                                {/* Add status-specific messages */}
+                                <p className='text-sm text-muted-foreground'>
+                                  {history.status === OrderStatus.PROCESSING && 'Đơn hàng của bạn đang được xử lý'}
+                                  {history.status === OrderStatus.COMPLETED && 'Đơn hàng đã được hoàn thành thành công'}
+                                  {history.status === OrderStatus.CANCELLED && 'Đơn hàng đã bị hủy'}
+                                  {history.status === OrderStatus.PENDING && 'Đơn hàng đang chờ xử lý'}
+                                  {history.status === OrderStatus.DELIVERING && 'Đơn hàng đang được giao đến bạn'}
+                                  {history.status === OrderStatus.DELIVERED && 'Đơn hàng đã được giao thành công'}
+                                  {history.status === OrderStatus.REFUND_REQUEST && 'Yêu cầu hoàn tiền đã được gửi'}
+                                  {history.status === OrderStatus.REFUNDING && 'Đơn hàng đang được hoàn tiền'}
+                                  {history.status === OrderStatus.REFUNDED && 'Đơn hàng đã được hoàn tiền thành công'}
+                                </p>
+                              </div>
+                            </div>
                           </div>
                         </div>
-                      </div>
-                    ))
-                ) : (
+                      )
+                    })}
+                </div>
+              ) : (
+                <div className='flex flex-col items-center justify-center py-8 text-center'>
+                  <div className='h-12 w-12 rounded-full bg-gray-100 flex items-center justify-center mb-3'>
+                    <Clock className='h-6 w-6 text-gray-400' />
+                  </div>
                   <p className='text-muted-foreground'>Không có lịch sử trạng thái</p>
-                )}
-              </div>
+                </div>
+              )}
             </CardContent>
           </Card>
         </div>
@@ -334,13 +420,17 @@ export default function OrderDetailPage(props: { params: Promise<{ id: string }>
                   <span className='text-muted-foreground'>Tổng tiền hàng</span>
                   <span>{order.totalAmount.toLocaleString()}đ</span>
                 </div>
-                <div className='flex justify-between text-sm'>
-                  <span className='text-muted-foreground'>Phí vận chuyển</span>
-                  <span>{order.deliAmount.toLocaleString()}đ</span>
-                </div>
+                {!hasOnlyCourses && (
+                  <div className='flex justify-between text-sm'>
+                    <span className='text-muted-foreground'>Phí vận chuyển</span>
+                    <span>{order.deliAmount.toLocaleString()}đ</span>
+                  </div>
+                )}
                 <div className='flex justify-between text-sm font-medium'>
                   <span>Tổng thanh toán</span>
-                  <span className='text-red-600'>{(order.totalAmount + order.deliAmount).toLocaleString()}đ</span>
+                  <span className='text-red-600'>
+                    {(order.totalAmount + (hasOnlyCourses ? 0 : order.deliAmount)).toLocaleString()}đ
+                  </span>
                 </div>
               </div>
 
