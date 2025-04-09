@@ -3,9 +3,9 @@ import productApiRequest from '@/apiRequests/product'
 import courseApiRequest from '@/apiRequests/course'
 import eventApiRequest from '@/apiRequests/event'
 import envConfig, { locales } from '@/config'
-import type { Blog, Product, Course, Event } from '@/types/api'
-import type { MetadataRoute } from 'next'
 import { wrapServerApi } from '@/lib/server-utils'
+import type { ApiResponse, Blog, Product, Course, Event } from '@/types/api'
+import type { MetadataRoute } from 'next'
 
 const staticRoutes: MetadataRoute.Sitemap = [
   {
@@ -55,21 +55,25 @@ const staticRoutes: MetadataRoute.Sitemap = [
   }
 ]
 
+// Hàm helper để lấy dữ liệu từ API một cách an toàn
+async function getApiData<T>(apiCall: () => Promise<ApiResponse<T>>): Promise<T[]> {
+  try {
+    const result = await wrapServerApi(apiCall)
+    return result?.payload?.data || []
+  } catch (error) {
+    console.error('Error fetching data:', error)
+    return []
+  }
+}
+
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  // Lấy dữ liệu từ API với wrapServerApi
-  const blogResult = await wrapServerApi(() => blogApiRequest.getBlogsCache({ page_index: 1, page_size: 1000 }))
-  const blogList = blogResult?.payload?.data || []
-
-  const productResult = await wrapServerApi(() =>
-    productApiRequest.getProductsCache({ page_index: 1, page_size: 1000 })
-  )
-  const productList = productResult?.payload?.data || []
-
-  const courseResult = await wrapServerApi(() => courseApiRequest.getCoursesCache({ page_index: 1, page_size: 1000 }))
-  const courseList = courseResult?.payload?.data || []
-
-  const eventResult = await wrapServerApi(() => eventApiRequest.getAllEvent())
-  const eventList = eventResult?.payload?.data || []
+  // Lấy dữ liệu từ API với xử lý lỗi
+  const [blogList, productList, courseList, eventList] = await Promise.all([
+    getApiData<Blog>(() => blogApiRequest.getBlogsCache({ page_index: 1, page_size: 1000 })),
+    getApiData<Product>(() => productApiRequest.getProductsCache({ page_index: 1, page_size: 1000 })),
+    getApiData<Course>(() => courseApiRequest.getCoursesCache({ page_index: 1, page_size: 1000 })),
+    getApiData<Event>(() => eventApiRequest.getAllEvent())
+  ])
 
   // Xử lý các route tĩnh
   const localizeStaticSiteMap = locales.reduce((acc) => {
@@ -86,7 +90,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   }, [] as MetadataRoute.Sitemap)
 
   // Xử lý sitemap cho blog
-  const blogSiteMap: MetadataRoute.Sitemap = blogList.map((blog: Blog) => ({
+  const blogSiteMap: MetadataRoute.Sitemap = blogList.map((blog) => ({
     url: `${envConfig.NEXT_PUBLIC_URL}/knowledge/${blog.slug}`,
     lastModified: blog.updatedAt || new Date(),
     changeFrequency: 'weekly' as const,
@@ -94,7 +98,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   }))
 
   // Xử lý sitemap cho sản phẩm
-  const productSiteMap: MetadataRoute.Sitemap = productList.map((product: Product) => ({
+  const productSiteMap: MetadataRoute.Sitemap = productList.map((product) => ({
     url: `${envConfig.NEXT_PUBLIC_URL}/product/${product.slug}`,
     lastModified: product.updatedAt || new Date(),
     changeFrequency: 'weekly' as const,
@@ -102,7 +106,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   }))
 
   // Xử lý sitemap cho khóa học
-  const courseSiteMap: MetadataRoute.Sitemap = courseList.map((course: Course) => ({
+  const courseSiteMap: MetadataRoute.Sitemap = courseList.map((course) => ({
     url: `${envConfig.NEXT_PUBLIC_URL}/course/${course.slug}`,
     lastModified: course.updatedAt || new Date(),
     changeFrequency: 'weekly' as const,
@@ -110,7 +114,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   }))
 
   // Xử lý sitemap cho sự kiện
-  const eventSiteMap: MetadataRoute.Sitemap = eventList.map((event: Event) => ({
+  const eventSiteMap: MetadataRoute.Sitemap = eventList.map((event) => ({
     url: `${envConfig.NEXT_PUBLIC_URL}/event/${event.id}`,
     lastModified: event.updateAt || new Date(),
     changeFrequency: 'daily' as const,
