@@ -85,10 +85,10 @@ export const useCreateRefundOrderMutation = () => {
 }
 
 // get order cho admin
-export const useGetAdminOrdersQuery = (pageSize: number, pageIndex: number, status: string) => {
+export const useGetAdminOrdersQuery = (pageSize: number, pageIndex: number, keyword?: string, status?: string) => {
   return useQuery({
-    queryKey: ['adminOrders', status, pageSize, pageIndex],
-    queryFn: () => orderApiRequest.getAdminOrders(pageSize, pageIndex, status)
+    queryKey: ['adminOrders', keyword, status, pageSize, pageIndex],
+    queryFn: () => orderApiRequest.getAdminOrders(pageSize, pageIndex, keyword, status)
   })
 }
 

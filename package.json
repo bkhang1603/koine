@@ -75,6 +75,7 @@
     "nextjs-toploader": "^3.7.15",
     "react": "19.0.0",
     "react-datepicker": "^8.2.1",
+    "react-day-picker": "^9.6.5",
     "react-dom": "19.0.0",
     "react-hook-form": "^7.52.0",
     "react-responsive-masonry": "^2.3.0",

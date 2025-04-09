@@ -3,7 +3,7 @@
 import { Button } from '@/components/ui/button'
 import { Plus } from 'lucide-react'
 import { Input } from '@/components/ui/input'
-import { useState, useEffect, useRef } from 'react'
+import { useState } from 'react'
 import { CreateCategoryDialog } from '@/components/private/common/blog/create-category-dialog'
 import { EditCategoryDialog } from '@/components/private/common/blog/edit-category-dialog'
 import {
@@ -63,14 +63,6 @@ export default function BlogCategoriesPage() {
   const [editingCategoryId, setEditingCategoryId] = useState<string | undefined>()
   const [, setDeleteDialogOpen] = useState(false)
   const [, setDeleteCategoryId] = useState<string | undefined>()
-
-  const isMounted = useRef(true)
-
-  useEffect(() => {
-    return () => {
-      isMounted.current = false
-    }
-  }, [])
 
   const { data: categoriesResponse, isLoading } = useCategoryBlogQuery({
     page_index: currentPageIndex,

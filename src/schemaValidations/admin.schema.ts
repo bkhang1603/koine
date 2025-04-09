@@ -214,64 +214,66 @@ export const getOrderDetailAdminRes = z.object({
   info: z.string(),
   message: z.string(),
   data: z.object({
-    id: z.string(),
-    userId: z.string(),
-    orderDate: z.string(),
-    totalAmount: z.number(),
-    deliMethod: z.enum(DeliveryMethodValues),
-    deliAmount: z.number(),
-    status: z.string(),
-    note: z.string().nullable(),
-    isDeleted: z.boolean(),
-    createdAt: z.string(),
-    updatedAt: z.string(),
-    orderCode: z.string(),
-    orderDetails: z.array(
-      z.object({
-        id: z.string(),
-        orderId: z.string(),
-        productId: z.string().nullable(),
-        courseId: z.string().nullable(),
-        comboId: z.string().nullable(),
-        quantity: z.number(),
-        unitPrice: z.number(),
-        discount: z.number(),
-        totalPrice: z.number(),
-        isDeleted: z.boolean(),
-        createdAt: z.string(),
-        updatedAt: z.string(),
-        course: z
-          .object({
-            title: z.string(),
-            description: z.string(),
-            imageUrl: z.string()
-          })
-          .nullable(),
-        product: z
-          .object({
-            name: z.string(),
-            description: z.string(),
-            imageUrl: z.string(),
-            stockQuantity: z.number()
-          })
-          .nullable(),
-        combo: z
-          .object({
-            name: z.string(),
-            description: z.string()
-          })
-          .nullable()
-      })
-    ),
-    createdAtFormatted: z.string(),
-    updatedAtFormatted: z.string(),
+    orderInfo: z.object({
+      id: z.string().uuid(),
+      orderCode: z.string(),
+      orderDate: z.string().datetime({ offset: true }),
+      orderDateFormatted: z.string(),
+      status: z.string(),
+      totalAmount: z.number().nonnegative(),
+      deliAmount: z.number().nonnegative(),
+      grandTotal: z.number().nonnegative(),
+      deliMethod: z.string(),
+      note: z.string(),
+      createdAt: z.string(),
+      updatedAt: z.string(),
+      createdAtFormatted: z.string(),
+      updatedAtFormatted: z.string(),
+      refundRequestDate: z.string().datetime({ offset: true }).nullable(),
+      refundReason: z.string(),
+      refundNote: z.string(),
+      refundProcessedDate: z.string().datetime({ offset: true }).nullable()
+    }),
+    customerInfo: z.object({
+      id: z.string().uuid(),
+      email: z.string().email(),
+      fullName: z.string(),
+      phone: z.string()
+    }),
     deliveryInfo: z.object({
       name: z.string(),
       address: z.string(),
       phone: z.string(),
       status: z.string()
     }),
-    payMethod: z.string()
+    paymentInfo: z.object({
+      payMethod: z.string(),
+      payStatus: z.string(),
+      payDate: z.string().datetime({ offset: true }),
+      payDateFormatted: z.string(),
+      payAmount: z.number().nonnegative()
+    }),
+    orderHistory: z.array(
+      z.object({
+        status: z.string(),
+        timestamp: z.string().datetime({ offset: true }),
+        timestampFormatted: z.string()
+      })
+    ),
+    orderItems: z.array(
+      z.object({
+        orderDetailId: z.string().uuid(),
+        quantity: z.number().int().positive(),
+        unitPrice: z.number().nonnegative(),
+        discount: z.number().min(0).max(1),
+        totalPrice: z.number().nonnegative(),
+        type: z.string(),
+        itemId: z.string().uuid(),
+        name: z.string(),
+        description: z.string(),
+        imageUrl: z.string().url()
+      })
+    )
   })
 })
 
@@ -400,40 +402,48 @@ export const getProductListAdminRes = z.object({
   statusCode: z.number(),
   info: z.string(),
   message: z.string(),
-  data: z.array(
-    z.object({
-      isDeleted: z.boolean(),
-      createdAt: z.string(),
-      updatedAt: z.string(),
-      id: z.string(),
-      creatorId: z.string(),
-      name: z.string(),
-      nameNoTone: z.string(),
-      slug: z.string(),
-      description: z.string(),
-      detail: z.string(),
-      guide: z.string(),
-      price: z.number(),
-      discount: z.number(),
-      stockQuantity: z.number(),
-      categories: z.array(
-        z.object({
-          id: z.string(),
-          name: z.string()
-        })
-      ),
-      images: z.array(
-        z.object({
-          name: z.string(),
-          imageUrl: z.string()
-        })
-      ),
-      totalRating: z.number(),
-      averageRating: z.number(),
-      createdAtFormatted: z.string(),
-      updatedAtFormatted: z.string()
-    })
-  ),
+  data: z.object({
+    statistics: z.object({
+      totalProducts: z.number().int().nonnegative(),
+      totalProductCategories: z.number().int().nonnegative(),
+      totalOutOfStockProducts: z.number().int().nonnegative(),
+      totalProductReviews: z.number().int().nonnegative()
+    }),
+    products: z.array(
+      z.object({
+        isDeleted: z.boolean(),
+        createdAt: z.string(),
+        updatedAt: z.string(),
+        id: z.string().uuid(),
+        creatorId: z.string().uuid(),
+        name: z.string(),
+        nameNoTone: z.string(),
+        slug: z.string(),
+        description: z.string(),
+        detail: z.string(),
+        guide: z.string(),
+        price: z.number().nonnegative(),
+        discount: z.number().min(0).max(1),
+        stockQuantity: z.number().int().nonnegative(),
+        categories: z.array(
+          z.object({
+            id: z.string().uuid(),
+            name: z.string()
+          })
+        ),
+        images: z.array(
+          z.object({
+            name: z.string(),
+            imageUrl: z.string().url()
+          })
+        ),
+        totalRating: z.number().int().nonnegative(),
+        averageRating: z.number().nonnegative(),
+        createdAtFormatted: z.string(),
+        updatedAtFormatted: z.string()
+      })
+    )
+  }),
   pagination: z.object({
     pageSize: z.number(),
     totalItem: z.number(),
@@ -542,6 +552,68 @@ export const getUserDetailAdminRes = z.object({
   })
 })
 
+export const getDashboardStatisticsRes = z.object({
+  statusCode: z.number(),
+  info: z.string(),
+  message: z.string(),
+  data: z.object({
+    statistics: z.object({
+      totalRevenue: z.number().nonnegative(),
+      averageRevenuePerDay: z.number().nonnegative(),
+      totalOrders: z.number().int().nonnegative(),
+      averageOrdersPerDay: z.number().nonnegative(),
+      completedOrders: z.number().int().nonnegative(),
+      completionRate: z.number().nonnegative(),
+      uniqueCustomers: z.number().int().nonnegative(),
+      averageOrderValue: z.number().nonnegative()
+    }),
+    revenueData: z.array(
+      z.object({
+        type: z.string(),
+        time: z.string(),
+        amount: z.number().nonnegative(),
+        ordersCount: z.number().int().nonnegative()
+      })
+    ),
+
+    // 3. Order Status Data Array
+    orderStatusData: z.array(
+      z.object({
+        status: z.string(),
+        count: z.number().int().nonnegative()
+      })
+    ),
+    bestSellingProducts: z.array(
+      z.object({
+        name: z.string(),
+        quantity: z.number().int().nonnegative(),
+        revenue: z.number().nonnegative()
+      })
+    ),
+    bestSellingCourses: z.array(
+      z.object({
+        name: z.string(),
+        quantity: z.number().int().nonnegative(),
+        revenue: z.number().nonnegative()
+      })
+    ),
+    locationDistribution: z.array(
+      z.object({
+        name: z.string(),
+        count: z.number().int().nonnegative(),
+        percentage: z.number().nonnegative()
+      })
+    ),
+    ageDistribution: z.array(
+      z.object({
+        name: z.string(),
+        count: z.number().int().nonnegative(),
+        percentage: z.number().nonnegative()
+      })
+    )
+  })
+})
+
 // Courses
 export type GetCoursesListAdminResType = z.infer<typeof getCoursesListAdminRes>
 
@@ -568,3 +640,6 @@ export type GetProductDetailAdminResType = z.TypeOf<typeof getProductDetailAdmin
 export type GetUserListAdminResType = z.TypeOf<typeof getUserListAdminRes>
 
 export type GetUserDetailAdminResType = z.TypeOf<typeof getUserDetailAdminRes>
+
+// Dashboard
+export type GetDashboardStatisticsResType = z.TypeOf<typeof getDashboardStatisticsRes>

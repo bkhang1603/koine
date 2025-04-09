@@ -1,11 +1,19 @@
 import productApiRequest from '@/apiRequests/product'
-import { useQuery, useMutation } from '@tanstack/react-query'
-import { CreateProductBodyType } from '@/schemaValidations/product.schema'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { CreateProductBodyType, UpdateCategoryProductBodyType } from '@/schemaValidations/product.schema'
 
-export const useGetCategoryProductsQuery = () => {
+export const useGetCategoryProductsQuery = ({
+  page_index,
+  page_size,
+  keyword
+}: {
+  page_index?: number | undefined
+  page_size?: number | undefined
+  keyword?: string | string[] | undefined
+}) => {
   return useQuery({
-    queryKey: ['categoryProducts'],
-    queryFn: () => productApiRequest.getCategoryProducts()
+    queryKey: ['categoryProducts', page_index, page_size, keyword],
+    queryFn: () => productApiRequest.getCategoryProducts({ page_index, page_size, keyword })
   })
 }
 
@@ -84,5 +92,53 @@ export const useProductDetailAdminQuery = ({ productId }: { productId: string })
 export const useCreateProductMutation = () => {
   return useMutation({
     mutationFn: (data: CreateProductBodyType) => productApiRequest.createProduct(data)
+  })
+}
+
+export const useCreateCategoryProductMutation = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: productApiRequest.createCategoryProduct,
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ['categoryProducts']
+      })
+    }
+  })
+}
+
+export const useUpdateCategoryProductMutation = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: ({ id, data }: { id: string; data: UpdateCategoryProductBodyType }) =>
+      productApiRequest.updateCategoryProduct(id, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ['categoryProducts']
+      })
+    }
+  })
+}
+
+export const useDeleteCategoryProductMutation = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: productApiRequest.deleteCategoryProduct,
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ['categoryProducts']
+      })
+    }
+  })
+}
+
+export const useGetCategoryProductDetailQuery = ({ id, enabled }: { id: string; enabled?: boolean }) => {
+  return useQuery({
+    queryKey: ['categoryProductDetail', id],
+    queryFn: () => productApiRequest.getCategoryProductDetail(id),
+    enabled: enabled ?? !!id
   })
 }

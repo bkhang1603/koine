@@ -21,7 +21,11 @@ import {
   DeleteCategoryCourseResType,
   GetCategoryCourseDetailResType,
   UpdateCategoryCourseBodyType,
-  UpdateCategoryCourseResType
+  UpdateCategoryCourseResType,
+  CreateLessonBodyType,
+  UpdateLessonBodyType,
+  UpdateChapterBodyType,
+  CreateChapterBodyType
 } from '@/schemaValidations/course.schema'
 import { OnlyMessageResType } from '@/schemaValidations/special.schema'
 
@@ -86,8 +90,14 @@ const courseApiRequest = {
     http.post<OnlyMessageResType>(`/courses/active-course-enroll`, data),
   getCourseProgress: (id: string) => http.get<UserCourseProgressResType>(`/user-progresses/status/${id}`),
   getChapters: (id: string) => http.get<ChaptersResType>(`/chapters/${id}`),
+  createChapter: (data: CreateChapterBodyType) => http.post<OnlyMessageResType>('/chapters', data),
+  updateChapter: (id: string, data: UpdateChapterBodyType) => http.put<OnlyMessageResType>(`/chapters/${id}`, data),
+  deleteChapter: (id: string) => http.delete<OnlyMessageResType>(`/chapters/${id}`),
   getLessons: (id: string) => http.get<LessonsResType>(`/lessons/${id}`),
   getLesson: (id: string) => http.get<LessonResType>(`/lessons/detail/${id}`),
+  createLesson: (data: CreateLessonBodyType) => http.post<OnlyMessageResType>('/lessons', data),
+  updateLesson: (id: string, data: UpdateLessonBodyType) => http.put<OnlyMessageResType>(`/lessons/${id}`, data),
+  deleteLesson: (id: string) => http.delete<OnlyMessageResType>(`/lessons/${id}`),
   getCourseReview: (id: string) => http.get<CourseReviewResType>(`/courses/${id}/reviews`),
   getAllCoursesForCustom: () => http.get<AllCoursesForCustomResType>(`/courses/all-basic-course-info`),
   getCoursesAdmin: ({

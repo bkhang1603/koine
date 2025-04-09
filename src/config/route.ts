@@ -41,6 +41,20 @@ const configRoute = {
     game: '/kid/game',
     achievement: '/kid/achievement'
   },
+  manager: {
+    dashboard: '/manager',
+    order: '/manager/order',
+    blog: '/manager/blog',
+    addBlog: '/manager/blog/add',
+    editBlog: '/manager/blog/edit',
+    course: '/manager/course',
+    addCourse: '/manager/course/add',
+    editCourse: '/manager/course/edit',
+    product: '/manager/product',
+    productNew: '/manager/product/new',
+    productEdit: '/manager/product/edit',
+    user: '/manager/user'
+  },
   admin: {
     dashboard: '/admin',
     order: '/admin/order',
@@ -54,6 +68,20 @@ const configRoute = {
     productNew: '/admin/product/new',
     productEdit: '/admin/product/edit',
     user: '/admin/user'
+  },
+  salesman: {
+    dashboard: '/salesman',
+    order: '/salesman/order',
+    blog: '/salesman/blog',
+    addBlog: '/salesman/blog/add',
+    editBlog: '/salesman/blog/edit',
+    course: '/salesman/course',
+    addCourse: '/salesman/course/add',
+    editCourse: '/salesman/course/edit',
+    product: '/salesman/product',
+    productNew: '/salesman/product/new',
+    productEdit: '/salesman/product/edit',
+    user: '/salesman/user'
   },
   support: {
     dashboard: '/support',

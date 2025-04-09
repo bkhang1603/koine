@@ -129,7 +129,9 @@ export function CourseContent({
                       </div>
                       <div className='flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity'>
                         <Button variant='ghost' size='icon' className='h-8 w-8 hover:bg-accent/20' asChild>
-                          <Link href={`/content-creator/course/${chapter.courseId}/lesson/${lesson.id}`}>
+                          <Link
+                            href={`/content-creator/course/${chapter.courseId}/chapter/${chapter.id}/lesson/${lesson.id}`}
+                          >
                             <Pencil className='w-4 h-4' />
                           </Link>
                         </Button>

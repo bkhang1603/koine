@@ -2,8 +2,7 @@
 
 import { Button } from '@/components/ui/button'
 import { Plus } from 'lucide-react'
-import { Input } from '@/components/ui/input'
-import { useState, useEffect, useRef } from 'react'
+import { useState } from 'react'
 import { CreateCategoryDialog } from '@/components/private/common/blog/create-category-dialog'
 import { EditCategoryDialog } from '@/components/private/common/blog/edit-category-dialog'
 import {
@@ -18,7 +17,7 @@ import { handleErrorApi } from '@/lib/utils'
 import { format } from 'date-fns'
 import { vi } from 'date-fns/locale'
 import { TableCustom, dataListType } from '@/components/table-custom'
-import { useRouter, useSearchParams } from 'next/navigation'
+import { useSearchParams } from 'next/navigation'
 import { MoreOptions } from '@/components/private/common/more-options'
 
 type CategoryFormData = {
@@ -27,7 +26,6 @@ type CategoryFormData = {
 }
 
 export default function BlogCategoriesPage() {
-  const router = useRouter()
   const searchParams = useSearchParams()
 
   // Get values from searchParams or use default values
@@ -35,42 +33,11 @@ export default function BlogCategoriesPage() {
   const currentPageSize = Number(searchParams.get('page_size')) || 5
   const currentPageIndex = Number(searchParams.get('page_index')) || 1
 
-  // Function to update URL when values change
-  const updateSearchParams = (newParams: { keyword?: string; page_size?: number; page_index?: number }) => {
-    const params = new URLSearchParams(searchParams.toString())
-
-    if (newParams.keyword !== undefined) {
-      if (newParams.keyword === '') {
-        params.delete('keyword')
-      } else {
-        params.set('keyword', newParams.keyword)
-      }
-    }
-
-    if (newParams.page_size !== undefined) {
-      params.set('page_size', newParams.page_size.toString())
-    }
-
-    if (newParams.page_index !== undefined) {
-      params.set('page_index', newParams.page_index.toString())
-    }
-
-    router.push(`?${params.toString()}`)
-  }
-
   const [createDialogOpen, setCreateDialogOpen] = useState(false)
   const [editDialogOpen, setEditDialogOpen] = useState(false)
   const [editingCategoryId, setEditingCategoryId] = useState<string | undefined>()
   const [, setDeleteDialogOpen] = useState(false)
   const [, setDeleteCategoryId] = useState<string | undefined>()
-
-  const isMounted = useRef(true)
-
-  useEffect(() => {
-    return () => {
-      isMounted.current = false
-    }
-  }, [])
 
   const { data: categoriesResponse, isLoading } = useCategoryBlogQuery({
     page_index: currentPageIndex,
@@ -280,16 +247,6 @@ export default function BlogCategoriesPage() {
         </Button>
       </div>
 
-      {/* Search */}
-      <div className='flex flex-col sm:flex-row gap-4'>
-        <Input
-          placeholder='Tìm kiếm danh mục...'
-          className='w-full sm:w-[300px]'
-          value={currentKeyword}
-          onChange={(e) => updateSearchParams({ keyword: e.target.value, page_index: 1 })}
-        />
-      </div>
-
       {/* Table */}
       <TableCustom
         data={tableData}
@@ -297,6 +254,9 @@ export default function BlogCategoriesPage() {
         bodyColumn={bodyColumn}
         href={'/admin/blog/categories'}
         loading={isLoading}
+        showSearch={true}
+        searchParamName='keyword'
+        searchPlaceholder='Tìm kiếm danh mục...'
       />
 
       <CreateCategoryDialog

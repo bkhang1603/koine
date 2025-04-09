@@ -2,7 +2,7 @@
 import { Button } from '@/components/ui/button'
 import { Accordion } from '@/components/ui/accordion'
 import { Plus } from 'lucide-react'
-import { ChapterItem } from '@/components/private/content-creator/course/chapter-item'
+import { ChapterItem } from '@/components/private/common/course/chapter-item'
 
 interface Chapter {
   id: string

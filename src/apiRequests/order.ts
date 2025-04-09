@@ -27,11 +27,11 @@ const orderApiRequest = {
     http.get<RefundOrderResType>(`/orders/my-refund?page_size=${page_size}&page_index=${page_index}`),
   createRefundOrder: ({ orderId, body }: { orderId: string; body: CreateRefundOrderBody }) =>
     http.post<CreateRefundOrderBodyRes>(`/orders/refund/${orderId}/request-refund`, body),
-  getAdminOrders: (pageSize: number, pageIndex: number, status?: string) =>
+  getAdminOrders: (pageSize: number, pageIndex: number, keyword?: string, status?: string) =>
     http.get<GetOrderListAdminResType>(
-      `/orders?${status ? `status=${status}` : ``}page_size=${pageSize}&page_index=${pageIndex}`
+      `/orders?${keyword ? `keyword=${keyword}&` : ''}${status ? `status=${status}&` : ''}page_size=${pageSize}&page_index=${pageIndex}`
     ),
-  getAdminOrderById: (id: string) => http.get<GetOrderDetailAdminResType>(`/orders/${id}`)
+  getAdminOrderById: (id: string) => http.get<GetOrderDetailAdminResType>(`/orders/detail/${id}`)
 }
 
 export default orderApiRequest

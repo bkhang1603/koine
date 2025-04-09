@@ -6,9 +6,10 @@ import { twMerge } from 'tailwind-merge'
 import { jwtDecode } from 'jwt-decode'
 import envConfig from '@/config'
 import { TokenPayload } from '@/types/jwt.types'
-import { format } from 'date-fns'
+import { format, subDays, subMonths, subYears } from 'date-fns'
 import { io } from 'socket.io-client'
 import authApiRequest from '@/apiRequests/auth'
+import { DateRange } from 'react-day-picker'
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
@@ -364,4 +365,197 @@ export const formatRole = (role: string) => {
     default:
       return role
   }
+}
+
+export const formatOrderStatus = (status: string) => {
+  switch (status) {
+    case 'PROCESSING':
+      return 'Đang xử lý'
+    case 'DELIVERING':
+      return 'Đang giao'
+    case 'COMPLETED':
+      return 'Hoàn thành'
+    case 'CANCELLED':
+      return 'Đã hủy'
+    default:
+      return status
+  }
+}
+
+export const formatPaymentStatus = (status: string) => {
+  switch (status) {
+    case 'PROCESSING':
+      return 'Đang xử lý'
+    case 'SUC':
+      return 'Đang giao'
+    case 'COMPLETED':
+      return 'Hoàn thành'
+    case 'CANCELLED':
+      return 'Đã hủy'
+    default:
+      return status
+  }
+}
+
+export const formatPercentage = (value: number, minDecimals = 1, maxDecimals = 1): string => {
+  // Convert decimal to percentage (e.g., 0.5 to 50)
+  const percentage = value * 100
+
+  // Check if it's a whole number
+  if (percentage % 1 === 0) {
+    return `${percentage}%`
+  }
+
+  // Format with specified decimal places
+  return `${percentage.toLocaleString('vi-VN', {
+    minimumFractionDigits: minDecimals,
+    maximumFractionDigits: maxDecimals
+  })}%`
+}
+
+export function getRandomInt(min: number, max: number) {
+  min = Math.ceil(min)
+  max = Math.floor(max)
+  return Math.floor(Math.random() * (max - min + 1)) + min
+}
+
+export function formatShortCurrency(value: number): string {
+  if (value >= 1000000000) {
+    return `${(value / 1000000000).toFixed(1).replace(/\.0$/, '')}tỷ`
+  }
+  if (value >= 1000000) {
+    return `${(value / 1000000).toFixed(1).replace(/\.0$/, '')}tr`
+  }
+  if (value >= 1000) {
+    return `${(value / 1000).toFixed(1).replace(/\.0$/, '')}k`
+  }
+  return value.toString()
+}
+
+export function formatAxisLabel(value: number, unit: string = ''): string {
+  if (value >= 1000000) {
+    return `${(value / 1000000).toFixed(1).replace(/\.0$/, '')}tr${unit}`
+  }
+  if (value >= 1000) {
+    return `${(value / 1000).toFixed(1).replace(/\.0$/, '')}k${unit}`
+  }
+  return `${value}${unit}`
+}
+
+export const getFilledDataStats = (data: RevenueDataItem[]) => {
+  const filledDays = data.filter((item) => item.isFilled).length
+  const totalDays = data.length
+  const filledPercentage = totalDays > 0 ? (filledDays / totalDays) * 100 : 0
+
+  return {
+    filledDays,
+    totalDays,
+    filledPercentage,
+    originalDays: totalDays - filledDays
+  }
+}
+
+export const formatApiRevenueData = (
+  apiData: Array<{
+    type: string
+    time: string
+    amount: number
+    ordersCount: number
+  }>
+): RevenueDataItem[] => {
+  return apiData.map((item) => {
+    let date: string
+
+    if (item.type === 'day') {
+      const [day, month, year] = item.time.split('/').map(Number)
+      date = `${year}-${month.toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`
+    } else if (item.type === 'week') {
+      date = `Week ${item.time.replace('Week ', '')}`
+    } else if (item.type === 'month') {
+      date = item.time
+    } else {
+      date = item.time
+    }
+
+    return {
+      date,
+      amount: item.amount,
+      ordersCount: item.ordersCount
+    }
+  })
+}
+
+export const getDateRangeFromType = (rangeType: RangeType): DateRange => {
+  const today = new Date()
+  let from: Date
+
+  switch (rangeType) {
+    case 'THIS_MONTH':
+      from = new Date(today.getFullYear(), today.getMonth(), 1)
+      break
+    case '3_MONTH':
+      from = subMonths(today, 3)
+      break
+    case '6_MONTH':
+      from = subMonths(today, 6)
+      break
+    case '1_YEAR':
+      from = subYears(today, 1)
+      break
+    case '2_YEARS':
+      from = subYears(today, 2)
+      break
+    case '3_YEARS':
+      from = subYears(today, 3)
+      break
+    case 'DAY':
+      // For DAY, default to last 30 days
+      from = subDays(today, 30)
+      break
+    default:
+      from = subMonths(today, 3) // Default to 3 months
+  }
+
+  return { from, to: today }
+}
+
+export const parseUrlDate = (dateStr: string | null): Date | undefined => {
+  if (!dateStr) return undefined
+  try {
+    const [day, month, year] = dateStr.split('/').map(Number)
+    if (isNaN(day) || isNaN(month) || isNaN(year)) return undefined
+    return new Date(year, month - 1, day)
+  } catch (error) {
+    return undefined
+  }
+}
+
+export const getValidRangeType = (type: string | null): RangeType => {
+  if (type && VALID_RANGE_TYPES.includes(type as RangeType)) {
+    return type as RangeType
+  }
+  return '3_MONTH' // Default to 3 months
+}
+
+export const formatDateForApi = (date: Date | undefined): string | undefined => {
+  if (!date) return undefined
+  return format(date, 'dd/MM/yyyy')
+}
+
+export type RangeType = 'DAY' | 'THIS_MONTH' | '3_MONTH' | '6_MONTH' | '1_YEAR' | '2_YEARS' | '3_YEARS'
+export const VALID_RANGE_TYPES: RangeType[] = [
+  'DAY',
+  'THIS_MONTH',
+  '3_MONTH',
+  '6_MONTH',
+  '1_YEAR',
+  '2_YEARS',
+  '3_YEARS'
+]
+
+export type RevenueDataItem = {
+  date: string
+  amount: number
+  ordersCount: number
+  isFilled?: boolean
 }

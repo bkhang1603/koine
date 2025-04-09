@@ -86,6 +86,7 @@ function SupportOrder(props: { searchParams: SearchParams }) {
   const message = responseData?.payload.message || ''
 
   // Cấu hình màu sắc và nhãn cho trạng thái
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const orderStatusConfig = {
     PROCESSING: { label: 'Đang xử lý', variant: 'default' },
     DELIVERING: { label: 'Đang giao', variant: 'primary' },
@@ -94,6 +95,7 @@ function SupportOrder(props: { searchParams: SearchParams }) {
   } as const
 
   // Cấu hình phương thức thanh toán
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const paymentMethodConfig = {
     COD: { label: 'Thanh toán khi nhận hàng', icon: DollarSign },
     BANKING: { label: 'Chuyển khoản', icon: DollarSign }
