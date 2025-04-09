@@ -10,14 +10,14 @@ const footerLinks = {
   company: [
     { label: 'Về chúng tôi', href: '/about' },
     { label: 'Liên hệ', href: '/contact' },
-    { label: 'Tuyển dụng', href: '/career' },
-    { label: 'Đối tác', href: '/partner' }
+    { label: 'Tuyển dụng', href: '/' },
+    { label: 'Đối tác', href: '/' }
   ],
   support: [
-    { label: 'FAQs', href: '/faq' },
-    { label: 'Chính sách bảo mật', href: '/privacy' },
-    { label: 'Điều khoản sử dụng', href: '/terms' },
-    { label: 'Hướng dẫn sử dụng', href: '/guide' }
+    { label: 'FAQs', href: '/help/faq' },
+    { label: 'Chính sách bảo mật', href: '/' },
+    { label: 'Điều khoản sử dụng', href: '/' },
+    { label: 'Hướng dẫn sử dụng', href: '/' }
   ],
   contact: [
     { icon: <Phone className='w-5 h-5' />, info: '0934 600 600' },
