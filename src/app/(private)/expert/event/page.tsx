@@ -12,6 +12,7 @@ import Link from 'next/link'
 import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { useState, useMemo } from 'react'
+import formatDurationForString from '../../../../../formatDuration'
 
 // Constants
 const EVENT_STATUS = {
@@ -234,7 +235,7 @@ export default function EventPage() {
             const eventTime = formatEventTime(event.startedAt, event.durations)
 
             return (
-              <Card key={event.id} className='overflow-hidden hover:shadow-lg transition-shadow'>
+              <Card key={event.id} className='flex flex-col h-full overflow-hidden hover:shadow-lg transition-shadow'>
                 <CardHeader className='p-0'>
                   <div className='relative'>
                     <Image
@@ -244,19 +245,23 @@ export default function EventPage() {
                       alt={event.title}
                       className='w-full h-48 object-cover'
                     />
-                  </div>
-                </CardHeader>
-                <CardContent className='pt-4 space-y-4'>
-                  <div className='flex justify-between items-start'>
-                    <h2 className='text-xl font-bold line-clamp-1'>{event.title}</h2>
-                    <Badge variant={EVENT_STATUS[event.status as keyof typeof EVENT_STATUS].variant}>
+                    <Badge
+                      variant={EVENT_STATUS[event.status as keyof typeof EVENT_STATUS].variant}
+                      className='absolute bottom-2 right-2'
+                    >
                       {EVENT_STATUS[event.status as keyof typeof EVENT_STATUS].text}
                     </Badge>
                   </div>
+                </CardHeader>
 
-                  <p className='text-muted-foreground line-clamp-2'>{event.description}</p>
+                <CardContent className='pt-4 space-y-4 flex-grow flex flex-col'>
+                  <div className='flex justify-between items-start'>
+                    <h2 className='text-xl font-bold line-clamp-1'>{event.title}</h2>
+                  </div>
 
-                  <div className='space-y-2 text-sm'>
+                  <p className='text-muted-foreground line-clamp-2'>{event.description} </p>
+
+                  <div className='space-y-2 text-sm mt-auto'>
                     <div className='flex items-center gap-2'>
                       <Mic size={16} className='text-muted-foreground' />
                       <span>{event.hostInfo.fullName}</span>
@@ -267,7 +272,7 @@ export default function EventPage() {
                     </div>
                     <div className='flex items-center gap-2'>
                       <Clock size={16} className='text-muted-foreground' />
-                      <span>{event.durationsDisplay}</span>
+                      <span>{formatDurationForString(event.durationsDisplay)}</span>
                     </div>
                   </div>
                 </CardContent>
