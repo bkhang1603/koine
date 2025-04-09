@@ -229,18 +229,18 @@ export const useGetCategoryCourseDetailQuery = ({ id, enabled }: { id: string; e
 }
 
 export const useCreateCategoryCourseMutation = () => {
-  const queryClient = useQueryClient()
+  // const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: courseApiRequest.createCategoryCourse,
-    onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: ['categoryCourses']
-      })
-      queryClient.invalidateQueries({
-        queryKey: ['account-notifications']
-      })
-    }
+    mutationFn: courseApiRequest.createCategoryCourse
+    // onSuccess: () => {
+    //   queryClient.invalidateQueries({
+    //     queryKey: ['categoryCourses']
+    //   })
+    //   queryClient.invalidateQueries({
+    //     queryKey: ['account-notifications']
+    //   })
+    // }
   })
 }
 

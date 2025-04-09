@@ -65,8 +65,8 @@ export default function Footer() {
             <div>
               <h4 className='font-semibold mb-6'>Công ty</h4>
               <ul className='space-y-4'>
-                {footerLinks.company.map((link) => (
-                  <li key={link.href}>
+                {footerLinks.company.map((link, index) => (
+                  <li key={index}>
                     <Link href={link.href} className='text-muted-foreground hover:text-primary transition-colors'>
                       {link.label}
                     </Link>
@@ -78,8 +78,8 @@ export default function Footer() {
             <div>
               <h4 className='font-semibold mb-6'>Hỗ trợ</h4>
               <ul className='space-y-4'>
-                {footerLinks.support.map((link) => (
-                  <li key={link.href}>
+                {footerLinks.support.map((link, index) => (
+                  <li key={index}>
                     <Link href={link.href} className='text-muted-foreground hover:text-primary transition-colors'>
                       {link.label}
                     </Link>
