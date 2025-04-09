@@ -11,101 +11,133 @@ import {
   DialogTitle,
   DialogTrigger
 } from '@/components/ui/dialog'
-import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
-import { toast } from '@/components/ui/use-toast'
+import { Checkbox } from '@/components/ui/checkbox'
+import { Label } from '@/components/ui/label'
 import { useCreateRefundOrderMutation } from '@/queries/useOrder'
 import { handleErrorApi } from '@/lib/utils'
-import { Wallet } from 'lucide-react'
+import { toast } from '@/components/ui/use-toast'
 
 interface RefundOrderDialogProps {
   orderId: string
   orderCode: string
+  orderDetails: Array<{
+    id: string
+    courseId?: string
+    productId?: string
+    comboId?: string
+    course?: { title: string }
+    product?: { name: string }
+    combo?: { name: string }
+  }>
 }
 
-export function RefundOrderDialog({ orderId, orderCode }: RefundOrderDialogProps) {
+export function RefundOrderDialog({ orderId, orderCode, orderDetails }: RefundOrderDialogProps) {
   const [open, setOpen] = useState(false)
+  const [selectedItems, setSelectedItems] = useState<string[]>([])
   const [reason, setReason] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
 
   const createRefundOrderMutation = useCreateRefundOrderMutation()
 
-  const handleRefund = async () => {
-    if (!reason) return
+  const handleItemSelect = (itemId: string) => {
+    setSelectedItems((prev) => (prev.includes(itemId) ? prev.filter((id) => id !== itemId) : [...prev, itemId]))
+  }
 
-    setIsSubmitting(true)
-
+  const handleSubmit = async () => {
     try {
-      if (createRefundOrderMutation.isPending) return
+      if (selectedItems.length === 0) {
+        toast({
+          variant: 'destructive',
+          description: 'Vui lòng chọn ít nhất một sản phẩm để hoàn tiền'
+        })
+        return
+      }
+
+      if (!reason.trim()) {
+        toast({
+          variant: 'destructive',
+          description: 'Vui lòng nhập lý do hoàn tiền'
+        })
+        return
+      }
+
+      setIsSubmitting(true)
 
       await createRefundOrderMutation.mutateAsync({
-        orderId,
-        body: { reason }
+        id: orderId,
+        body: {
+          orderDetailIds: selectedItems,
+          reason: reason.trim()
+        }
       })
 
       toast({
         description: 'Yêu cầu hoàn tiền đã được gửi thành công'
       })
+
       setOpen(false)
+      setSelectedItems([])
+      setReason('')
     } catch (error) {
-      handleErrorApi({
-        error
-      })
+      handleErrorApi({ error })
     } finally {
       setIsSubmitting(false)
     }
   }
 
-  const resetForm = () => {
-    setReason('')
-  }
-
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button
-          variant='outline'
-          className='w-full border-primary/30 bg-primary/5 hover:bg-primary/10 hover:text-primary/80 text-primary flex items-center justify-center gap-2'
-        >
-          <Wallet className='w-4 h-4' />
-          <span>Yêu cầu hoàn tiền</span>
+        <Button variant='outline' className='w-full'>
+          Yêu cầu hoàn tiền
         </Button>
       </DialogTrigger>
-      <DialogContent className='sm:max-w-md'>
+      <DialogContent className='sm:max-w-[425px]'>
         <DialogHeader>
-          <DialogTitle className='flex items-center gap-2'>
-            <Wallet className='h-5 w-5 text-primary' />
-            Yêu cầu hoàn tiền
-          </DialogTitle>
-          <DialogDescription>Vui lòng cung cấp lý do hoàn tiền cho đơn hàng #{orderCode}</DialogDescription>
+          <DialogTitle>Yêu cầu hoàn tiền đơn hàng #{orderCode}</DialogTitle>
+          <DialogDescription>
+            Vui lòng chọn sản phẩm cần hoàn tiền và nhập lý do. Yêu cầu của bạn sẽ được xử lý trong thời gian sớm nhất.
+          </DialogDescription>
         </DialogHeader>
 
         <div className='space-y-4 py-4'>
           <div className='space-y-2'>
+            <Label>Sản phẩm cần hoàn tiền</Label>
+            <div className='space-y-2'>
+              {orderDetails.map((item) => (
+                <div key={item.id} className='flex items-center space-x-2'>
+                  <Checkbox
+                    id={item.id}
+                    checked={selectedItems.includes(item.id)}
+                    onCheckedChange={() => handleItemSelect(item.id)}
+                  />
+                  <Label htmlFor={item.id} className='text-sm'>
+                    {item.course?.title || item.product?.name || item.combo?.name}
+                  </Label>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className='space-y-2'>
             <Label htmlFor='reason'>Lý do hoàn tiền</Label>
             <Textarea
               id='reason'
-              placeholder='Nhập lý do hoàn tiền...'
               value={reason}
               onChange={(e) => setReason(e.target.value)}
+              placeholder='Nhập lý do hoàn tiền...'
               className='min-h-[100px]'
             />
           </div>
         </div>
 
         <DialogFooter>
-          <Button
-            variant='outline'
-            onClick={() => {
-              setOpen(false)
-              resetForm()
-            }}
-            disabled={isSubmitting}
-          >
+          <Button variant='outline' onClick={() => setOpen(false)}>
             Hủy
           </Button>
-          <Button onClick={handleRefund} disabled={!reason || isSubmitting}>
-            {isSubmitting ? 'Đang xử lý...' : 'Gửi yêu cầu'}
+          <Button onClick={handleSubmit} disabled={isSubmitting}>
+            {isSubmitting ? 'Đang gửi yêu cầu...' : 'Gửi yêu cầu'}
           </Button>
         </DialogFooter>
       </DialogContent>

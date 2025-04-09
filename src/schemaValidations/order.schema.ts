@@ -187,6 +187,8 @@ export const refundOrderRes = z.object({
 })
 
 export const createRefundOrderBody = z.object({
+  orderDetailId: z.string(),
+  quantity: z.number(),
   reason: z.string()
 })
 

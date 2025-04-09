@@ -192,10 +192,11 @@ export default function Cart() {
   }, [cartDetails])
 
   // Group cart items by type
-  const { productItems, courseItems } = useMemo(() => {
+  const { productItems, courseItems, customCourseItems } = useMemo(() => {
     return {
       productItems: cartDetails.filter((item) => item.product !== null),
-      courseItems: cartDetails.filter((item) => item.course !== null)
+      courseItems: cartDetails.filter((item) => item.course !== null && !item.course.isCustom),
+      customCourseItems: cartDetails.filter((item) => item.course !== null && item.course.isCustom)
     }
   }, [cartDetails])
 
@@ -374,7 +375,7 @@ export default function Cart() {
                           </div>
                         ))}
 
-                        {/* Courses section */}
+                        {/* Regular Courses section */}
                         {courseItems.length > 0 && (
                           <>
                             <div className='p-3 pl-4 bg-gray-50 border-b flex items-center'>
@@ -384,7 +385,7 @@ export default function Cart() {
                             {courseItems.map((item, index) => (
                               <div
                                 key={item.id}
-                                className={`p-4 ${index !== courseItems.length - 1 ? 'border-b' : ''}`}
+                                className={`p-4 ${index !== courseItems.length - 1 ? 'border-b' : customCourseItems.length > 0 ? 'border-b' : ''}`}
                               >
                                 <div className='flex items-start'>
                                   <div className='flex w-1/2'>
@@ -403,6 +404,98 @@ export default function Cart() {
                                     </div>
                                     <div className='ml-4 flex-grow h-full'>
                                       <h3 className='font-medium text-sm'>{item.course?.title}</h3>
+                                    </div>
+                                  </div>
+                                  <div className='grid grid-cols-4 gap-4 w-1/2 items-center'>
+                                    <span className='text-center text-sm'>{item.unitPrice.toLocaleString()}đ</span>
+                                    <div className='flex items-center justify-center'>
+                                      <>
+                                        <Button
+                                          variant={'icon'}
+                                          disabled={item?.quantity === 1}
+                                          onClick={() => handleQuantityChange(item?.id, -1)}
+                                          className='p-1 h-full rounded-full hover:bg-gray-100 transition duration-200'
+                                        >
+                                          <Minus className='w-4 h-4' />
+                                        </Button>
+                                        <span className='mx-2 w-6 text-center text-sm'>
+                                          {quantities[item?.id] ?? item?.quantity}
+                                        </span>
+                                        <Button
+                                          variant={'icon'}
+                                          onClick={() => handleQuantityChange(item?.id, 1)}
+                                          className='p-1 h-full rounded-full hover:bg-gray-100 transition duration-200'
+                                        >
+                                          <Plus className='w-4 h-4' />
+                                        </Button>
+                                      </>
+                                    </div>
+                                    <span className='text-center text-sm font-medium text-red-600'>
+                                      {item.totalPrice.toLocaleString()}đ
+                                    </span>
+                                    <div className='flex justify-center'>
+                                      <AlertDialog>
+                                        <AlertDialogTrigger asChild>
+                                          <Button variant='ghost' size='icon' className='h-8 w-8'>
+                                            <Trash2 className='h-4 w-4' />
+                                          </Button>
+                                        </AlertDialogTrigger>
+                                        <AlertDialogContent>
+                                          <AlertDialogHeader>
+                                            <AlertDialogTitle>Xóa khóa học</AlertDialogTitle>
+                                            <AlertDialogDescription>
+                                              Bạn có chắc chắn muốn xóa khóa học này khỏi giỏ hàng không?
+                                            </AlertDialogDescription>
+                                          </AlertDialogHeader>
+                                          <AlertDialogFooter>
+                                            <AlertDialogAction
+                                              onClick={() => removeItem(item.id)}
+                                              className='bg-red-500 hover:bg-red-600 text-white'
+                                            >
+                                              Xóa
+                                            </AlertDialogAction>
+                                            <AlertDialogCancel>Hủy</AlertDialogCancel>
+                                          </AlertDialogFooter>
+                                        </AlertDialogContent>
+                                      </AlertDialog>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            ))}
+                          </>
+                        )}
+
+                        {/* Custom Courses section */}
+                        {customCourseItems.length > 0 && (
+                          <>
+                            <div className='p-3 pl-4 bg-gray-50 border-b flex items-center'>
+                              <BookOpen className='w-4 h-4 mr-2 text-primary' />
+                              <h3 className='font-medium text-sm text-primary'>Khóa học cá nhân hóa</h3>
+                            </div>
+                            {customCourseItems.map((item, index) => (
+                              <div
+                                key={item.id}
+                                className={`p-4 ${index !== customCourseItems.length - 1 ? 'border-b' : ''}`}
+                              >
+                                <div className='flex items-start'>
+                                  <div className='flex w-1/2'>
+                                    <div className='flex items-center'>
+                                      <Checkbox
+                                        checked={selectedItems.has(item.id)}
+                                        onCheckedChange={() => toggleSelectItem(item.id)}
+                                      />
+                                      <Image
+                                        src={item.course?.imageUrl || '/placeholder.svg'}
+                                        alt={item.course?.title || 'Course image'}
+                                        width={500}
+                                        height={500}
+                                        className='ml-4 w-20 h-20 object-cover rounded-md'
+                                      />
+                                    </div>
+                                    <div className='ml-4 flex-grow h-full'>
+                                      <h3 className='font-medium text-sm'>{item.course?.title}</h3>
+                                      <p className='text-sm text-primary mt-1'>Khóa học cá nhân hóa</p>
                                     </div>
                                   </div>
                                   <div className='grid grid-cols-4 gap-4 w-1/2 items-center'>

@@ -455,7 +455,11 @@ export default function OrderDetailPage(props: { params: Promise<{ id: string }>
               {/* Nút yêu cầu hoàn tiền khi đơn hàng đã hoàn thành */}
               {order.status === 'COMPLETED' && (
                 <div className='pt-2'>
-                  <RefundOrderDialog orderId={order.id} orderCode={order.orderCode} />
+                  <RefundOrderDialog
+                    orderId={order.id}
+                    orderCode={order.orderCode}
+                    orderDetails={order.orderDetails || []}
+                  />
                 </div>
               )}
             </CardContent>

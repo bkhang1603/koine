@@ -39,7 +39,7 @@ export default async function EventDetailPage(props: { params: Promise<{ id: str
   const data = await wrapServerApi(() => eventApiRequest.getEventById({ id }))
   const event = data?.payload?.data
 
-  if (!event) {
+  if (!data) {
     return (
       <div className='min-h-screen flex items-center justify-center bg-gray-50/50'>
         <div className='text-center'>
