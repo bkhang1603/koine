@@ -237,6 +237,9 @@ export const useCreateCategoryCourseMutation = () => {
       queryClient.invalidateQueries({
         queryKey: ['categoryCourses']
       })
+      queryClient.invalidateQueries({
+        queryKey: ['account-notifications']
+      })
     }
   })
 }
@@ -269,8 +272,15 @@ export const useDeleteCategoryCourseMutation = () => {
 }
 
 export const useCreateCourseCustomMutation = () => {
+  const queryClient = useQueryClient()
+
   return useMutation({
-    mutationFn: courseApiRequest.createCourseCustom
+    mutationFn: courseApiRequest.createCourseCustom,
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ['cartDetails']
+      })
+    }
   })
 }
 
