@@ -65,9 +65,10 @@ export function RefundOrderDialog({ orderId, orderCode, orderDetails }: RefundOr
       setIsSubmitting(true)
 
       await createRefundOrderMutation.mutateAsync({
-        id: orderId,
+        orderId,
         body: {
-          orderDetailIds: selectedItems,
+          orderDetailId: selectedItems[0],
+          quantity: 1,
           reason: reason.trim()
         }
       })
