@@ -113,35 +113,86 @@ export function QuizContent({
 
   if (showResults) {
     return (
-      <div className='flex flex-col min-h-screen'>
+      <div className='flex flex-col min-h-[calc(100vh-10rem)]'>
         <div className='flex-1'>
-          <Card className='overflow-hidden'>
-            <div className='p-8 text-center'>
-              <div className='mb-6'>
-                {score >= 70 ? (
-                  <div className='bg-green-50 w-20 h-20 rounded-full flex items-center justify-center mx-auto'>
-                    <CheckCircle2 className='w-12 h-12 text-green-500' />
-                  </div>
-                ) : (
-                  <div className='bg-red-50 w-20 h-20 rounded-full flex items-center justify-center mx-auto'>
-                    <XCircle className='w-12 h-12 text-red-500' />
-                  </div>
-                )}
+          <Card className='overflow-hidden border-0'>
+            {/* Background with gradient */}
+            <div
+              className={`relative h-32 ${
+                score >= 70
+                  ? 'bg-gradient-to-r from-green-500 to-emerald-600'
+                  : 'bg-gradient-to-r from-red-500 to-rose-600'
+              }`}
+            >
+              <div className='absolute -bottom-16 left-1/2 -translate-x-1/2'>
+                <div
+                  className={`w-32 h-32 rounded-2xl shadow-xl flex items-center justify-center ${
+                    score >= 70 ? 'bg-green-50' : 'bg-red-50'
+                  }`}
+                >
+                  {score >= 70 ? (
+                    <CheckCircle2 className='w-16 h-16 text-green-500' />
+                  ) : (
+                    <XCircle className='w-16 h-16 text-red-500' />
+                  )}
+                </div>
               </div>
-              <h2 className='text-2xl font-bold mb-3'>{score >= 70 ? 'Chúc mừng!' : 'Chưa đạt yêu cầu'}</h2>
-              <p className='text-lg mb-2'>Bạn đạt được {Math.round(score)}%</p>
-              <p className='text-muted-foreground mb-6'>
-                {Math.round((score / 100) * totalQuestions)}/{totalQuestions} câu đúng
-              </p>
-              {score >= 70 ? (
-                <p className='text-green-600 font-medium'>Bạn đã hoàn thành bài kiểm tra thành công!</p>
-              ) : (
-                <p className='text-red-600'>Bạn cần đạt ít nhất 70% để qua bài kiểm tra này.</p>
-              )}
+            </div>
+
+            {/* Content */}
+            <div className='px-6 pt-24 pb-8'>
+              <div className='text-center max-w-2xl mx-auto'>
+                {/* Score display */}
+                <div className='mb-6'>
+                  <div className='text-6xl font-bold bg-gradient-to-r from-slate-800 to-slate-600 bg-clip-text text-transparent'>
+                    {Math.round(score)}%
+                  </div>
+                  <div className='mt-1 text-slate-500 font-medium'>Kết quả của bạn</div>
+                </div>
+
+                {/* Stats */}
+                <div className='flex items-center justify-center gap-8 mb-8'>
+                  <div className='text-center px-6 py-3 bg-slate-50 rounded-xl'>
+                    <div className='text-2xl font-bold text-slate-800'>
+                      {Math.round((score / 100) * totalQuestions)}
+                    </div>
+                    <div className='text-sm text-slate-500 font-medium'>Câu đúng</div>
+                  </div>
+                  <div className='text-center px-6 py-3 bg-slate-50 rounded-xl'>
+                    <div className='text-2xl font-bold text-slate-800'>{totalQuestions}</div>
+                    <div className='text-sm text-slate-500 font-medium'>Tổng số câu</div>
+                  </div>
+                </div>
+
+                {/* Message */}
+                <div className='space-y-4'>
+                  <h2 className='text-2xl font-bold'>{score >= 70 ? 'Chúc mừng bạn!' : 'Cố gắng lần sau nhé!'}</h2>
+                  {score >= 70 ? (
+                    <div className='space-y-2'>
+                      <p className='text-green-600 font-medium text-lg'>Bạn đã hoàn thành xuất sắc bài kiểm tra!</p>
+                      <p className='text-slate-500'>
+                        Kết quả này cho thấy bạn đã nắm vững kiến thức trong bài học. Hãy tiếp tục phát huy trong các
+                        bài học tiếp theo nhé!
+                      </p>
+                    </div>
+                  ) : (
+                    <div className='space-y-2'>
+                      <p className='text-red-600 font-medium text-lg'>
+                        Bạn cần đạt ít nhất 70% để vượt qua bài kiểm tra
+                      </p>
+                      <p className='text-slate-500'>
+                        Đừng nản lòng! Hãy xem lại bài học và thử lại. Mỗi lần thử là một cơ hội để học hỏi và tiến bộ
+                        hơn.
+                      </p>
+                    </div>
+                  )}
+                </div>
+              </div>
             </div>
           </Card>
         </div>
 
+        {/* Action buttons */}
         <div className='sticky bottom-0 bg-white border-t py-6'>
           <div className='flex flex-col sm:flex-row items-center gap-4 max-w-2xl mx-auto'>
             {prevLesson ? (
@@ -171,6 +222,15 @@ export function QuizContent({
                   <CheckCircle2 className='w-5 h-5' />
                   <span className='font-medium'>Làm lại bài kiểm tra</span>
                 </div>
+              </Button>
+            )}
+
+            {score >= 70 && (
+              <Button
+                className='w-full sm:flex-1 h-12 rounded-xl bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 shadow-md hover:shadow-lg transition-all duration-200'
+                disabled
+              >
+                <span className='font-medium'>Đã hoàn thành</span>
               </Button>
             )}
 

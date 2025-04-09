@@ -296,7 +296,14 @@ export const useGetCourses = ({
 }
 
 export const useUpdateScoreQuizMutation = () => {
+  const queryClient = useQueryClient()
+
   return useMutation({
-    mutationFn: courseApiRequest.updateScoreQuiz
+    mutationFn: courseApiRequest.updateScoreQuiz,
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ['courseProgress']
+      })
+    }
   })
 }

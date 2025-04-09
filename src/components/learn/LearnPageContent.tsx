@@ -79,11 +79,8 @@ export function LearnPageContent({
         // If previous chapter has no quiz, check if all lessons are completed
         return prevChapter.lessons.every((l: any) => l.status === 'YET')
       }
-      // If this is the first chapter, check if it has quiz
-      if (chapter.questions && chapter.questions.length > 0) {
-        return false // First lesson of first chapter is locked if chapter has quiz
-      }
-      return true // First lesson of first chapter is accessible if no quiz
+      // If this is the first chapter, always allow access to its first lesson
+      return true
     }
 
     // For other lessons, check if previous lesson is completed
@@ -93,15 +90,12 @@ export function LearnPageContent({
 
   // Helper function to check if a quiz is accessible
   const canAccessQuiz = (chapter: any, currentCourse: any) => {
-    // Always accessible if it's the first chapter
-    const chapterIndex = currentCourse.chapters.findIndex((c: any) => c.id === chapter.id)
-    if (chapterIndex === 0) return true
-
     // Check if all lessons in this chapter are completed
     const allLessonsCompleted = chapter.lessons.every((l: any) => l.status === 'YET')
     if (!allLessonsCompleted) return false
 
     // Check if previous chapter's quiz is completed (if exists)
+    const chapterIndex = currentCourse.chapters.findIndex((c: any) => c.id === chapter.id)
     if (chapterIndex > 0) {
       const prevChapter = currentCourse.chapters[chapterIndex - 1]
       if (prevChapter.questions && prevChapter.questions.length > 0) {
@@ -111,7 +105,7 @@ export function LearnPageContent({
       return prevChapter.lessons.every((l: any) => l.status === 'YET')
     }
 
-    return true
+    return true // For first chapter, only check if all lessons are completed
   }
 
   // Helper function to get next accessible lesson
