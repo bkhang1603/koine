@@ -23,6 +23,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { cn } from '@/lib/utils'
 import { Breadcrumb } from '@/components/public/parent/setting/Breadcrumb'
 import { resolveSoa } from 'dns'
+import formatDurationForString from '../../../../../../formatDuration'
+import VideoUpload from '../components/video-uploader'
+import { toast } from '@/components/ui/use-toast'
 
 // Constants
 const EVENT_STATUS = {
@@ -130,11 +133,22 @@ export default function EventDetailPage(props: { params: Promise<{ id: string }>
         body: body
       })
       if (res) {
-        refetch()
+        toast({
+          description: 'Cập nhật số người tham gia thành công',
+          variant: 'success'
+        })
       } else {
+        toast({
+          description: 'Có lỗi xảy ra!',
+          variant: 'destructive'
+        })
         throw new Error('Lỗi khi báo cáo')
       }
     } catch (error) {
+      toast({
+        description: 'Có lỗi xảy ra!',
+        variant: 'destructive'
+      })
       handleErrorApi({ error })
     } finally {
       setIsProcessing(false)
@@ -264,7 +278,7 @@ export default function EventDetailPage(props: { params: Promise<{ id: string }>
               onClick={() => handleReportEventInfo(event.roomName)}
             >
               <RefreshCw className='w-4 h-4 mr-2' />
-              Cập nhật
+              Báo cáo số liệu
             </Button>
           )}
           {isCancelable && event.status == 'PENDING' && (
@@ -322,11 +336,22 @@ export default function EventDetailPage(props: { params: Promise<{ id: string }>
                   </div>
                   <div className='flex items-center gap-2'>
                     <Clock className='w-4 h-4 text-muted-foreground' />
-                    <span>Thời lượng: {event.durationsDisplay}</span>
+                    <span>Thời lượng: {formatDurationForString(event.durationsDisplay)}</span>
                   </div>
                   <div className='flex items-center gap-2'>
                     <Users className='w-4 h-4 text-muted-foreground' />
                     <span>Số người tham dự: {event.totalParticipants}</span>
+                  </div>
+                  <div className='flex items-center gap-2'>
+                    <Video className='w-4 h-4 text-muted-foreground' />
+                    <span>
+                      Bản ghi:{' '}
+                      <span
+                        className={`p-[6px] ${event.recordUrl ? 'bg-blue-400' : 'bg-gray-400'} rounded-xl font-semibold text-white`}
+                      >
+                        {event.recordUrl ? 'Đã tải lên' : 'Chưa có'}
+                      </span>
+                    </span>
                   </div>
                 </CardContent>
               </Card>
@@ -358,8 +383,8 @@ export default function EventDetailPage(props: { params: Promise<{ id: string }>
                   <Button
                     variant='default'
                     className={`w-full 
-    ${isClosed ? 'bg-gray-400 hover:bg-gray-400 cursor-default' : 'bg-primary hover:bg-primary/90'} 
-    text-white`}
+                      ${isClosed ? 'bg-gray-400 hover:bg-gray-400 cursor-default' : 'bg-primary hover:bg-primary/90'} 
+                    text-white`}
                     onClick={() => (isClosed ? null : handleOpenMeet(event.roomHostUrl))}
                   >
                     <Video className='w-4 h-4 mr-2' />
@@ -390,10 +415,27 @@ export default function EventDetailPage(props: { params: Promise<{ id: string }>
           {event.note && (
             <Card>
               <CardHeader>
-                <CardTitle>Ghi chú</CardTitle>
+                <CardTitle>Lí do</CardTitle>
               </CardHeader>
               <CardContent>
                 <p className='text-muted-foreground'>{event.note}</p>
+              </CardContent>
+            </Card>
+          )}
+
+          {event.status == 'DONE' && (
+            <Card>
+              <CardHeader>
+                <CardTitle>Tải lên bản ghi</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className='text-muted-foreground'>{event.note}</p>
+              </CardContent>
+              <CardContent>
+                <VideoUpload
+                  eventId={event.id} // Đảm bảo truyền đúng eventId
+                  initialPreview={event.recordUrl} // Nếu có bản ghi cũ, hiển thị trước đó
+                />
               </CardContent>
             </Card>
           )}
