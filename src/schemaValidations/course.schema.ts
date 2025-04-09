@@ -162,6 +162,8 @@ export const UserCourseProgressData = z.object({
       durationsDisplay: z.string(),
       sequence: z.number(),
       status: z.string(),
+      isTakeQuiz: z.boolean(),
+      isQuestion: z.boolean(),
       lessons: z.array(
         z.object({
           id: z.string(),
@@ -493,6 +495,20 @@ export const createCourseCustomRes = z.object({
   statusCode: z.number()
 })
 
+export const updateScoreQuizBody = z.object({
+  chapterId: z.string(),
+  score: z.number()
+})
+
+export const updateScoreQuizRes = z.object({
+  data: z.object({
+    score: z.number(),
+    attempts: z.number()
+  }),
+  message: z.string(),
+  statusCode: z.number()
+})
+
 export type CourseResType = z.infer<typeof CourseRes>
 
 export type CoursesResType = z.infer<typeof CoursesRes>
@@ -538,3 +554,7 @@ export type DeleteCategoryCourseResType = z.infer<typeof deleteCategoryCourseRes
 export type CreateCourseCustomBodyType = z.infer<typeof createCourseCustomBody>
 
 export type CreateCourseCustomResType = z.infer<typeof createCourseCustomRes>
+
+export type UpdateScoreQuizBodyType = z.infer<typeof updateScoreQuizBody>
+
+export type UpdateScoreQuizResType = z.infer<typeof updateScoreQuizRes>

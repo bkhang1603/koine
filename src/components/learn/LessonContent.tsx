@@ -24,7 +24,7 @@ type LessonContentProps = {
   }
 }
 
-export const LessonContent = ({ lesson }: LessonContentProps) => {
+export const LessonContent = ({ lesson }: { lesson: LessonContentProps['lesson'] }) => {
   const artRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {

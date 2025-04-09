@@ -3,7 +3,6 @@ import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
 import Link from 'next/link'
-import { useState, useEffect } from 'react'
 import { QuizContent } from './QuizContent'
 import { LessonContent } from './LessonContent'
 import { WelcomeScreen } from './WelcomeScreen'
@@ -11,6 +10,7 @@ import { NavigationButtons } from './NavigationButtons'
 import { Sidebar } from './Sidebar'
 
 interface LearnPageContentProps {
+  quizId: string | null
   course: any
   lesson: any
   lessonId: string | null
@@ -18,7 +18,9 @@ interface LearnPageContentProps {
   isLoading: boolean
   isFetching?: boolean
   onLessonClick: (lesson: any) => void
+  onQuizClick: (chapter: any) => void
   canAccessLesson: (lesson: any, course: any) => boolean
+  canAccessQuiz: (chapter: any, course: any) => boolean
   handleUpdate: ({ lessonId, status }: { lessonId: string; status: string }) => void
   getNextLesson: () => any
   getPreviousLesson: () => any
@@ -29,6 +31,7 @@ interface LearnPageContentProps {
 }
 
 export function LearnPageContent({
+  quizId,
   course,
   lesson,
   lessonId,
@@ -36,7 +39,9 @@ export function LearnPageContent({
   isLoading,
   isFetching,
   onLessonClick,
+  onQuizClick,
   canAccessLesson,
+  canAccessQuiz,
   handleUpdate,
   getNextLesson,
   getPreviousLesson,
@@ -45,29 +50,6 @@ export function LearnPageContent({
   backUrl,
   backLabel
 }: LearnPageContentProps) {
-  const [selectedChapterQuiz, setSelectedChapterQuiz] = useState<any>(null)
-
-  useEffect(() => {
-    setSelectedChapterQuiz(null)
-  }, [lessonId])
-
-  const handleQuizClick = (chapter: any) => {
-    setSelectedChapterQuiz(chapter)
-  }
-
-  const handleQuizComplete = async (score: number) => {
-    if (score >= 70 && course) {
-      const currentChapterIndex = course.chapters.findIndex((c: any) => c.id === selectedChapterQuiz.id)
-      if (currentChapterIndex < course.chapters.length - 1) {
-        const nextChapter = course.chapters[currentChapterIndex + 1]
-        const firstLesson = nextChapter.lessons[0]
-        if (firstLesson) {
-          onLessonClick(firstLesson)
-        }
-      }
-    }
-  }
-
   if (!course) {
     return (
       <div className='py-8'>
@@ -85,12 +67,14 @@ export function LearnPageContent({
   return (
     <div className='grid lg:grid-cols-[340px_1fr] gap-8'>
       <Sidebar
+        quizId={quizId}
         course={course}
         courseId={courseId}
         lessonId={lessonId}
         onLessonClick={onLessonClick}
         canAccessLesson={canAccessLesson}
-        onQuizClick={handleQuizClick}
+        canAccessQuiz={canAccessQuiz}
+        onQuizClick={onQuizClick}
         forKid={forKid}
       />
 
@@ -107,12 +91,8 @@ export function LearnPageContent({
                     <Skeleton className='h-full w-full rounded-2xl' />
                   </div>
                 </div>
-              ) : selectedChapterQuiz ? (
-                <QuizContent
-                  chapter={selectedChapterQuiz}
-                  onComplete={handleQuizComplete}
-                  onRetry={() => setSelectedChapterQuiz(selectedChapterQuiz)}
-                />
+              ) : quizId ? (
+                <QuizContent chapter={course?.chapters.find((c: any) => c.id === quizId)} />
               ) : lesson ? (
                 <LessonContent lesson={lesson} />
               ) : (
@@ -123,7 +103,7 @@ export function LearnPageContent({
         </div>
 
         {/* Navigation Footer */}
-        {lesson && !selectedChapterQuiz && (
+        {lesson && (
           <div className='flex-shrink-0 bg-white py-6'>
             <NavigationButtons
               course={course}
@@ -147,7 +127,7 @@ export function LearnPageContent({
                     chapter.lessons.some((l: any) => l.id === lesson.id)
                   )
                   if (currentChapter) {
-                    setSelectedChapterQuiz(currentChapter)
+                    onQuizClick(currentChapter)
                   }
                 } else if (next) {
                   onLessonClick(next)
