@@ -421,3 +421,18 @@ export const formatAvatarFallback = (email: string): string => {
   if (!email) return ''
   return `${email.slice(0, 2).toUpperCase()}`
 }
+
+export const translateLevel = (level: string) => {
+  switch (level) {
+    case 'ALL':
+      return 'Tất cả'
+    case 'BEGINNER':
+      return 'Cơ bản'
+    case 'INTERMEDIATE':
+      return 'Trung bình'
+    case 'ADVANCED':
+      return 'Nâng cao'
+    default:
+      return 'Tất cả'
+  }
+}
