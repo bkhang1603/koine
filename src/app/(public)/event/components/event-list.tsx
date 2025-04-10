@@ -129,8 +129,6 @@ export function EventList({ events }: EventListProps) {
               alt={event.title}
               width={800}
               height={800}
-              quality={70}
-              unoptimized={true}
               className='object-cover transition-transform duration-500 group-hover:scale-105 h-full w-full'
             />
             <Badge className={cn('absolute top-4 right-4', eventStatusConfig[event.status as EventStatus].color)}>
