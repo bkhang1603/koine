@@ -13,12 +13,22 @@ const eventApiRequest = {
   createEvent: (body: CreateEventMeetingRequestType) => http.post<any>('/events', body),
   // get event with caching
   getAllEvent: () =>
-    http.get<GetAllEventResType>('/events', {
-      cache: 'force-cache',
-      next: { revalidate: 4 * 60 * 60 }
-    }),
+    http.get<GetAllEventResType>(
+      '/events'
+      // {
+      // cache: 'force-cache',
+      // next: { revalidate: 4 * 60 * 60 }
+      // }
+    ),
   // Caching
-  getEventById: (body: { id: string }) => http.get<GetEventByIdResType>(`/events/${body.id}`),
+  getEventById: (body: { id: string }) =>
+    http.get<GetEventByIdResType>(
+      `/events/${body.id}`
+      // {
+      // cache: 'force-cache',
+      // next: { revalidate: 4 * 60 * 60 }
+      // }
+    ),
   // Without caching
   getEventByIdWithoutCaching: (body: { id: string }) => http.get<GetEventByIdResType>(`/events/${body.id}`),
   getAllEventForHost: () => http.get<GetAllEventResType>('/events/host'),

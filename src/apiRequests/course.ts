@@ -75,13 +75,16 @@ const courseApiRequest = {
     http.get<CoursesResType>(
       `/courses?page_index=${page_index}&page_size=${page_size}${
         keyword ? `&keyword=${keyword}` : ''
-      }${category ? `&category=${category}` : ''}${range ? `&range=${range}` : ''}${sort ? `&sort=${sort}` : ''}`,
-      { cache: 'force-cache', next: { revalidate: 12 * 60 * 60 } }
+      }${category ? `&category=${category}` : ''}${range ? `&range=${range}` : ''}${sort ? `&sort=${sort}` : ''}`
+      // { cache: 'force-cache', next: { revalidate: 12 * 60 * 60 } }
     ),
   getCourse: (id: string) => http.get<CourseResType>(`/courses/${id}`),
   // getCourse with caching
   getCourseCache: (id: string) =>
-    http.get<CourseResType>(`/courses/${id}`, { cache: 'force-cache', next: { revalidate: 12 * 60 * 60 } }),
+    http.get<CourseResType>(
+      `/courses/${id}`
+      // { cache: 'force-cache', next: { revalidate: 12 * 60 * 60 } }
+    ),
   addCourse: (data: CreateCourseBodyType) => http.post<CreateCourseBodyResType>('/courses', data),
   updateCourse: (id: string, data: CreateCourseBodyType) => http.put<CreateCourseBodyResType>(`/courses/${id}`, data),
   deleteCourse: (id: string) => http.delete<OnlyMessageResType>(`/courses/${id}`),
