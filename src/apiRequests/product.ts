@@ -45,8 +45,8 @@ const productApiRequest = {
     sort?: string | string[] | ['pa' | 'pd' | 'na' | 'nd'] | undefined
   }) =>
     http.get<ProductsResType>(
-      `/products?page_index=${page_index}&page_size=${page_size}${search ? `&keyword=${search}` : ''}${range ? `&range=${range}` : ''}${category ? `&category=${category}` : ''}${sort ? `&sort=${sort}` : ''}`,
-      { cache: 'force-cache', next: { revalidate: 12 * 60 * 60 } }
+      `/products?page_index=${page_index}&page_size=${page_size}${search ? `&keyword=${search}` : ''}${range ? `&range=${range}` : ''}${category ? `&category=${category}` : ''}${sort ? `&sort=${sort}` : ''}`
+      // { cache: 'force-cache', next: { revalidate: 12 * 60 * 60 } }
     ),
   getProduct: (id: string) => http.get<ProductResType>(`/products/${id}`),
   // getProduct with caching
@@ -58,10 +58,13 @@ const productApiRequest = {
   getCategoryProducts: () => http.get<CategoryProductsResType>('/category-products'),
   // getCategoryProducts with caching
   getCategoryProductsCache: () =>
-    http.get<CategoryProductsResType>('/category-products', {
-      cache: 'force-cache',
-      next: { revalidate: 24 * 60 * 60 }
-    }),
+    http.get<CategoryProductsResType>(
+      '/category-products'
+      // {
+      // cache: 'force-cache',
+      // next: { revalidate: 24 * 60 * 60 }
+      // }
+    ),
   getProductReviews: ({
     id,
     star,
