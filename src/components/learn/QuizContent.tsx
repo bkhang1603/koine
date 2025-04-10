@@ -296,7 +296,16 @@ export function QuizContent({
                   <div className='w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0 font-medium'>
                     {index + 1}
                   </div>
-                  <p className='font-medium pt-1.5'>{question.content}</p>
+                  <div className='flex-1'>
+                    <p className='font-medium pt-1'>{question.content}</p>
+                    <div className='mt-2'>
+                      {isMultipleChoice && (
+                        <span className='inline-flex items-center px-2 py-0.5 bg-blue-50 text-blue-600 text-xs font-medium rounded-full'>
+                          <span>Chọn nhiều đáp án</span>
+                        </span>
+                      )}
+                    </div>
+                  </div>
                 </div>
               </div>
               <div className='p-6'>

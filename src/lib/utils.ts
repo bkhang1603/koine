@@ -404,7 +404,7 @@ export const formatDuration = (duration: number): string => {
 
 export const formatDateEvent = (date: string): string => {
   // Múi giờ đang bị lệch 7 giờ, cần trừ đi 7 giờ
-  const localTime = new Date(date).getTime() - 7 * 60 * 60 * 1000
+  const localTime = new Date(date).getTime()
   const options: Intl.DateTimeFormatOptions = {
     year: 'numeric',
     month: 'long',
