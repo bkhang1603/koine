@@ -4,7 +4,7 @@ import { use } from 'react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Separator } from '@/components/ui/separator'
-import { ArrowLeft, User, AlertCircle, Mail, Phone, Calendar, MapPin } from 'lucide-react'
+import { User, AlertCircle, Mail, Phone } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { Badge } from '@/components/ui/badge'
@@ -12,6 +12,7 @@ import { useUserDetailAdminQuery } from '@/queries/useUser'
 import { Skeleton } from '@/components/ui/skeleton'
 import { format } from 'date-fns'
 import { vi } from 'date-fns/locale'
+import { Breadcrumb } from '@/components/private/common/breadcrumb'
 
 export default function AdminUserDetail(props: { params: Promise<{ id: string }> }) {
   const params = use(props.params)
@@ -82,12 +83,6 @@ export default function AdminUserDetail(props: { params: Promise<{ id: string }>
                 </div>
               </CardContent>
             </Card>
-
-            {/* Action buttons skeleton */}
-            <div className='space-y-3'>
-              <Skeleton className='w-full h-10 rounded-md' />
-              <Skeleton className='w-full h-10 rounded-md' />
-            </div>
           </div>
         </div>
       </div>
@@ -109,15 +104,22 @@ export default function AdminUserDetail(props: { params: Promise<{ id: string }>
     )
   }
 
+  const breadcrumbItems = [
+    {
+      title: 'Người dùng',
+      href: '/admin/user'
+    },
+    {
+      title: user.username
+    }
+  ]
+
   return (
     <div className='container max-w-7xl mx-auto py-6 space-y-8'>
-      {/* Back button */}
-      <Button variant='ghost' asChild className='gap-2 hover:bg-gray-100'>
-        <Link href='/admin/user'>
-          <ArrowLeft className='h-4 w-4' />
-          Quay lại danh sách người dùng
-        </Link>
-      </Button>
+      {/* Breadcrumb component */}
+      <div className='mb-6'>
+        <Breadcrumb items={breadcrumbItems} />
+      </div>
 
       {/* Header */}
       <div>
@@ -258,16 +260,6 @@ export default function AdminUserDetail(props: { params: Promise<{ id: string }>
               </div>
             </CardContent>
           </Card>
-
-          {/* Action buttons */}
-          <div className='space-y-3'>
-            <Button className='w-full' variant='default'>
-              Chỉnh sửa thông tin
-            </Button>
-            <Button className='w-full' variant='outline'>
-              {user.isActive ? 'Vô hiệu hóa tài khoản' : 'Kích hoạt tài khoản'}
-            </Button>
-          </div>
         </div>
       </div>
     </div>

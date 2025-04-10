@@ -1,75 +1,57 @@
 'use client'
 
-import { use, useEffect, useMemo } from 'react'
-import { useGetProductListAdminQuery } from '@/queries/useProduct'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { use, useMemo, useCallback } from 'react'
+import { useGetProductListAdminQuery, useProductDeleteMutation } from '@/queries/useProduct'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Package, DollarSign, Plus } from 'lucide-react'
+import { Package, Plus, Settings, BarChart, Star, PackageX } from 'lucide-react'
 import { TableCustom, dataListType } from '@/components/table-custom'
 import configRoute from '@/config/route'
 import { SearchParams } from '@/types/query'
-import { useRouter, usePathname } from 'next/navigation'
-import { Badge } from '@/components/ui/badge'
+import { useRouter } from 'next/navigation'
 import { format } from 'date-fns'
 import { vi } from 'date-fns/locale'
-import { MoreOptions } from '@/components/private/admin/product/more-options'
 import { Skeleton } from '@/components/ui/skeleton'
 import Image from 'next/image'
-import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
+import { MoreOptions } from '@/components/private/common/more-options'
+import { Breadcrumb } from '@/components/private/common/breadcrumb'
+import { toast } from '@/components/ui/use-toast'
+import { handleErrorApi } from '@/lib/utils'
 
 function AdminProduct(props: { searchParams: SearchParams }) {
   const searchParams = use(props.searchParams)
   const router = useRouter()
-  const pathname = usePathname()
 
   const currentPageSize = Number(searchParams.page_size) || 10
   const currentPageIndex = Number(searchParams.page_index) || 1
   const currentKeyword = (searchParams.keyword as string) || ''
 
-  const updateSearchParams = (newParams: { page_size?: number; page_index?: number; keyword?: string }) => {
-    const params = new URLSearchParams(searchParams as Record<string, string>)
-
-    if (newParams.keyword !== undefined) {
-      if (newParams.keyword === '') {
-        params.delete('keyword')
-      } else {
-        params.set('keyword', newParams.keyword)
-      }
-    }
-
-    if (newParams.page_size !== undefined) {
-      params.set('page_size', newParams.page_size.toString())
-    }
-
-    if (newParams.page_index !== undefined) {
-      params.set('page_index', newParams.page_index.toString())
-    }
-
-    router.push(`${pathname}?${params.toString()}`)
-  }
-
-  const {
-    data: responseData,
-    isLoading,
-    error
-  } = useGetProductListAdminQuery({
+  const { data: responseData, isLoading } = useGetProductListAdminQuery({
     page_index: currentPageIndex,
     page_size: currentPageSize,
     keyword: currentKeyword
   })
 
-  useEffect(() => {
-    if (responseData) {
-      console.log('Dữ liệu sản phẩm từ admin:', responseData)
-    }
-    if (error) {
-      console.error('Lỗi khi tải sản phẩm:', error)
-    }
-  }, [responseData, error])
+  const deleteProductMutation = useProductDeleteMutation()
 
-  const products = responseData?.payload.data || []
+  const handleDelete = useCallback(
+    async (productId: string) => {
+      try {
+        await deleteProductMutation.mutateAsync(productId)
+        toast({
+          description: 'Xóa sản phẩm thành công'
+        })
+      } catch (error) {
+        handleErrorApi({
+          error
+        })
+      }
+    },
+    [deleteProductMutation]
+  )
+
+  const products = responseData?.payload.data.products || []
   const pagination = responseData?.payload.pagination || {
     pageSize: 0,
     totalItem: 0,
@@ -77,16 +59,22 @@ function AdminProduct(props: { searchParams: SearchParams }) {
     totalPage: 0,
     maxPageSize: 0
   }
+  const statistics = responseData?.payload.data.statistics || {
+    totalProducts: 0,
+    totalProductCategories: 0,
+    totalOutOfStockProducts: 0,
+    totalProductReviews: 0
+  }
   const message = responseData?.payload.message || ''
 
   // Cấu hình cột cho bảng
   const headerColumn = [
     { id: 1, name: 'Tên sản phẩm' },
-    { id: 2, name: 'Giá' },
-    { id: 3, name: 'Giảm giá' },
-    { id: 4, name: 'Tồn kho' },
-    { id: 5, name: 'Đánh giá' },
-    { id: 6, name: 'Ngày tạo' },
+    { id: 2, name: 'Ngày tạo' },
+    { id: 3, name: 'Giá' },
+    { id: 4, name: 'Giảm giá' },
+    { id: 5, name: 'Tồn kho' },
+    { id: 6, name: 'Đánh giá' },
     { id: 7, name: '' }
   ]
 
@@ -115,29 +103,6 @@ function AdminProduct(props: { searchParams: SearchParams }) {
       },
       {
         id: 2,
-        render: (product: any) => (
-          <div>{new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(product.price)}</div>
-        )
-      },
-      {
-        id: 3,
-        render: (product: any) => <span>{product.discount}%</span>
-      },
-      {
-        id: 4,
-        render: (product: any) => <span>{product.stockQuantity}</span>
-      },
-      {
-        id: 5,
-        render: (product: any) => (
-          <div className='flex items-center gap-1'>
-            <span>{product.averageRating}</span>
-            <span className='text-xs text-muted-foreground'>({product.totalRating})</span>
-          </div>
-        )
-      },
-      {
-        id: 6,
         render: (product: any) => {
           const createdDate = new Date(product.createdAt)
           return (
@@ -149,17 +114,48 @@ function AdminProduct(props: { searchParams: SearchParams }) {
         }
       },
       {
+        id: 3,
+        render: (product: any) => (
+          <div>{new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(product.price)}</div>
+        )
+      },
+      {
+        id: 4,
+        render: (product: any) => <span>{product.discount}%</span>
+      },
+      {
+        id: 5,
+        render: (product: any) => <span>{product.stockQuantity}</span>
+      },
+      {
+        id: 6,
+        render: (product: any) => (
+          <div className='flex items-center gap-1'>
+            <span>{product.averageRating}</span>
+            <span className='text-xs text-muted-foreground'>({product.totalRating})</span>
+          </div>
+        )
+      },
+      {
         id: 7,
         render: (product: any) => (
           <MoreOptions
-            type='product'
+            itemType='product'
+            item={{
+              id: product.id,
+              title: product.name,
+              status: 'Hoạt động',
+              slug: product.slug
+            }}
             onView={() => router.push(`${configRoute.admin.product}/${product.id}`)}
-            productId={product.id}
+            onEdit={() => router.push(`${configRoute.admin.product}/${product.id}/edit`)}
+            onDelete={() => handleDelete(product.id)}
+            onPreview={() => window.open(`/product/${product.slug}`, '_blank')}
           />
         )
       }
     ],
-    [router]
+    [router, handleDelete]
   )
 
   const tableData: dataListType = {
@@ -168,27 +164,44 @@ function AdminProduct(props: { searchParams: SearchParams }) {
     pagination
   }
 
+  const breadcrumbItems = [
+    {
+      title: 'Sản phẩm'
+    }
+  ]
+
   return (
     <div className='container mx-auto px-4 py-6 space-y-6'>
+      {/* Breadcrumb */}
+      <Breadcrumb items={breadcrumbItems} />
+
       {/* Header */}
       <div className='flex items-center justify-between'>
         <div>
           <h1 className='text-2xl font-bold'>Quản lý sản phẩm</h1>
           <p className='text-muted-foreground mt-1'>Quản lý danh sách sản phẩm trong hệ thống</p>
         </div>
-        <Button asChild>
-          <Link href={configRoute.admin.productNew} className='flex items-center gap-2'>
-            <Plus className='h-4 w-4' />
-            Thêm sản phẩm mới
-          </Link>
-        </Button>
+        <div className='flex items-center gap-4'>
+          <Button variant='outline' asChild>
+            <Link href='/admin/product/categories'>
+              <Settings className='w-4 h-4 mr-2' />
+              Quản lý danh mục
+            </Link>
+          </Button>
+          <Button asChild>
+            <Link href={configRoute.admin.productNew} className='flex items-center gap-2'>
+              <Plus className='h-4 w-4' />
+              Thêm sản phẩm mới
+            </Link>
+          </Button>
+        </div>
       </div>
 
       {/* Stats Cards */}
-      <div className='grid grid-cols-1 md:grid-cols-3 gap-4'>
+      <div className='grid grid-cols-1 md:grid-cols-4 gap-4'>
         {isLoading ? (
           // Stats Cards Skeleton
-          [...Array(3)].map((_, i) => (
+          [...Array(4)].map((_, i) => (
             <Card key={i}>
               <CardHeader className='flex flex-row items-center justify-between pb-2'>
                 <Skeleton className='h-5 w-[120px]' />
@@ -208,50 +221,42 @@ function AdminProduct(props: { searchParams: SearchParams }) {
                 <Package className='h-4 w-4 text-muted-foreground' />
               </CardHeader>
               <CardContent>
-                <div className='text-2xl font-bold'>{pagination.totalItem}</div>
+                <div className='text-2xl font-bold'>{statistics.totalProducts}</div>
                 <p className='text-xs text-muted-foreground'>Sản phẩm trong hệ thống</p>
               </CardContent>
             </Card>
             <Card>
               <CardHeader className='flex flex-row items-center justify-between pb-2'>
-                <CardTitle className='text-sm font-medium'>Tổng doanh thu</CardTitle>
-                <DollarSign className='h-4 w-4 text-muted-foreground' />
+                <CardTitle className='text-sm font-medium'>Sản phẩm hết hàng</CardTitle>
+                <PackageX className='h-4 w-4 text-muted-foreground' />
               </CardHeader>
               <CardContent>
-                <div className='text-2xl font-bold'>
-                  {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(
-                    products.reduce((total, product) => total + product.price * product.stockQuantity, 0)
-                  )}
-                </div>
-                <p className='text-xs text-muted-foreground'>Giá trị hàng tồn kho</p>
+                <div className='text-2xl font-bold'>{statistics.totalOutOfStockProducts}</div>
+                <p className='text-xs text-muted-foreground'>Sản phẩm cần nhập thêm</p>
               </CardContent>
             </Card>
             <Card>
               <CardHeader className='flex flex-row items-center justify-between pb-2'>
-                <CardTitle className='text-sm font-medium'>Đánh giá trung bình</CardTitle>
-                <Package className='h-4 w-4 text-muted-foreground' />
+                <CardTitle className='text-sm font-medium'>Danh mục</CardTitle>
+                <BarChart className='h-4 w-4 text-muted-foreground' />
               </CardHeader>
               <CardContent>
-                <div className='text-2xl font-bold'>
-                  {(
-                    products.reduce((total, product) => total + product.averageRating, 0) / products.length || 0
-                  ).toFixed(1)}
-                </div>
-                <p className='text-xs text-muted-foreground'>Điểm đánh giá sản phẩm</p>
+                <div className='text-2xl font-bold'>{statistics.totalProductCategories}</div>
+                <p className='text-xs text-muted-foreground'>Danh mục sản phẩm</p>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardHeader className='flex flex-row items-center justify-between pb-2'>
+                <CardTitle className='text-sm font-medium'>Đánh giá</CardTitle>
+                <Star className='h-4 w-4 text-muted-foreground' />
+              </CardHeader>
+              <CardContent>
+                <div className='text-2xl font-bold'>{statistics.totalProductReviews}</div>
+                <p className='text-xs text-muted-foreground'>Đánh giá sản phẩm</p>
               </CardContent>
             </Card>
           </>
         )}
-      </div>
-
-      {/* Search */}
-      <div className='flex flex-col sm:flex-row gap-4'>
-        <Input
-          placeholder='Tìm kiếm sản phẩm...'
-          className='w-full sm:w-[300px]'
-          value={currentKeyword}
-          onChange={(e) => updateSearchParams({ keyword: e.target.value, page_index: 1 })}
-        />
       </div>
 
       {/* Table */}
@@ -261,6 +266,9 @@ function AdminProduct(props: { searchParams: SearchParams }) {
         bodyColumn={bodyColumn}
         href={configRoute.admin.product}
         loading={isLoading}
+        showSearch={true}
+        searchParamName='keyword'
+        searchPlaceholder='Tìm kiếm sản phẩm...'
       />
     </div>
   )

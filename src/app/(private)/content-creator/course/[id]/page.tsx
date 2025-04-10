@@ -1,30 +1,23 @@
 'use client'
 import { use } from 'react'
-import { useGetCourseQuery } from '@/queries/useCourse'
+import { useGetCourseQuery, useDeleteChapterMutation } from '@/queries/useCourse'
+import { useRouter } from 'next/navigation'
+import { toast } from '@/components/ui/use-toast'
 
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import {
-  Clock,
-  FileText,
-  LayoutList,
-  BookOpen,
-  Users,
-  Star,
-  Video,
-  File,
-  MessageCircle,
-  ChevronRight
-} from 'lucide-react'
+import { Clock, FileText, LayoutList, BookOpen, Users, Star, Plus } from 'lucide-react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { cn, formatLevel } from '@/lib/utils'
 import { Skeleton } from '@/components/ui/skeleton'
 import { format } from 'date-fns'
 import { vi } from 'date-fns/locale'
-import { useRouter } from 'next/navigation'
+import { Breadcrumb } from '@/components/private/common/breadcrumb'
 import { MoreOptions } from '@/components/private/common/more-options'
+import { LessonTypeDisplay } from '@/components/private/common/course/lesson-type-display'
+import { handleErrorApi } from '@/lib/utils'
 
 // Skeleton component cho course detail
 const CourseDetailSkeleton = () => {
@@ -76,46 +69,28 @@ const CourseDetailSkeleton = () => {
   )
 }
 
-// Hiển thị loại lesson
-const LessonTypeDisplay = ({ type }: { type: string }) => {
-  switch (type) {
-    case 'VIDEO':
-      return (
-        <Badge variant='outline' className='border-blue-500/50 text-blue-500'>
-          <Video className='w-3 h-3 mr-1' />
-          Video
-        </Badge>
-      )
-    case 'DOCUMENT':
-      return (
-        <Badge variant='outline' className='border-green-500/50 text-green-500'>
-          <File className='w-3 h-3 mr-1' />
-          Bài đọc
-        </Badge>
-      )
-    case 'BOTH':
-      return (
-        <Badge variant='outline' className='border-purple-500/50 text-purple-500'>
-          <Video className='w-3 h-3 mr-1' />
-          Video & Bài đọc
-        </Badge>
-      )
-    default:
-      return (
-        <Badge variant='outline' className='border-gray-500/50 text-gray-500'>
-          <FileText className='w-3 h-3 mr-1' />
-          Khác
-        </Badge>
-      )
-  }
-}
-
 export default function CourseDetailPage(props: { params: Promise<{ id: string }> }) {
   const params = use(props.params)
   const { data: courseData, isLoading } = useGetCourseQuery({ id: params.id })
   const router = useRouter()
+  const deleteChapterMutation = useDeleteChapterMutation({ courseId: params.id })
 
   const course = courseData?.payload?.data
+
+  const handleDeleteChapter = async (chapterId: string) => {
+    try {
+      await deleteChapterMutation.mutateAsync(chapterId)
+      toast({
+        title: 'Xóa chương thành công',
+        description: 'Chương đã được xóa',
+        variant: 'default'
+      })
+    } catch (error) {
+      handleErrorApi({
+        error
+      })
+    }
+  }
 
   if (isLoading) return <CourseDetailSkeleton />
   if (!course)
@@ -137,18 +112,22 @@ export default function CourseDetailPage(props: { params: Promise<{ id: string }
   const createdAt = new Date(course.createdAt)
   const updatedAt = new Date(course.updatedAt)
 
+  const breadcrumbItems = [
+    {
+      title: 'Khóa học',
+      href: '/content-creator/course'
+    },
+    {
+      title: course.title
+    }
+  ]
+
   return (
     <div className='min-h-screen bg-background'>
       <div className='container mx-auto px-4 py-4'>
-        {/* Breadcrumb - Tách riêng và đặt ở trên cùng */}
-        <div className='flex items-center justify-between mb-6'>
-          <nav className='flex items-center text-sm'>
-            <Link href='/content-creator/course' className='text-muted-foreground hover:text-primary transition-colors'>
-              Khóa học
-            </Link>
-            <ChevronRight className='w-4 h-4 mx-2 text-muted-foreground' />
-            <span className='font-medium line-clamp-1 max-w-[240px] md:max-w-md'>{course.title}</span>
-          </nav>
+        {/* Breadcrumb component */}
+        <div className='mb-6'>
+          <Breadcrumb items={breadcrumbItems} />
         </div>
 
         <div className='w-full aspect-[21/9] relative'>
@@ -235,6 +214,12 @@ export default function CourseDetailPage(props: { params: Promise<{ id: string }
                     <LayoutList className='w-5 h-5 text-primary' />
                     <CardTitle>Nội dung khóa học</CardTitle>
                   </div>
+                  <Button asChild>
+                    <Link href={`/content-creator/course/${params.id}/chapter/new`}>
+                      <Plus className='w-4 h-4 mr-2' />
+                      Thêm chương mới
+                    </Link>
+                  </Button>
                 </div>
               </CardHeader>
 
@@ -269,6 +254,20 @@ export default function CourseDetailPage(props: { params: Promise<{ id: string }
                               </div>
                             </div>
                           </div>
+                          <MoreOptions
+                            item={{
+                              id: chapter.id,
+                              title: chapter.title,
+                              status: 'VISIBLE',
+                              slug: ''
+                            }}
+                            itemType='chapter'
+                            onView={() => router.push(`/content-creator/course/${params.id}/chapter/${chapter.id}`)}
+                            onEdit={() =>
+                              router.push(`/content-creator/course/${params.id}/chapter/${chapter.id}/edit`)
+                            }
+                            onDelete={() => handleDeleteChapter(chapter.id)}
+                          />
                         </div>
                       </div>
 
@@ -280,7 +279,7 @@ export default function CourseDetailPage(props: { params: Promise<{ id: string }
                         ) : (
                           chapter.lessons.map((lesson, lessonIndex) => (
                             <Link
-                              href={`/content-creator/course/${params.id}/lesson/${lesson.id}`}
+                              href={`/content-creator/course/${params.id}/chapter/${chapter.id}`}
                               key={lesson.id}
                               className='p-4 pl-10 md:pl-20 hover:bg-muted/50 transition-colors border-b last:border-0 block'
                             >

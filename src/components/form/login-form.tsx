@@ -74,14 +74,17 @@ export default function LoginForm({ className, onSuccess }: { className?: string
           case 'MANAGER':
             router.push('/manager')
             break
-          case 'ACCOUNTING':
-            router.push('/salesman')
-            break
           case 'SUPPORTER':
             router.push('/support')
             break
           case 'CONTENT_CREATOR':
             router.push('/content-creator')
+            break
+          case 'EXPERT':
+            router.push('/expert')
+            break
+          case 'SALESMAN':
+            router.push('/salesman')
             break
           case 'ADULT':
             router.back()

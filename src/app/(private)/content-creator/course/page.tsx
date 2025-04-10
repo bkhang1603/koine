@@ -1,74 +1,56 @@
 'use client'
 
-import { use, useEffect, useMemo } from 'react'
+import { use, useMemo, useCallback } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { BookOpen, Users, Star, GraduationCap, Settings, Plus } from 'lucide-react'
+import { BookOpen, Eye, FilePen, GraduationCap, Settings, Plus } from 'lucide-react'
 import { TableCustom, dataListType } from '@/components/table-custom'
 import { SearchParams } from '@/types/query'
-import { useRouter, usePathname } from 'next/navigation'
+import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { Badge } from '@/components/ui/badge'
 import { format } from 'date-fns'
 import { vi } from 'date-fns/locale'
-import { Input } from '@/components/ui/input'
 import { MoreOptions } from '@/components/private/common/more-options'
-import { useCoursesAdminQuery } from '@/queries/useCourse'
+import { useDeleteCourseMutation, useGetDraftCoursesQuery } from '@/queries/useCourse'
 import { Skeleton } from '@/components/ui/skeleton'
 import Image from 'next/image'
 import { Button } from '@/components/ui/button'
+import { toast } from '@/components/ui/use-toast'
+import { handleErrorApi } from '@/lib/utils'
 
 function ContentCreatorCourse(props: { searchParams: SearchParams }) {
   const searchParams = use(props.searchParams)
   const router = useRouter()
-  const pathname = usePathname()
 
   // Lấy giá trị từ searchParams hoặc sử dụng giá trị mặc định
   const currentKeyword = (searchParams.keyword as string) || ''
   const currentPageSize = Number(searchParams.page_size) || 10
   const currentPageIndex = Number(searchParams.page_index) || 1
 
-  // Hàm để cập nhật URL khi thay đổi các giá trị
-  const updateSearchParams = (newParams: { keyword?: string; page_size?: number; page_index?: number }) => {
-    const params = new URLSearchParams(searchParams as Record<string, string>)
-
-    if (newParams.keyword !== undefined) {
-      if (newParams.keyword === '') {
-        params.delete('keyword')
-      } else {
-        params.set('keyword', newParams.keyword)
-      }
-    }
-
-    if (newParams.page_size !== undefined) {
-      params.set('page_size', newParams.page_size.toString())
-    }
-
-    if (newParams.page_index !== undefined) {
-      params.set('page_index', newParams.page_index.toString())
-    }
-
-    router.push(`${pathname}?${params.toString()}`)
-  }
-
   // Gọi API với giá trị từ URL
-  const {
-    data: responseData,
-    isLoading,
-    error
-  } = useCoursesAdminQuery({
+  const { data: responseData, isLoading } = useGetDraftCoursesQuery({
     keyword: currentKeyword,
     page_size: currentPageSize,
     page_index: currentPageIndex
   })
 
-  useEffect(() => {
-    if (responseData) {
-      console.log('Dữ liệu khóa học từ content creator:', responseData)
-    }
-    if (error) {
-      console.error('Lỗi khi tải khóa học:', error)
-    }
-  }, [responseData, error])
+  const deleteCourseMutation = useDeleteCourseMutation()
+
+  const handleDelete = useCallback(
+    async (courseId: string) => {
+      try {
+        await deleteCourseMutation.mutateAsync(courseId)
+        toast({
+          description: 'Xóa khóa học thành công'
+        })
+      } catch (error) {
+        handleErrorApi({
+          error
+        })
+      }
+    },
+    [deleteCourseMutation]
+  )
 
   const data = responseData?.payload.data || []
   const pagination = responseData?.payload.pagination || {
@@ -82,11 +64,12 @@ function ContentCreatorCourse(props: { searchParams: SearchParams }) {
   // Cấu hình cột cho bảng
   const headerColumn = [
     { id: 1, name: 'Tên khóa học' },
-    { id: 2, name: 'Đánh giá' },
-    { id: 3, name: 'Số người học' },
-    { id: 4, name: 'Trạng thái' },
-    { id: 5, name: 'Ngày tạo' },
-    { id: 6, name: '' }
+    { id: 2, name: 'Ngày tạo' },
+    { id: 3, name: 'Hiển thị' },
+    { id: 4, name: 'Nháp' },
+    { id: 5, name: 'Trạng thái' },
+    { id: 6, name: 'Khóa' },
+    { id: 7, name: '' }
   ]
 
   const bodyColumn = useMemo(
@@ -115,34 +98,6 @@ function ContentCreatorCourse(props: { searchParams: SearchParams }) {
       {
         id: 2,
         render: (course: any) => (
-          <div className='flex items-center min-w-[80px]'>
-            <span className='text-sm font-medium'>
-              {course.aveRating.toFixed(1) == 0 ? 5 : course.aveRating.toFixed(1)}
-            </span>
-          </div>
-        )
-      },
-      {
-        id: 3,
-        render: (course: any) => (
-          <div className='flex items-center min-w-[100px]'>
-            <span className='text-sm font-medium'>{course.totalEnrollment}</span>
-          </div>
-        )
-      },
-      {
-        id: 4,
-        render: (course: any) => (
-          <div className='flex items-center min-w-[100px]'>
-            <Badge variant={course.isBanned ? 'destructive' : 'green'} className='w-fit'>
-              {course.isBanned ? 'Đã khóa' : 'Hoạt động'}
-            </Badge>
-          </div>
-        )
-      },
-      {
-        id: 5,
-        render: (course: any) => (
           <div className='min-w-[120px]'>
             <div className='text-sm'>{format(new Date(course.createdAt), 'dd/MM/yyyy', { locale: vi })}</div>
             <div className='text-xs text-muted-foreground'>
@@ -152,7 +107,47 @@ function ContentCreatorCourse(props: { searchParams: SearchParams }) {
         )
       },
       {
+        id: 3,
+        render: (course: any) => (
+          <div className='flex items-center min-w-[100px]'>
+            <Badge variant={course.isVisible ? 'green' : 'destructive'} className='w-fit'>
+              {course.isVisible ? 'Hiển thị' : 'Ẩn'}
+            </Badge>
+          </div>
+        )
+      },
+      {
+        id: 4,
+        render: (course: any) => (
+          <div className='flex items-center min-w-[100px]'>
+            <Badge variant={course.isDraft ? 'yellow' : 'outline'} className='w-fit'>
+              {course.isDraft ? 'Nháp' : 'Đã xuất bản'}
+            </Badge>
+          </div>
+        )
+      },
+      {
+        id: 5,
+        render: (course: any) => (
+          <div className='flex items-center min-w-[100px]'>
+            <Badge variant='outline' className='w-fit bg-primary/10'>
+              {course.status || 'ACTIVE'}
+            </Badge>
+          </div>
+        )
+      },
+      {
         id: 6,
+        render: (course: any) => (
+          <div className='flex items-center min-w-[100px]'>
+            <Badge variant={course.isBanned ? 'destructive' : 'green'} className='w-fit'>
+              {course.isBanned ? 'Đã khóa' : 'Không khóa'}
+            </Badge>
+          </div>
+        )
+      },
+      {
+        id: 7,
         render: (course: any) => (
           <div className='flex justify-end min-w-[40px]'>
             <MoreOptions
@@ -166,12 +161,13 @@ function ContentCreatorCourse(props: { searchParams: SearchParams }) {
               onView={() => router.push(`/content-creator/course/${course.id}`)}
               onEdit={() => router.push(`/content-creator/course/${course.id}/edit`)}
               onPreview={() => router.push(`/course/${course.slug}`)}
+              onDelete={() => handleDelete(course.id)}
             />
           </div>
         )
       }
     ],
-    [router]
+    [router, handleDelete]
   )
 
   const tableData: dataListType = {
@@ -182,11 +178,8 @@ function ContentCreatorCourse(props: { searchParams: SearchParams }) {
 
   // Tính toán thống kê
   const totalCourses = pagination.totalItem || 0
-  const totalEnrollments = data.reduce((sum: number, course: any) => sum + course.totalEnrollment, 0)
-  const averageRating =
-    data.length > 0
-      ? (data.reduce((sum: number, course: any) => sum + course.aveRating, 0) / data.length).toFixed(1)
-      : 0
+  const visibleCourses = data.filter((course: any) => course.isVisible).length
+  const draftCourses = data.filter((course: any) => course.isDraft).length
   const bannedCourses = data.filter((course: any) => course.isBanned).length
 
   return (
@@ -244,22 +237,22 @@ function ContentCreatorCourse(props: { searchParams: SearchParams }) {
             </Card>
             <Card>
               <CardHeader className='flex flex-row items-center justify-between pb-2'>
-                <CardTitle className='text-sm font-medium'>Tổng lượt đăng ký</CardTitle>
-                <Users className='h-4 w-4 text-muted-foreground' />
+                <CardTitle className='text-sm font-medium'>Khóa học đang hiển thị</CardTitle>
+                <Eye className='h-4 w-4 text-muted-foreground' />
               </CardHeader>
               <CardContent>
-                <div className='text-2xl font-bold'>{totalEnrollments}</div>
-                <p className='text-xs text-muted-foreground'>Số lượt đăng ký khóa học</p>
+                <div className='text-2xl font-bold'>{visibleCourses}</div>
+                <p className='text-xs text-muted-foreground'>Số khóa học đang hiển thị</p>
               </CardContent>
             </Card>
             <Card>
               <CardHeader className='flex flex-row items-center justify-between pb-2'>
-                <CardTitle className='text-sm font-medium'>Đánh giá trung bình</CardTitle>
-                <Star className='h-4 w-4 text-muted-foreground' />
+                <CardTitle className='text-sm font-medium'>Khóa học đang nháp</CardTitle>
+                <FilePen className='h-4 w-4 text-muted-foreground' />
               </CardHeader>
               <CardContent>
-                <div className='text-2xl font-bold'>{averageRating}</div>
-                <p className='text-xs text-muted-foreground'>Điểm đánh giá trung bình</p>
+                <div className='text-2xl font-bold'>{draftCourses}</div>
+                <p className='text-xs text-muted-foreground'>Số khóa học đang nháp</p>
               </CardContent>
             </Card>
             <Card>
@@ -276,16 +269,6 @@ function ContentCreatorCourse(props: { searchParams: SearchParams }) {
         )}
       </div>
 
-      {/* Search */}
-      <div className='flex flex-col sm:flex-row gap-4'>
-        <Input
-          placeholder='Tìm kiếm khóa học...'
-          className='w-full sm:w-[300px]'
-          value={currentKeyword}
-          onChange={(e) => updateSearchParams({ keyword: e.target.value, page_index: 1 })}
-        />
-      </div>
-
       {/* Table */}
       <TableCustom
         data={tableData}
@@ -293,6 +276,9 @@ function ContentCreatorCourse(props: { searchParams: SearchParams }) {
         bodyColumn={bodyColumn}
         href='/content-creator/course'
         loading={isLoading}
+        showSearch={true}
+        searchParamName='keyword'
+        searchPlaceholder='Tìm kiếm khóa học...'
       />
     </div>
   )

@@ -18,11 +18,7 @@ const eventApiRequest = {
       next: { revalidate: 4 * 60 * 60 }
     }),
   // Caching
-  getEventById: (body: { id: string }) =>
-    http.get<GetEventByIdResType>(`/events/${body.id}`, {
-      cache: 'force-cache',
-      next: { revalidate: 4 * 60 * 60 }
-    }),
+  getEventById: (body: { id: string }) => http.get<GetEventByIdResType>(`/events/${body.id}`),
   // Without caching
   getEventByIdWithoutCaching: (body: { id: string }) => http.get<GetEventByIdResType>(`/events/${body.id}`),
   getAllEventForHost: () => http.get<GetAllEventResType>('/events/host'),

@@ -1,5 +1,11 @@
 import courseApiRequest from '@/apiRequests/course'
-import { CreateCourseBodyType, UpdateCategoryCourseBodyType } from '@/schemaValidations/course.schema'
+import {
+  CreateCourseBodyType,
+  UpdateCategoryCourseBodyType,
+  UpdateLessonBodyType,
+  CreateChapterBodyType,
+  UpdateChapterBodyType
+} from '@/schemaValidations/course.schema'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 
 export const useEnrollCourseMutation = () => {
@@ -67,7 +73,6 @@ export const useActiveCourseMutation = () => {
       queryClient.invalidateQueries({
         queryKey: ['userCourses']
       })
-      // Nếu bạn cần invalidate các query khác, hãy gọi riêng
       queryClient.invalidateQueries({
         queryKey: ['account-store']
       })
@@ -315,5 +320,94 @@ export const useUpdateScoreQuizMutation = () => {
         queryKey: ['courseProgress']
       })
     }
+  })
+}
+
+// Chapter mutations
+export const useCreateChapterMutation = () => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (data: CreateChapterBodyType) => courseApiRequest.createChapter(data),
+    onSuccess: (data, variables) => {
+      queryClient.invalidateQueries({ queryKey: ['courses', variables.courseId] })
+      queryClient.invalidateQueries({ queryKey: ['chapters', variables.courseId] })
+    }
+  })
+}
+
+export const useUpdateChapterMutation = ({ id, courseId }: { id: string; courseId: string }) => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (data: UpdateChapterBodyType) => courseApiRequest.updateChapter(id, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['courses', courseId] })
+      queryClient.invalidateQueries({ queryKey: ['chapters', courseId] })
+      queryClient.invalidateQueries({ queryKey: ['chapter', id] })
+    }
+  })
+}
+
+export const useDeleteChapterMutation = ({ courseId }: { courseId: string }) => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (id: string) => courseApiRequest.deleteChapter(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['courses', courseId] })
+      queryClient.invalidateQueries({ queryKey: ['chapters', courseId] })
+      queryClient.invalidateQueries({ queryKey: ['course', courseId] })
+    }
+  })
+}
+
+// Lesson mutations
+export const useCreateLessonMutation = () => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: courseApiRequest.createLesson,
+    onSuccess: (_, variables) => {
+      // Invalidate relevant queries after successful creation
+      queryClient.invalidateQueries({ queryKey: ['chapters', variables.chapterId] })
+      queryClient.invalidateQueries({ queryKey: ['lessons', variables.chapterId] })
+    }
+  })
+}
+
+export const useUpdateLessonMutation = ({ id, chapterId }: { id: string; chapterId: string }) => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (data: UpdateLessonBodyType) => courseApiRequest.updateLesson(id, data),
+    onSuccess: () => {
+      // Invalidate relevant queries after successful update
+      queryClient.invalidateQueries({ queryKey: ['chapters', chapterId] })
+      queryClient.invalidateQueries({ queryKey: ['lessons', chapterId] })
+      queryClient.invalidateQueries({ queryKey: ['courseProgress', id] })
+    }
+  })
+}
+
+export const useDeleteLessonMutation = ({ chapterId }: { chapterId: string }) => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (id: string) => courseApiRequest.deleteLesson(id),
+    onSuccess: () => {
+      // Invalidate relevant queries after successful deletion
+      queryClient.invalidateQueries({ queryKey: ['chapters', chapterId] })
+      queryClient.invalidateQueries({ queryKey: ['lessons', chapterId] })
+    }
+  })
+}
+
+export const useGetDraftCoursesQuery = ({
+  page_index,
+  page_size,
+  keyword
+}: {
+  page_index?: number
+  page_size?: number
+  keyword?: string
+}) => {
+  return useQuery({
+    queryKey: ['draftCourses', page_index, page_size, keyword],
+    queryFn: () => courseApiRequest.getDraftCourses({ page_index, page_size, keyword })
   })
 }

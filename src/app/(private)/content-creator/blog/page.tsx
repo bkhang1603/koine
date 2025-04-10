@@ -10,7 +10,6 @@ import { useBlogDeleteMutation, useMyBlogsQuery } from '@/queries/useBlog'
 import { Skeleton } from '@/components/ui/skeleton'
 import { toast } from '@/components/ui/use-toast'
 import { handleErrorApi } from '@/lib/utils'
-import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
 import { format } from 'date-fns'
 import { vi } from 'date-fns/locale'
@@ -20,16 +19,13 @@ import { MoreOptions } from '@/components/private/common/more-options'
 
 // Custom hook useDebounce
 // eslint-disable-next-line no-unused-vars
-function useDebounce<T>(value: T, delay: number = 500): T {
+function useDebounce<T>(value: T, delay: number = 800): T {
   const [debouncedValue, setDebouncedValue] = useState<T>(value)
 
   useEffect(() => {
-    // Thiết lập timer để cập nhật giá trị debounced sau delay
     const timer = setTimeout(() => {
       setDebouncedValue(value)
     }, delay)
-
-    // Xóa timer cũ nếu value thay đổi (hoặc component unmount)
     return () => {
       clearTimeout(timer)
     }
@@ -44,34 +40,12 @@ export default function BlogPage() {
 
   // Get values from searchParams or use default values
   const currentKeyword = searchParams.get('keyword') || ''
-  const currentPageSize = Number(searchParams.get('page_size')) || 5
+  const currentPageSize = Number(searchParams.get('page_size')) || 10
   const currentPageIndex = Number(searchParams.get('page_index')) || 1
-
-  // Function to update URL when values change
-  const updateSearchParams = (newParams: { keyword?: string; page_size?: number; page_index?: number }) => {
-    const params = new URLSearchParams(searchParams.toString())
-
-    if (newParams.keyword !== undefined) {
-      if (newParams.keyword === '') {
-        params.delete('keyword')
-      } else {
-        params.set('keyword', newParams.keyword)
-      }
-    }
-
-    if (newParams.page_size !== undefined) {
-      params.set('page_size', newParams.page_size.toString())
-    }
-
-    if (newParams.page_index !== undefined) {
-      params.set('page_index', newParams.page_index.toString())
-    }
-
-    router.push(`?${params.toString()}`)
-  }
 
   // Lấy danh sách blog từ API
   const { data: blogsResponse, isLoading } = useMyBlogsQuery({
+    keyword: currentKeyword,
     page_index: currentPageIndex,
     page_size: currentPageSize
   })
@@ -79,13 +53,19 @@ export default function BlogPage() {
   const deleteBlogMutation = useBlogDeleteMutation()
 
   // Dữ liệu blog từ API
-  const blogs = blogsResponse?.payload.data || []
+  const blogs = blogsResponse?.payload.data.blogs || []
   const pagination = blogsResponse?.payload.pagination || {
     pageSize: 0,
     totalItem: 0,
     currentPage: 0,
     totalPage: 0,
     maxPageSize: 0
+  }
+  const statistics = blogsResponse?.payload.data.statistics || {
+    totalBlogs: 0,
+    totalReacts: 0,
+    totalComments: 0,
+    totalVisibleBlogs: 0
   }
 
   const handleDelete = useCallback(
@@ -104,19 +84,13 @@ export default function BlogPage() {
     [deleteBlogMutation]
   )
 
-  // Calculate statistics
-  const totalBlogs = pagination.totalItem || 0
-  const totalReacts = blogs.reduce((sum: number, blog: any) => sum + blog.totalReact, 0)
-  const totalComments = blogs.reduce((sum: number, blog: any) => sum + blog.totalComment, 0)
-  const publishedBlogs = blogs.filter((blog: any) => blog.status === 'VISIBLE').length
-
   // Column configuration for the table
   const headerColumn = [
     { id: 1, name: 'Tiêu đề bài viết' },
-    { id: 2, name: 'Lượt thích' },
-    { id: 3, name: 'Bình luận' },
-    { id: 4, name: 'Trạng thái' },
-    { id: 5, name: 'Ngày tạo' },
+    { id: 2, name: 'Ngày tạo' },
+    { id: 3, name: 'Lượt thích' },
+    { id: 4, name: 'Bình luận' },
+    { id: 5, name: 'Trạng thái' },
     { id: 6, name: '' }
   ]
 
@@ -146,16 +120,19 @@ export default function BlogPage() {
       {
         id: 2,
         render: (blog: any) => (
-          <div className='flex items-center min-w-[80px]'>
-            <span className='text-sm font-medium'>{blog.totalReact}</span>
+          <div className='min-w-[120px]'>
+            <div className='text-sm'>{format(new Date(blog.createdAt), 'dd/MM/yyyy', { locale: vi })}</div>
+            <div className='text-xs text-muted-foreground'>
+              {format(new Date(blog.createdAt), 'HH:mm', { locale: vi })}
+            </div>
           </div>
         )
       },
       {
         id: 3,
         render: (blog: any) => (
-          <div className='flex items-center min-w-[100px]'>
-            <span className='text-sm font-medium'>{blog.totalComment}</span>
+          <div className='flex items-center min-w-[80px]'>
+            <span className='text-sm font-medium'>{blog.totalReact}</span>
           </div>
         )
       },
@@ -163,20 +140,17 @@ export default function BlogPage() {
         id: 4,
         render: (blog: any) => (
           <div className='flex items-center min-w-[100px]'>
-            <Badge variant={blog.status === 'VISIBLE' ? 'green' : 'secondary'} className='w-fit'>
-              {blog.status === 'VISIBLE' ? 'Đã xuất bản' : 'Bản nháp'}
-            </Badge>
+            <span className='text-sm font-medium'>{blog.totalComment}</span>
           </div>
         )
       },
       {
         id: 5,
         render: (blog: any) => (
-          <div className='min-w-[120px]'>
-            <div className='text-sm'>{format(new Date(blog.createdAt), 'dd/MM/yyyy', { locale: vi })}</div>
-            <div className='text-xs text-muted-foreground'>
-              {format(new Date(blog.createdAt), 'HH:mm', { locale: vi })}
-            </div>
+          <div className='flex items-center min-w-[100px]'>
+            <Badge variant={blog.status === 'VISIBLE' ? 'green' : 'secondary'} className='w-fit'>
+              {blog.status === 'VISIBLE' ? 'Đã xuất bản' : 'Bản nháp'}
+            </Badge>
           </div>
         )
       },
@@ -234,7 +208,6 @@ export default function BlogPage() {
           </Button>
         </div>
       </div>
-
       {/* Stats Cards with Skeleton */}
       <div className='grid grid-cols-1 md:grid-cols-4 gap-4'>
         {isLoading ? (
@@ -260,7 +233,7 @@ export default function BlogPage() {
                 <BookOpen className='h-4 w-4 text-muted-foreground' />
               </CardHeader>
               <CardContent>
-                <div className='text-2xl font-bold'>{totalBlogs}</div>
+                <div className='text-2xl font-bold'>{statistics.totalBlogs}</div>
                 <p className='text-xs text-muted-foreground'>Số lượng bài viết của bạn</p>
               </CardContent>
             </Card>
@@ -270,7 +243,7 @@ export default function BlogPage() {
                 <ThumbsUp className='h-4 w-4 text-muted-foreground' />
               </CardHeader>
               <CardContent>
-                <div className='text-2xl font-bold'>{totalReacts}</div>
+                <div className='text-2xl font-bold'>{statistics.totalReacts}</div>
                 <p className='text-xs text-muted-foreground'>Số lượt thích của bài viết</p>
               </CardContent>
             </Card>
@@ -280,7 +253,7 @@ export default function BlogPage() {
                 <MessageSquare className='h-4 w-4 text-muted-foreground' />
               </CardHeader>
               <CardContent>
-                <div className='text-2xl font-bold'>{totalComments}</div>
+                <div className='text-2xl font-bold'>{statistics.totalComments}</div>
                 <p className='text-xs text-muted-foreground'>Số bình luận của bài viết</p>
               </CardContent>
             </Card>
@@ -290,31 +263,23 @@ export default function BlogPage() {
                 <BarChart className='h-4 w-4 text-muted-foreground' />
               </CardHeader>
               <CardContent>
-                <div className='text-2xl font-bold'>{publishedBlogs}</div>
+                <div className='text-2xl font-bold'>{statistics.totalVisibleBlogs}</div>
                 <p className='text-xs text-muted-foreground'>Số bài viết đã được xuất bản</p>
               </CardContent>
             </Card>
           </>
         )}
       </div>
-
-      {/* Search */}
-      <div className='flex flex-col sm:flex-row gap-4'>
-        <Input
-          placeholder='Tìm kiếm bài viết...'
-          className='w-full sm:w-[300px]'
-          value={currentKeyword}
-          onChange={(e) => updateSearchParams({ keyword: e.target.value, page_index: 1 })}
-        />
-      </div>
-
-      {/* Table */}
+      {/* Table with integrated search */}
       <TableCustom
         data={tableData}
         headerColumn={headerColumn}
         bodyColumn={bodyColumn}
         href={'/content-creator/blog'}
         loading={isLoading}
+        showSearch={true}
+        searchParamName='keyword'
+        searchPlaceholder='Tìm kiếm bài viết...'
       />
     </div>
   )

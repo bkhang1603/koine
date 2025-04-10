@@ -9,7 +9,7 @@ export const Role = {
   Manager: 'MANAGER',
   ContentCreator: 'CONTENT_CREATOR',
   Expert: 'EXPERT',
-  Accounting: 'ACCOUNTING',
+  Salesman: 'SALESMAN',
   Adult: 'ADULT',
   Child: 'CHILD',
   Supporter: 'SUPPORTER'
@@ -20,7 +20,7 @@ export const RoleValues = [
   Role.Manager,
   Role.ContentCreator,
   Role.Expert,
-  Role.Accounting,
+  Role.Salesman,
   Role.Adult,
   Role.Child,
   Role.Supporter

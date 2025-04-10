@@ -5,9 +5,9 @@ import { Button } from '@/components/ui/button'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 import { FileText, Video, HelpCircle, X } from 'lucide-react'
 import { motion } from 'framer-motion'
-import { TextLessonContent } from '@/components/private/content-creator/course/text-lesson-content'
-import { VideoLessonContent } from '@/components/private/content-creator/course/video-lesson-content'
-import { QuizLessonContent } from '@/components/private/content-creator/course/quiz-lesson-content'
+import { TextLessonContent } from '@/components/private/common/course/text-lesson-content'
+import { VideoLessonContent } from '@/components/private/common/course/video-lesson-content'
+import { QuizLessonContent } from '@/components/private/common/course/quiz-lesson-content'
 
 interface Lesson {
   id: string

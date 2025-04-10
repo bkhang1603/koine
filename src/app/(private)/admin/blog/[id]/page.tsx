@@ -5,21 +5,12 @@ import Link from 'next/link'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import {
-  ArrowLeft,
-  Calendar,
-  Clock,
-  User,
-  ThumbsUp,
-  MessageSquare,
-  Edit,
-  ExternalLink,
-  ChevronRight
-} from 'lucide-react'
+import { ArrowLeft, Calendar, Clock, User, ThumbsUp, MessageSquare, Edit, ExternalLink } from 'lucide-react'
 import Image from 'next/image'
 import { useBlogDetailQuery } from '@/queries/useBlog'
 import { Skeleton } from '@/components/ui/skeleton'
 import { formatDate } from '@/lib/utils'
+import { Breadcrumb } from '@/components/private/common/breadcrumb'
 
 export default function BlogPostDetail(props: { params: Promise<{ id: string }> }) {
   const params = use(props.params)
@@ -89,18 +80,24 @@ export default function BlogPostDetail(props: { params: Promise<{ id: string }> 
     )
   }
 
+  const breadcrumbItems = [
+    {
+      title: 'Bài viết',
+      href: '/admin/blog'
+    },
+    {
+      title: post?.title || 'Chi tiết bài viết'
+    }
+  ]
+
   const readingTime = Math.ceil(post.content.split(/\s+/).length / 200)
 
   return (
     <div className='container max-w-4xl mx-auto px-4 py-6'>
-      {/* Breadcrumb */}
-      <nav className='flex items-center space-x-1 text-sm text-muted-foreground mb-6'>
-        <Link href='/admin/blog' className='hover:text-primary transition-colors'>
-          Blog
-        </Link>
-        <ChevronRight className='h-4 w-4' />
-        <span className='font-medium text-foreground max-w-[300px] truncate'>{post?.title || 'Chi tiết bài viết'}</span>
-      </nav>
+      {/* Breadcrumb component */}
+      <div className='mb-6'>
+        <Breadcrumb items={breadcrumbItems} />
+      </div>
 
       <div className='max-w-5xl mx-auto space-y-6'>
         <div className='flex justify-between items-center mb-6'>

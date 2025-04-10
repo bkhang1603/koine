@@ -103,8 +103,18 @@ const blogApiRequest = {
   }) => http.get<GetBlogsListAdminResType>(`/blogs?page_index=${page_index}&page_size=${page_size}&keyword=${keyword}`),
   getBlogDetailAdmin: (id: string) => http.get<GetBlogDetailAdminResType>(`/blogs/${id}`),
   getBlogCommentsAdmin: (id: string) => http.get<GetBlogCommentsAdminResType>(`/blog-comments/${id}`),
-  getMyBlogs: ({ page_index, page_size }: { page_index?: number | undefined; page_size?: number | undefined }) =>
-    http.get<GetMyBlogsResType>(`/blogs/my-blogs?page_index=${page_index}&page_size=${page_size}`)
+  getMyBlogs: ({
+    page_index,
+    page_size,
+    keyword
+  }: {
+    page_index?: number | undefined
+    page_size?: number | undefined
+    keyword?: string | string[] | undefined
+  }) =>
+    http.get<GetMyBlogsResType>(
+      `/blogs/my-blogs?page_index=${page_index}&page_size=${page_size}${keyword ? `&keyword=${keyword}` : ''}`
+    )
 }
 
 export default blogApiRequest

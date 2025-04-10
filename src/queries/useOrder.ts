@@ -91,10 +91,10 @@ export const useCreateRefundOrderMutation = () => {
 }
 
 // get order cho admin
-export const useGetAdminOrdersQuery = (pageSize: number, pageIndex: number, status: string) => {
+export const useGetAdminOrdersQuery = (pageSize: number, pageIndex: number, keyword?: string, status?: string) => {
   return useQuery({
-    queryKey: ['adminOrders', status, pageSize, pageIndex],
-    queryFn: () => orderApiRequest.getAdminOrders(pageSize, pageIndex, status)
+    queryKey: ['adminOrders', keyword, status, pageSize, pageIndex],
+    queryFn: () => orderApiRequest.getAdminOrders(pageSize, pageIndex, keyword, status)
   })
 }
 
@@ -102,5 +102,35 @@ export const useGetAdminOrderQuery = ({ id }: { id: string }) => {
   return useQuery({
     queryKey: ['order', id],
     queryFn: () => orderApiRequest.getAdminOrderById(id)
+  })
+}
+
+export const useConfirmDeliveryOrderMutation = ({ id }: { id: string }) => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: orderApiRequest.confirmDeliveryOrder,
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ['orders', id]
+      })
+      queryClient.invalidateQueries({
+        queryKey: ['adminOrders']
+      })
+    }
+  })
+}
+
+export const useGetRefundRequestsQuery = ({ page_size, page_index }: { page_size: number; page_index: number }) => {
+  return useQuery({
+    queryKey: ['refund-requests', page_size, page_index],
+    queryFn: () => orderApiRequest.getRefundRequests({ page_size, page_index })
+  })
+}
+
+export const useGetRefundRequestById = ({ id }: { id: string }) => {
+  return useQuery({
+    queryKey: ['refund-request', id],
+    queryFn: () => orderApiRequest.getRefundRequestById(id)
   })
 }

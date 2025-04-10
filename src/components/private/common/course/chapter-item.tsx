@@ -1,5 +1,5 @@
 /* eslint-disable no-unused-vars */
-import { LessonItem } from '@/components/private/content-creator/course/lesson-item'
+import { LessonItem } from '@/components/private/common/course/lesson-item'
 import { AccordionItem, AccordionTrigger, AccordionContent } from '@/components/ui/accordion'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'

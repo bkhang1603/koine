@@ -3,9 +3,7 @@
 import type React from 'react'
 import { useEffect, useState } from 'react'
 import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
 import { Button } from '@/components/ui/button'
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { Clock } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
@@ -50,10 +48,13 @@ export function TimePickerInput({ value, onChange, min = 0, max = 59, placeholde
 }
 
 interface TimePickerDemoProps {
+  // eslint-disable-next-line no-unused-vars
   setHours: (hours: number) => void
+  // eslint-disable-next-line no-unused-vars
   setMinutes: (minutes: number) => void
   initHours: number
   initMinutes: number
+  // eslint-disable-next-line no-unused-vars
   onTimeChange: (hours: number, minutes: number) => void
 }
 

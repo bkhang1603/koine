@@ -98,11 +98,22 @@ export const BlogCommentUpdateRes = z.object({
 
 export const BlogBodyData = z
   .object({
-    title: z.string().min(1, 'Tiêu đề không được để trống'),
-    content: z.string().min(1, 'Nội dung không được để trống'),
-    description: z.string().min(1, 'Mô tả không được để trống'),
-    imageUrl: z.string().min(1, 'Ảnh đại diện không được để trống'),
-    categoryIds: z.array(z.string()).default([])
+    title: z
+      .string()
+      .min(5, { message: 'Tiêu đề phải có ít nhất 5 ký tự' })
+      .max(255, { message: 'Tiêu đề không được vượt quá 255 ký tự' })
+      .trim(),
+    description: z
+      .string()
+      .min(10, { message: 'Mô tả phải có ít nhất 10 ký tự' })
+      .max(255, { message: 'Mô tả không được vượt quá 255 ký tự' })
+      .trim(),
+    content: z
+      .string()
+      .min(50, { message: 'Nội dung phải có ít nhất 50 ký tự' })
+      .refine((val) => val !== '<p></p>', { message: 'Nội dung không được để trống' }),
+    categoryIds: z.array(z.string()).min(1, { message: 'Vui lòng chọn ít nhất 1 danh mục' }),
+    imageUrl: z.string().min(1, 'Ảnh đại diện không được để trống')
   })
   .strict()
 
@@ -176,37 +187,45 @@ export const getMyBlogsRes = z.object({
   statusCode: z.number(),
   info: z.string(),
   message: z.string(),
-  data: z.array(
-    z.object({
-      isDeleted: z.boolean(),
-      createdAt: z.string(),
-      updatedAt: z.string(),
-      id: z.string(),
-      creatorId: z.string(),
-      title: z.string(),
-      titleNoTone: z.string(),
-      slug: z.string(),
-      description: z.string(),
-      content: z.string(),
-      imageUrl: z.string(),
-      status: z.enum(['VISIBLE', 'INVISIBLE']),
-      createdAtFormatted: z.string(),
-      updatedAtFormatted: z.string(),
-      creatorInfo: z.object({
-        id: z.string(),
-        firstName: z.string(),
-        avatarUrl: z.string()
-      }),
-      totalReact: z.number(),
-      totalComment: z.number(),
-      categories: z.array(
-        z.object({
-          id: z.string(),
-          name: z.string()
-        })
-      )
-    })
-  ),
+  data: z.object({
+    statistics: z.object({
+      totalBlogs: z.number(),
+      totalReacts: z.number(),
+      totalComments: z.number(),
+      totalVisibleBlogs: z.number()
+    }),
+    blogs: z.array(
+      z.object({
+        isDeleted: z.boolean(),
+        createdAt: z.string(),
+        updatedAt: z.string(),
+        id: z.string().uuid(),
+        creatorId: z.string().uuid(),
+        title: z.string(),
+        titleNoTone: z.string(),
+        slug: z.string(),
+        description: z.string(),
+        content: z.string(),
+        imageUrl: z.string().url(),
+        status: z.enum(['VISIBLE', 'INVISIBLE']),
+        createdAtFormatted: z.string(),
+        updatedAtFormatted: z.string(),
+        creatorInfo: z.object({
+          id: z.string().uuid(),
+          firstName: z.string(),
+          avatarUrl: z.string().url()
+        }),
+        totalReact: z.number(),
+        totalComment: z.number(),
+        categories: z.array(
+          z.object({
+            id: z.string().uuid(),
+            name: z.string()
+          })
+        )
+      })
+    )
+  }),
   pagination: z.object({
     pageSize: z.number(),
     totalItem: z.number(),

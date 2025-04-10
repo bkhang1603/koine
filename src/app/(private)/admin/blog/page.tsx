@@ -6,11 +6,10 @@ import { BookOpen, MessageSquare, BarChart, ThumbsUp, Settings, Plus } from 'luc
 import { TableCustom, dataListType } from '@/components/table-custom'
 import configRoute from '@/config/route'
 import { SearchParams } from '@/types/query'
-import { useRouter, usePathname } from 'next/navigation'
+import { useRouter } from 'next/navigation'
 import { Badge } from '@/components/ui/badge'
 import { format } from 'date-fns'
 import { vi } from 'date-fns/locale'
-import { Input } from '@/components/ui/input'
 import { MoreOptions } from '@/components/private/common/more-options'
 import { useBlogDeleteMutation, useMyBlogsQuery } from '@/queries/useBlog'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -23,35 +22,11 @@ import { handleErrorApi } from '@/lib/utils'
 function AdminBlog(props: { searchParams: SearchParams }) {
   const searchParams = use(props.searchParams)
   const router = useRouter()
-  const pathname = usePathname()
 
   // Get values from searchParams or use default values
   const currentKeyword = (searchParams.keyword as string) || ''
   const currentPageSize = Number(searchParams.page_size) || 10
   const currentPageIndex = Number(searchParams.page_index) || 1
-
-  // Function to update URL when values change
-  const updateSearchParams = (newParams: { keyword?: string; page_size?: number; page_index?: number }) => {
-    const params = new URLSearchParams(searchParams as Record<string, string>)
-
-    if (newParams.keyword !== undefined) {
-      if (newParams.keyword === '') {
-        params.delete('keyword')
-      } else {
-        params.set('keyword', newParams.keyword)
-      }
-    }
-
-    if (newParams.page_size !== undefined) {
-      params.set('page_size', newParams.page_size.toString())
-    }
-
-    if (newParams.page_index !== undefined) {
-      params.set('page_index', newParams.page_index.toString())
-    }
-
-    router.push(`${pathname}?${params.toString()}`)
-  }
 
   // Call API with URL values
   const {
@@ -59,6 +34,7 @@ function AdminBlog(props: { searchParams: SearchParams }) {
     isLoading,
     error
   } = useMyBlogsQuery({
+    keyword: currentKeyword,
     page_size: currentPageSize,
     page_index: currentPageIndex
   })
@@ -84,14 +60,15 @@ function AdminBlog(props: { searchParams: SearchParams }) {
 
   useEffect(() => {
     if (responseData) {
-      console.log('Blog data from admin:', responseData)
     }
     if (error) {
-      console.error('Error loading blogs:', error)
+      handleErrorApi({
+        error
+      })
     }
   }, [responseData, error])
 
-  const data = responseData?.payload.data || []
+  const data = responseData?.payload.data.blogs || []
   const pagination = responseData?.payload.pagination || {
     pageSize: 0,
     totalItem: 0,
@@ -99,16 +76,22 @@ function AdminBlog(props: { searchParams: SearchParams }) {
     totalPage: 0,
     maxPageSize: 0
   }
+  const statistics = responseData?.payload.data.statistics || {
+    totalBlogs: 0,
+    totalReacts: 0,
+    totalComments: 0,
+    totalVisibleBlogs: 0
+  }
 
   // Column configuration for the table
   const headerColumn = [
     { id: 1, name: 'Tiêu đề bài viết' },
-    { id: 2, name: 'Tác giả' },
+    { id: 2, name: 'Ngày tạo' },
+    { id: 3, name: 'Tác giả' },
     { id: 4, name: 'Lượt thích' },
     { id: 5, name: 'Bình luận' },
     { id: 6, name: 'Trạng thái' },
-    { id: 7, name: 'Ngày tạo' },
-    { id: 8, name: '' }
+    { id: 7, name: '' }
   ]
 
   const bodyColumn = useMemo(
@@ -136,6 +119,17 @@ function AdminBlog(props: { searchParams: SearchParams }) {
       },
       {
         id: 2,
+        render: (blog: any) => (
+          <div className='min-w-[120px]'>
+            <div className='text-sm'>{format(new Date(blog.createdAt), 'dd/MM/yyyy', { locale: vi })}</div>
+            <div className='text-xs text-muted-foreground'>
+              {format(new Date(blog.createdAt), 'HH:mm', { locale: vi })}
+            </div>
+          </div>
+        )
+      },
+      {
+        id: 3,
         render: (blog: any) => (
           <div className='min-w-[120px]'>
             <div className='text-sm'>{blog.creatorInfo.firstName}</div>
@@ -171,17 +165,6 @@ function AdminBlog(props: { searchParams: SearchParams }) {
       {
         id: 7,
         render: (blog: any) => (
-          <div className='min-w-[120px]'>
-            <div className='text-sm'>{format(new Date(blog.createdAt), 'dd/MM/yyyy', { locale: vi })}</div>
-            <div className='text-xs text-muted-foreground'>
-              {format(new Date(blog.createdAt), 'HH:mm', { locale: vi })}
-            </div>
-          </div>
-        )
-      },
-      {
-        id: 8,
-        render: (blog: any) => (
           <div className='flex justify-end min-w-[40px]'>
             <MoreOptions
               item={{
@@ -209,12 +192,6 @@ function AdminBlog(props: { searchParams: SearchParams }) {
     message: responseData?.payload.message || '',
     pagination
   }
-
-  // Calculate statistics
-  const totalBlogs = pagination.totalItem || 0
-  const totalReacts = data.reduce((sum: number, blog: any) => sum + blog.totalReact, 0)
-  const totalComments = data.reduce((sum: number, blog: any) => sum + blog.totalComment, 0)
-  const publishedBlogs = data.filter((blog: any) => blog.status === 'VISIBLE').length
 
   return (
     <div className='container mx-auto px-4 py-6 space-y-6'>
@@ -265,7 +242,7 @@ function AdminBlog(props: { searchParams: SearchParams }) {
                 <BookOpen className='h-4 w-4 text-muted-foreground' />
               </CardHeader>
               <CardContent>
-                <div className='text-2xl font-bold'>{totalBlogs}</div>
+                <div className='text-2xl font-bold'>{statistics.totalBlogs}</div>
                 <p className='text-xs text-muted-foreground'>Số lượng bài viết trong hệ thống</p>
               </CardContent>
             </Card>
@@ -275,7 +252,7 @@ function AdminBlog(props: { searchParams: SearchParams }) {
                 <ThumbsUp className='h-4 w-4 text-muted-foreground' />
               </CardHeader>
               <CardContent>
-                <div className='text-2xl font-bold'>{totalReacts}</div>
+                <div className='text-2xl font-bold'>{statistics.totalReacts}</div>
                 <p className='text-xs text-muted-foreground'>Số lượt thích của tất cả bài viết</p>
               </CardContent>
             </Card>
@@ -285,7 +262,7 @@ function AdminBlog(props: { searchParams: SearchParams }) {
                 <MessageSquare className='h-4 w-4 text-muted-foreground' />
               </CardHeader>
               <CardContent>
-                <div className='text-2xl font-bold'>{totalComments}</div>
+                <div className='text-2xl font-bold'>{statistics.totalComments}</div>
                 <p className='text-xs text-muted-foreground'>Số bình luận của tất cả bài viết</p>
               </CardContent>
             </Card>
@@ -295,7 +272,7 @@ function AdminBlog(props: { searchParams: SearchParams }) {
                 <BarChart className='h-4 w-4 text-muted-foreground' />
               </CardHeader>
               <CardContent>
-                <div className='text-2xl font-bold'>{publishedBlogs}</div>
+                <div className='text-2xl font-bold'>{statistics.totalVisibleBlogs}</div>
                 <p className='text-xs text-muted-foreground'>Số bài viết đã được xuất bản</p>
               </CardContent>
             </Card>
@@ -303,23 +280,16 @@ function AdminBlog(props: { searchParams: SearchParams }) {
         )}
       </div>
 
-      {/* Search */}
-      <div className='flex flex-col sm:flex-row gap-4'>
-        <Input
-          placeholder='Tìm kiếm bài viết...'
-          className='w-full sm:w-[300px]'
-          value={currentKeyword}
-          onChange={(e) => updateSearchParams({ keyword: e.target.value, page_index: 1 })}
-        />
-      </div>
-
-      {/* Table */}
+      {/* Table with integrated search */}
       <TableCustom
         data={tableData}
         headerColumn={headerColumn}
         bodyColumn={bodyColumn}
         href={configRoute.admin.blog}
         loading={isLoading}
+        showSearch={true}
+        searchParamName='keyword'
+        searchPlaceholder='Tìm kiếm bài viết...'
       />
     </div>
   )
