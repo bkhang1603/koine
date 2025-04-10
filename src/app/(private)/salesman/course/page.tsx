@@ -113,9 +113,7 @@ function ContentCreatorCourse(props: { searchParams: SearchParams }) {
         id: 3,
         render: (course: any) => (
           <div className='flex items-center min-w-[80px]'>
-            <span className='text-sm font-medium'>
-              {course.aveRating.toFixed(1) == 0 ? 5 : course.aveRating.toFixed(1)}
-            </span>
+            <span className='text-sm font-medium'>{course.aveRating ? course.aveRating.toFixed(1) : 5}</span>
           </div>
         )
       },
@@ -172,7 +170,7 @@ function ContentCreatorCourse(props: { searchParams: SearchParams }) {
   const averageRating =
     data.length > 0
       ? (data.reduce((sum: number, course: any) => sum + course.aveRating, 0) / data.length).toFixed(1)
-      : 0
+      : 5
   const bannedCourses = data.filter((course: any) => course.isBanned).length
 
   return (
