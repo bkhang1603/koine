@@ -143,13 +143,6 @@ export default function ChildCourseDetailPage(props: { params: Promise<{ childId
           <ChevronRight className='h-4 w-4 text-muted-foreground' />
           <span className='font-medium truncate max-w-[150px] sm:max-w-xs'>{courseData.courseTitle}</span>
         </div>
-
-        <Button variant='outline' size='sm' asChild className='gap-1'>
-          <Link href={`/setting/child-account/${childId}`}>
-            <ArrowLeft className='h-4 w-4' />
-            <span>Quay lại</span>
-          </Link>
-        </Button>
       </div>
 
       {/* Banner khóa học */}

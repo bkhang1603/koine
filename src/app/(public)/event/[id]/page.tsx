@@ -51,12 +51,14 @@ export default async function EventDetailPage(props: { params: Promise<{ id: str
       </div>
     )
   }
+  console.log(event.status)
 
   const isOpenable = (eventStartAt: string, duration: number): boolean => {
     const now = new Date()
-    const localTime = new Date(now.getTime() + 7 * 60 * 60 * 1000)
+    const localTime = new Date(now.getTime())
     const startTime = new Date(eventStartAt)
     const endDate = new Date(startTime.getTime() + duration * 1000)
+
     return localTime.getTime() >= startTime.getTime() && localTime.getTime() < endDate.getTime()
   }
 
@@ -111,13 +113,6 @@ export default async function EventDetailPage(props: { params: Promise<{ id: str
                 <span className='text-base'>{event.totalParticipants} người tham gia</span>
               </div>
             </div>
-
-            {isOpenable(event.startedAt, event.durations) && event.status === 'OPENING' && (
-              <Button size='lg' className='bg-primary hover:bg-primary/90 text-white font-medium px-6 h-12'>
-                <ExternalLink className='h-5 w-5 mr-2' />
-                Tham gia ngay
-              </Button>
-            )}
           </div>
         </div>
       </section>

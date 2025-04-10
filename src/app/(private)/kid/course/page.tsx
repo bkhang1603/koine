@@ -12,6 +12,7 @@ import images from '@/assets/images'
 import { motion } from 'framer-motion'
 import { Clock, Medal } from 'lucide-react'
 import { Skeleton } from '@/components/ui/skeleton'
+import { translateLevel } from '@/lib/utils'
 
 // Thêm component Overview
 const CourseOverview = ({ courses }: { courses: any[] }) => {
@@ -368,7 +369,7 @@ function CoursePage() {
 
                         <div className='absolute top-3 right-3'>
                           <span className='px-2 py-1 bg-white/80 text-slate-700 text-xs rounded-lg backdrop-blur-sm font-medium'>
-                            {course.level}
+                            {translateLevel(course.level)}
                           </span>
                         </div>
                       </div>

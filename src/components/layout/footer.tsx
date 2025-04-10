@@ -10,14 +10,14 @@ const footerLinks = {
   company: [
     { label: 'Về chúng tôi', href: '/about' },
     { label: 'Liên hệ', href: '/contact' },
-    { label: 'Tuyển dụng', href: '/career' },
-    { label: 'Đối tác', href: '/partner' }
+    { label: 'Tuyển dụng', href: '/' },
+    { label: 'Đối tác', href: '/' }
   ],
   support: [
-    { label: 'FAQs', href: '/faq' },
-    { label: 'Chính sách bảo mật', href: '/privacy' },
-    { label: 'Điều khoản sử dụng', href: '/terms' },
-    { label: 'Hướng dẫn sử dụng', href: '/guide' }
+    { label: 'FAQs', href: '/help/faq' },
+    { label: 'Chính sách bảo mật', href: '/' },
+    { label: 'Điều khoản sử dụng', href: '/' },
+    { label: 'Hướng dẫn sử dụng', href: '/' }
   ],
   contact: [
     { icon: <Phone className='w-5 h-5' />, info: '0934 600 600' },
@@ -65,8 +65,8 @@ export default function Footer() {
             <div>
               <h4 className='font-semibold mb-6'>Công ty</h4>
               <ul className='space-y-4'>
-                {footerLinks.company.map((link) => (
-                  <li key={link.href}>
+                {footerLinks.company.map((link, index) => (
+                  <li key={index}>
                     <Link href={link.href} className='text-muted-foreground hover:text-primary transition-colors'>
                       {link.label}
                     </Link>
@@ -78,8 +78,8 @@ export default function Footer() {
             <div>
               <h4 className='font-semibold mb-6'>Hỗ trợ</h4>
               <ul className='space-y-4'>
-                {footerLinks.support.map((link) => (
-                  <li key={link.href}>
+                {footerLinks.support.map((link, index) => (
+                  <li key={index}>
                     <Link href={link.href} className='text-muted-foreground hover:text-primary transition-colors'>
                       {link.label}
                     </Link>
@@ -114,10 +114,10 @@ export default function Footer() {
               © {new Date().getFullYear()} Your Company. All rights reserved.
             </p>
             <div className='flex items-center gap-6'>
-              <Link href='/privacy' className='text-sm text-muted-foreground hover:text-primary transition-colors'>
+              <Link href='/' className='text-sm text-muted-foreground hover:text-primary transition-colors'>
                 Privacy Policy
               </Link>
-              <Link href='/terms' className='text-sm text-muted-foreground hover:text-primary transition-colors'>
+              <Link href='/' className='text-sm text-muted-foreground hover:text-primary transition-colors'>
                 Terms of Service
               </Link>
             </div>

@@ -127,8 +127,9 @@ export function EventList({ events }: EventListProps) {
             <Image
               src={event.imageUrl ?? '/placeholder.svg'}
               alt={event.title}
-              fill
-              className='object-cover transition-transform duration-500 group-hover:scale-105'
+              width={800}
+              height={800}
+              className='object-cover transition-transform duration-500 group-hover:scale-105 h-full w-full'
             />
             <Badge className={cn('absolute top-4 right-4', eventStatusConfig[event.status as EventStatus].color)}>
               {eventStatusConfig[event.status as EventStatus].label}

@@ -405,7 +405,7 @@ export const formatDuration = (duration: number): string => {
 
 export const formatDateEvent = (date: string): string => {
   // Múi giờ đang bị lệch 7 giờ, cần trừ đi 7 giờ
-  const localTime = new Date(date).getTime() - 7 * 60 * 60 * 1000
+  const localTime = new Date(date).getTime()
   const options: Intl.DateTimeFormatOptions = {
     year: 'numeric',
     month: 'long',
@@ -421,6 +421,21 @@ export const formatAvatarFallback = (email: string): string => {
   // Uppercase first letter of each part
   if (!email) return ''
   return `${email.slice(0, 2).toUpperCase()}`
+}
+
+export const translateLevel = (level: string) => {
+  switch (level) {
+    case 'ALL':
+      return 'Tất cả'
+    case 'BEGINNER':
+      return 'Cơ bản'
+    case 'INTERMEDIATE':
+      return 'Trung bình'
+    case 'ADVANCED':
+      return 'Nâng cao'
+    default:
+      return 'Tất cả'
+  }
 }
 
 export const formatOrderStatus = (status: string) => {
