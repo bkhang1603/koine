@@ -1,7 +1,7 @@
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import Image from 'next/image'
-import { Calendar, Users, Clock, Info, ExternalLink } from 'lucide-react'
+import { Calendar, Users, Clock, Info } from 'lucide-react'
 import { cn, formatAvatarFallback, formatDateEvent, formatDuration } from '@/lib/utils'
 import { Breadcrumb } from '@/components/public/parent/setting/Breadcrumb'
 import { wrapServerApi } from '@/lib/server-utils'
