@@ -186,7 +186,7 @@ export function CourseDetail({ course }: CourseDetailProps) {
                                 slug: chapter.title.toLowerCase().replace(/\s+/g, '-')
                               }}
                               itemType='chapter'
-                              onView={() => router.push(`/admin/course/${course.id}/chapter/${chapter.id}`)}
+                              onView={() => router.push(`/expert/course/${course.id}/chapter/${chapter.id}`)}
                             />
                           </div>
                         </div>

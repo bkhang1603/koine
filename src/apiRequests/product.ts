@@ -59,7 +59,7 @@ const productApiRequest = {
   getProductCache: (id: string) =>
     http.get<ProductResType>(`/products/${id}`, { cache: 'force-cache', next: { revalidate: 12 * 60 * 60 } }),
   createProduct: (data: CreateProductBodyType) => http.post<CreateProductResType>('/products', data),
-  updateProduct: (id: string, data: any) => http.put(`/products/${id}`, data),
+  updateProduct: (id: string, data: CreateProductBodyType) => http.put<ProductResType>(`/products/${id}`, data),
   deleteProduct: (id: string) => http.delete(`/products/${id}`),
   getCategoryProducts: ({
     page_index,

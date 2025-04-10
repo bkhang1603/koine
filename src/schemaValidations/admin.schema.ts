@@ -7,47 +7,51 @@ export const getCoursesListAdminRes = z.object({
   message: z.string(),
   data: z.array(
     z.object({
+      isDeleted: z.boolean(),
+      createdAt: z.string(),
+      updatedAt: z.string(),
       id: z.string(),
       creatorId: z.string(),
       title: z.string(),
       titleNoTone: z.string(),
       slug: z.string(),
       description: z.string(),
+      durations: z.number(),
       imageUrl: z.string(),
       imageBanner: z.string(),
       price: z.number(),
       discount: z.number(),
-      durations: z.number(),
-      durationsDisplay: z.string(),
-      aveRating: z.number(),
+      level: z.string(),
+      censorId: z.string(),
       totalEnrollment: z.number(),
+      aveRating: z.number(),
+      status: z.string(),
+      isBanned: z.boolean(),
+      isCustom: z.boolean(),
+      isDraft: z.boolean(),
+      isVisible: z.boolean(),
       creator: z.object({
         id: z.string(),
         username: z.string()
       }),
-      censorId: z.string(),
       censor: z.object({
         id: z.string(),
         username: z.string()
       }),
-      isBanned: z.boolean(),
-      isCustom: z.boolean(),
-      level: z.string(),
+      durationsDisplay: z.string(),
       categories: z.array(
         z.object({
           id: z.string(),
           name: z.string()
         })
       ),
-      createdAt: z.string(),
-      updatedAt: z.string(),
       createdAtFormatted: z.string(),
       updatedAtFormatted: z.string()
     })
   ),
   pagination: z.object({
-    totalItem: z.number(),
     pageSize: z.number(),
+    totalItem: z.number(),
     currentPage: z.number(),
     maxPageSize: z.number(),
     totalPage: z.number()
@@ -274,6 +278,180 @@ export const getOrderDetailAdminRes = z.object({
         imageUrl: z.string().url()
       })
     )
+  })
+})
+
+export const getRefundRequestsRes = z.object({
+  statusCode: z.number(),
+  info: z.string(),
+  message: z.string(),
+  data: z.array(
+    z.object({
+      id: z.string().uuid(),
+      userId: z.string().uuid(),
+      orderCode: z.string(),
+      orderDate: z.string().datetime({ offset: true }),
+      totalAmount: z.number().nonnegative(),
+      deliAmount: z.number().nonnegative(),
+      deliMethod: z.string(),
+      status: z.string(),
+      note: z.string(),
+      expiredAt: z.string().datetime().nullable(),
+      orderDateFormatted: z.string(),
+      refundRequestDate: z.string().datetime().nullable(),
+      refundReason: z.string(),
+      refundNote: z.string(),
+      payment: z.object({
+        isDeleted: z.boolean(),
+        createdAt: z.string(),
+        updatedAt: z.string(),
+        id: z.string().uuid(),
+        orderId: z.string().uuid(),
+        payMethod: z.string(),
+        payDate: z.string().datetime({ offset: true }),
+        payAmount: z.number().nonnegative(),
+        payStatus: z.string()
+      }),
+      delivery: z
+        .object({
+          isDeleted: z.boolean(),
+          createdAt: z.string(),
+          updatedAt: z.string(),
+          id: z.string().uuid(),
+          orderId: z.string().uuid(),
+          name: z.string(),
+          phone: z.string(),
+          address: z.string(),
+          status: z.string()
+        })
+        .nullable(),
+      orderCodeFormatted: z.string(),
+      createdAtFormatted: z.string(),
+      refundRequestDateFormatted: z.string().nullable(),
+      refundProcessedDateFormatted: z.string().nullable(),
+      orderDetails: z.array(
+        z.object({
+          id: z.string().uuid(),
+          orderId: z.string().uuid(),
+          productId: z.string().uuid().nullable(),
+          courseId: z.string().uuid().nullable(),
+          comboId: z.string().uuid().nullable(),
+          quantity: z.number().int().positive(),
+          unitPrice: z.number().nonnegative(),
+          discount: z.number().min(0).max(1),
+          totalPrice: z.number().nonnegative(),
+          itemName: z.string(),
+          itemDescription: z.string(),
+          itemImageUrl: z.string().url(),
+          itemType: z.string()
+        })
+      ),
+      orderStatusHistory: z.array(
+        z.object({
+          status: z.string(),
+          timestamp: z.string().datetime({ offset: true }),
+          timestampFormatted: z.string()
+        })
+      ),
+      customerInfo: z.object({
+        id: z.string().uuid(),
+        name: z.string(),
+        phone: z.string().nullable(),
+        email: z.string().email()
+      })
+    })
+  ),
+  pagination: z.object({
+    pageSize: z.number().int().positive(),
+    totalItem: z.number().int().nonnegative(),
+    currentPage: z.number().int().positive(),
+    maxPageSize: z.number().int().positive(),
+    totalPage: z.number().int().nonnegative()
+  })
+})
+
+export const getRefundRequestByIdRes = z.object({
+  statusCode: z.number(),
+  info: z.string(),
+  message: z.string(),
+  data: z.object({
+    id: z.string().uuid(),
+    userId: z.string().uuid(),
+    orderDate: z.string().datetime({ offset: true }),
+    totalAmount: z.number().nonnegative(),
+    deliMethod: z.string(),
+    deliAmount: z.number().nonnegative(),
+    status: z.string(),
+    note: z.string().nullable(),
+    isDeleted: z.boolean(),
+    createdAt: z.string(),
+    updatedAt: z.string(),
+    orderCode: z.string(),
+    orderDetails: z.array(
+      z.object({
+        isDeleted: z.boolean(),
+        createdAt: z.string(),
+        updatedAt: z.string(),
+        id: z.string().uuid(),
+        orderId: z.string().uuid(),
+        productId: z.string().uuid().nullable(),
+        courseId: z.string().uuid().nullable(),
+        comboId: z.string().uuid().nullable(),
+        quantity: z.number().int().positive(),
+        unitPrice: z.number().nonnegative(),
+        discount: z.number().min(0).max(1),
+        totalPrice: z.number().nonnegative(),
+        course: z
+          .object({
+            title: z.string(),
+            description: z.string(),
+            imageUrl: z.string().url()
+          })
+          .nullable(),
+        product: z
+          .object({
+            name: z.string(),
+            description: z.string(),
+            imageUrl: z.string().url()
+          })
+          .nullable(),
+        combo: z
+          .object({
+            name: z.string(),
+            description: z.string(),
+            imageUrl: z.string().url()
+          })
+          .nullable()
+      })
+    ),
+    createdAtFormatted: z.string(),
+    updatedAtFormatted: z.string(),
+    orderStatusHistory: z.array(
+      z.object({
+        status: z.string(),
+        timestamp: z.string().datetime({ offset: true }),
+        timestampFormatted: z.string()
+      })
+    ),
+    deliveryInfo: z
+      .object({
+        isDeleted: z.boolean().optional(),
+        createdAt: z.string().optional(),
+        updatedAt: z.string().optional(),
+        id: z.string().uuid().optional(),
+        orderId: z.string().uuid().optional(),
+        name: z.string(),
+        phone: z.string(),
+        address: z.string(),
+        status: z.string()
+      })
+      .nullable(),
+    payment: z.object({
+      payMethod: z.string(),
+      payDate: z.string().datetime({ offset: true }).nullable(),
+      payAmount: z.number().nonnegative().nullable(),
+      payStatus: z.string()
+    })
   })
 })
 
@@ -614,16 +792,80 @@ export const getDashboardStatisticsRes = z.object({
   })
 })
 
+export const getDraftCoursesRes = z.object({
+  statusCode: z.number(),
+  info: z.string(),
+  message: z.string(),
+  data: z.array(
+    z.object({
+      isDeleted: z.boolean(),
+      createdAt: z.string(),
+      updatedAt: z.string(),
+      id: z.string().uuid(),
+      creatorId: z.string().uuid(),
+      title: z.string(),
+      titleNoTone: z.string(),
+      slug: z.string(),
+      description: z.string(),
+      durations: z.number().int().nonnegative(),
+      imageUrl: z.string().url(),
+      imageBanner: z.string().url(),
+      price: z.number().nonnegative(),
+      discount: z.number().min(0).max(1),
+      level: z.string(),
+      censorId: z.string().uuid().nullable(),
+      totalEnrollment: z.number().int().nonnegative(),
+      aveRating: z.number().nonnegative(),
+      status: z.string(),
+      isBanned: z.boolean(),
+      isCustom: z.boolean(),
+      isDraft: z.boolean(),
+      isVisible: z.boolean(),
+      creator: z.object({
+        id: z.string().uuid(),
+        username: z.string()
+      }),
+      censor: z
+        .object({
+          id: z.string().uuid(),
+          username: z.string()
+        })
+        .nullable(),
+      durationsDisplay: z.string(),
+      categories: z.array(
+        z.object({
+          id: z.string().uuid(),
+          name: z.string()
+        })
+      ),
+      createdAtFormatted: z.string(),
+      updatedAtFormatted: z.string()
+    })
+  ),
+  pagination: z.object({
+    pageSize: z.number().int().positive(),
+    totalItem: z.number().int().nonnegative(),
+    currentPage: z.number().int().positive(),
+    maxPageSize: z.number().int().positive(),
+    totalPage: z.number().int().nonnegative()
+  })
+})
+
 // Courses
 export type GetCoursesListAdminResType = z.infer<typeof getCoursesListAdminRes>
 
 export type GetCourseDetailAdminResType = z.infer<typeof getCourseDetailAdminRes>
+
+export type GetDraftCoursesResType = z.infer<typeof getDraftCoursesRes>
 
 // Orders
 export type GetOrderListAdminResType = z.TypeOf<typeof getOrderListAdminRes>
 
 export type GetOrderDetailAdminResType = z.TypeOf<typeof getOrderDetailAdminRes>
 
+export type GetRefundRequestsResType = z.TypeOf<typeof getRefundRequestsRes>
+
+export type GetRefundRequestByIdResType = z.TypeOf<typeof getRefundRequestByIdRes>
 // Blogs
 export type GetBlogsListAdminResType = z.TypeOf<typeof getBlogsListAdminRes>
 

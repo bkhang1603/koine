@@ -16,7 +16,7 @@ import { MoreOptions } from '@/components/private/common/more-options'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 
-function AdminCourse(props: { searchParams: SearchParams }) {
+function ExpertCourse(props: { searchParams: SearchParams }) {
   const searchParams = use(props.searchParams)
   const router = useRouter()
 
@@ -43,24 +43,18 @@ function AdminCourse(props: { searchParams: SearchParams }) {
 
   // Tính toán thống kê
   const totalCourses = pagination.totalItem || 0
-  const totalEnrollments = data.reduce((sum: number, course: any) => sum + course.totalEnrollment, 0)
-  const averageRating = Number(
-    data.length > 0
-      ? (data.reduce((sum: number, course: any) => sum + course.aveRating, 0) / data.length).toFixed(1)
-      : 0
-  )
+  const visibleCourses = data.filter((course: any) => course.isVisible).length
+  const draftCourses = data.filter((course: any) => course.isDraft).length
   const bannedCourses = data.filter((course: any) => course.isBanned).length
 
   // Cấu hình cột cho bảng
   const headerColumn = [
     { id: 1, name: 'Tên khóa học' },
-    { id: 2, name: 'Người tạo' },
-    { id: 3, name: 'Người duyệt' },
-    { id: 4, name: 'Đánh giá' },
-    { id: 5, name: 'Số người học' },
-    { id: 6, name: 'Trạng thái' },
-    { id: 7, name: 'Ngày tạo' },
-    { id: 8, name: '' }
+    { id: 2, name: 'Ngày tạo' },
+    { id: 3, name: 'Hiển thị' },
+    { id: 4, name: 'Trạng thái' },
+    { id: 5, name: 'Khóa' },
+    { id: 6, name: '' }
   ]
 
   const handleReview = () => null
@@ -90,50 +84,6 @@ function AdminCourse(props: { searchParams: SearchParams }) {
       },
       {
         id: 2,
-        render: (course: any) => (
-          <div className='min-w-[120px]'>
-            <div className='text-sm'>{course.creator?.username || 'N/A'}</div>
-          </div>
-        )
-      },
-      {
-        id: 3,
-        render: (course: any) => (
-          <div className='min-w-[120px]'>
-            <div className='text-sm'>{course.censor?.username || 'Chưa được duyệt'}</div>
-          </div>
-        )
-      },
-      {
-        id: 4,
-        render: (course: any) => (
-          <div className='flex items-center min-w-[80px]'>
-            <span className='text-sm font-medium'>
-              {course.aveRating ? (course.aveRating.toFixed(1) === '0.0' ? '5.0' : course.aveRating.toFixed(1)) : '0.0'}
-            </span>
-          </div>
-        )
-      },
-      {
-        id: 5,
-        render: (course: any) => (
-          <div className='flex items-center min-w-[100px]'>
-            <span className='text-sm font-medium'>{course.totalEnrollment}</span>
-          </div>
-        )
-      },
-      {
-        id: 6,
-        render: (course: any) => (
-          <div className='flex items-center min-w-[100px]'>
-            <Badge variant={course.isBanned ? 'destructive' : 'green'} className='w-fit'>
-              {course.isBanned ? 'Đã khóa' : 'Hoạt động'}
-            </Badge>
-          </div>
-        )
-      },
-      {
-        id: 7,
         render: (course: any) => {
           const date = course.createdAt ? new Date(course.createdAt) : new Date()
           return (
@@ -145,7 +95,37 @@ function AdminCourse(props: { searchParams: SearchParams }) {
         }
       },
       {
-        id: 8,
+        id: 3,
+        render: (course: any) => (
+          <div className='flex items-center min-w-[100px]'>
+            <Badge variant={course.isVisible ? 'green' : 'destructive'} className='w-fit'>
+              {course.isVisible ? 'Hiển thị' : 'Ẩn'}
+            </Badge>
+          </div>
+        )
+      },
+      {
+        id: 4,
+        render: (course: any) => (
+          <div className='flex items-center min-w-[100px]'>
+            <Badge variant='outline' className='w-fit bg-primary/10'>
+              {course.status || 'ACTIVE'}
+            </Badge>
+          </div>
+        )
+      },
+      {
+        id: 5,
+        render: (course: any) => (
+          <div className='flex items-center min-w-[100px]'>
+            <Badge variant={course.isBanned ? 'destructive' : 'green'} className='w-fit'>
+              {course.isBanned ? 'Đã khóa' : 'Không khóa'}
+            </Badge>
+          </div>
+        )
+      },
+      {
+        id: 6,
         render: (course: any) => (
           <div className='flex justify-end min-w-[40px]'>
             <MoreOptions
@@ -194,8 +174,8 @@ function AdminCourse(props: { searchParams: SearchParams }) {
       <CourseStats
         isLoading={isLoading}
         totalCourses={totalCourses}
-        totalEnrollments={totalEnrollments}
-        averageRating={averageRating}
+        visibleCourses={visibleCourses}
+        draftCourses={draftCourses}
         bannedCourses={bannedCourses}
       />
 
@@ -214,4 +194,4 @@ function AdminCourse(props: { searchParams: SearchParams }) {
   )
 }
 
-export default AdminCourse
+export default ExpertCourse

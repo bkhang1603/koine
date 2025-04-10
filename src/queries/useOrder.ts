@@ -104,3 +104,33 @@ export const useGetAdminOrderQuery = ({ id }: { id: string }) => {
     queryFn: () => orderApiRequest.getAdminOrderById(id)
   })
 }
+
+export const useConfirmDeliveryOrderMutation = ({ id }: { id: string }) => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: orderApiRequest.confirmDeliveryOrder,
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ['orders', id]
+      })
+      queryClient.invalidateQueries({
+        queryKey: ['adminOrders']
+      })
+    }
+  })
+}
+
+export const useGetRefundRequestsQuery = ({ page_size, page_index }: { page_size: number; page_index: number }) => {
+  return useQuery({
+    queryKey: ['refund-requests', page_size, page_index],
+    queryFn: () => orderApiRequest.getRefundRequests({ page_size, page_index })
+  })
+}
+
+export const useGetRefundRequestById = ({ id }: { id: string }) => {
+  return useQuery({
+    queryKey: ['refund-request', id],
+    queryFn: () => orderApiRequest.getRefundRequestById(id)
+  })
+}

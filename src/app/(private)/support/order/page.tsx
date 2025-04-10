@@ -15,7 +15,7 @@ import { MoreOptions } from '@/components/private/common/more-options'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 
-function AdminOrder(props: { searchParams: SearchParams }) {
+function SupportOrder(props: { searchParams: SearchParams }) {
   const searchParams = use(props.searchParams)
   const router = useRouter()
 
@@ -141,7 +141,7 @@ function AdminOrder(props: { searchParams: SearchParams }) {
       {
         id: 6,
         render: (order: any) => (
-          <MoreOptions item={order} itemType='order' onView={() => router.push(`/admin/order/${order.id}`)} />
+          <MoreOptions item={order} itemType='order' onView={() => router.push(`/support/order/${order.id}`)} />
         )
       }
     ],
@@ -237,7 +237,7 @@ function AdminOrder(props: { searchParams: SearchParams }) {
         data={tableData}
         headerColumn={headerColumn}
         bodyColumn={bodyColumn}
-        href={configRoute.admin.order}
+        href={configRoute.support.order}
         loading={isLoading}
         showSearch={true}
         searchParamName='keyword'
@@ -276,4 +276,4 @@ function AdminOrder(props: { searchParams: SearchParams }) {
   )
 }
 
-export default AdminOrder
+export default SupportOrder

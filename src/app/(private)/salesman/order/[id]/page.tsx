@@ -76,7 +76,7 @@ export default function AdminOrderDetailPage(props: { params: Promise<{ id: stri
           )}
         </div>
         <Button variant='outline' asChild>
-          <Link href='/admin/order'>Quay lại danh sách đơn hàng</Link>
+          <Link href='/salesman/order'>Quay lại danh sách đơn hàng</Link>
         </Button>
       </div>
     )
@@ -137,7 +137,7 @@ export default function AdminOrderDetailPage(props: { params: Promise<{ id: stri
   const breadcrumbItems = [
     {
       title: 'Đơn hàng',
-      href: '/admin/order'
+      href: '/salesman/order'
     },
     {
       title: orderData.orderInfo.orderCode || 'Chi tiết đơn hàng'

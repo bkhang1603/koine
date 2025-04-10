@@ -28,7 +28,7 @@ type OrderItemType = {
   imageUrl: string
 }
 
-export default function AdminOrderDetailPage(props: { params: Promise<{ id: string }> }) {
+export default function SupportOrderDetailPage(props: { params: Promise<{ id: string }> }) {
   const params = use(props.params)
   const orderId = params.id
   console.log('Order ID:', orderId)
@@ -76,7 +76,7 @@ export default function AdminOrderDetailPage(props: { params: Promise<{ id: stri
           )}
         </div>
         <Button variant='outline' asChild>
-          <Link href='/admin/order'>Quay lại danh sách đơn hàng</Link>
+          <Link href='/support/order'>Quay lại danh sách đơn hàng</Link>
         </Button>
       </div>
     )
@@ -137,7 +137,7 @@ export default function AdminOrderDetailPage(props: { params: Promise<{ id: stri
   const breadcrumbItems = [
     {
       title: 'Đơn hàng',
-      href: '/admin/order'
+      href: '/support/order'
     },
     {
       title: orderData.orderInfo.orderCode || 'Chi tiết đơn hàng'

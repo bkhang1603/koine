@@ -1,32 +1,18 @@
 'use client'
 
 import { use } from 'react'
-import { useGetLessonQuery, useGetCourseQuery, useDeleteLessonMutation } from '@/queries/useCourse'
+import { useGetLessonQuery, useGetCourseQuery } from '@/queries/useCourse'
 import { Breadcrumb } from '@/components/private/common/breadcrumb'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import { Clock, FileText, Video, ArrowLeft, ExternalLink, Edit, Trash2, Loader2 } from 'lucide-react'
+import { Clock, FileText, Video, ArrowLeft, ExternalLink } from 'lucide-react'
 import { Skeleton } from '@/components/ui/skeleton'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { formatDate } from '@/lib/utils'
-import { useRef, useEffect, useState } from 'react'
+import { useRef, useEffect } from 'react'
 import Artplayer from 'artplayer'
-import { useRouter } from 'next/navigation'
-import { toast } from '@/components/ui/use-toast'
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger
-} from '@/components/ui/alert-dialog'
-import { handleErrorApi } from '@/lib/utils'
 
 // Skeleton component for lesson detail
 const LessonDetailSkeleton = () => {
@@ -89,40 +75,12 @@ export default function LessonDetailPage(props: {
 }) {
   const params = use(props.params)
   const playerRef = useRef<HTMLDivElement>(null)
-  const router = useRouter()
 
   // Fetch lesson data using useGetLessonQuery
   const { data: lessonData, isLoading: isLoadingLesson } = useGetLessonQuery({ id: params.lessonId, enabled: true })
 
   // Fetch course data for breadcrumb and context
   const { data: courseData, isLoading: isLoadingCourse } = useGetCourseQuery({ id: params.id })
-
-  // Add delete mutation
-  const deleteLessonMutation = useDeleteLessonMutation({ chapterId: params.chapterId })
-  const [isDeleting, setIsDeleting] = useState(false)
-
-  // Handle lesson deletion
-  const handleDeleteLesson = async () => {
-    try {
-      setIsDeleting(true)
-      await deleteLessonMutation.mutateAsync(params.lessonId)
-
-      toast({
-        title: 'Xóa bài học thành công',
-        description: 'Bài học đã được xóa khỏi chương',
-        variant: 'default'
-      })
-
-      router.push(`/content-creator/course/${params.id}/chapter/${params.chapterId}`)
-    } catch (error) {
-      handleErrorApi({
-        error
-      })
-      console.error('Error deleting lesson:', error)
-    } finally {
-      setIsDeleting(false)
-    }
-  }
 
   useEffect(() => {
     if (
@@ -176,7 +134,7 @@ export default function LessonDetailPage(props: {
         <FileText className='w-16 h-16 text-muted-foreground mb-4' />
         <h2 className='text-2xl font-bold mb-2'>Không tìm thấy bài học</h2>
         <p className='text-muted-foreground mb-6'>Bài học này không tồn tại hoặc đã bị xóa</p>
-        <Link href={`/content-creator/course/${params.id}/chapter/${params.chapterId}`}>
+        <Link href={`/salesman/course/${params.id}/chapter/${params.chapterId}`}>
           <Button>Quay lại chương học</Button>
         </Link>
       </div>
@@ -191,7 +149,7 @@ export default function LessonDetailPage(props: {
         <FileText className='w-16 h-16 text-muted-foreground mb-4' />
         <h2 className='text-2xl font-bold mb-2'>Không tìm thấy chương học</h2>
         <p className='text-muted-foreground mb-6'>Chương học của bài học này không tồn tại hoặc đã bị xóa</p>
-        <Link href={`/content-creator/course/${params.id}`}>
+        <Link href={`/salesman/course/${params.id}`}>
           <Button>Quay lại khóa học</Button>
         </Link>
       </div>
@@ -207,7 +165,7 @@ export default function LessonDetailPage(props: {
         <FileText className='w-16 h-16 text-muted-foreground mb-4' />
         <h2 className='text-2xl font-bold mb-2'>Bài học không thuộc chương này</h2>
         <p className='text-muted-foreground mb-6'>Bài học này không thuộc chương học đã chọn</p>
-        <Link href={`/content-creator/course/${params.id}/chapter/${params.chapterId}`}>
+        <Link href={`/salesman/course/${params.id}/chapter/${params.chapterId}`}>
           <Button>Quay lại chương học</Button>
         </Link>
       </div>
@@ -218,15 +176,15 @@ export default function LessonDetailPage(props: {
   const breadcrumbItems = [
     {
       title: 'Khóa học',
-      href: '/content-creator/course'
+      href: '/salesman/course'
     },
     {
       title: course.title,
-      href: `/content-creator/course/${params.id}`
+      href: `/salesman/course/${params.id}`
     },
     {
       title: chapter.title,
-      href: `/content-creator/course/${params.id}/chapter/${chapter.id}`
+      href: `/salesman/course/${params.id}/chapter/${chapter.id}`
     },
     {
       title: lesson.title
@@ -244,56 +202,13 @@ export default function LessonDetailPage(props: {
         {/* Back and Action Buttons */}
         <div className='flex items-center justify-between mb-6'>
           <Button variant='outline' asChild>
-            <Link href={`/content-creator/course/${params.id}/chapter/${chapter.id}`}>
+            <Link href={`/salesman/course/${params.id}/chapter/${chapter.id}`}>
               <ArrowLeft className='w-4 h-4 mr-2' />
               Quay lại chương học
             </Link>
           </Button>
 
           <div className='flex items-center gap-2'>
-            <AlertDialog>
-              <AlertDialogTrigger asChild>
-                <Button variant='destructive' size='sm' disabled={isDeleting}>
-                  {isDeleting ? (
-                    <>
-                      <Loader2 className='w-4 h-4 mr-2 animate-spin' />
-                      Đang xóa...
-                    </>
-                  ) : (
-                    <>
-                      <Trash2 className='w-4 h-4 mr-2' />
-                      Xóa
-                    </>
-                  )}
-                </Button>
-              </AlertDialogTrigger>
-              <AlertDialogContent>
-                <AlertDialogHeader>
-                  <AlertDialogTitle>Bạn có chắc chắn muốn xóa?</AlertDialogTitle>
-                  <AlertDialogDescription>
-                    Hành động này không thể hoàn tác. Bài học này sẽ bị xóa vĩnh viễn khỏi chương học.
-                  </AlertDialogDescription>
-                </AlertDialogHeader>
-                <AlertDialogFooter>
-                  <AlertDialogCancel>Hủy</AlertDialogCancel>
-                  <AlertDialogAction
-                    onClick={handleDeleteLesson}
-                    className='bg-destructive text-destructive-foreground hover:bg-destructive/90'
-                  >
-                    Xóa bài học
-                  </AlertDialogAction>
-                </AlertDialogFooter>
-              </AlertDialogContent>
-            </AlertDialog>
-
-            <Button variant='outline' size='sm' asChild>
-              <Link
-                href={`/content-creator/course/${params.id}/chapter/${params.chapterId}/lesson/${params.lessonId}/edit`}
-              >
-                <Edit className='w-4 h-4 mr-2' />
-                Chỉnh sửa
-              </Link>
-            </Button>
             <Button size='sm' asChild>
               <a
                 href={`/learn/course/${params.id}/lesson/${params.lessonId}`}

@@ -1,5 +1,10 @@
 import http from '@/lib/http'
-import { GetOrderDetailAdminResType, GetOrderListAdminResType } from '@/schemaValidations/admin.schema'
+import {
+  GetOrderDetailAdminResType,
+  GetOrderListAdminResType,
+  GetRefundRequestByIdResType,
+  GetRefundRequestsResType
+} from '@/schemaValidations/admin.schema'
 import {
   CancelOrderBody,
   CancelOrderBodyRes,
@@ -13,6 +18,7 @@ import {
   UpdatePaymentMethodBody,
   UpdatePaymentMethodBodyRes
 } from '@/schemaValidations/order.schema'
+import { OnlyMessageResType } from '@/schemaValidations/special.schema'
 
 const orderApiRequest = {
   getOrders: () => http.get('/orders'),
@@ -31,7 +37,12 @@ const orderApiRequest = {
     http.get<GetOrderListAdminResType>(
       `/orders?${keyword ? `keyword=${keyword}&` : ''}${status ? `status=${status}&` : ''}page_size=${pageSize}&page_index=${pageIndex}`
     ),
-  getAdminOrderById: (id: string) => http.get<GetOrderDetailAdminResType>(`/orders/detail/${id}`)
+  getAdminOrderById: (id: string) => http.get<GetOrderDetailAdminResType>(`/orders/detail/${id}`),
+  confirmDeliveryOrder: ({ id }: { id: string }) =>
+    http.put<OnlyMessageResType>(`/deliveries/simulate-delivery/{orderId}?orderId=${id}`, {}),
+  getRefundRequests: ({ page_size, page_index }: { page_size: number; page_index: number }) =>
+    http.get<GetRefundRequestsResType>(`/orders/refund?page_size=${page_size}&page_index=${page_index}`),
+  getRefundRequestById: (id: string) => http.get<GetRefundRequestByIdResType>(`/orders/${id}`)
 }
 
 export default orderApiRequest

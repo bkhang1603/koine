@@ -386,3 +386,18 @@ export const useDeleteLessonMutation = ({ chapterId }: { chapterId: string }) =>
     }
   })
 }
+
+export const useGetDraftCoursesQuery = ({
+  page_index,
+  page_size,
+  keyword
+}: {
+  page_index?: number
+  page_size?: number
+  keyword?: string
+}) => {
+  return useQuery({
+    queryKey: ['draftCourses', page_index, page_size, keyword],
+    queryFn: () => courseApiRequest.getDraftCourses({ page_index, page_size, keyword })
+  })
+}

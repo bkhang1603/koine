@@ -1,13 +1,12 @@
 'use client'
 import { use } from 'react'
-import { useGetCourseQuery, useDeleteChapterMutation } from '@/queries/useCourse'
+import { useGetCourseQuery } from '@/queries/useCourse'
 import { useRouter } from 'next/navigation'
-import { toast } from '@/components/ui/use-toast'
 
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import { Clock, FileText, LayoutList, BookOpen, Users, Star, Plus } from 'lucide-react'
+import { Clock, FileText, LayoutList, BookOpen, Users, Star } from 'lucide-react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { cn, formatLevel } from '@/lib/utils'
@@ -17,7 +16,6 @@ import { vi } from 'date-fns/locale'
 import { Breadcrumb } from '@/components/private/common/breadcrumb'
 import { MoreOptions } from '@/components/private/common/more-options'
 import { LessonTypeDisplay } from '@/components/private/common/course/lesson-type-display'
-import { handleErrorApi } from '@/lib/utils'
 
 // Skeleton component cho course detail
 const CourseDetailSkeleton = () => {
@@ -73,24 +71,8 @@ export default function CourseDetailPage(props: { params: Promise<{ id: string }
   const params = use(props.params)
   const { data: courseData, isLoading } = useGetCourseQuery({ id: params.id })
   const router = useRouter()
-  const deleteChapterMutation = useDeleteChapterMutation({ courseId: params.id })
 
   const course = courseData?.payload?.data
-
-  const handleDeleteChapter = async (chapterId: string) => {
-    try {
-      await deleteChapterMutation.mutateAsync(chapterId)
-      toast({
-        title: 'Xóa chương thành công',
-        description: 'Chương đã được xóa',
-        variant: 'default'
-      })
-    } catch (error) {
-      handleErrorApi({
-        error
-      })
-    }
-  }
 
   if (isLoading) return <CourseDetailSkeleton />
   if (!course)
@@ -99,7 +81,7 @@ export default function CourseDetailPage(props: { params: Promise<{ id: string }
         <FileText className='w-16 h-16 text-muted-foreground mb-4' />
         <h2 className='text-2xl font-bold mb-2'>Không tìm thấy khóa học</h2>
         <p className='text-muted-foreground mb-6'>Khóa học này không tồn tại hoặc đã bị xóa</p>
-        <Link href='/content-creator/course'>
+        <Link href='/salesman/course'>
           <Button>Quay lại danh sách khóa học</Button>
         </Link>
       </div>
@@ -115,7 +97,7 @@ export default function CourseDetailPage(props: { params: Promise<{ id: string }
   const breadcrumbItems = [
     {
       title: 'Khóa học',
-      href: '/content-creator/course'
+      href: '/salesman/course'
     },
     {
       title: course.title
@@ -214,12 +196,6 @@ export default function CourseDetailPage(props: { params: Promise<{ id: string }
                     <LayoutList className='w-5 h-5 text-primary' />
                     <CardTitle>Nội dung khóa học</CardTitle>
                   </div>
-                  <Button asChild>
-                    <Link href={`/content-creator/course/${params.id}/chapter/new`}>
-                      <Plus className='w-4 h-4 mr-2' />
-                      Thêm chương mới
-                    </Link>
-                  </Button>
                 </div>
               </CardHeader>
 
@@ -254,20 +230,18 @@ export default function CourseDetailPage(props: { params: Promise<{ id: string }
                               </div>
                             </div>
                           </div>
-                          <MoreOptions
-                            item={{
-                              id: chapter.id,
-                              title: chapter.title,
-                              status: 'VISIBLE',
-                              slug: ''
-                            }}
-                            itemType='chapter'
-                            onView={() => router.push(`/content-creator/course/${params.id}/chapter/${chapter.id}`)}
-                            onEdit={() =>
-                              router.push(`/content-creator/course/${params.id}/chapter/${chapter.id}/edit`)
-                            }
-                            onDelete={() => handleDeleteChapter(chapter.id)}
-                          />
+                          <div>
+                            <MoreOptions
+                              item={{
+                                id: chapter.id,
+                                title: chapter.title,
+                                status: 'VISIBLE',
+                                slug: chapter.title.toLowerCase().replace(/\s+/g, '-')
+                              }}
+                              itemType='chapter'
+                              onView={() => router.push(`/salesman/course/${params.id}/chapter/${chapter.id}`)}
+                            />
+                          </div>
                         </div>
                       </div>
 
@@ -279,7 +253,7 @@ export default function CourseDetailPage(props: { params: Promise<{ id: string }
                         ) : (
                           chapter.lessons.map((lesson, lessonIndex) => (
                             <Link
-                              href={`/content-creator/course/${params.id}/chapter/${chapter.id}`}
+                              href={`/salesman/course/${params.id}/chapter/${chapter.id}`}
                               key={lesson.id}
                               className='p-4 pl-10 md:pl-20 hover:bg-muted/50 transition-colors border-b last:border-0 block'
                             >

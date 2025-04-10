@@ -169,7 +169,7 @@ export default function AdminProductDetail(props: { params: Promise<{ id: string
           <p className='text-gray-500'>Sản phẩm không tồn tại hoặc đã bị xóa</p>
         </div>
         <Button variant='outline' asChild>
-          <Link href='/admin/product'>Quay lại danh sách sản phẩm</Link>
+          <Link href='/salesman/product'>Quay lại danh sách sản phẩm</Link>
         </Button>
       </div>
     )
@@ -180,8 +180,8 @@ export default function AdminProductDetail(props: { params: Promise<{ id: string
 
   const breadcrumbItems = [
     {
-      title: 'Khóa học',
-      href: '/admin/product'
+      title: 'Sản phẩm',
+      href: '/salesman/product'
     },
     {
       title: product.name
@@ -190,12 +190,10 @@ export default function AdminProductDetail(props: { params: Promise<{ id: string
 
   return (
     <div className='container max-w-7xl mx-auto py-6 space-y-8'>
-      {/* Back button */}
-      <Button variant='ghost' asChild className='gap-2 hover:bg-gray-100'>
-        <div className='mb-6'>
-          <Breadcrumb items={breadcrumbItems} />
-        </div>
-      </Button>
+      {/* Breadcrumb */}
+      <div className='mb-6'>
+        <Breadcrumb items={breadcrumbItems} />
+      </div>
 
       {/* Header */}
       <div>

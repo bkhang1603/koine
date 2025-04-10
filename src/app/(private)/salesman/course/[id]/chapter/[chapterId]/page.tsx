@@ -1,14 +1,13 @@
 'use client'
 
 import { use } from 'react'
-import { useGetChaptersQuery, useGetCourseQuery, useDeleteLessonMutation } from '@/queries/useCourse'
+import { useGetChaptersQuery, useGetCourseQuery } from '@/queries/useCourse'
 import { Breadcrumb } from '@/components/private/common/breadcrumb'
 import { FileText, Clock, BookOpen, LayoutList, Video, File } from 'lucide-react'
 import { Skeleton } from '@/components/ui/skeleton'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
-import { toast } from '@/components/ui/use-toast'
-import { handleErrorApi, cn } from '@/lib/utils'
+import { cn } from '@/lib/utils'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { useRouter } from 'next/navigation'
@@ -74,9 +73,6 @@ export default function ChapterDetailPage(props: { params: Promise<{ id: string;
   // Fetch course data for breadcrumb and context
   const { data: courseData, isLoading: isLoadingCourse } = useGetCourseQuery({ id: params.id })
 
-  // State for lesson deletion
-  const deleteLessonMutation = useDeleteLessonMutation({ chapterId: params.chapterId })
-
   // Show skeleton while loading
   if (isLoadingChapters || isLoadingCourse) return <ChapterDetailSkeleton />
 
@@ -91,7 +87,7 @@ export default function ChapterDetailPage(props: { params: Promise<{ id: string;
         <FileText className='w-16 h-16 text-muted-foreground mb-4' />
         <h2 className='text-2xl font-bold mb-2'>Không tìm thấy chương học</h2>
         <p className='text-muted-foreground mb-6'>Chương học này không tồn tại hoặc đã bị xóa</p>
-        <Link href={`/content-creator/course/${params.id}`}>
+        <Link href={`/salesman/course/${params.id}`}>
           <Button>Quay lại khóa học</Button>
         </Link>
       </div>
@@ -102,11 +98,11 @@ export default function ChapterDetailPage(props: { params: Promise<{ id: string;
   const breadcrumbItems = [
     {
       title: 'Khóa học',
-      href: '/content-creator/course'
+      href: '/salesman/course'
     },
     {
       title: course.title,
-      href: `/content-creator/course/${params.id}`
+      href: `/salesman/course/${params.id}`
     },
     {
       title: chapter.title
@@ -116,28 +112,9 @@ export default function ChapterDetailPage(props: { params: Promise<{ id: string;
   // Find chapter's lessons from the course data
   const chapterLessons = course.chapters.find((ch) => ch.id === params.chapterId)?.lessons || []
 
-  // Handle lesson deletion
-  const handleDelete = (lessonId: string) => {
-    return async () => {
-      try {
-        await deleteLessonMutation.mutateAsync(lessonId)
-        toast({
-          description: 'Xóa bài viết thành công'
-        })
-      } catch (error) {
-        handleErrorApi({
-          error
-        })
-      }
-    }
-  }
-
   // URL generators for lesson actions
   const getViewLessonUrl = (lessonId: string) =>
-    `/content-creator/course/${params.id}/chapter/${params.chapterId}/lesson/${lessonId}`
-
-  const getEditLessonUrl = (lessonId: string) =>
-    `/content-creator/course/${params.id}/chapter/${params.chapterId}/lesson/${lessonId}/edit`
+    `/salesman/course/${params.id}/chapter/${params.chapterId}/lesson/${lessonId}`
 
   // Default empty state for lessons
   const emptyLessonsState = (
@@ -208,11 +185,6 @@ export default function ChapterDetailPage(props: { params: Promise<{ id: string;
                 <FileText className='w-5 h-5 text-primary' />
                 <CardTitle>Danh sách bài học</CardTitle>
               </div>
-              <Button variant='outline' size='sm' asChild>
-                <Link href={`/content-creator/course/${params.id}/chapter/${params.chapterId}/lesson/new`}>
-                  Thêm bài học
-                </Link>
-              </Button>
             </div>
           </CardHeader>
 
@@ -258,8 +230,6 @@ export default function ChapterDetailPage(props: { params: Promise<{ id: string;
                           }}
                           itemType='lesson'
                           onView={() => router.push(getViewLessonUrl(lesson.id))}
-                          onEdit={() => router.push(getEditLessonUrl(lesson.id))}
-                          onDelete={handleDelete(lesson.id)}
                         />
                       </div>
                     </div>

@@ -135,10 +135,39 @@ export const useDeleteCategoryProductMutation = () => {
   })
 }
 
+export const useProductDeleteMutation = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: productApiRequest.deleteProduct,
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ['productListAdmin']
+      })
+    }
+  })
+}
+
 export const useGetCategoryProductDetailQuery = ({ id, enabled }: { id: string; enabled?: boolean }) => {
   return useQuery({
     queryKey: ['categoryProductDetail', id],
     queryFn: () => productApiRequest.getCategoryProductDetail(id),
     enabled: enabled ?? !!id
+  })
+}
+
+export const useUpdateProductMutation = ({ id }: { id: string }) => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: (data: CreateProductBodyType) => productApiRequest.updateProduct(id, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ['product-detail', id]
+      })
+      queryClient.invalidateQueries({
+        queryKey: ['productListAdmin']
+      })
+    }
   })
 }

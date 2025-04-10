@@ -1,22 +1,18 @@
 'use client'
 
-import { use, useMemo, useCallback } from 'react'
+import { use, useMemo } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { BookOpen, Users, Star, GraduationCap, Settings, Plus } from 'lucide-react'
+import { BookOpen, Users, Star, GraduationCap } from 'lucide-react'
 import { TableCustom, dataListType } from '@/components/table-custom'
 import { SearchParams } from '@/types/query'
 import { useRouter } from 'next/navigation'
-import Link from 'next/link'
 import { Badge } from '@/components/ui/badge'
 import { format } from 'date-fns'
 import { vi } from 'date-fns/locale'
 import { MoreOptions } from '@/components/private/common/more-options'
-import { useCoursesAdminQuery, useDeleteCourseMutation } from '@/queries/useCourse'
+import { useCoursesAdminQuery } from '@/queries/useCourse'
 import { Skeleton } from '@/components/ui/skeleton'
 import Image from 'next/image'
-import { Button } from '@/components/ui/button'
-import { toast } from '@/components/ui/use-toast'
-import { handleErrorApi } from '@/lib/utils'
 
 function ContentCreatorCourse(props: { searchParams: SearchParams }) {
   const searchParams = use(props.searchParams)
@@ -33,24 +29,6 @@ function ContentCreatorCourse(props: { searchParams: SearchParams }) {
     page_size: currentPageSize,
     page_index: currentPageIndex
   })
-
-  const deleteCourseMutation = useDeleteCourseMutation()
-
-  const handleDelete = useCallback(
-    async (courseId: string) => {
-      try {
-        await deleteCourseMutation.mutateAsync(courseId)
-        toast({
-          description: 'Xóa khóa học thành công'
-        })
-      } catch (error) {
-        handleErrorApi({
-          error
-        })
-      }
-    },
-    [deleteCourseMutation]
-  )
 
   const data = responseData?.payload.data || []
   const pagination = responseData?.payload.pagination || {
@@ -96,14 +74,40 @@ function ContentCreatorCourse(props: { searchParams: SearchParams }) {
       },
       {
         id: 2,
-        render: (course: any) => (
-          <div className='min-w-[120px]'>
-            <div className='text-sm'>{format(new Date(course.createdAt), 'dd/MM/yyyy', { locale: vi })}</div>
-            <div className='text-xs text-muted-foreground'>
-              {format(new Date(course.createdAt), 'HH:mm', { locale: vi })}
+        render: (course: any) => {
+          // Parse the date string safely
+          let dateObj
+          try {
+            // Try to parse the date format "YYYY-MM-DD HH:MM:SS"
+            const [datePart, timePart] = course.createdAt.split(' ')
+            const [year, month, day] = datePart.split('-')
+            const [hour, minute, second] = timePart.split(':')
+
+            dateObj = new Date(
+              parseInt(year),
+              parseInt(month) - 1,
+              parseInt(day),
+              parseInt(hour),
+              parseInt(minute),
+              parseInt(second)
+            )
+
+            // Check if date is valid
+            if (isNaN(dateObj.getTime())) {
+              throw new Error('Invalid date')
+            }
+          } catch (error) {
+            // Fallback to current date if parsing fails
+            dateObj = new Date()
+          }
+
+          return (
+            <div className='min-w-[120px]'>
+              <div className='text-sm'>{format(dateObj, 'dd/MM/yyyy', { locale: vi })}</div>
+              <div className='text-xs text-muted-foreground'>{format(dateObj, 'HH:mm', { locale: vi })}</div>
             </div>
-          </div>
-        )
+          )
+        }
       },
       {
         id: 3,
@@ -145,16 +149,15 @@ function ContentCreatorCourse(props: { searchParams: SearchParams }) {
                 slug: course.slug
               }}
               itemType='course'
-              onView={() => router.push(`/content-creator/course/${course.id}`)}
-              onEdit={() => router.push(`/content-creator/course/${course.id}/edit`)}
+              onView={() => router.push(`/salesman/course/${course.id}`)}
+              onEdit={() => router.push(`/salesman/course/${course.id}/edit`)}
               onPreview={() => router.push(`/course/${course.slug}`)}
-              onDelete={() => handleDelete(course.id)}
             />
           </div>
         )
       }
     ],
-    [router, handleDelete]
+    [router]
   )
 
   const tableData: dataListType = {
@@ -179,20 +182,6 @@ function ContentCreatorCourse(props: { searchParams: SearchParams }) {
         <div>
           <h1 className='text-2xl font-bold'>Quản lý khóa học</h1>
           <p className='text-muted-foreground mt-1'>Quản lý và theo dõi tất cả khóa học của bạn</p>
-        </div>
-        <div className='flex items-center gap-4'>
-          <Button variant='outline' asChild>
-            <Link href='/content-creator/course/categories'>
-              <Settings className='w-4 h-4 mr-2' />
-              Quản lý danh mục
-            </Link>
-          </Button>
-          <Button asChild>
-            <Link href='/content-creator/course/new'>
-              <Plus className='w-4 h-4 mr-2' />
-              Tạo khóa học mới
-            </Link>
-          </Button>
         </div>
       </div>
 
@@ -264,7 +253,7 @@ function ContentCreatorCourse(props: { searchParams: SearchParams }) {
         data={tableData}
         headerColumn={headerColumn}
         bodyColumn={bodyColumn}
-        href='/content-creator/course'
+        href='/salesman/course'
         loading={isLoading}
         showSearch={true}
         searchParamName='keyword'

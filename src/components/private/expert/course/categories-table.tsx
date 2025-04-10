@@ -98,7 +98,7 @@ export function CategoriesTable({ data, pagination, isLoading }: CategoriesTable
       headerColumn={headerColumn}
       bodyColumn={bodyColumn}
       loading={isLoading}
-      href='/admin/course/categories'
+      href='/expert/course/categories'
       showSearch={true}
       searchParamName='keyword'
       searchPlaceholder='Tìm kiếm danh mục...'

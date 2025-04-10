@@ -1,7 +1,7 @@
 'use client'
 
-import { use, useMemo } from 'react'
-import { useGetAdminOrdersQuery } from '@/queries/useOrder'
+import { use, useMemo, useCallback } from 'react'
+import { useGetAdminOrdersQuery, useConfirmDeliveryOrderMutation } from '@/queries/useOrder'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { ArrowUpDown, DollarSign, Package } from 'lucide-react'
 import { TableCustom, dataListType } from '@/components/table-custom'
@@ -14,10 +14,14 @@ import { vi } from 'date-fns/locale'
 import { MoreOptions } from '@/components/private/common/more-options'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { toast } from '@/components/ui/use-toast'
+import { handleErrorApi } from '@/lib/utils'
+import { useQueryClient } from '@tanstack/react-query'
 
 function AdminOrder(props: { searchParams: SearchParams }) {
   const searchParams = use(props.searchParams)
   const router = useRouter()
+  const queryClient = useQueryClient()
 
   const currentStatus = (searchParams.status as string) || 'ALL'
   const currentKeyword = (searchParams.keyword as string) || ''
@@ -30,6 +34,37 @@ function AdminOrder(props: { searchParams: SearchParams }) {
     // eslint-disable-next-line no-unused-vars
     error
   } = useGetAdminOrdersQuery(currentPageSize, currentPageIndex, currentKeyword, currentStatus)
+
+  // Create confirm delivery mutation
+  const confirmDeliveryMutation = useConfirmDeliveryOrderMutation({ id: '' })
+
+  // Handle confirm delivery callback
+  const handleConfirmDelivery = useCallback(
+    async (orderId: string) => {
+      try {
+        await confirmDeliveryMutation.mutateAsync({ id: orderId })
+        toast({
+          description: 'Xác nhận giao hàng thành công'
+        })
+        // Refresh the data
+        queryClient.invalidateQueries({
+          queryKey: ['adminOrders']
+        })
+      } catch (error) {
+        handleErrorApi({
+          error
+        })
+      }
+    },
+    [confirmDeliveryMutation, queryClient]
+  )
+
+  // Handle error from API
+  if (error) {
+    handleErrorApi({
+      error
+    })
+  }
 
   const orders = responseData?.payload.data.orders || []
   const statistics = responseData?.payload.data.statistics || {
@@ -141,11 +176,23 @@ function AdminOrder(props: { searchParams: SearchParams }) {
       {
         id: 6,
         render: (order: any) => (
-          <MoreOptions item={order} itemType='order' onView={() => router.push(`/admin/order/${order.id}`)} />
+          <div className='flex justify-end min-w-[40px]'>
+            <MoreOptions
+              item={{
+                id: order.id,
+                title: order.orderCode,
+                status: order.status,
+                slug: ''
+              }}
+              itemType='order'
+              onView={() => router.push(`/salesman/order/${order.id}`)}
+              onConfirmDelivery={order.status === 'DELIVERING' ? () => handleConfirmDelivery(order.id) : undefined}
+            />
+          </div>
         )
       }
     ],
-    [orderStatusConfig, paymentMethodConfig, router]
+    [orderStatusConfig, paymentMethodConfig, router, handleConfirmDelivery]
   )
 
   const tableData: dataListType = {
@@ -237,7 +284,7 @@ function AdminOrder(props: { searchParams: SearchParams }) {
         data={tableData}
         headerColumn={headerColumn}
         bodyColumn={bodyColumn}
-        href={configRoute.admin.order}
+        href={configRoute.salesman.order}
         loading={isLoading}
         showSearch={true}
         searchParamName='keyword'

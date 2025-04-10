@@ -18,7 +18,7 @@ import {
   AlertDialogTitle
 } from '@/components/ui/alert-dialog'
 import { Button } from '@/components/ui/button'
-import { Edit, MoreHorizontal, Trash, Eye, MessageSquare, Globe, CheckCircle, XCircle } from 'lucide-react'
+import { Edit, MoreHorizontal, Trash, Eye, MessageSquare, Globe, CheckCircle, XCircle, Truck } from 'lucide-react'
 import { useState } from 'react'
 
 interface ItemType {
@@ -39,6 +39,7 @@ interface MoreOptionsProps {
   onPreview?: () => void
   onReview?: () => void
   onReject?: () => void
+  onConfirmDelivery?: () => void
 }
 
 export function MoreOptions({
@@ -50,11 +51,13 @@ export function MoreOptions({
   onManageComments,
   onPreview,
   onReview,
-  onReject
+  onReject,
+  onConfirmDelivery
 }: MoreOptionsProps) {
   const [showDeleteAlert, setShowDeleteAlert] = useState(false)
   const [showReviewAlert, setShowReviewAlert] = useState(false)
   const [showRejectAlert, setShowRejectAlert] = useState(false)
+  const [showConfirmDeliveryAlert, setShowConfirmDeliveryAlert] = useState(false)
   const [isDropdownOpen, setIsDropdownOpen] = useState(false)
 
   const handleDelete = () => {
@@ -70,6 +73,11 @@ export function MoreOptions({
   const handleReject = () => {
     setIsDropdownOpen(false)
     setShowRejectAlert(true)
+  }
+
+  const handleConfirmDelivery = () => {
+    setIsDropdownOpen(false)
+    setShowConfirmDeliveryAlert(true)
   }
 
   // Map hiển thị text tương ứng với từng loại
@@ -150,6 +158,21 @@ export function MoreOptions({
                   </DropdownMenuItem>
                 )}
               </div>
+            </>
+          )}
+
+          {onConfirmDelivery && (
+            <>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem
+                onClick={handleConfirmDelivery}
+                onSelect={(event) => {
+                  event.preventDefault()
+                }}
+              >
+                <Truck className='w-4 h-4 mr-2' />
+                Xác nhận giao hàng
+              </DropdownMenuItem>
             </>
           )}
 
@@ -238,6 +261,29 @@ export function MoreOptions({
             >
               <XCircle className='w-4 h-4 mr-2' />
               Từ chối {deleteTexts[itemType]}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      <AlertDialog open={showConfirmDeliveryAlert} onOpenChange={setShowConfirmDeliveryAlert}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Xác nhận giao hàng thành công?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Đơn hàng sẽ được chuyển sang trạng thái hoàn thành sau khi xác nhận.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel className='focus-visible:ring-0'>Hủy</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => {
+                onConfirmDelivery?.()
+                setShowConfirmDeliveryAlert(false)
+              }}
+            >
+              <Truck className='w-4 h-4 mr-2' />
+              Xác nhận giao hàng
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

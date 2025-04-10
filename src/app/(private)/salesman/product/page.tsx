@@ -1,9 +1,9 @@
 'use client'
 
-import { use, useMemo } from 'react'
-import { useGetProductListAdminQuery } from '@/queries/useProduct'
+import { use, useMemo, useCallback } from 'react'
+import { useGetProductListAdminQuery, useProductDeleteMutation } from '@/queries/useProduct'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Package, Plus, Settings } from 'lucide-react'
+import { Package, Plus, Settings, BarChart, Star, PackageX } from 'lucide-react'
 import { TableCustom, dataListType } from '@/components/table-custom'
 import configRoute from '@/config/route'
 import { SearchParams } from '@/types/query'
@@ -15,6 +15,9 @@ import Image from 'next/image'
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
 import { MoreOptions } from '@/components/private/common/more-options'
+import { Breadcrumb } from '@/components/private/common/breadcrumb'
+import { toast } from '@/components/ui/use-toast'
+import { handleErrorApi } from '@/lib/utils'
 
 function AdminProduct(props: { searchParams: SearchParams }) {
   const searchParams = use(props.searchParams)
@@ -29,6 +32,24 @@ function AdminProduct(props: { searchParams: SearchParams }) {
     page_size: currentPageSize,
     keyword: currentKeyword
   })
+
+  const deleteProductMutation = useProductDeleteMutation()
+
+  const handleDelete = useCallback(
+    async (productId: string) => {
+      try {
+        await deleteProductMutation.mutateAsync(productId)
+        toast({
+          description: 'Xóa sản phẩm thành công'
+        })
+      } catch (error) {
+        handleErrorApi({
+          error
+        })
+      }
+    },
+    [deleteProductMutation]
+  )
 
   const products = responseData?.payload.data.products || []
   const pagination = responseData?.payload.pagination || {
@@ -120,13 +141,21 @@ function AdminProduct(props: { searchParams: SearchParams }) {
         render: (product: any) => (
           <MoreOptions
             itemType='product'
-            item={product}
-            onView={() => router.push(`${configRoute.admin.product}/${product.id}`)}
+            item={{
+              id: product.id,
+              title: product.name,
+              status: 'Hoạt động',
+              slug: product.slug
+            }}
+            onView={() => router.push(`${configRoute.salesman.product}/${product.id}`)}
+            onEdit={() => router.push(`${configRoute.salesman.product}/${product.id}/edit`)}
+            onDelete={() => handleDelete(product.id)}
+            onPreview={() => window.open(`/product/${product.slug}`, '_blank')}
           />
         )
       }
     ],
-    [router]
+    [router, handleDelete]
   )
 
   const tableData: dataListType = {
@@ -135,8 +164,17 @@ function AdminProduct(props: { searchParams: SearchParams }) {
     pagination
   }
 
+  const breadcrumbItems = [
+    {
+      title: 'Sản phẩm'
+    }
+  ]
+
   return (
     <div className='container mx-auto px-4 py-6 space-y-6'>
+      {/* Breadcrumb */}
+      <Breadcrumb items={breadcrumbItems} />
+
       {/* Header */}
       <div className='flex items-center justify-between'>
         <div>
@@ -145,13 +183,13 @@ function AdminProduct(props: { searchParams: SearchParams }) {
         </div>
         <div className='flex items-center gap-4'>
           <Button variant='outline' asChild>
-            <Link href='/admin/product/categories'>
+            <Link href='/salesman/product/categories'>
               <Settings className='w-4 h-4 mr-2' />
               Quản lý danh mục
             </Link>
           </Button>
           <Button asChild>
-            <Link href={configRoute.admin.productNew} className='flex items-center gap-2'>
+            <Link href={configRoute.salesman.productNew} className='flex items-center gap-2'>
               <Plus className='h-4 w-4' />
               Thêm sản phẩm mới
             </Link>
@@ -160,10 +198,10 @@ function AdminProduct(props: { searchParams: SearchParams }) {
       </div>
 
       {/* Stats Cards */}
-      <div className='grid grid-cols-1 md:grid-cols-3 gap-4'>
+      <div className='grid grid-cols-1 md:grid-cols-4 gap-4'>
         {isLoading ? (
           // Stats Cards Skeleton
-          [...Array(3)].map((_, i) => (
+          [...Array(4)].map((_, i) => (
             <Card key={i}>
               <CardHeader className='flex flex-row items-center justify-between pb-2'>
                 <Skeleton className='h-5 w-[120px]' />
@@ -190,7 +228,7 @@ function AdminProduct(props: { searchParams: SearchParams }) {
             <Card>
               <CardHeader className='flex flex-row items-center justify-between pb-2'>
                 <CardTitle className='text-sm font-medium'>Sản phẩm hết hàng</CardTitle>
-                <Package className='h-4 w-4 text-muted-foreground' />
+                <PackageX className='h-4 w-4 text-muted-foreground' />
               </CardHeader>
               <CardContent>
                 <div className='text-2xl font-bold'>{statistics.totalOutOfStockProducts}</div>
@@ -199,8 +237,18 @@ function AdminProduct(props: { searchParams: SearchParams }) {
             </Card>
             <Card>
               <CardHeader className='flex flex-row items-center justify-between pb-2'>
-                <CardTitle className='text-sm font-medium'>Tổng đánh giá</CardTitle>
-                <Package className='h-4 w-4 text-muted-foreground' />
+                <CardTitle className='text-sm font-medium'>Danh mục</CardTitle>
+                <BarChart className='h-4 w-4 text-muted-foreground' />
+              </CardHeader>
+              <CardContent>
+                <div className='text-2xl font-bold'>{statistics.totalProductCategories}</div>
+                <p className='text-xs text-muted-foreground'>Danh mục sản phẩm</p>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardHeader className='flex flex-row items-center justify-between pb-2'>
+                <CardTitle className='text-sm font-medium'>Đánh giá</CardTitle>
+                <Star className='h-4 w-4 text-muted-foreground' />
               </CardHeader>
               <CardContent>
                 <div className='text-2xl font-bold'>{statistics.totalProductReviews}</div>
@@ -216,7 +264,7 @@ function AdminProduct(props: { searchParams: SearchParams }) {
         data={tableData}
         headerColumn={headerColumn}
         bodyColumn={bodyColumn}
-        href={configRoute.admin.product}
+        href={configRoute.salesman.product}
         loading={isLoading}
         showSearch={true}
         searchParamName='keyword'

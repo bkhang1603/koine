@@ -20,6 +20,8 @@ import {
   useGetCategoryProductDetailQuery,
   useGetCategoryProductsQuery
 } from '@/queries/useProduct'
+import { Breadcrumb } from '@/components/private/common/breadcrumb'
+import configRoute from '@/config/route'
 
 type CategoryFormData = {
   name: string
@@ -180,6 +182,16 @@ export default function CourseCategoriesPage() {
     }
   }
 
+  const breadcrumbItems = [
+    {
+      title: 'Sản phẩm',
+      href: configRoute.salesman.product
+    },
+    {
+      title: 'Danh mục sản phẩm'
+    }
+  ]
+
   // Column configuration for the table
   const headerColumn = [
     { id: 1, name: 'Tên danh mục' },
@@ -260,6 +272,9 @@ export default function CourseCategoriesPage() {
 
   return (
     <div className='container mx-auto px-4 py-6 space-y-6'>
+      {/* Breadcrumb */}
+      <Breadcrumb items={breadcrumbItems} />
+
       {/* Header */}
       <div className='flex items-center justify-between'>
         <div>
@@ -287,7 +302,7 @@ export default function CourseCategoriesPage() {
         data={tableData}
         headerColumn={headerColumn}
         bodyColumn={bodyColumn}
-        href={'/admin/product/categories'}
+        href={'/salesman/product/categories'}
         loading={isLoading}
         showSearch={true}
         searchParamName='keyword'

@@ -180,7 +180,7 @@ export default function AdminProductDetail(props: { params: Promise<{ id: string
 
   const breadcrumbItems = [
     {
-      title: 'Khóa học',
+      title: 'Sản phẩm',
       href: '/admin/product'
     },
     {
@@ -190,12 +190,10 @@ export default function AdminProductDetail(props: { params: Promise<{ id: string
 
   return (
     <div className='container max-w-7xl mx-auto py-6 space-y-8'>
-      {/* Back button */}
-      <Button variant='ghost' asChild className='gap-2 hover:bg-gray-100'>
-        <div className='mb-6'>
-          <Breadcrumb items={breadcrumbItems} />
-        </div>
-      </Button>
+      {/* Breadcrumb */}
+      <div className='mb-6'>
+        <Breadcrumb items={breadcrumbItems} />
+      </div>
 
       {/* Header */}
       <div>

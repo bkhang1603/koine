@@ -1,5 +1,9 @@
 import http from '@/lib/http'
-import { GetCourseDetailAdminResType, GetCoursesListAdminResType } from '@/schemaValidations/admin.schema'
+import {
+  GetCourseDetailAdminResType,
+  GetCoursesListAdminResType,
+  GetDraftCoursesResType
+} from '@/schemaValidations/admin.schema'
 import {
   AllCoursesForCustomResType,
   CategoryCoursesResType,
@@ -136,7 +140,19 @@ const courseApiRequest = {
   updateCategoryCourse: (id: string, data: UpdateCategoryCourseBodyType) =>
     http.put<UpdateCategoryCourseResType>(`/category-courses/${id}`, data),
   deleteCategoryCourse: (id: string) => http.delete<DeleteCategoryCourseResType>(`/category-courses/${id}`),
-  updateScoreQuiz: (data: UpdateScoreQuizBodyType) => http.put<UpdateScoreQuizResType>('/chapters/update-score', data)
+  updateScoreQuiz: (data: UpdateScoreQuizBodyType) => http.put<UpdateScoreQuizResType>('/chapters/update-score', data),
+  getDraftCourses: ({
+    page_index,
+    page_size,
+    keyword
+  }: {
+    page_index?: number | undefined
+    page_size?: number | undefined
+    keyword?: string | string[] | undefined
+  }) =>
+    http.get<GetDraftCoursesResType>(
+      `/courses/draft?page_index=${page_index}&page_size=${page_size}${keyword ? `&keyword=${keyword}` : ''}`
+    )
 }
 
 export default courseApiRequest
