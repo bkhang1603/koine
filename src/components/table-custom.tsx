@@ -1,9 +1,13 @@
 import PaginationTable from '@/components/pagination-table'
-import { Card, CardContent, CardFooter } from '@/components/ui/card'
+import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
+import { Input } from '@/components/ui/input'
+import { Search } from 'lucide-react'
+import { usePathname, useRouter, useSearchParams } from 'next/navigation'
+import { useEffect, useState } from 'react'
 
-import type { JSX } from 'react'
+import type { JSX, ReactNode } from 'react'
 
 type headerColumnType = {
   id: number
@@ -30,18 +34,89 @@ export type dataListType = {
   }
 }
 
+// Custom debounce hook
+function useDebounce<T>(value: T, delay: number): T {
+  const [debouncedValue, setDebouncedValue] = useState<T>(value)
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedValue(value)
+    }, delay)
+
+    return () => {
+      clearTimeout(timer)
+    }
+  }, [value, delay])
+
+  return debouncedValue
+}
+
+// Table Search component
+function TableSearch({
+  searchParamName = 'keyword',
+  placeholder = 'Tìm kiếm...'
+}: {
+  searchParamName?: string
+  placeholder?: string
+}) {
+  const searchParams = useSearchParams()
+  const pathname = usePathname()
+  const { replace } = useRouter()
+  const [searchValue, setSearchValue] = useState(searchParams.get(searchParamName)?.toString() || '')
+
+  const debouncedSearchValue = useDebounce(searchValue, 500)
+
+  useEffect(() => {
+    const params = new URLSearchParams(searchParams)
+
+    if (debouncedSearchValue) {
+      params.set(searchParamName, debouncedSearchValue)
+    } else {
+      params.delete(searchParamName)
+    }
+
+    replace(`${pathname}?${params.toString()}`)
+  }, [debouncedSearchValue, pathname, replace, searchParams, searchParamName])
+
+  return (
+    <div className='relative w-full max-w-[400px]'>
+      <div className='absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none'>
+        <Search className='h-4 w-4 text-muted-foreground' />
+      </div>
+      <Input
+        type='search'
+        placeholder={placeholder}
+        className='pl-10 rounded-lg'
+        value={searchValue}
+        onChange={(e) => setSearchValue(e.target.value)}
+        name={searchParamName}
+      />
+    </div>
+  )
+}
+
 export function TableCustom({
   data,
   headerColumn,
   bodyColumn,
   href,
-  loading = false
+  loading = false,
+  filterComponent,
+  description,
+  showSearch = false,
+  searchParamName = 'keyword',
+  searchPlaceholder = 'Tìm kiếm...'
 }: {
   data: dataListType
   headerColumn: headerColumnType[]
   bodyColumn: bodyColumnType[]
   href: string
   loading?: boolean
+  filterComponent?: ReactNode
+  description?: string
+  showSearch?: boolean
+  searchParamName?: string
+  searchPlaceholder?: string
 }) {
   const renderSkeleton = () => {
     return (
@@ -99,8 +174,19 @@ export function TableCustom({
     )
   }
 
+  const hasHeaderContent = filterComponent || description || showSearch
+
   return (
     <Card>
+      {hasHeaderContent && (
+        <CardHeader className='px-6 space-y-4'>
+          <div className='flex flex-col md:flex-row justify-between items-start gap-4'>
+            {showSearch && <TableSearch searchParamName={searchParamName} placeholder={searchPlaceholder} />}
+            {filterComponent && <div>{filterComponent}</div>}
+          </div>
+          {description && <p className='text-sm text-muted-foreground'>{description}</p>}
+        </CardHeader>
+      )}
       <CardContent className='p-6'>
         <Table>
           <TableHeader>

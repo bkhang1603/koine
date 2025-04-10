@@ -1,6 +1,6 @@
 import { Sidebar } from '@/types/sidebar'
 import SidebarLayout from '@/components/layout/sidebar-layout'
-import { LayoutDashboard, Users, Package, BookOpen, BarChart, Receipt, Tags } from 'lucide-react'
+import { LayoutDashboard, Users, Package, BookOpen, Receipt, Tags } from 'lucide-react'
 
 export default function SalesmanLayout({
   children
@@ -9,13 +9,13 @@ export default function SalesmanLayout({
 }>) {
   const sidebarData: Sidebar = [
     {
-      title: 'Tổng quan',
+      title: 'Thống kê',
       group: [
         {
           id: 'dashboard',
           href: '/salesman',
           icon: <LayoutDashboard className='h-5 w-5' />,
-          label: 'Dashboard'
+          label: 'Tổng quan'
         }
       ]
     },
@@ -24,13 +24,13 @@ export default function SalesmanLayout({
       group: [
         {
           id: 'customers',
-          href: '/salesman/customers',
+          href: '/salesman/user',
           icon: <Users className='h-5 w-5' />,
           label: 'Khách hàng'
         },
         {
           id: 'orders',
-          href: '/salesman/orders',
+          href: '/salesman/order',
           icon: <Receipt className='h-5 w-5' />,
           label: 'Đơn hàng'
         }
@@ -41,13 +41,13 @@ export default function SalesmanLayout({
       group: [
         {
           id: 'courses',
-          href: '/salesman/courses',
+          href: '/salesman/course',
           icon: <BookOpen className='h-5 w-5' />,
           label: 'Khóa học'
         },
         {
           id: 'products',
-          href: '/salesman/products',
+          href: '/salesman/product',
           icon: <Package className='h-5 w-5' />,
           label: 'Sản phẩm'
         },
@@ -56,17 +56,6 @@ export default function SalesmanLayout({
           href: '/salesman/promotions',
           icon: <Tags className='h-5 w-5' />,
           label: 'Khuyến mãi'
-        }
-      ]
-    },
-    {
-      title: 'Báo cáo',
-      group: [
-        {
-          id: 'reports',
-          href: '/salesman/reports',
-          icon: <BarChart className='h-5 w-5' />,
-          label: 'Báo cáo'
         }
       ]
     }

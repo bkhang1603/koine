@@ -266,13 +266,15 @@ export const useBlogCommentsAdminQuery = ({ id }: { id: string }) => {
 
 export const useMyBlogsQuery = ({
   page_index,
-  page_size
+  page_size,
+  keyword
 }: {
   page_index?: number | undefined
   page_size?: number | undefined
+  keyword?: string | string[] | undefined
 }) => {
   return useQuery({
-    queryKey: ['myBlogs', page_index, page_size],
-    queryFn: () => blogApiRequest.getMyBlogs({ page_index, page_size })
+    queryKey: ['myBlogs', page_index, page_size, keyword],
+    queryFn: () => blogApiRequest.getMyBlogs({ page_index, page_size, keyword })
   })
 }

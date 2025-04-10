@@ -3,7 +3,7 @@
 import { Button } from '@/components/ui/button'
 import { Plus } from 'lucide-react'
 import { Input } from '@/components/ui/input'
-import { useState, useEffect, useRef } from 'react'
+import { useState } from 'react'
 import { toast } from '@/components/ui/use-toast'
 import { handleErrorApi } from '@/lib/utils'
 import { format } from 'date-fns'
@@ -61,16 +61,8 @@ export default function CourseCategoriesPage() {
   const [createDialogOpen, setCreateDialogOpen] = useState(false)
   const [editDialogOpen, setEditDialogOpen] = useState(false)
   const [editingCategoryId, setEditingCategoryId] = useState<string | undefined>()
-  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
-  const [deleteCategoryId, setDeleteCategoryId] = useState<string | undefined>()
-
-  const isMounted = useRef(true)
-
-  useEffect(() => {
-    return () => {
-      isMounted.current = false
-    }
-  }, [])
+  const [, setDeleteDialogOpen] = useState(false)
+  const [, setDeleteCategoryId] = useState<string | undefined>()
 
   const { data: categoriesResponse, isLoading } = useGetCategoryCoursesQuery({
     page_index: currentPageIndex,
@@ -293,6 +285,9 @@ export default function CourseCategoriesPage() {
         bodyColumn={bodyColumn}
         href={'/content-creator/course/categories'}
         loading={isLoading}
+        showSearch={true}
+        searchParamName='keyword'
+        searchPlaceholder='Tìm kiếm danh mục...'
       />
 
       {/* Dialogs */}

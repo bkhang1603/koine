@@ -416,14 +416,17 @@ export const previewLessonsRes = z.object({
 })
 
 export const createCourseBody = z.object({
-  categoryIds: z.array(z.string()),
-  title: z.string(),
-  description: z.string(),
-  imageUrl: z.string(),
-  imageBanner: z.string(),
-  price: z.number(),
-  discount: z.number(),
-  level: z.string()
+  categoryIds: z.array(z.string()).min(1, { message: 'Vui lòng chọn ít nhất 1 danh mục' }),
+  title: z.string().min(5, { message: 'Tiêu đề phải có ít nhất 5 ký tự' }),
+  description: z.string().min(10, { message: 'Mô tả phải có ít nhất 10 ký tự' }),
+  imageUrl: z.string().url({ message: 'URL hình ảnh không hợp lệ' }).or(z.string().length(0)),
+  imageBanner: z.string().url({ message: 'URL hình ảnh không hợp lệ' }).or(z.string().length(0)),
+  price: z.number().min(0, { message: 'Giá không được âm' }),
+  discount: z
+    .number()
+    .min(0, { message: 'Giảm giá không được âm' })
+    .max(100, { message: 'Giảm giá không được quá 100%' }),
+  level: z.string().min(1, { message: 'Vui lòng chọn cấp độ' })
 })
 
 export const createCourseBodyRes = z.object({
@@ -509,6 +512,33 @@ export const updateScoreQuizRes = z.object({
   statusCode: z.number()
 })
 
+export const createChapterSchema = z.object({
+  title: z.string().min(3, 'Tiêu đề phải có ít nhất 3 ký tự').max(255, 'Tiêu đề không được vượt quá 255 ký tự'),
+  description: z.string().min(10, 'Mô tả phải có ít nhất 10 ký tự').max(255, 'Mô tả không được vượt quá 255 ký tự'),
+  courseId: z.string()
+})
+
+export const updateChapterSchema = createChapterSchema.omit({ courseId: true })
+
+export const createLessonBody = z.object({
+  chapterId: z.string(),
+  type: z.enum(TypeResourceValues),
+  title: z.string().min(5, { message: 'Tiêu đề phải có ít nhất 5 ký tự' }),
+  description: z.string().min(10, { message: 'Mô tả phải có ít nhất 10 ký tự' }),
+  durations: z.number(),
+  content: z.string().nullable(),
+  videoUrl: z.string().nullable()
+})
+
+export const updateLessonBody = z.object({
+  type: z.enum(TypeResourceValues),
+  title: z.string().min(5, { message: 'Tiêu đề phải có ít nhất 5 ký tự' }),
+  description: z.string().min(10, { message: 'Mô tả phải có ít nhất 10 ký tự' }),
+  durations: z.number(),
+  content: z.string().nullable(),
+  videoUrl: z.string().nullable()
+})
+
 export type CourseResType = z.infer<typeof CourseRes>
 
 export type CoursesResType = z.infer<typeof CoursesRes>
@@ -558,3 +588,11 @@ export type CreateCourseCustomResType = z.infer<typeof createCourseCustomRes>
 export type UpdateScoreQuizBodyType = z.infer<typeof updateScoreQuizBody>
 
 export type UpdateScoreQuizResType = z.infer<typeof updateScoreQuizRes>
+
+export type CreateChapterBodyType = z.infer<typeof createChapterSchema>
+
+export type UpdateChapterBodyType = z.infer<typeof updateChapterSchema>
+
+export type CreateLessonBodyType = z.infer<typeof createLessonBody>
+
+export type UpdateLessonBodyType = z.infer<typeof updateLessonBody>

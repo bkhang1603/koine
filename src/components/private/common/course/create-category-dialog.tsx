@@ -26,7 +26,9 @@ type CategoryFormValues = z.infer<typeof formSchema>
 
 type CreateCategoryDialogProps = {
   open: boolean
+  // eslint-disable-next-line no-unused-vars
   onOpenChange: (open: boolean) => void
+  // eslint-disable-next-line no-unused-vars
   onSubmit: (values: CategoryFormValues) => void
   isLoading: boolean
 }

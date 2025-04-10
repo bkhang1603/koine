@@ -67,7 +67,14 @@ export const CategoryProductData = z
 export const CategoryProductsRes = z.object({
   data: z.array(CategoryProductData),
   message: z.string(),
-  statusCode: z.number()
+  statusCode: z.number(),
+  pagination: z.object({
+    totalItem: z.number(),
+    pageSize: z.number(),
+    currentPage: z.number(),
+    maxPageSize: z.number(),
+    totalPage: z.number()
+  })
 })
 
 export const ProductReviewsData = z
@@ -156,6 +163,56 @@ export const CreateProductRes = z.object({
   })
 })
 
+export const createCategoryProductBody = z.object({
+  name: z.string(),
+  description: z.string()
+})
+
+export const createCategoryProductRes = z.object({
+  data: z.object({
+    name: z.string(),
+    description: z.string(),
+    isDeleted: z.boolean(),
+    createdAt: z.string(),
+    updatedAt: z.string(),
+    id: z.string()
+  }),
+  message: z.string(),
+  statusCode: z.number(),
+  info: z.string()
+})
+
+export const updateCategoryProductBody = z.object({
+  name: z.string(),
+  description: z.string()
+})
+
+export const updateCategoryProductRes = z.object({
+  message: z.string(),
+  statusCode: z.number(),
+  info: z.string()
+})
+
+export const deleteCategoryProductRes = z.object({
+  message: z.string(),
+  statusCode: z.number(),
+  info: z.string()
+})
+
+export const getCategoryProductDetailRes = z.object({
+  data: z.object({
+    isDeleted: z.boolean(),
+    createdAt: z.string(),
+    updatedAt: z.string(),
+    id: z.string(),
+    name: z.string(),
+    description: z.string()
+  }),
+  message: z.string(),
+  statusCode: z.number(),
+  info: z.string()
+})
+
 export type ProductsResType = z.TypeOf<typeof ProductsRes>
 
 export type ProductResType = z.TypeOf<typeof ProductRes>
@@ -167,3 +224,15 @@ export type ProductReviewsResType = z.TypeOf<typeof ProductReviewsRes>
 export type CreateProductBodyType = z.infer<typeof CreateProductBody>
 
 export type CreateProductResType = z.infer<typeof CreateProductRes>
+
+export type CreateCategoryProductBodyType = z.infer<typeof createCategoryProductBody>
+
+export type CreateCategoryProductResType = z.infer<typeof createCategoryProductRes>
+
+export type UpdateCategoryProductBodyType = z.infer<typeof updateCategoryProductBody>
+
+export type UpdateCategoryProductResType = z.infer<typeof updateCategoryProductRes>
+
+export type DeleteCategoryProductResType = z.infer<typeof deleteCategoryProductRes>
+
+export type GetCategoryProductDetailResType = z.infer<typeof getCategoryProductDetailRes>

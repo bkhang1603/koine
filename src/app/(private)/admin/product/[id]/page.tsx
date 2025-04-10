@@ -4,7 +4,7 @@ import { use } from 'react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Separator } from '@/components/ui/separator'
-import { ArrowLeft, Package, AlertCircle, Star, DollarSign, ShoppingCart } from 'lucide-react'
+import { Package, AlertCircle, Star, ShoppingCart } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { Badge } from '@/components/ui/badge'
@@ -14,16 +14,15 @@ import { useState } from 'react'
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { vi } from 'date-fns/locale'
 import { format } from 'date-fns'
+import { Breadcrumb } from '@/components/private/common/breadcrumb'
 
 export default function AdminProductDetail(props: { params: Promise<{ id: string }> }) {
   const params = use(props.params)
   const { isLoading, error, data } = useProductDetailAdminQuery({ productId: params.id })
   const product = data?.payload.data
 
-  // State for selected image
   const [selectedImage, setSelectedImage] = useState<string | null>(null)
 
-  // Handle image click
   const openImageDialog = (imageUrl: string) => {
     setSelectedImage(imageUrl)
   }
@@ -179,15 +178,22 @@ export default function AdminProductDetail(props: { params: Promise<{ id: string
   // Calculate final price after discount
   const finalPrice = product.price * (1 - product.discount / 100)
 
+  const breadcrumbItems = [
+    {
+      title: 'Sản phẩm',
+      href: '/admin/product'
+    },
+    {
+      title: product.name
+    }
+  ]
+
   return (
     <div className='container max-w-7xl mx-auto py-6 space-y-8'>
-      {/* Back button */}
-      <Button variant='ghost' asChild className='gap-2 hover:bg-gray-100'>
-        <Link href='/admin/product'>
-          <ArrowLeft className='h-4 w-4' />
-          Quay lại danh sách sản phẩm
-        </Link>
-      </Button>
+      {/* Breadcrumb */}
+      <div className='mb-6'>
+        <Breadcrumb items={breadcrumbItems} />
+      </div>
 
       {/* Header */}
       <div>
@@ -352,16 +358,6 @@ export default function AdminProductDetail(props: { params: Promise<{ id: string
               </div>
             </CardContent>
           </Card>
-
-          {/* Action buttons */}
-          <div className='space-y-3'>
-            <Button className='w-full' variant='default'>
-              Chỉnh sửa sản phẩm
-            </Button>
-            <Button className='w-full' variant='outline'>
-              {product.stockQuantity > 0 ? 'Đánh dấu hết hàng' : 'Đánh dấu còn hàng'}
-            </Button>
-          </div>
         </div>
       </div>
 

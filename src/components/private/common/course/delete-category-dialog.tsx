@@ -13,6 +13,7 @@ import { Loader2, Trash } from 'lucide-react'
 
 type DeleteCategoryDialogProps = {
   open: boolean
+  // eslint-disable-next-line no-unused-vars
   onOpenChange: (open: boolean) => void
   onConfirm: () => void
   isLoading: boolean

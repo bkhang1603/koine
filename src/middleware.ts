@@ -96,7 +96,8 @@ const roleBasedPaths = {
   MANAGER: ['/manager', '/manager/:path*'],
   CONTENT_CREATOR: ['/content-creator', '/content-creator/:path*'],
   EXPERT: ['/expert', '/expert/:path*'],
-  CHILD: ['/kid', '/kid/:path*']
+  CHILD: ['/kid', '/kid/:path*'],
+  SALESMAN: ['/salesman', '/salesman/:path*']
 }
 
 // Đường dẫn cần xác thực nhưng không ràng buộc role

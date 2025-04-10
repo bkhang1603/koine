@@ -1,6 +1,6 @@
 import { useState, useRef } from 'react'
 import { toast } from '@/components/ui/use-toast'
-import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar'
+import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { Upload, FileVideo } from 'lucide-react'
 import { useUploadRecordMutation } from '@/queries/useUpload' // Hook tải video lên (giả sử bạn có một hook như vậy)
 import { useUpdateEventMutation } from '@/queries/useEvent'
@@ -13,6 +13,7 @@ interface VideoUploadProps {
 
 const VideoUpload: React.FC<VideoUploadProps> = ({ initialPreview, disabled = false, eventId }) => {
   const [preview, setPreview] = useState<string | null>(initialPreview || null)
+  // eslint-disable-next-line no-unused-vars
   const [file, setFile] = useState<File | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
@@ -47,6 +48,7 @@ const VideoUpload: React.FC<VideoUploadProps> = ({ initialPreview, disabled = fa
         const uploadResult = await uploadVideoMutation.mutateAsync(formData)
         console.log('url ', uploadResult.payload.data)
         if (uploadResult.payload.data) {
+          // eslint-disable-next-line no-unused-vars
           const res = await updateEventInfo.mutateAsync({
             body: { recordUrl: uploadResult.payload.data },
             eventId

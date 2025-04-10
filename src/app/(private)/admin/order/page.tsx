@@ -1,73 +1,35 @@
 'use client'
 
-import { use, useEffect, useMemo } from 'react'
+import { use, useMemo } from 'react'
 import { useGetAdminOrdersQuery } from '@/queries/useOrder'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { ArrowUpDown, DollarSign, Package, GraduationCap } from 'lucide-react'
+import { ArrowUpDown, DollarSign, Package } from 'lucide-react'
 import { TableCustom, dataListType } from '@/components/table-custom'
 import configRoute from '@/config/route'
 import { SearchParams } from '@/types/query'
-import { useRouter, usePathname } from 'next/navigation'
+import { useRouter } from 'next/navigation'
 import { Badge } from '@/components/ui/badge'
 import { format } from 'date-fns'
 import { vi } from 'date-fns/locale'
 import { MoreOptions } from '@/components/private/common/more-options'
 import { Skeleton } from '@/components/ui/skeleton'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 
 function AdminOrder(props: { searchParams: SearchParams }) {
   const searchParams = use(props.searchParams)
   const router = useRouter()
-  const pathname = usePathname()
 
   const currentStatus = (searchParams.status as string) || 'ALL'
+  const currentKeyword = (searchParams.keyword as string) || ''
   const currentPageSize = Number(searchParams.page_size) || 10
   const currentPageIndex = Number(searchParams.page_index) || 1
-
-  const updateSearchParams = (newParams: { status?: string; page_size?: number; page_index?: number }) => {
-    const params = new URLSearchParams(searchParams as Record<string, string>)
-
-    if (newParams.status !== undefined) {
-      if (newParams.status === 'ALL') {
-        params.delete('status')
-      } else {
-        params.set('status', newParams.status)
-      }
-    }
-
-    if (newParams.page_size !== undefined) {
-      params.set('page_size', newParams.page_size.toString())
-    }
-
-    if (newParams.page_index !== undefined) {
-      params.set('page_index', newParams.page_index.toString())
-    }
-
-    router.push(`${pathname}?${params.toString()}`)
-  }
-
-  const handleStatusChange = (value: string) => {
-    updateSearchParams({ status: value, page_index: 1 })
-  }
-
-  const getApiStatus = (uiStatus: string) => {
-    return uiStatus === 'ALL' ? '' : uiStatus
-  }
 
   const {
     data: responseData,
     isLoading,
+    // eslint-disable-next-line no-unused-vars
     error
-  } = useGetAdminOrdersQuery(currentPageSize, currentPageIndex, getApiStatus(currentStatus))
-
-  useEffect(() => {
-    if (responseData) {
-      console.log('Dữ liệu đơn hàng từ admin:', responseData)
-    }
-    if (error) {
-      console.error('Lỗi khi tải đơn hàng:', error)
-    }
-  }, [responseData, error])
+  } = useGetAdminOrdersQuery(currentPageSize, currentPageIndex, currentKeyword, currentStatus)
 
   const orders = responseData?.payload.data.orders || []
   const statistics = responseData?.payload.data.statistics || {
@@ -86,14 +48,17 @@ function AdminOrder(props: { searchParams: SearchParams }) {
   const message = responseData?.payload.message || ''
 
   // Cấu hình màu sắc và nhãn cho trạng thái
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const orderStatusConfig = {
     PROCESSING: { label: 'Đang xử lý', variant: 'default' },
     DELIVERING: { label: 'Đang giao', variant: 'primary' },
     COMPLETED: { label: 'Hoàn thành', variant: 'secondary' },
-    CANCELLED: { label: 'Đã hủy', variant: 'destructive' }
+    CANCELLED: { label: 'Đã hủy', variant: 'destructive' },
+    REFUND_REQUEST: { label: 'Hoàn tiền', variant: 'destructive' }
   } as const
 
   // Cấu hình phương thức thanh toán
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const paymentMethodConfig = {
     COD: { label: 'Thanh toán khi nhận hàng', icon: DollarSign },
     BANKING: { label: 'Chuyển khoản', icon: DollarSign }
@@ -103,13 +68,10 @@ function AdminOrder(props: { searchParams: SearchParams }) {
   const headerColumn = [
     { id: 1, name: 'Mã đơn hàng' },
     { id: 2, name: 'Thời gian' },
-    { id: 3, name: 'Khách hàng' },
-    { id: 4, name: 'Sản phẩm' },
-    { id: 5, name: 'Khóa học' },
-    { id: 6, name: 'Tổng tiền' },
-    { id: 7, name: 'Phương thức TT' },
-    { id: 8, name: 'Trạng thái' },
-    { id: 9, name: '' }
+    { id: 3, name: 'Tổng tiền' },
+    { id: 4, name: 'Phương thức TT' },
+    { id: 5, name: 'Trạng thái' },
+    { id: 6, name: '' }
   ]
 
   const bodyColumn = useMemo(
@@ -134,43 +96,6 @@ function AdminOrder(props: { searchParams: SearchParams }) {
         id: 3,
         render: (order: any) => (
           <div className='space-y-0.5'>
-            <div className='font-medium'>{order.deliveryInfo.name}</div>
-            <div className='text-xs text-muted-foreground'>{order.deliveryInfo.phone}</div>
-          </div>
-        )
-      },
-      {
-        id: 4,
-        render: (order: any) => {
-          const products = order.orderDetails.filter((item: any) => item.productId !== null)
-          return products.length > 0 ? (
-            <div className='flex items-center gap-2'>
-              <Package className='w-4 h-4 text-muted-foreground' />
-              <span className='text-sm'>{products.length}</span>
-            </div>
-          ) : (
-            <span className='text-xs text-muted-foreground'>Không có</span>
-          )
-        }
-      },
-      {
-        id: 5,
-        render: (order: any) => {
-          const courses = order.orderDetails.filter((item: any) => item.courseId !== null)
-          return courses.length > 0 ? (
-            <div className='flex items-center gap-2'>
-              <GraduationCap className='w-4 h-4 text-muted-foreground' />
-              <span className='text-sm'>{courses.length}</span>
-            </div>
-          ) : (
-            <span className='text-xs text-muted-foreground'>Không có</span>
-          )
-        }
-      },
-      {
-        id: 6,
-        render: (order: any) => (
-          <div className='space-y-0.5'>
             <div>
               {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(order.totalAmount)}
             </div>
@@ -184,7 +109,7 @@ function AdminOrder(props: { searchParams: SearchParams }) {
         )
       },
       {
-        id: 7,
+        id: 4,
         render: (order: any) => {
           const method = order.paymentMethod
           const config = paymentMethodConfig[method as keyof typeof paymentMethodConfig] || {
@@ -202,7 +127,7 @@ function AdminOrder(props: { searchParams: SearchParams }) {
         }
       },
       {
-        id: 8,
+        id: 5,
         render: (order: any) => {
           const status = order.status
           const config = orderStatusConfig[status as keyof typeof orderStatusConfig] || {
@@ -214,7 +139,7 @@ function AdminOrder(props: { searchParams: SearchParams }) {
         }
       },
       {
-        id: 9,
+        id: 6,
         render: (order: any) => (
           <MoreOptions item={order} itemType='order' onView={() => router.push(`/admin/order/${order.id}`)} />
         )
@@ -307,22 +232,6 @@ function AdminOrder(props: { searchParams: SearchParams }) {
         )}
       </div>
 
-      {/* Filters */}
-      <div className='flex flex-col sm:flex-row gap-4'>
-        <Select value={currentStatus} onValueChange={handleStatusChange}>
-          <SelectTrigger className='w-full sm:w-[180px]'>
-            <SelectValue placeholder='Trạng thái' />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value='ALL'>Tất cả</SelectItem>
-            <SelectItem value='PROCESSING'>Đang xử lý</SelectItem>
-            <SelectItem value='DELIVERING'>Đang giao</SelectItem>
-            <SelectItem value='COMPLETED'>Hoàn thành</SelectItem>
-            <SelectItem value='CANCELLED'>Đã hủy</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
-
       {/* Table */}
       <TableCustom
         data={tableData}
@@ -330,6 +239,38 @@ function AdminOrder(props: { searchParams: SearchParams }) {
         bodyColumn={bodyColumn}
         href={configRoute.admin.order}
         loading={isLoading}
+        showSearch={true}
+        searchParamName='keyword'
+        searchPlaceholder='Tìm kiếm đơn hàng...'
+        filterComponent={
+          <Select
+            value={currentStatus}
+            onValueChange={(value) => {
+              const params = new URLSearchParams(searchParams as Record<string, string>)
+              if (value === 'ALL') {
+                params.delete('status')
+              } else {
+                params.set('status', value)
+              }
+              params.set('page_index', '1')
+              router.replace(`${window.location.pathname}?${params.toString()}`)
+            }}
+          >
+            <SelectTrigger className='w-full sm:w-[180px]'>
+              <SelectValue placeholder='Trạng thái' />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value='ALL'>Tất cả</SelectItem>
+              <SelectItem value='PENDING'>Chờ xử lý</SelectItem>
+              <SelectItem value='PROCESSING'>Đang xử lý</SelectItem>
+              <SelectItem value='DELIVERING'>Đang giao</SelectItem>
+              <SelectItem value='COMPLETED'>Hoàn thành</SelectItem>
+              <SelectItem value='CANCELLED'>Đã hủy</SelectItem>
+              <SelectItem value='FAILED_PAYMENT'>Thanh toán thất bại</SelectItem>
+              <SelectItem value='RETURN_REQUEST'>Yêu cầu trả hàng</SelectItem>
+            </SelectContent>
+          </Select>
+        }
       />
     </div>
   )
