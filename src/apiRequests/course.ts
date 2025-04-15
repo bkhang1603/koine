@@ -88,7 +88,8 @@ const courseApiRequest = {
   addCourse: (data: CreateCourseBodyType) => http.post<CreateCourseBodyResType>('/courses', data),
   updateCourse: (id: string, data: CreateCourseBodyType) => http.put<CreateCourseBodyResType>(`/courses/${id}`, data),
   deleteCourse: (id: string) => http.delete<OnlyMessageResType>(`/courses/${id}`),
-  enrollCourse: (id: string) => http.post<OnlyMessageResType>(`/courses/enroll/${id}`, {}),
+  enrollCourse: (body: { courseId: string; childId?: string | null }) =>
+    http.post<OnlyMessageResType>(`/courses/active-course-enroll`, body),
   getUserCourses: () => http.get<UserCoursesResType>('/course-enrollment/enrolled'),
   updateCourseProgress: (lessonId: string) => http.post<OnlyMessageResType>('/user-progresses', { lessonId }),
   // getCategoryCourses: () => http.get<CategoryCoursesResType>(`/category-courses`),

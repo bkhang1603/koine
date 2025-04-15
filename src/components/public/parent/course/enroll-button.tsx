@@ -32,11 +32,13 @@ export default function EnrollButton({ id, className }: EnrollButtonProps) {
     }
 
     try {
-      await enrollMutation.mutateAsync(id)
+      await enrollMutation.mutateAsync({
+        courseId: id,
+        childId: null
+      })
       toast({
         description: 'Đăng ký khóa học thành công'
       })
-      router.push(`/learn/${id}`)
     } catch (error) {
       handleErrorApi({ error })
     }
