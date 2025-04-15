@@ -18,7 +18,7 @@ import { useCreateRefundOrderMutation } from '@/queries/useOrder'
 import { handleErrorApi } from '@/lib/utils'
 import { toast } from '@/components/ui/use-toast'
 import Image from 'next/image'
-import { Book, Package, Boxes } from 'lucide-react'
+import { Book, Package, Boxes, AlertCircle } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 interface RefundOrderDialogProps {
@@ -151,6 +151,19 @@ export function RefundOrderDialog({ orderId, orderDetails }: RefundOrderDialogPr
             Vui lòng chọn sản phẩm cần hoàn tiền và nhập lý do. Yêu cầu của bạn sẽ được xử lý trong thời gian sớm nhất.
           </DialogDescription>
         </DialogHeader>
+
+        <div className='mt-2 p-3 bg-amber-50 border border-amber-100 rounded-md'>
+          <div className='flex items-start gap-2'>
+            <AlertCircle className='h-5 w-5 text-amber-500 flex-shrink-0 mt-0.5' />
+            <div>
+              <p className='text-sm font-medium text-amber-800'>Lưu ý quan trọng</p>
+              <p className='text-sm text-amber-700 mt-1'>
+                Bạn chỉ được hoàn tiền duy nhất 1 lần cho đơn hàng này. Vui lòng quyết định chính xác để tránh phát sinh
+                vấn đề sau này.
+              </p>
+            </div>
+          </div>
+        </div>
 
         <div className='space-y-4 py-4'>
           <div className='space-y-2'>

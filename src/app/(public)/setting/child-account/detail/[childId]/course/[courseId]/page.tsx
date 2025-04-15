@@ -175,205 +175,91 @@ export default function ChildCourseDetailPage(props: { params: Promise<{ childId
         </div>
       </div>
 
-      {/* Tabs */}
-      <Tabs value={activeTab} onValueChange={setActiveTab} className='w-full'>
-        <TabsList className='mb-4'>
-          <TabsTrigger
-            value='overview'
-            className='rounded-md data-[state=active]:bg-primary data-[state=active]:text-white'
-          >
-            <BarChart className='h-4 w-4 mr-2' />
-            Tổng quan
-          </TabsTrigger>
-          <TabsTrigger
-            value='content'
-            className='rounded-md data-[state=active]:bg-primary data-[state=active]:text-white'
-          >
-            <BookOpen className='h-4 w-4 mr-2' />
-            Nội dung khóa học
-          </TabsTrigger>
-        </TabsList>
-
-        {/* Phần Tổng quan */}
-        <TabsContent value='overview' className='space-y-6'>
-          {/* Thẻ tiến độ */}
-          <Card className='shadow-sm border'>
-            <CardHeader className='pb-0'>
-              <CardTitle className='text-xl'>Tiến độ học tập</CardTitle>
-              <CardDescription>Theo dõi quá trình học tập của bé</CardDescription>
-            </CardHeader>
-            <CardContent className='pt-6'>
-              <div className='space-y-6'>
-                {/* Progress Bar */}
-                <div className='space-y-2'>
-                  <div className='flex justify-between text-sm'>
-                    <span>Hoàn thành khóa học</span>
-                    <span className='font-medium'>{stats.completionPercentage}%</span>
-                  </div>
-                  <Progress value={stats.completionPercentage} className='h-2.5' />
+      <div className='space-y-6'>
+        {/* Thẻ tiến độ */}
+        <Card className='shadow-sm border'>
+          <CardHeader className='pb-0'>
+            <CardTitle className='text-xl'>Tiến độ học tập</CardTitle>
+            <CardDescription>Theo dõi quá trình học tập của bé</CardDescription>
+          </CardHeader>
+          <CardContent className='pt-6'>
+            <div className='space-y-6'>
+              {/* Progress Bar */}
+              <div className='space-y-2'>
+                <div className='flex justify-between text-sm'>
+                  <span>Hoàn thành khóa học</span>
+                  <span className='font-medium'>{stats.completionPercentage}%</span>
                 </div>
-
-                {/* Stats Cards */}
-                <div className='grid grid-cols-2 md:grid-cols-4 gap-4'>
-                  <Card className='bg-blue-50 border-blue-100'>
-                    <CardContent className='p-4 flex gap-3 items-center'>
-                      <div className='h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0'>
-                        <BookOpen className='h-5 w-5 text-blue-600' />
-                      </div>
-                      <div>
-                        <p className='text-xs text-blue-700'>Bài học đã học</p>
-                        <p className='text-lg font-semibold text-blue-800'>
-                          {stats.completedLessons}/{stats.totalLessons}
-                        </p>
-                      </div>
-                    </CardContent>
-                  </Card>
-
-                  <Card className='bg-green-50 border-green-100'>
-                    <CardContent className='p-4 flex gap-3 items-center'>
-                      <div className='h-10 w-10 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0'>
-                        <CheckCheck className='h-5 w-5 text-green-600' />
-                      </div>
-                      <div>
-                        <p className='text-xs text-green-700'>Chương đã hoàn thành</p>
-                        <p className='text-lg font-semibold text-green-800'>
-                          {stats.completedChapters}/{stats.totalChapters}
-                        </p>
-                      </div>
-                    </CardContent>
-                  </Card>
-
-                  <Card className='bg-amber-50 border-amber-100'>
-                    <CardContent className='p-4 flex gap-3 items-center'>
-                      <div className='h-10 w-10 rounded-full bg-amber-100 flex items-center justify-center flex-shrink-0'>
-                        <Timer className='h-5 w-5 text-amber-600' />
-                      </div>
-                      <div>
-                        <p className='text-xs text-amber-700'>Tổng thời gian học</p>
-                        <p className='text-lg font-semibold text-amber-800'>
-                          {courseData.totalLearningTime || '0h 0m'}
-                        </p>
-                      </div>
-                    </CardContent>
-                  </Card>
-
-                  <Card className='bg-purple-50 border-purple-100'>
-                    <CardContent className='p-4 flex gap-3 items-center'>
-                      <div className='h-10 w-10 rounded-full bg-purple-100 flex items-center justify-center flex-shrink-0'>
-                        <Activity className='h-5 w-5 text-purple-600' />
-                      </div>
-                      <div>
-                        <p className='text-xs text-purple-700'>Trạng thái</p>
-                        <p className='text-lg font-semibold text-purple-800'>
-                          {stats.completionPercentage === 100 ? 'Hoàn thành' : 'Đang học'}
-                        </p>
-                      </div>
-                    </CardContent>
-                  </Card>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Thẻ kiểm soát của phụ huynh */}
-          <Card className='shadow-sm border'>
-            <CardHeader>
-              <CardTitle className='text-xl'>Kiểm soát truy cập</CardTitle>
-              <CardDescription>Quản lý việc truy cập khóa học của bé</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className='flex items-center justify-between'>
-                <div className='space-y-1'>
-                  <Label htmlFor='access-toggle' className='font-medium'>
-                    {courseData.isAccessibleByChild ? 'Đang cho phép truy cập' : 'Đang chặn truy cập'}
-                  </Label>
-                  <p className='text-sm text-muted-foreground'>
-                    {courseData.isAccessibleByChild
-                      ? 'Bé có thể xem và học tất cả nội dung của khóa học này'
-                      : 'Bé không thể truy cập vào khóa học này'}
-                  </p>
-                </div>
-                <Switch
-                  id='access-toggle'
-                  checked={courseData.isAccessibleByChild}
-                  onCheckedChange={handleToggleAccess}
-                />
+                <Progress value={stats.completionPercentage} className='h-2.5' />
               </div>
 
-              {/* Thêm ghi chú dành cho phụ huynh */}
-              <div className='mt-4 p-3 bg-amber-50 border border-amber-100 rounded-md'>
-                <div className='flex items-start gap-2'>
-                  <AlertCircle className='h-5 w-5 text-amber-500 flex-shrink-0 mt-0.5' />
-                  <div>
-                    <h4 className='text-sm font-medium text-amber-800'>Lưu ý</h4>
-                    <p className='text-xs text-amber-700 mt-1'>
-                      Khi chặn truy cập, bé sẽ không thể xem và học các bài trong khóa học này. Tuy nhiên, tiến độ học
-                      tập vẫn được lưu lại.
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Hoạt động gần đây */}
-          <Card className='shadow-sm border'>
-            <CardHeader>
-              <CardTitle className='text-xl'>Các bài học đã hoàn thành gần đây</CardTitle>
-            </CardHeader>
-            <CardContent className='px-0 py-0'>
-              <div className='divide-y'>
-                {courseData.chapters
-                  .flatMap((chapter: any) =>
-                    chapter.lessons
-                      .filter((lesson: any) => lesson.lessonStatus === 'COMPLETED')
-                      .map((lesson: any) => ({
-                        ...lesson,
-                        chapterTitle: chapter.chapterTitle,
-                        chapterSequence: chapter.chapterSequence
-                      }))
-                  )
-                  .slice(0, 5)
-                  .map((lesson: any) => (
-                    <div key={lesson.lessonId} className='px-6 py-3 flex items-center gap-3 hover:bg-gray-50'>
-                      <div className='h-8 w-8 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0'>
-                        <CheckCircle2 className='h-4 w-4 text-green-600' />
-                      </div>
-                      <div className='flex-1'>
-                        <p className='text-sm font-medium'>{lesson.lessonTitle}</p>
-                        <p className='text-xs text-gray-500'>
-                          Chương {lesson.chapterSequence}: {lesson.chapterTitle}
-                        </p>
-                      </div>
-                      <Badge variant='outline' className='bg-green-50 text-green-700 border-green-200'>
-                        Hoàn thành
-                      </Badge>
+              {/* Stats Cards */}
+              <div className='grid grid-cols-2 md:grid-cols-4 gap-4'>
+                <Card className='bg-blue-50 border-blue-100'>
+                  <CardContent className='p-4 flex gap-3 items-center'>
+                    <div className='h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0'>
+                      <BookOpen className='h-5 w-5 text-blue-600' />
                     </div>
-                  ))}
+                    <div>
+                      <p className='text-xs text-blue-700'>Bài học đã học</p>
+                      <p className='text-lg font-semibold text-blue-800'>
+                        {stats.completedLessons}/{stats.totalLessons}
+                      </p>
+                    </div>
+                  </CardContent>
+                </Card>
 
-                {courseData.chapters.flatMap((chapter: any) =>
-                  chapter.lessons.filter((lesson: any) => lesson.lessonStatus === 'COMPLETED')
-                ).length === 0 && (
-                  <div className='px-6 py-8 text-center'>
-                    <BookMarked className='h-10 w-10 text-gray-300 mx-auto mb-2' />
-                    <p className='text-gray-500'>Chưa có bài học nào được hoàn thành</p>
-                  </div>
-                )}
+                <Card className='bg-green-50 border-green-100'>
+                  <CardContent className='p-4 flex gap-3 items-center'>
+                    <div className='h-10 w-10 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0'>
+                      <CheckCheck className='h-5 w-5 text-green-600' />
+                    </div>
+                    <div>
+                      <p className='text-xs text-green-700'>Chương đã hoàn thành</p>
+                      <p className='text-lg font-semibold text-green-800'>
+                        {stats.completedChapters}/{stats.totalChapters}
+                      </p>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                <Card className='bg-amber-50 border-amber-100'>
+                  <CardContent className='p-4 flex gap-3 items-center'>
+                    <div className='h-10 w-10 rounded-full bg-amber-100 flex items-center justify-center flex-shrink-0'>
+                      <Timer className='h-5 w-5 text-amber-600' />
+                    </div>
+                    <div>
+                      <p className='text-xs text-amber-700'>Tổng thời gian học</p>
+                      <p className='text-lg font-semibold text-amber-800'>{courseData.totalLearningTime || '0h 0m'}</p>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                <Card className='bg-purple-50 border-purple-100'>
+                  <CardContent className='p-4 flex gap-3 items-center'>
+                    <div className='h-10 w-10 rounded-full bg-purple-100 flex items-center justify-center flex-shrink-0'>
+                      <Activity className='h-5 w-5 text-purple-600' />
+                    </div>
+                    <div>
+                      <p className='text-xs text-purple-700'>Trạng thái</p>
+                      <p className='text-lg font-semibold text-purple-800'>
+                        {stats.completionPercentage === 100 ? 'Hoàn thành' : 'Đang học'}
+                      </p>
+                    </div>
+                  </CardContent>
+                </Card>
               </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
+            </div>
+          </CardContent>
+        </Card>
 
-        {/* Phần Nội dung khóa học */}
-        <TabsContent value='content'>
-          <Card className='mb-4'>
-            <CardHeader>
-              <CardTitle className='text-xl'>Nội dung khóa học</CardTitle>
-              <CardDescription>Tất cả chương và bài học trong khóa học này</CardDescription>
-            </CardHeader>
-          </Card>
-
-          <div className='px-0 pt-0'>
+        {/* Nội dung khóa học */}
+        <Card className='shadow-sm border'>
+          <CardHeader>
+            <CardTitle className='text-xl'>Nội dung khóa học</CardTitle>
+            <CardDescription>Tất cả chương và bài học trong khóa học này</CardDescription>
+          </CardHeader>
+          <CardContent>
             <Accordion
               type='single'
               collapsible
@@ -498,9 +384,9 @@ export default function ChildCourseDetailPage(props: { params: Promise<{ childId
                 </AccordionItem>
               ))}
             </Accordion>
-          </div>
-        </TabsContent>
-      </Tabs>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   )
 }

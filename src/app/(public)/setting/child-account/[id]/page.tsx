@@ -21,7 +21,7 @@ export default function ChildAccountDetailPage(props: { params: Promise<{ id: st
   const childId = params.id as string
   const [activeTab, setActiveTab] = useState('all')
 
-  const { data, isLoading } = useGetChildAccountById(childId)
+  const { data, isLoading, isFetching } = useGetChildAccountById(childId)
   const childAccount = data?.payload.data
 
   // Tính toán các thống kê cho dashboard
@@ -81,27 +81,7 @@ export default function ChildAccountDetailPage(props: { params: Promise<{ id: st
 
   return (
     <div className='space-y-8'>
-      {/* Back Button và Page Header */}
-      {/* <div className='flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4'>
-        <Link href='/setting/child-account'>
-          <Button variant='outline' size='sm' className='gap-2'>
-            <ArrowLeft className='h-4 w-4' />
-            Quay lại danh sách
-          </Button>
-        </Link>
-      </div> */}
-      <SettingBreadcrumb
-        isLoading={isLoading}
-        items={childAccountBreadcrumbItems}
-        backButton={
-          <Link href={configRoute.setting.childAccount}>
-            <Button variant='outline' size='sm' className='gap-2'>
-              <ArrowLeft className='h-4 w-4' />
-              Quay lại danh sách
-            </Button>
-          </Link>
-        }
-      />
+      <SettingBreadcrumb isLoading={isLoading} items={childAccountBreadcrumbItems} />
 
       {/* Loading State */}
       {isLoading ? (
@@ -151,6 +131,7 @@ export default function ChildAccountDetailPage(props: { params: Promise<{ id: st
               {courseByChildTabs.map((tab: any) => (
                 <TabsContent key={tab.value} value={tab.value} className='mt-0'>
                   <CourseCardList
+                    isCourseLoading={isFetching}
                     courses={getFilteredCourses()}
                     emptyState={
                       <EmptyCourses

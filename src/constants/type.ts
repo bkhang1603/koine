@@ -104,3 +104,27 @@ export const RefundStatus = {
 } as const
 
 export const RefundStatusValues = [RefundStatus.REFUND_REQUEST, RefundStatus.REFUNDING, RefundStatus.REFUNDED] as const
+
+export const TicketType = {
+  COURSE: 'COURSE',
+  PRODUCT: 'PRODUCT',
+  ORDER: 'ORDER',
+  BLOG: 'BLOG',
+  GUEST: 'GUEST'
+} as const
+
+export const TicketTypeValues = [
+  TicketType.COURSE,
+  TicketType.PRODUCT,
+  TicketType.ORDER,
+  TicketType.BLOG,
+  TicketType.GUEST
+] as const
+
+export const ReportType = {
+  COURSE: 'COURSE',
+  BLOG: 'BLOG',
+  LECTURER: 'LECTURER '
+} as const
+
+export const ReportTypeValues = [ReportType.COURSE, ReportType.BLOG, ReportType.LECTURER] as const

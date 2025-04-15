@@ -5,7 +5,18 @@ import { Input } from '@/components/ui/input'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { Search, Clock, Calendar, AlertTriangle, Wallet, RefreshCw } from 'lucide-react'
+import {
+  Search,
+  Clock,
+  Calendar,
+  AlertTriangle,
+  Wallet,
+  RefreshCw,
+  CheckCircle,
+  Book,
+  Package,
+  Boxes
+} from 'lucide-react'
 import { Separator } from '@/components/ui/separator'
 import { useGetRefundOrders } from '@/queries/useOrder'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -219,24 +230,83 @@ export default function RefundPage() {
                         </div>
                         <div className='flex items-center gap-1'>
                           <Clock className='h-4 w-4' />
-                          <span>Yêu cầu: {formatDate(order.refundRequestDate)}</span>
+                          <span>Yêu cầu hoàn tiền: {formatDate(order.refundRequestDate)}</span>
                         </div>
+                        {order.refundProcessedDate && (
+                          <div className='flex items-center gap-1'>
+                            <CheckCircle className='h-4 w-4' />
+                            <span>Xử lý: {formatDate(order.refundProcessedDate)}</span>
+                          </div>
+                        )}
                       </div>
                     </div>
                   </div>
 
                   <Separator />
 
+                  {/* Thông tin sản phẩm hoàn tiền */}
+                  {order.orderDetails && order.orderDetails.length > 0 && (
+                    <div className='space-y-3'>
+                      <div className='text-sm font-medium'>Sản phẩm yêu cầu hoàn tiền</div>
+                      <div className='space-y-3'>
+                        {order.orderDetails.map((item) => (
+                          <div
+                            key={item.id}
+                            className='p-3 bg-muted/20 rounded-lg border border-muted flex items-center gap-3'
+                          >
+                            <div className='flex-1'>
+                              {item.courseId ? (
+                                <div className='flex items-center gap-1'>
+                                  <Book className='h-4 w-4 text-primary' />
+                                  <span className='font-medium'>Khóa học</span>
+                                </div>
+                              ) : item.productId ? (
+                                <div className='flex items-center gap-1'>
+                                  <Package className='h-4 w-4 text-primary' />
+                                  <span className='font-medium'>Sản phẩm</span>
+                                </div>
+                              ) : item.comboId ? (
+                                <div className='flex items-center gap-1'>
+                                  <Boxes className='h-4 w-4 text-primary' />
+                                  <span className='font-medium'>Combo</span>
+                                </div>
+                              ) : null}
+                              <div className='mt-1 text-sm text-muted-foreground'>
+                                Số lượng: {item.quantity} | Giá: {formatPrice(item.totalPrice)}
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
                   {/* Thông tin yêu cầu */}
                   <div className='space-y-4'>
                     <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+                      {/* Chỉ hiển thị thông tin người nhận khi có ít nhất một sản phẩm vật lý */}
+                      {order.orderDetails && order.orderDetails.some((item) => item.productId) && (
+                        <div>
+                          <div className='text-sm font-medium text-muted-foreground mb-1'>Thông tin nhận hàng</div>
+                          <p className='font-medium text-slate-800'>{order.delivery?.name || 'N/A'}</p>
+                          {order.delivery?.phone && (
+                            <p className='text-sm text-slate-600 mt-1'>{order.delivery.phone}</p>
+                          )}
+                          {order.delivery?.address && (
+                            <p className='text-sm text-slate-600 mt-1 line-clamp-2'>{order.delivery.address}</p>
+                          )}
+                        </div>
+                      )}
                       <div>
-                        <div className='text-sm font-medium text-muted-foreground mb-1'>Người yêu cầu</div>
-                        <p className='font-medium text-slate-800'>{order.delivery?.name || 'N/A'}</p>
-                      </div>
-                      <div>
-                        <div className='text-sm font-medium text-muted-foreground mb-1'>Mã thanh toán</div>
-                        <p className='font-medium text-slate-800'>#{order.payment?.id || 'N/A'}</p>
+                        <div className='text-sm font-medium text-muted-foreground mb-1'>Thông tin thanh toán</div>
+                        <p className='font-medium text-slate-800'>
+                          {order.payment?.payMethod === 'COD' ? 'Thanh toán khi nhận hàng' : 'Chuyển khoản ngân hàng'}
+                        </p>
+                        {order.payment?.payDate && (
+                          <p className='text-sm text-slate-600 mt-1'>
+                            Ngày thanh toán: {formatDate(order.payment.payDate)}
+                          </p>
+                        )}
                       </div>
                     </div>
 
@@ -246,6 +316,15 @@ export default function RefundPage() {
                         <p className='text-slate-700'>{order.refundReason || 'Không có lý do'}</p>
                       </div>
                     </div>
+
+                    {order.refundNote && (
+                      <div>
+                        <div className='text-sm font-medium text-muted-foreground mb-1'>Ghi chú từ cửa hàng</div>
+                        <div className='p-3 bg-primary/5 rounded-md border border-primary/20'>
+                          <p className='text-slate-700'>{order.refundNote}</p>
+                        </div>
+                      </div>
+                    )}
                   </div>
 
                   <Separator />
@@ -257,10 +336,10 @@ export default function RefundPage() {
                       <div className='flex items-center gap-1.5'>
                         <div
                           className={`w-2 h-2 rounded-full ${
-                            order.status === 'COMPLETED' || order.status === 'REFUNDED'
+                            order.status === 'REFUNDED'
                               ? 'bg-green-500'
-                              : order.status === 'CANCELLED' || order.status === 'FAILED'
-                                ? 'bg-red-500'
+                              : order.status === 'REFUNDING'
+                                ? 'bg-blue-500'
                                 : 'bg-yellow-500'
                           }`}
                         />

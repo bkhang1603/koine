@@ -230,7 +230,19 @@ export const useGetChildProfileQuery = ({ enabled }: { enabled?: boolean }) => {
 
 export const useGetMyOrdersReviews = () => {
   return useQuery({
-    queryKey: ['my-orders-reviews'],
+    queryKey: ['list-order-need-review'],
     queryFn: accountApiRequest.getMyOrdersReviews
+  })
+}
+
+export const useCreateTicketMutation = () => {
+  return useMutation({
+    mutationFn: accountApiRequest.createTicket
+  })
+}
+
+export const useCreateReportMutation = () => {
+  return useMutation({
+    mutationFn: accountApiRequest.createReport
   })
 }

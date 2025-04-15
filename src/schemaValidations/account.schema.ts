@@ -1,4 +1,4 @@
-import { RoleValues, GenderValues, OrderTypeValues } from '@/constants/type'
+import { RoleValues, GenderValues, OrderTypeValues, TicketTypeValues, ReportTypeValues } from '@/constants/type'
 import z from 'zod'
 
 export const accountRes = z.object({
@@ -552,6 +552,19 @@ export const myOrdersReviewsRes = z.object({
   statusCode: z.number()
 })
 
+export const createTicketBody = z.object({
+  type: z.enum(TicketTypeValues),
+  objectId: z.string(),
+  content: z.string()
+})
+
+export const createReportBody = z.object({
+  type: z.enum(ReportTypeValues),
+  reportedEntityId: z.string(),
+  reasonId: z.string(),
+  reasonDetail: z.string()
+})
+
 export type AccountResType = z.TypeOf<typeof accountRes>
 
 export type CourseByAccountResType = z.TypeOf<typeof courseByAccountRes>
@@ -595,3 +608,7 @@ export type CreateOrderNeedReviewBodyType = z.TypeOf<typeof createOrderNeedRevie
 export type ProfileChildResType = z.TypeOf<typeof profileChildRes>
 
 export type MyOrdersReviewsResType = z.TypeOf<typeof myOrdersReviewsRes>
+
+export type CreateTicketBodyType = z.TypeOf<typeof createTicketBody>
+
+export type CreateReportBodyType = z.TypeOf<typeof createReportBody>

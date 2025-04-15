@@ -192,7 +192,7 @@ export function ReviewProductDialog({ itemId, itemType, orderDetailId }: ReviewP
             size='sm'
             onClick={handleReview}
             disabled={rating === 0 || createReviewMutation.isPending}
-            className={`h-9 ${rating ? 'bg-gray-900 hover:bg-gray-800' : 'bg-gray-200'} text-white`}
+            className={`h-9 ${rating ? 'bg-primary hover:bg-primary/80' : 'bg-gray-200'} text-white`}
           >
             {createReviewMutation.isPending ? 'Đang gửi...' : 'Gửi đánh giá'}
           </Button>
