@@ -8,18 +8,18 @@ import {
 } from '@/schemaValidations/course.schema'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 
-export const useEnrollCourseMutation = () => {
-  const queryClient = useQueryClient()
+// export const useEnrollCourseMutation = () => {
+//   const queryClient = useQueryClient()
 
-  return useMutation({
-    mutationFn: courseApiRequest.enrollCourse,
-    onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: ['userCourses']
-      })
-    }
-  })
-}
+//   return useMutation({
+//     mutationFn: courseApiRequest.enrollCourse,
+//     onSuccess: () => {
+//       queryClient.invalidateQueries({
+//         queryKey: ['userCourses']
+//       })
+//     }
+//   })
+// }
 
 export const useGetUserCoursesQuery = ({ enabled }: { enabled?: boolean }) => {
   return useQuery({

@@ -103,7 +103,7 @@ export default function ReportCourseButton({ courseId, courseName }: ReportCours
         <DialogHeader>
           <DialogTitle>Báo cáo khóa học</DialogTitle>
           <DialogDescription>
-            Báo cáo khóa học "{courseName}" vì lý do vi phạm. Chúng tôi sẽ xem xét báo cáo của bạn.
+            Báo cáo khóa học &quot;{courseName}&quot; vì lý do vi phạm. Chúng tôi sẽ xem xét báo cáo của bạn.
           </DialogDescription>
         </DialogHeader>
 

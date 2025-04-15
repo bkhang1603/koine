@@ -88,15 +88,15 @@ const courseApiRequest = {
   addCourse: (data: CreateCourseBodyType) => http.post<CreateCourseBodyResType>('/courses', data),
   updateCourse: (id: string, data: CreateCourseBodyType) => http.put<CreateCourseBodyResType>(`/courses/${id}`, data),
   deleteCourse: (id: string) => http.delete<OnlyMessageResType>(`/courses/${id}`),
-  enrollCourse: (body: { courseId: string; childId?: string | null }) =>
-    http.post<OnlyMessageResType>(`/courses/active-course-enroll`, body),
+  // enrollCourse: (body: { courseId: string; childId?: string | null }) =>
+  //   http.post<OnlyMessageResType>(`/courses/active-course-enroll`, body),
   getUserCourses: () => http.get<UserCoursesResType>('/course-enrollment/enrolled'),
   updateCourseProgress: (lessonId: string) => http.post<OnlyMessageResType>('/user-progresses', { lessonId }),
   // getCategoryCourses: () => http.get<CategoryCoursesResType>(`/category-courses`),
   // getCategoryCourses with caching
   getCategoryCoursesCache: () =>
     http.get<CategoryCoursesResType>(`/category-courses`, { cache: 'force-cache', next: { revalidate: 24 * 60 * 60 } }),
-  activeCourse: (data: { childId?: string | null; courseId: string | null }) =>
+  activeCourse: (data: { childId?: string | null; courseId: string }) =>
     http.post<OnlyMessageResType>(`/courses/active-course-enroll`, data),
   getCourseProgress: (id: string) => http.get<UserCourseProgressResType>(`/user-progresses/status/${id}`),
   getChapters: (id: string) => http.get<ChaptersResType>(`/chapters/${id}`),

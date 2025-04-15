@@ -1,5 +1,5 @@
 import courseApiRequest from '@/apiRequests/course'
-import { FileText, Video, MonitorPlay, Clock, Users2, BarChart, PlayCircle, HelpCircle, Flag } from 'lucide-react'
+import { FileText, Video, MonitorPlay, Clock, Users2, BarChart, HelpCircle } from 'lucide-react'
 import Image from 'next/image'
 import { Card } from '@/components/ui/card'
 import EnrollButton from '@/components/public/parent/course/enroll-button'

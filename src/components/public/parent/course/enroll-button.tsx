@@ -4,10 +4,9 @@ import { Button } from '@/components/ui/button'
 import { GraduationCap } from 'lucide-react'
 import { useAuthModal } from '@/components/auth/auth-modal-provider'
 import { useAppStore } from '@/components/app-provider'
-import { useEnrollCourseMutation, useGetUserCoursesQuery } from '@/queries/useCourse'
+import { useActiveCourseMutation, useGetUserCoursesQuery } from '@/queries/useCourse'
 import { toast } from '@/components/ui/use-toast'
 import { handleErrorApi } from '@/lib/utils'
-import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 
 interface EnrollButtonProps {
@@ -18,8 +17,7 @@ interface EnrollButtonProps {
 export default function EnrollButton({ id, className }: EnrollButtonProps) {
   const isAuth = useAppStore((state) => state.isAuth)
   const { showLoginModal } = useAuthModal()
-  const enrollMutation = useEnrollCourseMutation()
-  const router = useRouter()
+  const enrollMutation = useActiveCourseMutation()
 
   // Check if the course is already enrolled and free
   const { data } = useGetUserCoursesQuery({ enabled: isAuth })

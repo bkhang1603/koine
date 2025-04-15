@@ -1,6 +1,5 @@
 'use client'
 
-import * as React from 'react'
 import { format, startOfMonth, subMonths, subYears, addDays, isAfter, isFuture } from 'date-fns'
 import { CalendarIcon, ChevronDown } from 'lucide-react'
 import { DateRange, DayPicker } from 'react-day-picker'
@@ -11,6 +10,7 @@ import { Button } from '@/components/ui/button'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 
 import 'react-day-picker/dist/style.css'
+import { useCallback, useEffect, useState } from 'react'
 
 export type { DateRange }
 
@@ -35,16 +35,16 @@ export function DateRangePicker({
   onRangeTypeChange,
   initialSelectedOption = '3_MONTH'
 }: DateRangePickerProps) {
-  const [isOpen, setIsOpen] = React.useState(false)
-  const [showCalendar, setShowCalendar] = React.useState(false)
+  const [isOpen, setIsOpen] = useState(false)
+  const [showCalendar, setShowCalendar] = useState(false)
 
   // Initialize selectedOption from props or default to 3_MONTH
-  const [selectedOption, setSelectedOption] = React.useState<SelectedOptionType>(
+  const [selectedOption, setSelectedOption] = useState<SelectedOptionType>(
     initialSelectedOption === 'DAY' ? 'CUSTOM' : initialSelectedOption
   )
 
   // Initialize with default range on first render if needed
-  React.useEffect(() => {
+  useEffect(() => {
     if (!value?.from && !value?.to) {
       const today = new Date()
       let fromDate: Date
@@ -81,14 +81,14 @@ export function DateRangePicker({
   }, [onChange, initialSelectedOption, value?.from, value?.to])
 
   // Update selected option when initialSelectedOption changes
-  React.useEffect(() => {
+  useEffect(() => {
     if (initialSelectedOption) {
       setSelectedOption(initialSelectedOption === 'DAY' ? 'CUSTOM' : initialSelectedOption)
     }
   }, [initialSelectedOption])
 
   // Function to check if a date is disabled
-  const isDateDisabled = React.useCallback(
+  const isDateDisabled = useCallback(
     (date: Date) => {
       // Disable future dates
       if (isFuture(date)) {

@@ -8,7 +8,6 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Progress } from '@/components/ui/progress'
 import { Badge } from '@/components/ui/badge'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import {
   BookOpen,
   Clock,
@@ -17,19 +16,14 @@ import {
   ChevronRight,
   PlayCircle,
   FileText,
-  BookMarked,
   BarChart3,
   Timer,
   Calendar as CalendarIcon,
-  BarChart,
   CheckCheck,
   Activity
 } from 'lucide-react'
 import Link from 'next/link'
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion'
-import { Switch } from '@/components/ui/switch'
-import { Label } from '@/components/ui/label'
-import { toast } from '@/components/ui/use-toast'
 import { CoursesDetailSkeleton } from '@/components/public/parent/setting/child-account/detail/course/course-detail-skeleton'
 import { cn } from '@/lib/utils'
 import { useGetCourseDetailForChild } from '@/queries/useAccount'
@@ -44,20 +38,6 @@ export default function ChildCourseDetailPage(props: { params: Promise<{ childId
   const courseData = data?.payload.data || null
 
   const [activeChapter, setActiveChapter] = useState<string | null>(null)
-  const [activeTab, setActiveTab] = useState('overview')
-
-  // Xử lý việc toggle quyền truy cập
-  const handleToggleAccess = () => {
-    // API call sẽ được xử lý tại đây
-    if (!courseData) return
-    const newAccessState = !courseData.isAccessibleByChild
-
-    // Hiển thị thông báo
-    toast({
-      description: `Khóa học đã được ${newAccessState ? 'cho phép' : 'chặn'} truy cập`,
-      variant: newAccessState ? 'default' : 'destructive'
-    })
-  }
 
   // Format thời gian
   const formatDate = (dateString: string) => {
