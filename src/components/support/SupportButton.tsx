@@ -12,13 +12,35 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import * as z from 'zod'
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
+import { toast } from '@/components/ui/use-toast'
+import { useCreateTicketMutation } from '@/queries/useAccount'
+import { TicketType } from '@/constants/type'
+import { handleErrorApi } from '@/lib/utils'
 
 // Define form validation schema with Zod
 const formSchema = z.object({
-  name: z.string().min(2, { message: 'Họ tên phải có ít nhất 2 ký tự' }),
-  email: z.string().email({ message: 'Email không hợp lệ' }),
-  phone: z.string().min(10, { message: 'Số điện thoại không hợp lệ' }),
-  message: z.string().min(10, { message: 'Nội dung cần ít nhất 10 ký tự' })
+  name: z
+    .string()
+    .min(2, { message: 'Họ tên phải có ít nhất 2 ký tự' })
+    .max(50, { message: 'Họ tên không được vượt quá 50 ký tự' })
+    .refine((value) => /^[^\d!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]*$/.test(value), {
+      message: 'Họ tên không được chứa số hoặc ký tự đặc biệt'
+    }),
+  email: z
+    .string()
+    .email({ message: 'Email không hợp lệ' })
+    .max(100, { message: 'Email không được vượt quá 100 ký tự' }),
+  phone: z
+    .string()
+    .min(10, { message: 'Số điện thoại phải có ít nhất 10 ký tự' })
+    .max(15, { message: 'Số điện thoại không được vượt quá 15 ký tự' })
+    .refine((value) => /^(0|\+84)[0-9]{9,10}$/.test(value), {
+      message: 'Số điện thoại không hợp lệ. Định dạng 0xxxxxxxxx hoặc +84xxxxxxxxx'
+    }),
+  content: z
+    .string()
+    .min(10, { message: 'Nội dung cần ít nhất 10 ký tự' })
+    .max(500, { message: 'Nội dung không được vượt quá 500 ký tự' })
 })
 
 type FormValues = z.infer<typeof formSchema>
@@ -26,7 +48,7 @@ type FormValues = z.infer<typeof formSchema>
 const SupportButton = () => {
   const [isOpen, setIsOpen] = useState(false)
   const [isTicketFormOpen, setIsTicketFormOpen] = useState(false)
-  const [isSubmitting, setIsSubmitting] = useState(false)
+  const createTicketMutation = useCreateTicketMutation()
 
   // Initialize form
   const form = useForm<FormValues>({
@@ -35,7 +57,7 @@ const SupportButton = () => {
       name: '',
       email: '',
       phone: '',
-      message: ''
+      content: ''
     }
   })
 
@@ -52,22 +74,25 @@ const SupportButton = () => {
   }
 
   const onSubmit = async (data: FormValues) => {
-    setIsSubmitting(true)
     try {
-      // Here you would send the data to your API
-      console.log('Form data:', data)
+      await createTicketMutation.mutateAsync({
+        type: TicketType.GUEST,
+        name: data.name,
+        email: data.email,
+        phone: data.phone,
+        objectId: null,
+        content: data.content
+      })
 
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1000))
+      toast({
+        description: 'Yêu cầu hỗ trợ đã được gửi thành công!'
+      })
 
-      // Success handling
-      alert('Yêu cầu hỗ trợ đã được gửi thành công!')
       form.reset()
+      setIsOpen(false)
       setIsTicketFormOpen(false)
     } catch (error) {
-      console.error('Error submitting form:', error)
-    } finally {
-      setIsSubmitting(false)
+      handleErrorApi({ error })
     }
   }
 
@@ -169,7 +194,7 @@ const SupportButton = () => {
                     />
                     <FormField
                       control={form.control}
-                      name='message'
+                      name='content'
                       render={({ field }) => (
                         <FormItem className='space-y-2'>
                           <FormLabel>Nội dung</FormLabel>
@@ -180,8 +205,8 @@ const SupportButton = () => {
                         </FormItem>
                       )}
                     />
-                    <Button className='w-full' type='submit' disabled={isSubmitting}>
-                      {isSubmitting ? 'Đang gửi...' : 'Gửi yêu cầu'}
+                    <Button className='w-full' type='submit' disabled={createTicketMutation.isPending}>
+                      {createTicketMutation.isPending ? 'Đang gửi...' : 'Gửi yêu cầu'}
                     </Button>
                   </form>
                 </Form>

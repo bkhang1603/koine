@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
@@ -14,11 +14,13 @@ import {
 import { Textarea } from '@/components/ui/textarea'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Label } from '@/components/ui/label'
+import { Input } from '@/components/ui/input'
 import { useCreateRefundOrderMutation } from '@/queries/useOrder'
+import { useUploadImageMutation } from '@/queries/useUpload'
 import { handleErrorApi } from '@/lib/utils'
 import { toast } from '@/components/ui/use-toast'
 import Image from 'next/image'
-import { Book, Package, Boxes, AlertCircle } from 'lucide-react'
+import { Book, Package, Boxes, AlertCircle, X, ImageIcon } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 interface RefundOrderDialogProps {
@@ -41,8 +43,12 @@ export function RefundOrderDialog({ orderId, orderDetails }: RefundOrderDialogPr
   const [open, setOpen] = useState(false)
   const [selectedItems, setSelectedItems] = useState<Array<{ id: string; reason: string }>>([])
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [images, setImages] = useState<File[]>([])
+  const [previewUrls, setPreviewUrls] = useState<string[]>([])
+  const fileInputRef = useRef<HTMLInputElement>(null)
 
   const createRefundOrderMutation = useCreateRefundOrderMutation()
+  const uploadImageMutation = useUploadImageMutation()
 
   const handleItemSelect = (itemId: string) => {
     setSelectedItems((prev) => {
@@ -56,6 +62,30 @@ export function RefundOrderDialog({ orderId, orderDetails }: RefundOrderDialogPr
 
   const handleItemReasonChange = (itemId: string, reason: string) => {
     setSelectedItems((prev) => prev.map((item) => (item.id === itemId ? { ...item, reason } : item)))
+  }
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || [])
+    if (files.length === 0) return
+
+    // Limit to 5 images max
+    const newFiles = [...images, ...files].slice(0, 5)
+    setImages(newFiles)
+
+    // Generate preview URLs for the images
+    const newPreviewUrls = newFiles.map((file) => URL.createObjectURL(file))
+    setPreviewUrls(newPreviewUrls)
+  }
+
+  const handleRemoveImage = (index: number) => {
+    const newImages = [...images]
+    newImages.splice(index, 1)
+    setImages(newImages)
+
+    const newPreviewUrls = [...previewUrls]
+    URL.revokeObjectURL(newPreviewUrls[index]) // Clean up URL
+    newPreviewUrls.splice(index, 1)
+    setPreviewUrls(newPreviewUrls)
   }
 
   const handleSubmit = async () => {
@@ -79,6 +109,20 @@ export function RefundOrderDialog({ orderId, orderDetails }: RefundOrderDialogPr
 
       setIsSubmitting(true)
 
+      // Upload images if there are any
+      let imageUrls: string[] = []
+      if (images.length > 0) {
+        const formData = new FormData()
+        images.forEach((image) => {
+          formData.append('images', image)
+        })
+
+        const result = await uploadImageMutation.mutateAsync(formData)
+        if (result.payload.data) {
+          imageUrls = Array.isArray(result.payload.data) ? result.payload.data : [result.payload.data]
+        }
+      }
+
       await createRefundOrderMutation.mutateAsync({
         orderId,
         body: {
@@ -87,7 +131,8 @@ export function RefundOrderDialog({ orderId, orderDetails }: RefundOrderDialogPr
             orderDetailId: item.id,
             quantity: 1,
             reason: item.reason.trim()
-          }))
+          })),
+          imageUrls: imageUrls
         }
       })
 
@@ -95,8 +140,13 @@ export function RefundOrderDialog({ orderId, orderDetails }: RefundOrderDialogPr
         description: 'Yêu cầu hoàn tiền đã được gửi thành công'
       })
 
+      // Clean up image preview URLs
+      previewUrls.forEach((url) => URL.revokeObjectURL(url))
+
       setOpen(false)
       setSelectedItems([])
+      setImages([])
+      setPreviewUrls([])
     } catch (error) {
       handleErrorApi({ error })
     } finally {
@@ -219,6 +269,53 @@ export function RefundOrderDialog({ orderId, orderDetails }: RefundOrderDialogPr
                   </div>
                 )
               })}
+            </div>
+          </div>
+
+          {/* Image upload section */}
+          <div className='space-y-2 pt-4 border-t'>
+            <Label className='text-sm font-medium'>Hình ảnh minh chứng</Label>
+            <p className='text-xs text-muted-foreground mb-2'>
+              Bạn có thể đính kèm tối đa 5 ảnh để minh chứng cho yêu cầu hoàn tiền
+            </p>
+
+            <div className='grid grid-cols-5 gap-2'>
+              {previewUrls.map((url, index) => (
+                <div key={index} className='relative aspect-square rounded-md overflow-hidden border'>
+                  <Image src={url} alt={`Preview ${index + 1}`} fill className='object-cover' />
+                  <Button
+                    type='button'
+                    variant='destructive'
+                    size='icon'
+                    className='absolute top-1 right-1 h-5 w-5 rounded-full p-0'
+                    onClick={() => handleRemoveImage(index)}
+                  >
+                    <X className='h-3 w-3' />
+                  </Button>
+                </div>
+              ))}
+
+              {previewUrls.length < 5 && (
+                <div className='relative'>
+                  <Button
+                    type='button'
+                    onClick={() => fileInputRef.current?.click()}
+                    variant='outline'
+                    className='h-full w-full aspect-square flex flex-col items-center justify-center border-dashed gap-1 border-2'
+                  >
+                    <ImageIcon className='h-6 w-6 text-gray-400' />
+                    <span className='text-xs text-gray-500'>Thêm ảnh</span>
+                  </Button>
+                  <Input
+                    ref={fileInputRef}
+                    type='file'
+                    accept='image/*'
+                    multiple
+                    className='hidden'
+                    onChange={handleFileChange}
+                  />
+                </div>
+              )}
             </div>
           </div>
         </div>

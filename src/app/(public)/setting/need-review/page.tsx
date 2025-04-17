@@ -188,7 +188,7 @@ function NeedReviewPage() {
       <Tabs defaultValue='all' value={activeTab} onValueChange={setActiveTab}>
         <TabsList className='grid w-full sm:w-auto grid-cols-4 h-10'>
           <TabsTrigger value='all' className='text-xs sm:text-sm'>
-            Tất cả <span className='ml-1 text-xs font-medium text-gray-500'>({reviewList.length})</span>
+            Chưa đánh giá <span className='ml-1 text-xs font-medium text-gray-500'>({reviewList.length})</span>
           </TabsTrigger>
           <TabsTrigger value='course' className='text-xs sm:text-sm'>
             Khóa học <span className='ml-1 text-xs font-medium text-gray-500'>({courseCount})</span>

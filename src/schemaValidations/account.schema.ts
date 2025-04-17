@@ -554,7 +554,10 @@ export const myOrdersReviewsRes = z.object({
 
 export const createTicketBody = z.object({
   type: z.enum(TicketTypeValues),
-  objectId: z.string(),
+  name: z.string(),
+  email: z.string(),
+  phone: z.string(),
+  objectId: z.string().nullable(),
   content: z.string()
 })
 

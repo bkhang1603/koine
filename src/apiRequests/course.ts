@@ -31,7 +31,8 @@ import {
   CreateLessonBodyType,
   UpdateLessonBodyType,
   UpdateChapterBodyType,
-  CreateChapterBodyType
+  CreateChapterBodyType,
+  CourseComboDetailResType
 } from '@/schemaValidations/course.schema'
 import { OnlyMessageResType } from '@/schemaValidations/special.schema'
 
@@ -90,6 +91,7 @@ const courseApiRequest = {
   deleteCourse: (id: string) => http.delete<OnlyMessageResType>(`/courses/${id}`),
   // enrollCourse: (body: { courseId: string; childId?: string | null }) =>
   //   http.post<OnlyMessageResType>(`/courses/active-course-enroll`, body),
+  getCourseComboDetail: (id: string) => http.get<CourseComboDetailResType>(`/combos/${id}`),
   getUserCourses: () => http.get<UserCoursesResType>('/course-enrollment/enrolled'),
   updateCourseProgress: (lessonId: string) => http.post<OnlyMessageResType>('/user-progresses', { lessonId }),
   // getCategoryCourses: () => http.get<CategoryCoursesResType>(`/category-courses`),

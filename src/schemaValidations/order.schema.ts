@@ -161,62 +161,73 @@ export const rePurchaseOrderRes = z.object({
   message: z.string()
 })
 
-export const refundOrder = z.object({
-  isDeleted: z.boolean(),
-  createdAt: z.string(),
-  updatedAt: z.string(),
-  id: z.string(),
-  userId: z.string(),
-  orderDate: z.string(),
-  orderCode: z.number(),
-  totalAmount: z.number(),
-  deliMethod: z.enum(DeliveryMethodValues),
-  deliAmount: z.number(),
-  status: z.enum(OrderStatusValues),
-  note: z.string(),
-  expiredAt: z.string(),
-  refundRequestDate: z.string(),
-  refundReason: z.string(),
-  refundProcessedDate: z.string(),
-  refundNote: z.string(),
-  orderDetails: z.array(
-    z.object({
+export const refundOrder = z
+  .object({
+    id: z.string(),
+    userId: z.string(),
+    orderDate: z.string(),
+    orderCode: z.number(),
+    totalAmount: z.number(),
+    deliMethod: z.enum(DeliveryMethodValues),
+    deliAmount: z.number(),
+    status: z.enum(OrderStatusValues),
+    note: z.string(),
+    expiredAt: z.string(),
+    orderCodeFormatted: z.string(),
+    orderDateFormatted: z.string(),
+    refundRequestDate: z.string(),
+    refundRequestDateFormatted: z.string(),
+    refundReason: z.string(),
+    refundProcessedDate: z.string(),
+    refundProcessedDateFormatted: z.string(),
+    refundNote: z.string(),
+    orderDetails: z.array(
+      z.object({
+        id: z.string(),
+        orderId: z.string(),
+        productId: z.string(),
+        courseId: z.string(),
+        comboId: z.string(),
+        quantity: z.number(),
+        unitPrice: z.number(),
+        discount: z.number(),
+        totalPrice: z.number(),
+        itemName: z.string(),
+        itemDescription: z.string(),
+        itemImageUrl: z.string(),
+        itemType: z.string()
+      })
+    ),
+    payment: z.object({
       isDeleted: z.boolean(),
       createdAt: z.string(),
       updatedAt: z.string(),
       id: z.string(),
       orderId: z.string(),
-      productId: z.string(),
-      courseId: z.string(),
-      comboId: z.string(),
-      quantity: z.number(),
-      unitPrice: z.number(),
-      discount: z.number(),
-      totalPrice: z.number()
-    })
-  ),
-  payment: z.object({
-    isDeleted: z.boolean(),
-    createdAt: z.string(),
-    updatedAt: z.string(),
-    id: z.string(),
-    orderId: z.string(),
-    payMethod: z.enum(PaymentMethodValues),
-    payDate: z.string(),
-    payAmount: z.number(),
-    payStatus: z.enum(OrderStatusValues)
-  }),
-  delivery: z.object({
-    isDeleted: z.boolean(),
-    createdAt: z.string(),
-    updatedAt: z.string(),
-    id: z.string(),
-    orderId: z.string(),
-    name: z.string(),
-    phone: z.string(),
-    address: z.string()
+      payMethod: z.enum(PaymentMethodValues),
+      payDate: z.string(),
+      payAmount: z.number(),
+      payStatus: z.enum(OrderStatusValues)
+    }),
+    delivery: z.object({
+      isDeleted: z.boolean(),
+      createdAt: z.string(),
+      updatedAt: z.string(),
+      id: z.string(),
+      orderId: z.string(),
+      name: z.string(),
+      phone: z.string(),
+      address: z.string()
+    }),
+    orderStatusHistory: z.array(
+      z.object({
+        status: z.enum(OrderStatusValues),
+        timestamp: z.string(),
+        timestampFormatted: z.string()
+      })
+    )
   })
-})
+  .strict()
 
 export const refundOrderRes = z.object({
   data: z.array(refundOrder),
@@ -239,7 +250,8 @@ export const createRefundOrderBody = z.object({
       quantity: z.number(),
       reason: z.string()
     })
-  )
+  ),
+  imageUrls: z.array(z.string()).optional()
 })
 
 export const createRefundOrderBodyRes = z.object({
