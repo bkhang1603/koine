@@ -246,3 +246,40 @@ export const useCreateReportMutation = () => {
     mutationFn: accountApiRequest.createReport
   })
 }
+
+export const useUpdateChildProfileMutation = ({ id }: { id: string }) => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: accountApiRequest.updateChildProfile,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['account-profile-child'] })
+      queryClient.invalidateQueries({ queryKey: ['child-account-by-id', id] })
+    }
+  })
+}
+
+export const usePlusGamePointMutation = () => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: accountApiRequest.plusGamePoint,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['account-profile-child'] })
+      queryClient.invalidateQueries({ queryKey: ['top-ranking-kids'] })
+    }
+  })
+}
+
+export const useGetTopRanking = () => {
+  return useQuery({
+    queryKey: ['top-ranking-kids'],
+    queryFn: accountApiRequest.topRanking
+  })
+}
+
+export const useGetMyCertificate = () => {
+  return useQuery({
+    queryKey: ['my-certificate'],
+    queryFn: accountApiRequest.getMyCertificate
+  })
+}

@@ -630,3 +630,10 @@ export type RevenueDataItem = {
   ordersCount: number
   isFilled?: boolean
 }
+
+export const formatLevelForKid = (level: number) => {
+  // Từ 0 đến 100 điểm có tên riêng, trên 500 có tên riêng và trên 1000 có tên riêng và cũng là level cuối cùng. Chỉ có 3 level
+  if (level >= 1000) return 'Nhà thám hiểm chuyên gia'
+  if (level >= 500) return 'Nhà thám hiểm chính thức'
+  return 'Nhà thám hiểm tập sự'
+}

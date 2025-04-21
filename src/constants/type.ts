@@ -100,10 +100,16 @@ export const PaymentMethodValues = [PaymentMethod.BANKING, PaymentMethod.COD] as
 export const RefundStatus = {
   REFUND_REQUEST: 'REFUND_REQUEST',
   REFUNDING: 'REFUNDING',
-  REFUNDED: 'REFUNDED'
+  REFUNDED: 'REFUNDED',
+  CANCELLED: 'REFUND_FAILED'
 } as const
 
-export const RefundStatusValues = [RefundStatus.REFUND_REQUEST, RefundStatus.REFUNDING, RefundStatus.REFUNDED] as const
+export const RefundStatusValues = [
+  RefundStatus.REFUND_REQUEST,
+  RefundStatus.REFUNDING,
+  RefundStatus.REFUNDED,
+  RefundStatus.CANCELLED
+] as const
 
 export const TicketType = {
   COURSE: 'COURSE',
@@ -124,7 +130,21 @@ export const TicketTypeValues = [
 export const ReportType = {
   COURSE: 'COURSE',
   BLOG: 'BLOG',
-  LECTURER: 'LECTURER '
+  PRODUCT: 'PRODUCT'
 } as const
 
-export const ReportTypeValues = [ReportType.COURSE, ReportType.BLOG, ReportType.LECTURER] as const
+export const ReportTypeValues = [ReportType.COURSE, ReportType.BLOG, ReportType.PRODUCT] as const
+
+export const ReturnStatus = {
+  RETURN_REQUEST: 'EXCHANGE_REQUEST',
+  RETURNING: 'EXCHANGING',
+  RETURNED: 'EXCHANGED',
+  CANCELLED: 'EXCHANGE_FAILED'
+} as const
+
+export const ReturnStatusValues = [
+  ReturnStatus.RETURN_REQUEST,
+  ReturnStatus.RETURNING,
+  ReturnStatus.RETURNED,
+  ReturnStatus.CANCELLED
+] as const

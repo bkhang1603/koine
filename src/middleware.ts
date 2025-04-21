@@ -111,6 +111,33 @@ const unAuthPrivatePaths = [...Object.values(roleBasedPaths).flat()]
 
 const unAuthPaths = ['/login', '/register']
 
+// Danh sách đường dẫn chỉ dành cho người dùng ADULT
+const adultOnlyPaths = [
+  '/',
+  '/setting',
+  '/setting/:path*',
+  '/product',
+  '/product/:path*',
+  '/course',
+  '/course/:path*',
+  '/cart',
+  '/checkout',
+  '/event',
+  '/event/:path*',
+  '/knowledge',
+  '/knowledge/:path*',
+  '/contact',
+  '/help/faq'
+]
+
+// Kiểm tra nếu đường dẫn hiện tại thuộc về danh sách chỉ dành cho ADULT
+const isAdultOnlyPath = (pathname: string) => {
+  return adultOnlyPaths.some((path) => {
+    // Kiểm tra chính xác path hoặc nếu path bắt đầu từ đường dẫn cơ sở (ví dụ: /product/123)
+    return pathname === path || (path !== '/' && pathname.startsWith(path + '/')) || (path === '/' && pathname === '/')
+  })
+}
+
 // Hàm decode JWT không cần thư viện
 function decodeJwt(token: string) {
   try {
@@ -187,11 +214,14 @@ export function middleware(request: NextRequest) {
       return NextResponse.rewrite(new URL('/unauthorized', request.url))
     }
 
-    // 2.1 Nếu là role khác ADULT và cố truy cập trang chủ
-    if (pathname === '/' && userRole && userRole !== 'ADULT') {
+    // 2.1 Nếu không phải role ADULT và cố truy cập các trang chỉ dành cho ADULT
+    if (userRole && userRole !== 'ADULT' && isAdultOnlyPath(pathname)) {
       const redirectPath = roleBasedPaths[userRole as keyof typeof roleBasedPaths]?.[0] || '/'
       return NextResponse.redirect(new URL(redirectPath, request.url))
     }
+
+    // Code cũ trước khi sửa
+    // (pathname === '/' && userRole && userRole !== 'ADULT')
   }
 
   // 3. Trường hợp đã đăng nhập
@@ -225,10 +255,17 @@ export const config = {
     '/login',
     '/register',
     '/course',
+    '/course/:path*',
+    '/product',
+    '/product/:path*',
     '/about',
     '/knowledge',
+    '/knowledge/:path*',
+    '/event',
+    '/event/:path*',
     '/contact',
     '/help/faq',
+    '/order/:path*',
 
     // Thêm các đường dẫn giới hạn theo role
     '/setting/:path*',

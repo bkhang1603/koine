@@ -549,7 +549,44 @@ export default function OrderDetailPage(props: { params: Promise<{ id: string }>
               {/* Nút yêu cầu hoàn tiền khi đơn hàng đã hoàn thành */}
               {order.status === 'COMPLETED' && (
                 <div className='pt-2'>
-                  <RefundOrderDialog orderId={order.id} orderDetails={order.orderDetails || []} />
+                  {(() => {
+                    // Tính thời gian đã trôi qua kể từ khi hoàn thành đơn hàng
+                    const completedHistoryEntry = order.orderStatusHistory?.find(
+                      (history) => history.status === OrderStatus.COMPLETED
+                    )
+                    const completedDate = completedHistoryEntry
+                      ? new Date(completedHistoryEntry.timestamp)
+                      : new Date(order.updatedAt)
+
+                    const currentDate = new Date()
+                    const daysPassed = Math.floor(
+                      (currentDate.getTime() - completedDate.getTime()) / (1000 * 60 * 60 * 24)
+                    )
+                    const isWithinRefundPeriod = daysPassed <= 3
+
+                    if (isWithinRefundPeriod) {
+                      return (
+                        <RefundOrderDialog
+                          orderId={order.id}
+                          orderDetails={order.orderDetails || []}
+                          buttonText={hasOnlyCourses ? 'Yêu cầu hoàn tiền' : 'Yêu cầu hoàn tiền/đổi trả'}
+                        />
+                      )
+                    } else {
+                      return (
+                        <div className='p-3 bg-gray-50 border border-gray-200 rounded-md text-sm text-gray-500'>
+                          <div className='flex items-start gap-2'>
+                            <AlertCircle className='h-5 w-5 text-gray-400 flex-shrink-0 mt-0.5' />
+                            <div>
+                              Thời hạn yêu cầu hoàn tiền/đổi trả đã kết thúc. Bạn chỉ được phép yêu cầu trong vòng 3
+                              ngày kể từ khi đơn hàng hoàn thành ({format(completedDate, 'dd/MM/yyyy', { locale: vi })}
+                              ).
+                            </div>
+                          </div>
+                        </div>
+                      )
+                    }
+                  })()}
                 </div>
               )}
             </CardContent>

@@ -9,4 +9,10 @@ const socket = io(envConfig.NEXT_PUBLIC_SOCKET_ENDPOINT, {
   }
 })
 
+export const socketForChat = io(`${envConfig.NEXT_PUBLIC_SOCKET_ENDPOINT}/chat`, {
+  auth: {
+    Authorization: `Bearer ${getAccessTokenFromLocalStorage()}`
+  }
+})
+
 export default socket

@@ -5,7 +5,9 @@ import { Card } from '@/components/ui/card'
 import { Progress } from '@/components/ui/progress'
 import { ArrowLeft, RefreshCw, Rocket, Star, Trophy, Brain, Timer } from 'lucide-react'
 import Link from 'next/link'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
+import { usePlusGamePointMutation } from '@/queries/useAccount'
+import { toast } from '@/components/ui/use-toast'
 
 // Tạo câu hỏi toán học
 const generateQuestion = (level: number) => {
@@ -91,11 +93,43 @@ export default function RocketMathGamePage() {
   const [timeLeft, setTimeLeft] = useState(10)
   const [gameOver, setGameOver] = useState(false)
   const [consecutive, setConsecutive] = useState(0)
+  const [pointsUpdated, setPointsUpdated] = useState(false)
+
+  const plusGamePointMutation = usePlusGamePointMutation()
 
   // Khởi tạo câu hỏi đầu tiên trong useEffect
   useEffect(() => {
     setCurrentQuestion(generateQuestion(level))
   }, [level])
+
+  const handleGameOver = useCallback(() => {
+    setGameOver(true)
+
+    // Cập nhật điểm khi game kết thúc
+    if (!pointsUpdated) {
+      // Giới hạn điểm tối đa là 30 (giảm từ 100)
+      const gamePoints = Math.min(30, Math.floor(score / 5))
+      plusGamePointMutation.mutate(
+        { point: gamePoints },
+        {
+          onSuccess: () => {
+            toast({
+              title: 'Cập nhật điểm thành công',
+              description: `Bạn đã nhận được ${gamePoints} điểm!`
+            })
+            setPointsUpdated(true)
+          },
+          onError: () => {
+            toast({
+              title: 'Không thể cập nhật điểm',
+              description: 'Đã xảy ra lỗi khi cập nhật điểm',
+              variant: 'destructive'
+            })
+          }
+        }
+      )
+    }
+  }, [score, pointsUpdated, plusGamePointMutation])
 
   // Timer countdown
   useEffect(() => {
@@ -113,7 +147,7 @@ export default function RocketMathGamePage() {
     }, 1000)
 
     return () => clearInterval(timer)
-  }, [gameOver])
+  }, [gameOver, handleGameOver])
 
   const handleAnswerSelect = (selectedValue: number) => {
     if (selectedOption !== null) return // Đã chọn đáp án
@@ -167,10 +201,6 @@ export default function RocketMathGamePage() {
     }
   }
 
-  const handleGameOver = () => {
-    setGameOver(true)
-  }
-
   const resetGame = () => {
     setLevel(1)
     setScore(0)
@@ -180,6 +210,7 @@ export default function RocketMathGamePage() {
     setTimeLeft(10)
     setGameOver(false)
     setConsecutive(0)
+    setPointsUpdated(false)
   }
 
   // Kiểm tra currentQuestion trước khi render
@@ -317,7 +348,12 @@ export default function RocketMathGamePage() {
                     <Trophy className='h-10 w-10' />
                   </div>
                   <h2 className='text-2xl font-bold text-slate-800 mb-2'>Hoàn thành!</h2>
-                  <p className='text-slate-600 mb-6'>Tên lửa của bạn đã bay được {rocketProgress}m</p>
+                  <p className='text-slate-600 mb-2'>Tên lửa của bạn đã bay được {rocketProgress}m</p>
+                  {pointsUpdated && (
+                    <p className='text-teal-600 font-medium mb-6'>
+                      Bạn đã nhận được {Math.min(30, Math.floor(score / 5))} điểm
+                    </p>
+                  )}
                   <Button onClick={resetGame} className='bg-teal-500 hover:bg-teal-600 text-white'>
                     <RefreshCw className='w-4 h-4 mr-2' />
                     Chơi lại

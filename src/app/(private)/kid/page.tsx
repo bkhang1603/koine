@@ -14,6 +14,7 @@ import { motion } from 'framer-motion'
 import { AnimatedBackground } from '@/components/private/kid/home/AnimatedBackground'
 import { PlayerCard } from '@/components/private/kid/home/PlayerCard'
 import { AchievementSection } from '@/components/private/kid/home/AchievementSection'
+import { formatLevel } from '@/lib/utils'
 
 // Types
 
@@ -267,7 +268,7 @@ const KidAdventureDashboard = () => {
                       {/* Difficulty level */}
                       <div className='absolute top-3 right-3'>
                         <span className='px-2 py-1 bg-white/80 text-slate-700 text-xs rounded-lg backdrop-blur-sm font-medium'>
-                          {course.level || 'Dễ'}
+                          {formatLevel(course.level || 'BEGINNER')}
                         </span>
                       </div>
                     </div>

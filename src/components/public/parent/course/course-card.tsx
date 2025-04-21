@@ -122,7 +122,10 @@ function CourseCard({ course }: { course: CoursesResType['data'][0] }) {
           <div className='absolute top-2 left-2 flex flex-col gap-1'>
             {/* Combo Badge */}
             {course.isCombo && (
-              <Badge variant='secondary' className='flex items-center gap-1 bg-primary/90 hover:bg-primary'>
+              <Badge
+                variant='secondary'
+                className='flex items-center justify-center gap-1 bg-primary/90 hover:bg-primary'
+              >
                 <Gift className='w-3 h-3' />
                 <span>Combo</span>
               </Badge>
@@ -154,18 +157,18 @@ function CourseCard({ course }: { course: CoursesResType['data'][0] }) {
         <div className='p-2'>
           {/* Categories */}
           <div className='flex flex-wrap gap-1 mb-1.5 min-h-[22px]'>
-            {course.categories.slice(0, 3).map((cat) => (
+            {course.categories.slice(0, 2).map((cat) => (
               <span
                 key={cat.id}
-                className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium border ${getCategoryColor(cat.name)}`}
+                className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium border ${getCategoryColor(cat.name)}`}
               >
                 <Hash className='w-2 h-2 mr-0.5' />
                 {cat.name}
               </span>
             ))}
-            {course.categories.length > 3 && (
-              <span className='inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium bg-gray-100 text-gray-600 border border-gray-200'>
-                +{course.categories.length - 3}
+            {course.categories.length > 2 && (
+              <span className='inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-600 border border-gray-200'>
+                +{course.categories.length - 2}
               </span>
             )}
           </div>

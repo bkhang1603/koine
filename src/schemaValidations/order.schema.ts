@@ -259,6 +259,23 @@ export const createRefundOrderBodyRes = z.object({
   statusCode: z.number()
 })
 
+export const createReturnOrderBody = z.object({
+  reason: z.string(),
+  items: z.array(
+    z.object({
+      orderDetailId: z.string(),
+      quantity: z.number(),
+      reason: z.string()
+    })
+  ),
+  imageUrls: z.array(z.string())
+})
+
+export const createReturnOrderBodyRes = z.object({
+  message: z.string(),
+  statusCode: z.number()
+})
+
 export type OrderBody = z.infer<typeof orderBody>
 
 export type OrderBodyResType = z.TypeOf<typeof orderBodyRes>
@@ -286,3 +303,7 @@ export type RefundOrderResType = z.TypeOf<typeof refundOrderRes>
 export type CreateRefundOrderBody = z.TypeOf<typeof createRefundOrderBody>
 
 export type CreateRefundOrderBodyRes = z.TypeOf<typeof createRefundOrderBodyRes>
+
+export type CreateReturnOrderBody = z.TypeOf<typeof createReturnOrderBody>
+
+export type CreateReturnOrderBodyRes = z.TypeOf<typeof createReturnOrderBodyRes>

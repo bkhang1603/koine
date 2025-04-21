@@ -7,6 +7,7 @@ import { Skeleton } from '@/components/ui/skeleton'
 import images from '@/assets/images'
 import { Badge } from './Badge'
 import { ActionButton } from './ActionButton'
+import { formatLevelForKid } from '@/lib/utils'
 
 interface PlayerCardProps {
   playerName: string
@@ -59,7 +60,7 @@ export const PlayerCard = ({ playerName, loading, childProfile, totalPoints }: P
               <h1 className='text-2xl md:text-3xl font-bold text-slate-800'>Xin chào, {playerName}!</h1>
               <p className='text-slate-600 flex items-center gap-2 justify-center md:justify-start'>
                 <Target className='w-4 h-4 text-blue-500' />
-                <span>Nhà phiêu lưu tập sự</span>
+                <span>{formatLevelForKid(childProfile?.level || 1)}</span>
               </p>
             </div>
 

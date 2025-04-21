@@ -15,7 +15,7 @@ import { Breadcrumb } from '@/components/public/parent/setting/Breadcrumb'
 import configRoute from '@/config/route'
 import { formatDuration } from '@/lib/utils'
 import PreviewButton from '@/components/public/parent/course/preview-button'
-import ReportCourseButton from '@/components/public/parent/course/report-course-button'
+import { ReportCourseButton } from '@/components/public/parent/report-button'
 
 // const formatDuration = (minutes: number) => {
 //   const hours = Math.floor(minutes / 60)
@@ -124,7 +124,7 @@ export default async function CourseDetail(props: {
                     >
                       {courseData.title}
                     </h1>
-                    <ReportCourseButton courseId={courseData.id} courseName={courseData.title} />
+                    <ReportCourseButton courseId={courseData.id} courseName={courseData.title} buttonVariant='icon' />
                   </div>
                   <div>
                     <p className='text-gray-600 text-base sm:text-lg leading-relaxed'>{courseData.description}</p>

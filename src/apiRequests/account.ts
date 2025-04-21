@@ -17,13 +17,17 @@ import {
   CreateTicketBodyType,
   ListChildAccountNeedReviewResType,
   ListChildAccountResType,
+  MyCertificateResType,
   MyChildAccountByIdResType,
   MyChildAccountResType,
   MyOrdersReviewsResType,
+  PlusGamePointBodyType,
   ProfileChildResType,
   RegisterChildAccountBodyType,
   RegisterChildAccountResType,
   SuggestCoursesFreeResType,
+  TopRankingResType,
+  UpdateChildProfileBodyType,
   UpdateVisibleCourseForChildBodyType
 } from '@/schemaValidations/account.schema'
 import { OnlyMessageResType } from '@/schemaValidations/special.schema'
@@ -73,7 +77,12 @@ const accountApiRequest = {
   getChildProfile: () => http.get<ProfileChildResType>('users/profile-child'),
   getMyOrdersReviews: () => http.get<MyOrdersReviewsResType>('/orders/my-reviews'),
   createTicket: (body: CreateTicketBodyType) => http.post<OnlyMessageResType>('/request-supports', body),
-  createReport: (body: CreateReportBodyType) => http.post<OnlyMessageResType>('/reports', body)
+  createReport: (body: CreateReportBodyType) => http.post<OnlyMessageResType>('/reports', body),
+  updateChildProfile: ({ id, body }: { id: string; body: UpdateChildProfileBodyType }) =>
+    http.put<OnlyMessageResType>(`/users/profile/${id}`, body),
+  plusGamePoint: (body: PlusGamePointBodyType) => http.put<OnlyMessageResType>('/users/game-point', body),
+  topRanking: () => http.get<TopRankingResType>('/users/top-game-kids'),
+  getMyCertificate: () => http.get<MyCertificateResType>('/users/my-certificates?page_index=1&page_size=100')
 }
 
 export default accountApiRequest

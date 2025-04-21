@@ -3,11 +3,14 @@
 import { useAppStore } from '@/components/app-provider'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
-import { Progress } from '@/components/ui/progress'
 import { motion } from 'framer-motion'
-import { Brain, Target, Gamepad2, Trophy, Crown, Star, Medal } from 'lucide-react'
+import { Brain, Gamepad2, Trophy, Medal, Star } from 'lucide-react'
 import Link from 'next/link'
 import { PageBanner } from '@/components/shared/PageBanner'
+import { useGetTopRanking } from '@/queries/useAccount'
+import { Skeleton } from '@/components/ui/skeleton'
+import Image from 'next/image'
+import { cn } from '@/lib/utils'
 
 // Game data
 const games = [
@@ -19,27 +22,12 @@ const games = [
     level: 'Dễ',
     category: 'Trí nhớ',
     color: 'from-sky-100 via-blue-200 to-indigo-200',
-    stats: {
-      highScore: 850,
-      gamesPlayed: 12,
-      accuracy: '85%'
-    },
+    benefits: [
+      { icon: '🧠', text: 'Phát triển trí nhớ' },
+      { icon: '👁️', text: 'Rèn tập trung' },
+      { icon: '⏱️', text: 'Phản xạ nhanh' }
+    ],
     link: '/kid/game/memory'
-  },
-  {
-    id: 'quiz',
-    title: 'Quiz Challenge',
-    description: 'Thử thách kiến thức với câu đố thú vị',
-    icon: '🎯',
-    level: 'Trung bình',
-    category: 'Kiến thức',
-    color: 'from-emerald-100 via-green-200 to-teal-200',
-    stats: {
-      highScore: 920,
-      gamesPlayed: 8,
-      accuracy: '92%'
-    },
-    link: '/kid/game/quiz'
   },
   {
     id: 'tictactoe',
@@ -49,11 +37,11 @@ const games = [
     level: 'Dễ',
     category: 'Chiến thuật',
     color: 'from-rose-100 via-pink-200 to-purple-200',
-    stats: {
-      highScore: 750,
-      gamesPlayed: 15,
-      accuracy: '78%'
-    },
+    benefits: [
+      { icon: '🧩', text: 'Tư duy chiến thuật' },
+      { icon: '🔄', text: 'Tính toán trước' },
+      { icon: '🤔', text: 'Phân tích đối thủ' }
+    ],
     link: '/kid/game/tictactoe'
   },
   {
@@ -64,11 +52,11 @@ const games = [
     level: 'Khó',
     category: 'Toán học',
     color: 'from-amber-100 via-orange-200 to-red-200',
-    stats: {
-      highScore: 680,
-      gamesPlayed: 6,
-      accuracy: '72%'
-    },
+    benefits: [
+      { icon: '🔢', text: 'Tính toán nhanh' },
+      { icon: '📊', text: 'Giải quyết vấn đề' },
+      { icon: '🎯', text: 'Tập trung cao' }
+    ],
     link: '/kid/game/rocket'
   },
   {
@@ -79,23 +67,60 @@ const games = [
     level: 'Dễ',
     category: 'Quan sát',
     color: 'from-red-100 via-rose-200 to-pink-200',
-    stats: {
-      highScore: 810,
-      gamesPlayed: 14,
-      accuracy: '86%'
-    },
+    benefits: [
+      { icon: '👁️', text: 'Nhận biết màu sắc' },
+      { icon: '🧠', text: 'Nhớ mẫu hình' },
+      { icon: '⚡', text: 'Phản xạ nhanh' }
+    ],
     link: '/kid/game/colorpattern'
   }
 ]
 
-// Game Overview Component
+// Game Overview Component with Top 10 Ranking
 const GameOverview = () => {
   const childProfile = useAppStore((state) => state.childProfile)
-  const totalGamesPlayed = games.reduce((acc, game) => acc + game.stats.gamesPlayed, 0)
-  const averageAccuracy = Math.round(games.reduce((acc, game) => acc + parseInt(game.stats.accuracy), 0) / games.length)
-  const totalPoints = childProfile?.totalPoints || 0
-  const weeklyGames = 15 // Số game chơi trong tuần
-  const weeklyGoal = 20 // Mục tiêu số game trong tuần
+  const { data: topRankingData, isLoading: isLoadingRanking } = useGetTopRanking()
+  const topRankings = topRankingData?.payload.data || []
+
+  // // Dữ liệu giả cho bảng xếp hạng
+  // const mockRankingData = [
+  //   { userId: '1', username: 'Minh Anh', avatarUrl: 'https://i.pravatar.cc/150?img=32', gamePoints: 1250 },
+  //   { userId: '2', username: 'Hải Nam', avatarUrl: 'https://i.pravatar.cc/150?img=52', gamePoints: 1180 },
+  //   { userId: '3', username: 'Thu Hương', avatarUrl: 'https://i.pravatar.cc/150?img=48', gamePoints: 1050 },
+  //   { userId: '4', username: 'Duy Khang', avatarUrl: 'https://i.pravatar.cc/150?img=41', gamePoints: 980 },
+  //   { userId: '5', username: 'Thu Trang', avatarUrl: 'https://i.pravatar.cc/150?img=24', gamePoints: 915 },
+  //   { userId: '6', username: 'Văn Minh', avatarUrl: 'https://i.pravatar.cc/150?img=54', gamePoints: 880 },
+  //   { userId: '7', username: 'Nhật Minh', avatarUrl: 'https://i.pravatar.cc/150?img=60', gamePoints: 820 },
+  //   { userId: '8', username: 'Khánh Linh', avatarUrl: 'https://i.pravatar.cc/150?img=34', gamePoints: 780 },
+  //   { userId: '9', username: 'Anh Tú', avatarUrl: 'https://i.pravatar.cc/150?img=14', gamePoints: 720 },
+  //   { userId: '10', username: 'Lan Anh', avatarUrl: 'https://i.pravatar.cc/150?img=25', gamePoints: 680 }
+  // ]
+
+  // // Nếu có id của user hiện tại, thêm vào danh sách để hiển thị highlight
+  // if (childProfile?.id) {
+  //   // Tìm xem user hiện tại đã có trong danh sách chưa
+  //   const userExists = mockRankingData.some((player) => player.userId === childProfile.id)
+
+  //   // Nếu chưa có, thêm vào ở vị trí thứ 5
+  //   if (!userExists) {
+  //     mockRankingData.splice(4, 0, {
+  //       userId: childProfile.id,
+  //       username: `${childProfile.firstName} ${childProfile.lastName}`.trim(),
+  //       avatarUrl: childProfile.avatarUrl,
+  //       gamePoints: 905
+  //     })
+  //   }
+  // }
+
+  // // Sử dụng dữ liệu giả nếu không có dữ liệu thật
+  // const topRankings =
+  //   topRankingData?.payload?.data && topRankingData.payload.data.length > 0
+  //     ? topRankingData.payload.data
+  //     : mockRankingData
+
+  // Find current user's ranking - using userId from top rankings data
+  const currentUserRanking = topRankings.findIndex((user) => user.userId === childProfile?.id) + 1
+  const isInTopRanking = currentUserRanking > 0
 
   return (
     <motion.section
@@ -107,95 +132,197 @@ const GameOverview = () => {
       {/* Header */}
       <div className='flex items-center gap-3 mb-6'>
         <div className='w-12 h-12 rounded-2xl bg-gradient-to-br from-purple-500 to-indigo-500 flex items-center justify-center'>
-          <Gamepad2 className='w-6 h-6 text-white' />
+          <Trophy className='w-6 h-6 text-white' />
         </div>
         <div>
-          <h2 className='text-2xl font-bold text-slate-800'>Tổng quan trò chơi</h2>
-          <p className='text-slate-600'>Theo dõi thành tích chơi game của bạn</p>
+          <h2 className='text-2xl font-bold text-slate-800'>Bảng xếp hạng</h2>
+          <p className='text-slate-600'>Top 10 người chơi có điểm cao nhất</p>
         </div>
       </div>
 
-      {/* Stats Grid */}
-      <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6'>
-        <Card className='p-4 bg-gradient-to-br from-purple-50 to-indigo-50'>
-          <div className='flex items-start gap-3'>
-            <div className='p-2 rounded-lg bg-purple-100'>
-              <Gamepad2 className='w-5 h-5 text-purple-600' />
-            </div>
-            <div>
-              <div className='text-2xl font-bold text-slate-800'>{totalGamesPlayed}</div>
-              <div className='text-sm text-slate-600'>Số game đã chơi</div>
-            </div>
+      {/* Ranking Table Card */}
+      <Card className='overflow-hidden border-0 shadow-md'>
+        {isLoadingRanking ? (
+          <div className='p-8 space-y-6'>
+            {[...Array(5)].map((_, i) => (
+              <div key={i} className='flex items-center gap-4'>
+                <Skeleton className='h-10 w-10 rounded-full' />
+                <Skeleton className='h-6 flex-1' />
+                <Skeleton className='h-8 w-20' />
+              </div>
+            ))}
           </div>
-        </Card>
+        ) : (
+          <div>
+            <div className='bg-gradient-to-br from-indigo-100 via-indigo-50 to-white px-6 py-5 flex items-center border-b border-indigo-100 sticky top-0 z-10 shadow-sm'>
+              <div className='w-14 text-center'>
+                <span className='inline-flex items-center justify-center w-8 h-8 rounded-full bg-indigo-500 text-white font-semibold text-sm shadow-sm'>
+                  #
+                </span>
+              </div>
+              <div className='flex-1 font-semibold text-indigo-800 flex items-center gap-2'>
+                <span>Người chơi</span>
+                <Trophy className='h-4 w-4 text-indigo-400' />
+              </div>
+              <div className='w-28 text-right font-semibold text-indigo-800 flex items-center justify-end gap-1'>
+                <Star className='h-4 w-4 text-indigo-400' />
+                <span>Điểm số</span>
+              </div>
+            </div>
 
-        <Card className='p-4 bg-gradient-to-br from-emerald-50 to-green-50'>
-          <div className='flex items-start gap-3'>
-            <div className='p-2 rounded-lg bg-emerald-100'>
-              <Target className='w-5 h-5 text-emerald-600' />
-            </div>
-            <div>
-              <div className='text-2xl font-bold text-slate-800'>{averageAccuracy}%</div>
-              <div className='text-sm text-slate-600'>Độ chính xác</div>
-            </div>
-          </div>
-        </Card>
+            <div className='divide-y divide-indigo-50'>
+              {topRankings.slice(0, 10).map((player, index) => {
+                const isCurrentUser = player.userId === childProfile?.id
+                const rankColors = [
+                  'bg-gradient-to-r from-amber-500 to-yellow-500 text-white', // 1st
+                  'bg-gradient-to-r from-slate-400 to-slate-500 text-white', // 2nd
+                  'bg-gradient-to-r from-amber-700 to-yellow-700 text-white' // 3rd
+                ]
 
-        <Card className='p-4 bg-gradient-to-br from-amber-50 to-orange-50'>
-          <div className='flex items-start gap-3'>
-            <div className='p-2 rounded-lg bg-amber-100'>
-              <Trophy className='w-5 h-5 text-amber-600' />
-            </div>
-            <div>
-              <div className='text-2xl font-bold text-slate-800'>{totalPoints}</div>
-              <div className='text-sm text-slate-600'>Tổng điểm</div>
-            </div>
-          </div>
-        </Card>
+                return (
+                  <motion.div
+                    key={player.userId}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: index * 0.05 }}
+                    className={cn(
+                      'px-6 py-5 flex items-center hover:bg-indigo-50/50 transition-colors',
+                      isCurrentUser
+                        ? 'bg-gradient-to-r from-blue-50 to-indigo-50 border-l-4 border-blue-500'
+                        : index < 3
+                          ? `bg-gradient-to-r from-white to-indigo-50/30 ${index === 0 ? 'border-b border-amber-100' : ''}`
+                          : index % 2 === 0
+                            ? 'bg-white'
+                            : 'bg-indigo-50/20'
+                    )}
+                  >
+                    <div className='w-14 flex justify-center'>
+                      {index < 3 ? (
+                        <div
+                          className={`w-9 h-9 flex items-center justify-center rounded-full ${rankColors[index]} font-bold shadow-md`}
+                        >
+                          {index + 1}
+                        </div>
+                      ) : (
+                        <div className='w-8 h-8 flex items-center justify-center rounded-full bg-indigo-100 text-indigo-800 font-medium'>
+                          {index + 1}
+                        </div>
+                      )}
+                    </div>
 
-        <Card className='p-4 bg-gradient-to-br from-blue-50 to-sky-50'>
-          <div className='flex items-start gap-3'>
-            <div className='p-2 rounded-lg bg-blue-100'>
-              <Medal className='w-5 h-5 text-blue-600' />
-            </div>
-            <div>
-              <div className='text-2xl font-bold text-slate-800'>3</div>
-              <div className='text-sm text-slate-600'>Huy hiệu đạt được</div>
-            </div>
-          </div>
-        </Card>
-      </div>
+                    <div className='flex-1 flex items-center gap-4'>
+                      <div className='relative'>
+                        {index < 3 && (
+                          <div
+                            className={`absolute -top-2 -right-2 z-10 p-1 rounded-full shadow-sm ${index === 0 ? 'bg-amber-400' : index === 1 ? 'bg-slate-400' : 'bg-amber-700'}`}
+                          >
+                            {index === 0 ? (
+                              <Trophy className='h-3 w-3 text-white' />
+                            ) : (
+                              <Medal className='h-3 w-3 text-white' />
+                            )}
+                          </div>
+                        )}
+                        <div
+                          className={`w-12 h-12 rounded-full overflow-hidden ${index < 3 ? 'ring-2 ring-offset-2' : 'border-2 border-white'} ${index === 0 ? 'ring-amber-400' : index === 1 ? 'ring-slate-400' : index === 2 ? 'ring-amber-700' : ''} shadow-md`}
+                        >
+                          {player.avatarUrl ? (
+                            <Image
+                              src={player.avatarUrl}
+                              alt={player.username || 'Player'}
+                              width={48}
+                              height={48}
+                              className='w-full h-full object-cover'
+                            />
+                          ) : (
+                            <div className='w-full h-full bg-gradient-to-br from-indigo-400 to-purple-400 flex items-center justify-center text-lg font-semibold text-white'>
+                              {(player.username || 'P')[0].toUpperCase()}
+                            </div>
+                          )}
+                        </div>
+                      </div>
 
-      {/* Progress Cards */}
-      <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
-        <Card className='p-6'>
-          <div className='flex items-center justify-between mb-4'>
-            <div className='flex items-center gap-2'>
-              <Crown className='w-5 h-5 text-purple-500' />
-              <h3 className='font-semibold text-slate-800'>Mục tiêu tuần</h3>
-            </div>
-            <div className='text-2xl font-bold text-purple-500'>{weeklyGames} games</div>
-          </div>
-          <p className='text-sm text-slate-600 mb-3'>Hoàn thành mục tiêu để nhận thưởng</p>
-          <Progress value={(weeklyGames / weeklyGoal) * 100} className='h-2' />
-          <div className='mt-2 text-xs text-slate-500 text-right'>
-            {weeklyGames}/{weeklyGoal} games
-          </div>
-        </Card>
+                      <div>
+                        <div className='font-medium text-slate-800 flex items-center gap-1.5'>
+                          {player.username || 'Người chơi'}
+                          {isCurrentUser && (
+                            <span className='text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full font-semibold'>
+                              Bạn
+                            </span>
+                          )}
+                        </div>
+                        {index < 3 && (
+                          <div className='text-xs text-slate-500 flex items-center gap-1 mt-0.5'>
+                            {index === 0 ? 'Vô địch 👑' : index === 1 ? 'Á quân ✨' : 'Hạng ba 🏅'}
+                          </div>
+                        )}
+                      </div>
+                    </div>
 
-        <Card className='p-6'>
-          <div className='flex items-center justify-between mb-4'>
-            <div className='flex items-center gap-2'>
-              <Star className='w-5 h-5 text-amber-500' />
-              <h3 className='font-semibold text-slate-800'>Xếp hạng</h3>
+                    <div className='w-28 text-right'>
+                      <span
+                        className={`text-lg font-bold ${index < 3 ? 'bg-clip-text text-transparent bg-gradient-to-r' : 'text-slate-700'} ${index === 0 ? 'from-amber-500 to-yellow-600' : index === 1 ? 'from-slate-500 to-slate-700' : index === 2 ? 'from-amber-700 to-amber-900' : ''}`}
+                      >
+                        {player.gamePoints.toLocaleString()}
+                      </span>
+                      <span className='text-xs text-slate-500 ml-1'>điểm</span>
+                    </div>
+                  </motion.div>
+                )
+              })}
             </div>
-            <div className='text-2xl font-bold text-amber-500'>#12</div>
+
+            {!isInTopRanking && childProfile && (
+              <div className='px-8 py-6 bg-gradient-to-r from-blue-50 to-indigo-50 border-t border-indigo-100'>
+                <div className='flex items-center justify-between'>
+                  <div className='flex items-center gap-3'>
+                    <div className='w-10 h-10 rounded-full overflow-hidden border-2 border-white shadow-md'>
+                      {childProfile.avatarUrl ? (
+                        <Image
+                          src={childProfile.avatarUrl}
+                          alt={`${childProfile.firstName || ''} ${childProfile.lastName || ''}`.trim()}
+                          width={40}
+                          height={40}
+                          className='w-full h-full object-cover'
+                        />
+                      ) : (
+                        <div className='w-full h-full bg-gradient-to-br from-blue-400 to-indigo-400 flex items-center justify-center text-white'>
+                          {(childProfile.firstName || 'U')[0].toUpperCase()}
+                        </div>
+                      )}
+                    </div>
+                    <div>
+                      <div className='font-medium text-slate-800'>
+                        {`${childProfile.firstName || ''} ${childProfile.lastName || ''}`.trim()}
+                        <span className='text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full font-semibold ml-2'>
+                          Bạn
+                        </span>
+                      </div>
+                      <div className='text-sm text-slate-500'>Chưa có trong bảng xếp hạng</div>
+                    </div>
+                  </div>
+                  <Button size='sm' className='bg-indigo-500 hover:bg-indigo-600'>
+                    Chơi ngay
+                  </Button>
+                </div>
+              </div>
+            )}
+
+            {topRankings.length === 0 && (
+              <div className='py-16 px-6 text-center'>
+                <div className='w-20 h-20 bg-indigo-100 flex items-center justify-center rounded-full mx-auto mb-4'>
+                  <Trophy className='w-10 h-10 text-indigo-400' />
+                </div>
+                <h3 className='text-xl font-semibold text-slate-800 mb-2'>Chưa có dữ liệu xếp hạng</h3>
+                <p className='text-slate-500 max-w-md mx-auto mb-6'>
+                  Hãy là người đầu tiên tham gia bảng xếp hạng bằng cách chơi các trò chơi và tích lũy điểm
+                </p>
+                <Button className='bg-indigo-500 hover:bg-indigo-600'>Khám phá trò chơi</Button>
+              </div>
+            )}
           </div>
-          <p className='text-sm text-slate-600 mb-3'>Top người chơi trong tuần</p>
-          <Progress value={80} className='h-2' />
-          <div className='mt-2 text-xs text-slate-500 text-right'>Top 20%</div>
-        </Card>
-      </div>
+        )}
+      </Card>
     </motion.section>
   )
 }
@@ -260,19 +387,16 @@ function KidGamePage() {
                       </div>
 
                       <div className='mt-auto'>
-                        <div className='grid grid-cols-3 gap-2 mb-4'>
-                          <div className='bg-slate-50 p-2 rounded-lg text-center'>
-                            <div className='text-sm font-semibold text-slate-700'>{game.stats.highScore}</div>
-                            <div className='text-xs text-slate-500'>Điểm cao</div>
-                          </div>
-                          <div className='bg-slate-50 p-2 rounded-lg text-center'>
-                            <div className='text-sm font-semibold text-slate-700'>{game.stats.gamesPlayed}</div>
-                            <div className='text-xs text-slate-500'>Đã chơi</div>
-                          </div>
-                          <div className='bg-slate-50 p-2 rounded-lg text-center'>
-                            <div className='text-sm font-semibold text-slate-700'>{game.stats.accuracy}</div>
-                            <div className='text-xs text-slate-500'>Chính xác</div>
-                          </div>
+                        <div className='space-y-2 mb-4'>
+                          {game.benefits.map((benefit, index) => (
+                            <div
+                              key={index}
+                              className='flex items-center gap-2 px-3 py-2 bg-slate-50 rounded-lg hover:bg-slate-100 transition-colors'
+                            >
+                              <div className='text-lg'>{benefit.icon}</div>
+                              <div className='text-sm font-medium text-slate-700'>{benefit.text}</div>
+                            </div>
+                          ))}
                         </div>
 
                         <Button className='w-full bg-slate-100 hover:bg-slate-200 text-slate-700'>Chơi ngay</Button>

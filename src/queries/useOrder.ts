@@ -134,3 +134,16 @@ export const useGetRefundRequestById = ({ id }: { id: string }) => {
     queryFn: () => orderApiRequest.getRefundRequestById(id)
   })
 }
+
+export const useCreateReturnOrderMutation = () => {
+  return useMutation({
+    mutationFn: orderApiRequest.createReturnOrder
+  })
+}
+
+export const useGetReturnOrdersQuery = ({ page_size, page_index }: { page_size: number; page_index: number }) => {
+  return useQuery({
+    queryKey: ['return-orders', page_size, page_index],
+    queryFn: () => orderApiRequest.getReturnOrders({ page_size, page_index })
+  })
+}
