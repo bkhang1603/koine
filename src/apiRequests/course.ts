@@ -64,7 +64,8 @@ const courseApiRequest = {
     category,
     range,
     sort,
-    keyword
+    keyword,
+    age
   }: {
     page_index?: number | undefined
     page_size?: number | undefined
@@ -72,11 +73,12 @@ const courseApiRequest = {
     range?: number | undefined
     sort?: string | undefined | ['pa', 'pd', 'na', 'nd'] | string[]
     keyword?: string | string[] | undefined
+    age?: string | string[] | undefined
   }) =>
     http.get<CoursesResType>(
       `/courses?page_index=${page_index}&page_size=${page_size}${
         keyword ? `&keyword=${keyword}` : ''
-      }${category ? `&category=${category}` : ''}${range ? `&range=${range}` : ''}${sort ? `&sort=${sort}` : ''}`
+      }${category ? `&category=${category}` : ''}${range ? `&range=${range}` : ''}${sort ? `&sort=${sort}` : ''}${age ? `&age=${age}` : ''}`
       // { cache: 'force-cache', next: { revalidate: 12 * 60 * 60 } }
     ),
   getCourse: (id: string) => http.get<CourseResType>(`/courses/${id}`),

@@ -14,7 +14,7 @@ import { CategoryCoursesResType } from '@/schemaValidations/course.schema'
 
 const formSchema = z.object({
   categories: z.array(z.string()),
-  target: z.array(z.string()),
+  ageRanges: z.array(z.string()),
   price: z.coerce.number().min(0).max(1000000)
 })
 
@@ -25,7 +25,7 @@ function CourseFilter({ categories }: { categories: CategoryCoursesResType['data
     resolver: zodResolver(formSchema),
     defaultValues: {
       categories: [],
-      target: [],
+      ageRanges: [],
       price: 500000
     }
   })
@@ -47,15 +47,25 @@ function CourseFilter({ categories }: { categories: CategoryCoursesResType['data
     } else {
       currentParams.delete('category')
     }
-    if (values.target && values.target.length > 0) {
-      currentParams.set('target', values.target.join(','))
+    if (values.ageRanges && values.ageRanges.length > 0) {
+      currentParams.set('age', values.ageRanges.join(','))
     } else {
-      currentParams.delete('target')
+      currentParams.delete('age')
     }
 
     // Cập nhật URL với các params mới
     router.push(`${window.location.pathname}?${currentParams.toString()}`)
   }
+
+  // Định nghĩa các độ tuổi
+  const ageRanges = [
+    { id: '3-6', label: '3-6 tuổi' },
+    { id: '7-9', label: '7-9 tuổi' },
+    { id: '10-12', label: '10-12 tuổi' },
+    { id: '13-15', label: '13-15 tuổi' },
+    { id: '16-18', label: '16-18 tuổi' },
+    { id: '18+', label: '18+ tuổi' }
+  ]
 
   return (
     <div className='col-span-1'>
@@ -177,46 +187,32 @@ function CourseFilter({ categories }: { categories: CategoryCoursesResType['data
               </AccordionContent>
             </AccordionItem>
             <AccordionItem value='item-2'>
-              <AccordionTrigger className='hover:no-underline'>Đối tượng</AccordionTrigger>
+              <AccordionTrigger className='hover:no-underline'>Độ tuổi</AccordionTrigger>
               <AccordionContent>
                 <FormField
                   control={form.control}
-                  name='target'
+                  name='ageRanges'
                   render={({ field }) => (
                     <FormItem>
                       <FormControl>
                         <div className='flex flex-col justify-center gap-3'>
-                          <div className='flex items-center gap-3'>
-                            <Checkbox
-                              {...field}
-                              id='girl'
-                              value={'girl'}
-                              checked={Array.isArray(field.value) && field.value.includes('girl')}
-                              onCheckedChange={(checked) => {
-                                const newValue = checked
-                                  ? [...field.value, 'girl']
-                                  : field.value.filter((val) => val !== 'girl')
-                                field.onChange(newValue)
-                              }}
-                            />
-                            <label htmlFor='girl'>Bé gái</label>
-                          </div>
-
-                          <div className='flex items-center gap-3'>
-                            <Checkbox
-                              {...field}
-                              id='boy'
-                              value={'boy'}
-                              checked={Array.isArray(field.value) && field.value.includes('boy')}
-                              onCheckedChange={(checked) => {
-                                const newValue = checked
-                                  ? [...field.value, 'boy']
-                                  : field.value.filter((val) => val !== 'boy')
-                                field.onChange(newValue)
-                              }}
-                            />
-                            <label htmlFor='boy'>Bé trai</label>
-                          </div>
+                          {ageRanges.map((age) => (
+                            <div key={age.id} className='flex items-center gap-3'>
+                              <Checkbox
+                                {...field}
+                                id={age.id}
+                                value={age.id}
+                                checked={Array.isArray(field.value) && field.value.includes(age.id)}
+                                onCheckedChange={(checked) => {
+                                  const newValue = checked
+                                    ? [...field.value, age.id]
+                                    : field.value.filter((val) => val !== age.id)
+                                  field.onChange(newValue)
+                                }}
+                              />
+                              <label htmlFor={age.id}>{age.label}</label>
+                            </div>
+                          ))}
                         </div>
                       </FormControl>
                     </FormItem>

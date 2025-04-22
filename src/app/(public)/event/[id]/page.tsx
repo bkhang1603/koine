@@ -1,7 +1,7 @@
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import Image from 'next/image'
-import { Calendar, Users, Clock, Info } from 'lucide-react'
+import { Calendar, Users, Clock, Info, Video } from 'lucide-react'
 import { cn, formatAvatarFallback, formatDateEvent, formatDuration } from '@/lib/utils'
 import { Breadcrumb } from '@/components/public/parent/setting/Breadcrumb'
 import { wrapServerApi } from '@/lib/server-utils'
@@ -13,6 +13,7 @@ import Link from 'next/link'
 import configRoute from '@/config/route'
 import { EventStatus } from '@/app/(public)/event/types'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import EventRecording from '@/app/(public)/event/components/event-recording'
 
 const eventStatusConfig: Record<EventStatus, { label: string; color: string }> = {
   OPENING: {
@@ -140,6 +141,19 @@ export default async function EventDetailPage(props: { params: Promise<{ id: str
               </div>
             </div>
 
+            {/* Hiển thị bản ghi video nếu có recordUrl và sự kiện đã kết thúc */}
+            {event.recordUrl && event.status === 'DONE' && (
+              <div className='bg-white rounded-xl shadow-sm overflow-hidden'>
+                <div className='p-6 sm:p-8'>
+                  <h2 className='text-2xl font-bold mb-6 text-gray-900 flex items-center'>
+                    <Video className='h-6 w-6 mr-2 text-primary' />
+                    Bản ghi sự kiện
+                  </h2>
+                  <EventRecording recordUrl={event.recordUrl} />
+                </div>
+              </div>
+            )}
+
             {/* Nội dung sự kiện */}
             <div className='bg-white rounded-xl shadow-sm overflow-hidden'>
               <div className='p-6 sm:p-8'>
@@ -185,6 +199,16 @@ export default async function EventDetailPage(props: { params: Promise<{ id: str
                       <p className='text-gray-600'>{event.totalParticipants} người</p>
                     </div>
                   </div>
+
+                  {event.recordUrl && (
+                    <div className='flex items-start gap-3'>
+                      <Video className='h-5 w-5 text-primary mt-0.5' />
+                      <div>
+                        <p className='font-medium text-gray-900'>Bản ghi</p>
+                        <p className='text-green-600'>Đã có bản ghi sự kiện</p>
+                      </div>
+                    </div>
+                  )}
                 </div>
 
                 {isOpenable(event.startedAt, event.durations) && event.status === 'OPENING' && (
