@@ -221,10 +221,7 @@ export default function CustomCoursePage() {
       <Alert variant='notification'>
         {/* <BookOpen className='h-4 w-4' /> */}
         <AlertTitle>Hướng dẫn sử dụng</AlertTitle>
-        <AlertDescription>
-          Chọn các chương từ các khóa học hiện có để tạo khóa học riêng của bạn. Hệ thống sẽ tự động tạo tên và hình ảnh
-          cho khóa học dựa trên nội dung bạn chọn.
-        </AlertDescription>
+        <AlertDescription>Chọn các chương từ các khóa học hiện có để tạo khóa học riêng của bạn.</AlertDescription>
       </Alert>
 
       <div className='grid md:grid-cols-3 gap-6'>

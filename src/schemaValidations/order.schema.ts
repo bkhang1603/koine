@@ -4,7 +4,7 @@ import z from 'zod'
 export const orderBody = z
   .object({
     arrayCartDetailIds: z.array(z.string()),
-    deliveryInfoId: z.string(),
+    deliveryInfoId: z.string().nullable(),
     deliMethod: z.enum(DeliveryMethodValues),
     itemId: z.string().nullable(),
     quantity: z.number().nullable(),

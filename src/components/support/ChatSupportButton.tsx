@@ -11,8 +11,8 @@ import { format, isToday, isYesterday } from 'date-fns'
 import { vi } from 'date-fns/locale'
 import { useAppStore } from '@/components/app-provider'
 import { useGetChatForUser, useStartChat, useGetChatMessages } from '@/queries/useChat'
-import { socketForChat } from '@/lib/socket'
 import { getAccessTokenFromLocalStorage } from '@/lib/utils'
+import socket from '@/lib/socket'
 
 // Type for chat room
 interface ChatRoom {
@@ -129,7 +129,7 @@ const ChatSupportButton = () => {
     }
 
     function login() {
-      socketForChat.emit(
+      socket.emit(
         'login',
         {
           token: token
@@ -146,7 +146,7 @@ const ChatSupportButton = () => {
 
     function joinRoom() {
       if (chatRoom?.id) {
-        socketForChat.emit(
+        socket.emit(
           'joinRoom',
           {
             roomId: chatRoom.id
@@ -160,24 +160,24 @@ const ChatSupportButton = () => {
       }
     }
 
-    if (!socketForChat.connected) {
-      socketForChat.connect()
+    if (!socket.connected) {
+      socket.connect()
     } else {
       onConnect()
     }
 
-    socketForChat.on('newMessage', handleNewMessage)
+    socket.on('newMessage', handleNewMessage)
 
     return () => {
-      socketForChat.off('newMessage', handleNewMessage)
+      socket.off('newMessage', handleNewMessage)
     }
   }, [user, token, isLoggedIn, chatRoom?.id, handleNewMessage, refetchChat, refetchMessages])
 
   // Join chat room when chat ID changes
   // useEffect(() => {
-  //   if (!user || !chatRoom?.id || !socketForChat.connected || isChatClosed) return
+  //   if (!user || !chatRoom?.id || !socket.connected || isChatClosed) return
 
-  //   socketForChat.emit('joinRoom', {
+  //   socket.emit('joinRoom', {
   //     roomId: chatRoom.id
   //   })
   // }, [chatRoom?.id, user, isChatClosed])
@@ -200,7 +200,7 @@ const ChatSupportButton = () => {
     const messageContent = newMessage.trim()
     setNewMessage('')
 
-    socketForChat.emit(
+    socket.emit(
       'sendMessage',
       {
         roomId: chatRoom.id,

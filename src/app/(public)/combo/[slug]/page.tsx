@@ -93,17 +93,7 @@ export default async function ComboDetailPage(props: {
           </div>
 
           <div className='flex items-center justify-between gap-2'>
-            <BuyNowButton
-              course={{
-                id: combo.id,
-                title: combo.name,
-                imageUrl: combo.imageUrl || '/no-image.png',
-                price: combo.price,
-                discount: combo.discount,
-                isCombo: true
-              }}
-              className='w-full'
-            />
+            <BuyNowButton combo={combo} className='w-full' />
             <CourseButton
               id={combo.id}
               course={{

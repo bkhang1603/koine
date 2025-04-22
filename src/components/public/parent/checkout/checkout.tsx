@@ -30,9 +30,14 @@ export default function Checkout() {
   const checkoutBuyNow = useAppStore((state) => state.checkoutBuyNow)
   const pickAddress = useAppStore((state) => state.pickAddress)
   const setPickAddress = useAppStore((state) => state.setPickAddress)
+  const setCheckoutData = useAppStore((state) => state.setCheckoutData)
   const [type, setType] = useState<'checkoutData' | 'checkoutBuyNow'>('checkoutData')
   const checkoutBuyNowFromLocalStorage = getCheckoutBuyNowFromLocalStorage()
   const checkoutFormLocalStorage = getCheckoutDataFromLocalStorage()
+
+  console.log('checkoutBuyNow', checkoutBuyNow)
+  console.log('checkoutData', checkoutData)
+  console.log('type', type)
 
   useEffect(() => {
     if (checkoutFormLocalStorage) {
@@ -129,16 +134,45 @@ export default function Checkout() {
     }
   }, [hasOnlyDigitalItems])
 
+  // Đảm bảo có dữ liệu mới nhất khi component mount
+  useEffect(() => {
+    // Reset state nếu không có dữ liệu checkout
+    if (!checkoutData?.cartDetails?.length && !checkoutBuyNow && type === 'checkoutData') {
+      router.push(configRoute.cart)
+      return
+    }
+
+    // Đảm bảo thông tin đơn hàng là mới nhất
+    if (type === 'checkoutData' && checkoutData) {
+      const currentCartDetails = checkoutData.cartDetails || []
+      // Lọc ra các cartDetail còn tồn tại (không bị xóa)
+      const validCartDetails = currentCartDetails.filter((item) => !item.isDeleted)
+
+      if (validCartDetails.length !== currentCartDetails.length) {
+        // Cập nhật lại state nếu có sự thay đổi
+        setCheckoutData({
+          ...checkoutData,
+          cartDetails: validCartDetails,
+          totalAmount: validCartDetails.reduce((sum, item) => sum + item.totalPrice, 0)
+        })
+      }
+    }
+  }, [checkoutData, checkoutBuyNow, type, router, setCheckoutData])
+
   const handleCreateOrder = async () => {
     if (createOrderMutation.isPending) return
 
     // Only require an address if there are physical items
     if (hasPhysicalItems && !pickAddress) return
 
+    // Đảm bảo lấy data mới nhất
+    const currentCartDetailIds =
+      checkoutData?.cartDetails?.filter((item) => !item.isDeleted).map((item) => item.id) || []
+
     const orderData: OrderBody = {
-      arrayCartDetailIds: checkoutData?.cartDetails?.map((item) => item.id) ?? [],
+      arrayCartDetailIds: currentCartDetailIds,
       // For digital items, use a default value that the API accepts for deliveryInfoId
-      deliveryInfoId: hasPhysicalItems ? pickAddress!.id : '',
+      deliveryInfoId: hasPhysicalItems ? pickAddress!.id : null,
       deliMethod: hasPhysicalItems ? shippingMethod : DeliveryMethod.NONESHIP,
       itemId: null,
       quantity: null,
@@ -149,23 +183,21 @@ export default function Checkout() {
     // Nếu là mua ngay (checkoutBuyNow)
     if (checkoutBuyNow) {
       if (checkoutBuyNow.product !== null) {
+        orderData.arrayCartDetailIds = [checkoutBuyNow.productId ?? '']
         orderData.itemId = checkoutBuyNow.productId
         orderData.quantity = checkoutBuyNow.quantity
         orderData.itemType = OrderType.PRODUCT
       } else if (checkoutBuyNow.course !== null) {
+        orderData.arrayCartDetailIds = [checkoutBuyNow.courseId ?? '']
         orderData.itemId = checkoutBuyNow.courseId
         orderData.quantity = checkoutBuyNow.quantity
         orderData.itemType = OrderType.COURSE
       } else if (checkoutBuyNow.combo !== null) {
+        orderData.arrayCartDetailIds = [checkoutBuyNow.comboId ?? '']
         orderData.itemId = checkoutBuyNow.comboId
         orderData.quantity = checkoutBuyNow.quantity
         orderData.itemType = OrderType.COMBO
       }
-    }
-    // Nếu là mua từ giỏ hàng (checkoutData)
-    else if (checkoutData?.cartDetails && checkoutData.cartDetails.length > 0) {
-      // Giữ nguyên arrayCartDetailIds đã được set ở trên
-      // Không cần set itemId, quantity và itemType vì đã có trong cartDetails
     }
 
     try {
@@ -214,6 +246,7 @@ export default function Checkout() {
               <Breadcrumb
                 items={[
                   { title: 'Cửa hàng', href: configRoute.product },
+                  { title: 'Khóa học', href: configRoute.course },
                   { title: 'Mua ngay', href: configRoute.checkout }
                 ]}
               />
