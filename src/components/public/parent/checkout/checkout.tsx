@@ -30,7 +30,6 @@ export default function Checkout() {
   const checkoutBuyNow = useAppStore((state) => state.checkoutBuyNow)
   const pickAddress = useAppStore((state) => state.pickAddress)
   const setPickAddress = useAppStore((state) => state.setPickAddress)
-  const setCheckoutData = useAppStore((state) => state.setCheckoutData)
   const [type, setType] = useState<'checkoutData' | 'checkoutBuyNow'>('checkoutData')
   const checkoutBuyNowFromLocalStorage = getCheckoutBuyNowFromLocalStorage()
   const checkoutFormLocalStorage = getCheckoutDataFromLocalStorage()
@@ -134,43 +133,14 @@ export default function Checkout() {
     }
   }, [hasOnlyDigitalItems])
 
-  // Đảm bảo có dữ liệu mới nhất khi component mount
-  useEffect(() => {
-    // Reset state nếu không có dữ liệu checkout
-    if (!checkoutData?.cartDetails?.length && !checkoutBuyNow && type === 'checkoutData') {
-      router.push(configRoute.cart)
-      return
-    }
-
-    // Đảm bảo thông tin đơn hàng là mới nhất
-    if (type === 'checkoutData' && checkoutData) {
-      const currentCartDetails = checkoutData.cartDetails || []
-      // Lọc ra các cartDetail còn tồn tại (không bị xóa)
-      const validCartDetails = currentCartDetails.filter((item) => !item.isDeleted)
-
-      if (validCartDetails.length !== currentCartDetails.length) {
-        // Cập nhật lại state nếu có sự thay đổi
-        setCheckoutData({
-          ...checkoutData,
-          cartDetails: validCartDetails,
-          totalAmount: validCartDetails.reduce((sum, item) => sum + item.totalPrice, 0)
-        })
-      }
-    }
-  }, [checkoutData, checkoutBuyNow, type, router, setCheckoutData])
-
   const handleCreateOrder = async () => {
     if (createOrderMutation.isPending) return
 
     // Only require an address if there are physical items
     if (hasPhysicalItems && !pickAddress) return
 
-    // Đảm bảo lấy data mới nhất
-    const currentCartDetailIds =
-      checkoutData?.cartDetails?.filter((item) => !item.isDeleted).map((item) => item.id) || []
-
     const orderData: OrderBody = {
-      arrayCartDetailIds: currentCartDetailIds,
+      arrayCartDetailIds: [],
       // For digital items, use a default value that the API accepts for deliveryInfoId
       deliveryInfoId: hasPhysicalItems ? pickAddress!.id : null,
       deliMethod: hasPhysicalItems ? shippingMethod : DeliveryMethod.NONESHIP,
@@ -180,24 +150,35 @@ export default function Checkout() {
       payMethod: payMethod
     }
 
-    // Nếu là mua ngay (checkoutBuyNow)
-    if (checkoutBuyNow) {
-      if (checkoutBuyNow.product !== null) {
-        orderData.arrayCartDetailIds = [checkoutBuyNow.productId ?? '']
-        orderData.itemId = checkoutBuyNow.productId
-        orderData.quantity = checkoutBuyNow.quantity
-        orderData.itemType = OrderType.PRODUCT
-      } else if (checkoutBuyNow.course !== null) {
-        orderData.arrayCartDetailIds = [checkoutBuyNow.courseId ?? '']
-        orderData.itemId = checkoutBuyNow.courseId
-        orderData.quantity = checkoutBuyNow.quantity
-        orderData.itemType = OrderType.COURSE
-      } else if (checkoutBuyNow.combo !== null) {
-        orderData.arrayCartDetailIds = [checkoutBuyNow.comboId ?? '']
-        orderData.itemId = checkoutBuyNow.comboId
-        orderData.quantity = checkoutBuyNow.quantity
-        orderData.itemType = OrderType.COMBO
+    if (type === 'checkoutData') {
+      if (checkoutData) {
+        orderData.arrayCartDetailIds = checkoutData.cartDetails.filter((item) => !item.isDeleted).map((item) => item.id)
       }
+    } else if (type === 'checkoutBuyNow') {
+      // Nếu là mua ngay (checkoutBuyNow)
+      if (checkoutBuyNow) {
+        if (checkoutBuyNow.product !== null) {
+          orderData.arrayCartDetailIds = [checkoutBuyNow.productId ?? '']
+          orderData.itemId = checkoutBuyNow.productId
+          orderData.quantity = checkoutBuyNow.quantity
+          orderData.itemType = OrderType.PRODUCT
+        } else if (checkoutBuyNow.course !== null) {
+          orderData.arrayCartDetailIds = [checkoutBuyNow.courseId ?? '']
+          orderData.itemId = checkoutBuyNow.courseId
+          orderData.quantity = checkoutBuyNow.quantity
+          orderData.itemType = OrderType.COURSE
+        } else if (checkoutBuyNow.combo !== null) {
+          orderData.arrayCartDetailIds = [checkoutBuyNow.comboId ?? '']
+          orderData.itemId = checkoutBuyNow.comboId
+          orderData.quantity = checkoutBuyNow.quantity
+          orderData.itemType = OrderType.COMBO
+        }
+      }
+    } else {
+      toast({
+        description: 'Không có dữ liệu để tạo đơn hàng'
+      })
+      return
     }
 
     try {
