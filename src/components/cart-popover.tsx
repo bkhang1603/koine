@@ -1,4 +1,4 @@
-import { ShoppingBag, X, ChevronRight } from 'lucide-react'
+import { ShoppingBag, X, ChevronRight, Package } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Separator } from '@/components/ui/separator'
@@ -46,6 +46,24 @@ export default function CartPopover({ data }: { data: CartDetailResType['data'] 
     }
   }
 
+  // Hàm trợ giúp để lấy thông tin hiển thị cho mỗi mục giỏ hàng
+  const getItemDisplayInfo = (item: CartDetailResType['data']['cartDetails'][0]) => {
+    // Nếu là combo
+    if (item.comboId) {
+      return {
+        title: item.combo?.name || 'Combo',
+        image: item.combo?.imageUrl,
+        icon: <Package className='h-6 w-6 text-indigo-400' />
+      }
+    }
+    // Nếu là sản phẩm hoặc khóa học
+    return {
+      title: item.product?.name || item.course?.title || 'Sản phẩm',
+      image: item.product?.imageUrl || item.course?.imageUrl,
+      icon: <ShoppingBag className='h-6 w-6 text-gray-400' />
+    }
+  }
+
   return (
     <div className='p-0 rounded-lg border shadow-lg overflow-hidden'>
       <div className='py-3 px-4 bg-white border-b sticky top-0 z-10 flex items-center justify-between'>
@@ -83,41 +101,52 @@ export default function CartPopover({ data }: { data: CartDetailResType['data'] 
           </div>
         ) : (
           <div>
-            {data['cartDetails'].map((item) => (
-              <div key={item.id} className='relative hover:bg-gray-50 transition-colors'>
-                <div className='p-4 flex gap-3'>
-                  {item.product?.imageUrl || item.course?.imageUrl ? (
-                    <Image
-                      src={item.product?.imageUrl || item.course?.imageUrl || ''}
-                      alt={item.product?.name || item.course?.title || ''}
-                      width={500}
-                      height={500}
-                      className='rounded-md w-16 h-16 object-cover flex-shrink-0'
-                    />
-                  ) : (
-                    <div className='w-16 h-16 bg-gray-100 rounded-md flex-shrink-0 flex items-center justify-center'>
-                      <ShoppingBag className='h-6 w-6 text-gray-400' />
-                    </div>
-                  )}
+            {data['cartDetails'].map((item) => {
+              const displayInfo = getItemDisplayInfo(item)
 
-                  <div className='flex-1 min-w-0'>
-                    <div className='flex justify-between items-start gap-2'>
-                      <h4 className='font-medium text-sm line-clamp-1'>{item.product?.name || item.course?.title}</h4>
-                      <Button variant='ghost' size='icon' className='h-6 w-6' onClick={() => handleDelete(item.id)}>
-                        <X className='h-4 w-4' />
-                      </Button>
+              return (
+                <div key={item.id} className='relative hover:bg-gray-50 transition-colors'>
+                  <div className='p-4 flex gap-3'>
+                    {displayInfo.image ? (
+                      <Image
+                        src={displayInfo.image}
+                        alt={displayInfo.title}
+                        width={500}
+                        height={500}
+                        className='rounded-md w-16 h-16 object-cover flex-shrink-0'
+                      />
+                    ) : (
+                      <div className='w-16 h-16 bg-gray-100 rounded-md flex-shrink-0 flex items-center justify-center'>
+                        {displayInfo.icon}
+                      </div>
+                    )}
+
+                    <div className='flex-1 min-w-0'>
+                      <div className='flex justify-between items-start gap-2'>
+                        <h4 className='font-medium text-sm line-clamp-1'>
+                          {displayInfo.title}
+                          {item.comboId && (
+                            <Badge className='ml-1 text-xs bg-indigo-100 text-indigo-800 hover:bg-indigo-200'>
+                              Combo
+                            </Badge>
+                          )}
+                        </h4>
+                        <Button variant='ghost' size='icon' className='h-6 w-6' onClick={() => handleDelete(item.id)}>
+                          <X className='h-4 w-4' />
+                        </Button>
+                      </div>
+                      <p className='text-xs text-muted-foreground'>Số lượng: {item.quantity}</p>
+                      <p className='text-sm font-medium text-secondary'>
+                        {item.totalPrice === 0
+                          ? 'Miễn phí'
+                          : `${(item.unitPrice - item.unitPrice * item.discount).toLocaleString()} đ`}
+                      </p>
                     </div>
-                    <p className='text-xs text-muted-foreground'>Số lượng: {item.quantity}</p>
-                    <p className='text-sm font-medium text-secondary'>
-                      {item.totalPrice === 0
-                        ? 'Miễn phí'
-                        : `${(item.unitPrice - item.unitPrice * item.discount).toLocaleString()} đ`}
-                    </p>
                   </div>
+                  <Separator />
                 </div>
-                <Separator />
-              </div>
-            ))}
+              )
+            })}
           </div>
         )}
       </ScrollArea>

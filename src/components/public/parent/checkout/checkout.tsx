@@ -8,7 +8,7 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import { Label } from '@/components/ui/label'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { useAppStore } from '@/components/app-provider'
-import { ChevronRight, MapPin, Plus, ShoppingCart, Loader2, BookOpen, PackageOpen } from 'lucide-react'
+import { ChevronRight, MapPin, Plus, ShoppingCart, Loader2, BookOpen, PackageOpen, Package } from 'lucide-react'
 import Link from 'next/link'
 import configRoute from '@/config/route'
 import { useGetAccountAddress } from '@/queries/useAccount'
@@ -69,7 +69,10 @@ export default function Checkout() {
     if (type === 'checkoutData') {
       const hasProducts = checkoutData?.cartDetails.some((item) => item.product !== null) || false
       const hasCourses = checkoutData?.cartDetails.some((item) => item.course !== null) || false
-      return hasProducts && hasCourses
+      const hasCombos = checkoutData?.cartDetails.some((item) => item.combo !== null) || false
+
+      // Consider true if any two or more different types exist
+      return (hasProducts && hasCourses) || (hasProducts && hasCombos) || (hasCourses && hasCombos)
     } else if (type === 'checkoutBuyNow' && checkoutBuyNow) {
       // Buy now can only be one type at a time
       return false
@@ -78,24 +81,38 @@ export default function Checkout() {
   }, [type, checkoutData, checkoutBuyNow])
 
   // Group checkout items by type
-  const { productItems, courseItems } = useMemo(() => {
+  const { productItems, courseItems, comboItems } = useMemo(() => {
     if (type === 'checkoutData' && checkoutData?.cartDetails) {
       return {
         productItems: checkoutData.cartDetails.filter((item) => item.product !== null),
-        courseItems: checkoutData.cartDetails.filter((item) => item.course !== null)
+        courseItems: checkoutData.cartDetails.filter((item) => item.course !== null),
+        comboItems: checkoutData.cartDetails.filter((item) => item.combo !== null)
       }
     }
     return {
       productItems: [],
-      courseItems: []
+      courseItems: [],
+      comboItems: []
     }
   }, [type, checkoutData])
 
   const hasPhysicalItems = useMemo(() => {
     if (type === 'checkoutData') {
+      // Only consider actual physical products, not combos
       return checkoutData?.cartDetails.some((item) => item.product !== null)
     }
+    // For buy now, only consider physical if it's a product
     return checkoutBuyNow?.product !== null
+  }, [type, checkoutData, checkoutBuyNow])
+
+  // Determine if the order contains only digital items (courses or combos)
+  const hasOnlyDigitalItems = useMemo(() => {
+    if (type === 'checkoutData') {
+      return checkoutData?.cartDetails.every(
+        (item) => item.product === null && (item.course !== null || item.combo !== null)
+      )
+    }
+    return checkoutBuyNow?.product === null && (checkoutBuyNow?.course !== null || checkoutBuyNow?.combo !== null)
   }, [type, checkoutData, checkoutBuyNow])
 
   // Tính tổng tiền dựa trên loại đơn hàng
@@ -105,14 +122,23 @@ export default function Checkout() {
     return (baseAmount || 0) + (shippingMethod === DeliveryMethod.EXPEDITED ? 50000 : 26000)
   }, [type, checkoutData, checkoutBuyNow, hasPhysicalItems, shippingMethod])
 
+  // Set BANKING as the only payment method for digital items (courses and combos)
+  useEffect(() => {
+    if (hasOnlyDigitalItems) {
+      setPayMethod(PaymentMethod.BANKING)
+    }
+  }, [hasOnlyDigitalItems])
+
   const handleCreateOrder = async () => {
     if (createOrderMutation.isPending) return
 
-    if (!pickAddress) return
+    // Only require an address if there are physical items
+    if (hasPhysicalItems && !pickAddress) return
 
     const orderData: OrderBody = {
       arrayCartDetailIds: checkoutData?.cartDetails?.map((item) => item.id) ?? [],
-      deliveryInfoId: pickAddress.id,
+      // For digital items, use a default value that the API accepts for deliveryInfoId
+      deliveryInfoId: hasPhysicalItems ? pickAddress!.id : '',
       deliMethod: hasPhysicalItems ? shippingMethod : DeliveryMethod.NONESHIP,
       itemId: null,
       quantity: null,
@@ -243,6 +269,30 @@ export default function Checkout() {
                         <span className='font-medium'>{checkoutBuyNow?.totalPrice.toLocaleString()}đ</span>
                       </div>
                     )}
+
+                    {checkoutBuyNow?.combo !== null && (
+                      <div className='flex items-start'>
+                        <Image
+                          src={checkoutBuyNow?.combo.imageUrl ?? ''}
+                          alt={checkoutBuyNow?.combo.name ?? ''}
+                          width={80}
+                          height={80}
+                          className='w-20 h-20 object-cover rounded-md'
+                        />
+                        <div className='flex-grow ml-4'>
+                          <div className='flex items-center gap-2'>
+                            <h3 className='font-medium'>{checkoutBuyNow?.combo.name}</h3>
+                            <div className='flex items-center'>
+                              <span className='text-xs font-medium px-2 py-0.5 bg-indigo-100 text-indigo-800 rounded-full'>
+                                Combo
+                              </span>
+                            </div>
+                          </div>
+                          <p className='text-sm text-gray-500 mt-1'>Số lượng: {checkoutBuyNow?.quantity}</p>
+                        </div>
+                        <span className='font-medium'>{checkoutBuyNow?.totalPrice.toLocaleString()}đ</span>
+                      </div>
+                    )}
                   </CardContent>
                 )}
 
@@ -259,7 +309,7 @@ export default function Checkout() {
                         {productItems.map((item, index) => (
                           <div
                             key={index}
-                            className={`p-4 pb-4 ${index !== productItems.length - 1 ? 'border-b mb-4' : courseItems.length > 0 ? 'border-b mb-4' : ''}`}
+                            className={`p-4 pb-4 ${index !== productItems.length - 1 ? 'border-b mb-4' : courseItems.length > 0 || comboItems.length > 0 ? 'border-b mb-4' : ''}`}
                           >
                             <div className='flex items-start'>
                               <Image
@@ -272,6 +322,44 @@ export default function Checkout() {
                               <div className='flex-grow ml-4'>
                                 <h3 className='font-medium'>{item.product?.name}</h3>
                                 <p className='text-sm text-gray-500'>Số lượng: {item.quantity}</p>
+                              </div>
+                              <span className='font-medium'>{item.totalPrice.toLocaleString()}đ</span>
+                            </div>
+                          </div>
+                        ))}
+                      </>
+                    )}
+
+                    {/* Combo section */}
+                    {comboItems.length > 0 && (
+                      <>
+                        <div className='p-3 pl-4 bg-gray-50 border-b flex items-center'>
+                          <Package className='w-4 h-4 mr-2 text-indigo-500' />
+                          <h3 className='font-medium text-sm text-indigo-700'>Combo</h3>
+                        </div>
+                        {comboItems.map((item, index) => (
+                          <div
+                            key={index}
+                            className={`p-4 pb-4 ${index !== comboItems.length - 1 ? 'border-b mb-4' : courseItems.length > 0 ? 'border-b mb-4' : ''}`}
+                          >
+                            <div className='flex items-start'>
+                              <Image
+                                src={item.combo?.imageUrl ?? '/placeholder.png'}
+                                alt={item.combo?.name ?? ''}
+                                width={80}
+                                height={80}
+                                className='w-20 h-20 object-cover rounded-md'
+                              />
+                              <div className='flex-grow ml-4'>
+                                <div className='flex items-center gap-2'>
+                                  <h3 className='font-medium'>{item.combo?.name}</h3>
+                                  <div className='flex items-center'>
+                                    <span className='text-xs font-medium px-2 py-0.5 bg-indigo-100 text-indigo-800 rounded-full'>
+                                      Combo
+                                    </span>
+                                  </div>
+                                </div>
+                                <p className='text-sm text-gray-500 mt-1'>Số lượng: {item.quantity}</p>
                               </div>
                               <span className='font-medium'>{item.totalPrice.toLocaleString()}đ</span>
                             </div>
@@ -294,8 +382,8 @@ export default function Checkout() {
                           >
                             <div className='flex items-start'>
                               <Image
-                                src={item.course?.imageUrl || ''}
-                                alt={item.course?.title || ''}
+                                src={item.course?.imageUrl ?? ''}
+                                alt={item.course?.title ?? ''}
                                 width={80}
                                 height={80}
                                 className='w-20 h-20 object-cover rounded-md'
@@ -324,8 +412,8 @@ export default function Checkout() {
                       {item.product !== null && (
                         <div className='flex items-start'>
                           <Image
-                            src={item.product.imageUrl}
-                            alt={item.product.name}
+                            src={item.product.imageUrl ?? ''}
+                            alt={item.product.name ?? ''}
                             width={80}
                             height={80}
                             className='w-20 h-20 object-cover rounded-md'
@@ -342,8 +430,8 @@ export default function Checkout() {
                       {item.course !== null && (
                         <div className='flex items-start'>
                           <Image
-                            src={item.course.imageUrl}
-                            alt={item.course.title}
+                            src={item.course.imageUrl ?? ''}
+                            alt={item.course.title ?? ''}
                             width={80}
                             height={80}
                             className='w-20 h-20 object-cover rounded-md'
@@ -351,6 +439,30 @@ export default function Checkout() {
                           <div className='flex-grow ml-4'>
                             <h3 className='font-medium'>{item.course.title}</h3>
                             <p className='text-sm text-gray-500'>Số lượng: {item.quantity}</p>
+                          </div>
+                          <span className='font-medium'>{item.totalPrice.toLocaleString()}đ</span>
+                        </div>
+                      )}
+
+                      {item.combo !== null && (
+                        <div className='flex items-start'>
+                          <Image
+                            src={item.combo.imageUrl ?? '/placeholder.png'}
+                            alt={item.combo.name ?? ''}
+                            width={80}
+                            height={80}
+                            className='w-20 h-20 object-cover rounded-md'
+                          />
+                          <div className='flex-grow ml-4'>
+                            <div className='flex items-center gap-2'>
+                              <h3 className='font-medium'>{item.combo.name}</h3>
+                              <div className='flex items-center'>
+                                <span className='text-xs font-medium px-2 py-0.5 bg-indigo-100 text-indigo-800 rounded-full'>
+                                  Combo
+                                </span>
+                              </div>
+                            </div>
+                            <p className='text-sm text-gray-500 mt-1'>Số lượng: {item.quantity}</p>
                           </div>
                           <span className='font-medium'>{item.totalPrice.toLocaleString()}đ</span>
                         </div>
@@ -395,8 +507,8 @@ export default function Checkout() {
                       <Label htmlFor='BANKING'>Thanh toán qua ngân hàng</Label>
                     </div>
 
-                    {/* Chỉ hiện COD khi có sản phẩm vật lý */}
-                    {hasPhysicalItems && (
+                    {/* Chỉ hiện COD khi có sản phẩm vật lý (không phải course hoặc combo) */}
+                    {hasPhysicalItems && !hasOnlyDigitalItems && (
                       <div className='flex items-center space-x-2 mb-2'>
                         <RadioGroupItem value='COD' id='COD' />
                         <Label htmlFor='COD'>Thanh toán khi nhận hàng</Label>

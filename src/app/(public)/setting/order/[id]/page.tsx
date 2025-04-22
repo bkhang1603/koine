@@ -275,8 +275,23 @@ export default function OrderDetailPage(props: { params: Promise<{ id: string }>
                 {comboItems.map((item) => (
                   <div key={item.id} className='py-4 first:pt-0 last:pb-0'>
                     <div className='flex gap-4'>
+                      <div className='relative w-16 h-16'>
+                        <Image
+                          src={(item.combo as any).imageUrl || (item as any).itemImageUrl || '/placeholder.svg'}
+                          alt={item.combo.name}
+                          fill
+                          className='object-cover rounded-lg'
+                        />
+                      </div>
                       <div className='flex-1'>
-                        <h3 className='font-medium'>{item.combo.name}</h3>
+                        <div className='flex items-center gap-4'>
+                          <h3 className='font-medium'>{item.combo.name}</h3>
+                          <div className='flex flex-wrap items-center gap-2'>
+                            <span className='text-xs font-medium px-2 py-0.5 bg-indigo-100 text-indigo-800 rounded-full'>
+                              Combo
+                            </span>
+                          </div>
+                        </div>
                         <div className='flex items-center justify-between mt-2'>
                           <div className='text-sm text-muted-foreground'>
                             Số lượng: <span className='font-medium'>{item.quantity}</span>

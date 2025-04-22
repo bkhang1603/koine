@@ -20,7 +20,8 @@ import {
   AlertTriangle,
   RefreshCcw,
   Banknote,
-  Trash2
+  Trash2,
+  ShoppingCart
 } from 'lucide-react'
 import { Separator } from '@/components/ui/separator'
 import { Button } from '@/components/ui/button'
@@ -471,6 +472,52 @@ export default function OrderPage() {
                                     <div className='font-medium'>{detail?.itemTitle}</div>
                                     <div className='flex items-center text-sm text-muted-foreground mt-1'>
                                       <span>
+                                        {(detail?.unitPrice || 0).toLocaleString()}đ x {detail?.quantity || 0}
+                                      </span>
+                                    </div>
+                                  </div>
+                                  <div className='text-sm font-medium'>
+                                    {(
+                                      detail?.totalPrice || (detail?.unitPrice || 0) * (detail?.quantity || 0)
+                                    ).toLocaleString()}
+                                    đ
+                                  </div>
+                                </div>
+                              ))}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Combos */}
+                      {order?.orderDetails && order.orderDetails.filter((detail) => !!detail?.comboId).length > 0 && (
+                        <div className='space-y-3'>
+                          <div className='flex items-center gap-2 text-sm font-medium text-muted-foreground'>
+                            <ShoppingCart className='h-4 w-4' />
+                            <span>Combo ({order.orderDetails.filter((detail) => !!detail?.comboId).length})</span>
+                          </div>
+                          <div className='grid gap-3'>
+                            {order.orderDetails
+                              .filter((detail) => !!detail?.comboId)
+                              .map((detail, index) => (
+                                <div key={detail?.id || index} className='flex items-center gap-3'>
+                                  <div className='w-12 h-12 rounded-lg overflow-hidden'>
+                                    <Image
+                                      src={detail?.itemImageUrl || '/placeholder.svg'}
+                                      alt={detail?.itemTitle || ''}
+                                      width={50}
+                                      height={50}
+                                      className='object-cover w-full h-full'
+                                    />
+                                  </div>
+                                  <div className='flex-1'>
+                                    <div className='flex items-center gap-2'>
+                                      <div className='font-medium'>{detail?.itemTitle}</div>
+                                      <span className='text-xs font-medium px-2 py-0.5 bg-indigo-100 text-indigo-800 rounded-full'>
+                                        Combo
+                                      </span>
+                                    </div>
+                                    <div className='flex items-center gap-2 mt-1'>
+                                      <span className='text-sm text-muted-foreground'>
                                         {(detail?.unitPrice || 0).toLocaleString()}đ x {detail?.quantity || 0}
                                       </span>
                                     </div>
