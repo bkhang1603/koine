@@ -17,6 +17,7 @@ interface CourseButtonProps {
     imageUrl: string
     price: number
     discount: number
+    isCombo?: boolean
   }
   variant?: 'default' | 'outline'
   className?: string
@@ -39,7 +40,8 @@ export default function CourseButton({ course, variant = 'default', className }:
       }
 
       const value = {
-        courseId: course.id,
+        courseId: course.isCombo ? null : course.id,
+        comboId: course.isCombo ? course.id : null,
         productId: null,
         quantity: 1
       }

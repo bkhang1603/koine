@@ -59,6 +59,7 @@ export const AddCartDetailReq = z
   .object({
     productId: z.string().nullable(),
     courseId: z.string().nullable(),
+    comboId: z.string().nullable(),
     quantity: z.number()
   })
   .strict()

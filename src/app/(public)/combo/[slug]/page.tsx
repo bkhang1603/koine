@@ -99,7 +99,8 @@ export default async function ComboDetailPage(props: {
                 title: combo.name,
                 imageUrl: combo.imageUrl || '/no-image.png',
                 price: combo.price,
-                discount: combo.discount
+                discount: combo.discount,
+                isCombo: true
               }}
               className='w-full'
             />
@@ -110,7 +111,8 @@ export default async function ComboDetailPage(props: {
                 title: combo.name,
                 imageUrl: combo.imageUrl || '/no-image.png',
                 price: combo.price,
-                discount: combo.discount
+                discount: combo.discount,
+                isCombo: true
               }}
               className='w-full'
               variant='outline'

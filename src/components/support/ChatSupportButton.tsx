@@ -56,9 +56,9 @@ const ChatSupportButton = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false)
 
   // Queries
-  const { data: chatData, isLoading: isChatLoading, refetch: refetchChat } = useGetChatForUser()
+  const { data: chatData, isLoading: isChatLoading, refetch: refetchChat } = useGetChatForUser(!!user)
 
-  const { mutateAsync: startChatMutation, isPending: isStartingChat } = useStartChat()
+  const startChatMutation = useStartChat()
 
   // Parse chat data safely
   const chatRoom = useMemo(() => (chatData?.payload?.data || null) as ChatRoom | null, [chatData?.payload?.data])
@@ -128,10 +128,6 @@ const ChatSupportButton = () => {
       }
     }
 
-    function onDisconnect() {
-      setIsLoggedIn(false)
-    }
-
     function login() {
       socketForChat.emit(
         'login',
@@ -170,13 +166,9 @@ const ChatSupportButton = () => {
       onConnect()
     }
 
-    socketForChat.on('connect', onConnect)
-    socketForChat.on('disconnect', onDisconnect)
     socketForChat.on('newMessage', handleNewMessage)
 
     return () => {
-      socketForChat.off('connect', onConnect)
-      socketForChat.off('disconnect', onDisconnect)
       socketForChat.off('newMessage', handleNewMessage)
     }
   }, [user, token, isLoggedIn, chatRoom?.id, handleNewMessage, refetchChat, refetchMessages])
@@ -226,7 +218,7 @@ const ChatSupportButton = () => {
 
   const handleStartChat = async () => {
     try {
-      await startChatMutation({ message: 'Bắt đầu' })
+      await startChatMutation.mutateAsync({ message: 'Bắt đầu' })
       refetchChat()
     } catch (error) {
       console.error('Failed to start chat:', error)
@@ -315,8 +307,12 @@ const ChatSupportButton = () => {
                     <p className='text-xs text-gray-500 text-center max-w-xs mb-6'>
                       Bạn cần hỗ trợ? Hãy bắt đầu cuộc trò chuyện với nhân viên hỗ trợ của chúng tôi.
                     </p>
-                    <Button onClick={handleStartChat} disabled={isStartingChat} className='bg-primary text-white'>
-                      {isStartingChat ? (
+                    <Button
+                      onClick={handleStartChat}
+                      disabled={startChatMutation.isPending}
+                      className='bg-primary text-white'
+                    >
+                      {startChatMutation.isPending ? (
                         <>
                           <Loader2 className='h-4 w-4 animate-spin mr-2' /> Đang khởi tạo...
                         </>
@@ -433,10 +429,10 @@ const ChatSupportButton = () => {
                           </div>
                           <Button
                             onClick={handleStartChat}
-                            disabled={isStartingChat}
+                            disabled={startChatMutation.isPending}
                             className='bg-primary text-white w-full'
                           >
-                            {isStartingChat ? (
+                            {startChatMutation.isPending ? (
                               <>
                                 <Loader2 className='h-4 w-4 animate-spin mr-2' /> Đang khởi tạo...
                               </>

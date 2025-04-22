@@ -14,6 +14,7 @@ interface BuyNowButtonProps {
     imageUrl: string
     price: number
     discount: number
+    isCombo?: boolean
   }
   className?: string
 }
@@ -33,8 +34,8 @@ export default function BuyNowButton({ course, className }: BuyNowButtonProps) {
     const checkoutData = {
       id: course.id,
       productId: null,
-      courseId: course.id,
-      comboId: null,
+      courseId: course.isCombo ? null : course.id,
+      comboId: course.isCombo ? course.id : null,
       quantity: 1,
       unitPrice: course.price,
       totalPrice: course.price * (1 - course.discount),

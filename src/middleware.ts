@@ -112,31 +112,31 @@ const unAuthPrivatePaths = [...Object.values(roleBasedPaths).flat()]
 const unAuthPaths = ['/login', '/register']
 
 // Danh sách đường dẫn chỉ dành cho người dùng ADULT
-const adultOnlyPaths = [
-  '/',
-  '/setting',
-  '/setting/:path*',
-  '/product',
-  '/product/:path*',
-  '/course',
-  '/course/:path*',
-  '/cart',
-  '/checkout',
-  '/event',
-  '/event/:path*',
-  '/knowledge',
-  '/knowledge/:path*',
-  '/contact',
-  '/help/faq'
-]
+// const adultOnlyPaths = [
+//   '/',
+//   '/setting',
+//   '/setting/:path*',
+//   '/product',
+//   '/product/:path*',
+//   '/course',
+//   '/course/:path*',
+//   '/cart',
+//   '/checkout',
+//   '/event',
+//   '/event/:path*',
+//   '/knowledge',
+//   '/knowledge/:path*',
+//   '/contact',
+//   '/help/faq'
+// ]
 
 // Kiểm tra nếu đường dẫn hiện tại thuộc về danh sách chỉ dành cho ADULT
-const isAdultOnlyPath = (pathname: string) => {
-  return adultOnlyPaths.some((path) => {
-    // Kiểm tra chính xác path hoặc nếu path bắt đầu từ đường dẫn cơ sở (ví dụ: /product/123)
-    return pathname === path || (path !== '/' && pathname.startsWith(path + '/')) || (path === '/' && pathname === '/')
-  })
-}
+// const isAdultOnlyPath = (pathname: string) => {
+//   return adultOnlyPaths.some((path) => {
+//     // Kiểm tra chính xác path hoặc nếu path bắt đầu từ đường dẫn cơ sở (ví dụ: /product/123)
+//     return pathname === path || (path !== '/' && pathname.startsWith(path + '/')) || (path === '/' && pathname === '/')
+//   })
+// }
 
 // Hàm decode JWT không cần thư viện
 function decodeJwt(token: string) {
@@ -215,7 +215,7 @@ export function middleware(request: NextRequest) {
     }
 
     // 2.1 Nếu không phải role ADULT và cố truy cập các trang chỉ dành cho ADULT
-    if (userRole && userRole !== 'ADULT' && isAdultOnlyPath(pathname)) {
+    if (pathname === '/' && userRole && userRole !== 'ADULT') {
       const redirectPath = roleBasedPaths[userRole as keyof typeof roleBasedPaths]?.[0] || '/'
       return NextResponse.redirect(new URL(redirectPath, request.url))
     }

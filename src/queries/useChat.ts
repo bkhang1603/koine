@@ -16,10 +16,11 @@ export const useGetChatMessages = ({ id, limit, enabled }: { id: string; limit: 
   })
 }
 
-export const useGetChatForUser = () => {
+export const useGetChatForUser = (enabled: boolean) => {
   return useQuery({
     queryKey: ['chat-for-user'],
-    queryFn: chatApiRequest.getChatForUser
+    queryFn: chatApiRequest.getChatForUser,
+    enabled
   })
 }
 
