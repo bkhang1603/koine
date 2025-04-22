@@ -171,7 +171,8 @@ export default async function CourseDetail(props: {
                           title: courseData.title,
                           imageUrl: courseData.imageBanner,
                           price: courseData.price,
-                          discount: courseData.discount
+                          discount: courseData.discount,
+                          isCombo: courseData.isCombo
                         }}
                         className='w-full h-12 text-base font-medium'
                       />
@@ -188,7 +189,8 @@ export default async function CourseDetail(props: {
                           title: courseData.title,
                           imageUrl: courseData.imageBanner,
                           price: courseData.price,
-                          discount: courseData.discount
+                          discount: courseData.discount,
+                          isCombo: courseData.isCombo
                         }}
                         variant='outline'
                         className='w-full h-12 text-base font-medium'

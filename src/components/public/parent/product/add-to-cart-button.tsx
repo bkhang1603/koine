@@ -48,6 +48,7 @@ function AddToCartButton({ product }: { product: ProductResType['data'] }) {
 
       const value = {
         productId: product.id,
+        comboId: null,
         courseId: null, // Add courseId property
         quantity: data.quantity
       }
