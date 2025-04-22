@@ -313,7 +313,9 @@ export default function Cart() {
                                 </div>
                               </div>
                               <div className='grid grid-cols-4 gap-4 w-1/2 items-center'>
-                                <span className='text-center text-sm'>{item.unitPrice.toLocaleString()}đ</span>
+                                <span className='text-center text-sm'>
+                                  {(item.unitPrice - item.unitPrice * item.discount).toLocaleString()}đ
+                                </span>
                                 <div className='flex items-center justify-center'>
                                   {item.product?.stockQuantity! > 0 ? (
                                     <>
@@ -407,7 +409,9 @@ export default function Cart() {
                                     </div>
                                   </div>
                                   <div className='grid grid-cols-4 gap-4 w-1/2 items-center'>
-                                    <span className='text-center text-sm'>{item.unitPrice.toLocaleString()}đ</span>
+                                    <span className='text-center text-sm'>
+                                      {(item.unitPrice - item.unitPrice * item.discount).toLocaleString()}đ
+                                    </span>
                                     <div className='flex items-center justify-center'>
                                       <>
                                         <Button
