@@ -1,6 +1,6 @@
 'use client'
 
-import { use, useEffect, useMemo, useState } from 'react'
+import { use, useEffect, useMemo } from 'react'
 import { SearchParams } from '@/types/query'
 import { handleErrorApi } from '@/lib/utils'
 import { Breadcrumb } from '@/components/private/common/breadcrumb'
@@ -9,10 +9,6 @@ import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { MessageCircle, User } from 'lucide-react'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useGetCourseReviewQuery } from '@/queries/useCourse'
-import { Button } from '@/components/ui/button'
-import { Textarea } from '@/components/ui/textarea'
-import { toast } from '@/components/ui/use-toast'
-import { useCreateCourseCommentMutation } from '@/queries/useCourse'
 
 // Define interface for review structure based on the CourseReviewRes schema
 interface ReviewUser {
@@ -39,8 +35,6 @@ function CommentList(props: { params: Promise<{ id: string }>; searchParams: Sea
   // unwrap searchParams and cast to the right type (non-Promise version)
 
   const courseId = params.id
-  const [activeReply, setActiveReply] = useState<string | null>(null)
-  const [replyContent, setReplyContent] = useState('')
 
   // Use useGetCourseReviewQuery for reviews
   const {
@@ -50,9 +44,6 @@ function CommentList(props: { params: Promise<{ id: string }>; searchParams: Sea
   } = useGetCourseReviewQuery({
     id: courseId
   })
-
-  // Add course comment mutation
-  const createCommentMutation = useCreateCourseCommentMutation()
 
   useEffect(() => {
     if (error) {
@@ -76,56 +67,6 @@ function CommentList(props: { params: Promise<{ id: string }>; searchParams: Sea
     }),
     [courseId]
   )
-
-  // Toggle reply input
-  const handleToggleReply = (reviewId: string) => {
-    if (activeReply === reviewId) {
-      setActiveReply(null)
-      setReplyContent('')
-    } else {
-      setActiveReply(reviewId)
-      setReplyContent('')
-    }
-  }
-
-  // Handle creating a reply
-  const handleCreateReply = (reviewId: string) => {
-    if (!replyContent.trim()) {
-      toast({
-        title: 'Thông báo',
-        description: 'Vui lòng nhập nội dung trả lời',
-        variant: 'destructive'
-      })
-      return
-    }
-
-    const commentData = {
-      courseId: courseId,
-      replyId: reviewId,
-      content: replyContent
-    }
-
-    console.log('Comment data before sending:', commentData)
-
-    createCommentMutation.mutate(commentData, {
-      onSuccess: () => {
-        toast({
-          title: 'Thành công',
-          description: 'Trả lời đã được gửi thành công'
-        })
-        setReplyContent('')
-        setActiveReply(null)
-      },
-      onError: (error) => {
-        toast({
-          title: 'Lỗi',
-          description: 'Có lỗi xảy ra khi gửi trả lời',
-          variant: 'destructive'
-        })
-        handleErrorApi({ error })
-      }
-    })
-  }
 
   const breadcrumbItems = [
     {
@@ -161,43 +102,9 @@ function CommentList(props: { params: Promise<{ id: string }>; searchParams: Sea
             <p className='text-sm break-words'>{review.review}</p>
           </div>
 
-          <div className='flex items-center text-xs text-slate-500 gap-3'>
+          <div className='flex items-center text-xs text-slate-500'>
             <div>{review.createdAtFormatted}</div>
-            <button onClick={() => handleToggleReply(review.user.id)} className='font-medium hover:underline'>
-              Trả lời
-            </button>
           </div>
-
-          {/* Reply form */}
-          {activeReply === review.user.id && (
-            <div className='mt-2 flex gap-2'>
-              <Avatar className='h-7 w-7 mt-1'>
-                <AvatarFallback>
-                  <User className='h-3 w-3' />
-                </AvatarFallback>
-              </Avatar>
-              <div className='flex-1'>
-                <Textarea
-                  placeholder='Viết phản hồi...'
-                  className='min-h-16 mb-2 text-sm'
-                  value={replyContent}
-                  onChange={(e) => setReplyContent(e.target.value)}
-                />
-                <div className='flex justify-end gap-2'>
-                  <Button variant='outline' size='sm' onClick={() => setActiveReply(null)}>
-                    Hủy
-                  </Button>
-                  <Button
-                    size='sm'
-                    onClick={() => handleCreateReply(review.user.id)}
-                    disabled={createCommentMutation.isPending || !replyContent.trim()}
-                  >
-                    {createCommentMutation.isPending ? 'Đang gửi...' : 'Phản hồi'}
-                  </Button>
-                </div>
-              </div>
-            </div>
-          )}
         </div>
       </div>
     </div>
@@ -231,7 +138,6 @@ function CommentList(props: { params: Promise<{ id: string }>; searchParams: Sea
                     <Skeleton className='h-4 w-32' />
                     <Skeleton className='h-16 w-full' />
                     <div className='flex gap-2'>
-                      <Skeleton className='h-3 w-16' />
                       <Skeleton className='h-3 w-16' />
                     </div>
                   </div>
