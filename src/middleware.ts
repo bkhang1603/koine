@@ -97,7 +97,8 @@ const roleBasedPaths = {
   CONTENT_CREATOR: ['/content-creator', '/content-creator/:path*'],
   EXPERT: ['/expert', '/expert/:path*'],
   CHILD: ['/kid', '/kid/:path*'],
-  SALESMAN: ['/salesman', '/salesman/:path*']
+  SALESMAN: ['/salesman', '/salesman/:path*'],
+  SUPPORTER: ['/support', '/support/:path*']
 }
 
 // Đường dẫn cần xác thực nhưng không ràng buộc role
@@ -110,6 +111,9 @@ const privatePaths = [...commonPrivatePaths, ...Object.values(roleBasedPaths).fl
 const unAuthPrivatePaths = [...Object.values(roleBasedPaths).flat()]
 
 const unAuthPaths = ['/login', '/register']
+
+// Đường dẫn không cho phép truy cấp nếu không phải adult
+const blockedPaths = ['/knowledge', '/knowledge/:path*', '/course', '/course/:path*', '/product', '/product/:path*']
 
 // Hàm decode JWT không cần thư viện
 function decodeJwt(token: string) {
@@ -188,7 +192,13 @@ export function middleware(request: NextRequest) {
     }
 
     // 2.1 Nếu là role khác ADULT và cố truy cập trang chủ
-    if (pathname === '/' && userRole && userRole !== 'ADULT') {
+    // if (pathname === '/' && userRole && userRole !== 'ADULT') {
+    //   const redirectPath = roleBasedPaths[userRole as keyof typeof roleBasedPaths]?.[0] || '/'
+    //   return NextResponse.redirect(new URL(redirectPath, request.url))
+    // }
+
+    // 2.2 Nếu là role khác ADULT và cố truy cập trang chủ
+    if (blockedPaths.some((path) => pathname.startsWith(path.split('/:')[0])) && userRole && userRole !== 'ADULT') {
       const redirectPath = roleBasedPaths[userRole as keyof typeof roleBasedPaths]?.[0] || '/'
       return NextResponse.redirect(new URL(redirectPath, request.url))
     }
@@ -225,6 +235,7 @@ export const config = {
     '/login',
     '/register',
     '/course',
+    '/product',
     '/about',
     '/knowledge',
     '/contact',
@@ -234,7 +245,17 @@ export const config = {
     '/setting/:path*',
     '/learn/:path*',
     '/admin/:path*',
+    '/admin',
     '/content-creator/:path*',
+    '/content-creator',
+    '/support/:path*',
+    '/support',
+    '/salesman/:path*',
+    '/salesman',
+    '/expert/:path*',
+    '/expert',
+    '/manager/:path*',
+    '/manager',
     '/kid/:path*',
     '/unauthorized',
     '/cart',

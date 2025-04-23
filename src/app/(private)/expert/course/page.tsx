@@ -1,22 +1,22 @@
 'use client'
 
-import { use } from 'react'
-import { SearchParams } from '@/types/query'
-import { useCoursesAdminQuery } from '@/queries/useCourse'
-import { CourseStats } from '@/components/private/expert/course/course-stats'
-import { Button } from '@/components/ui/button'
+import { use, useMemo, useCallback } from 'react'
 import { LayoutList } from 'lucide-react'
-import Link from 'next/link'
-import { useMemo } from 'react'
 import { TableCustom, dataListType } from '@/components/table-custom'
+import { SearchParams } from '@/types/query'
+import { useRouter } from 'next/navigation'
 import { Badge } from '@/components/ui/badge'
 import { format } from 'date-fns'
 import { vi } from 'date-fns/locale'
 import { MoreOptions } from '@/components/private/common/more-options'
+import { useGetDraftCoursesQuery, useUpdateStatusCourseMutation } from '@/queries/useCourse'
 import Image from 'next/image'
-import { useRouter } from 'next/navigation'
+import { Button } from '@/components/ui/button'
+import Link from 'next/link'
+import { toast } from '@/components/ui/use-toast'
+import { formatCourseStatus, handleErrorApi } from '@/lib/utils'
 
-function ExpertCourse(props: { searchParams: SearchParams }) {
+function SalesmanCourse(props: { searchParams: SearchParams }) {
   const searchParams = use(props.searchParams)
   const router = useRouter()
 
@@ -26,11 +26,61 @@ function ExpertCourse(props: { searchParams: SearchParams }) {
   const currentPageIndex = Number(searchParams.page_index) || 1
 
   // Gọi API với giá trị từ URL
-  const { data: responseData, isLoading } = useCoursesAdminQuery({
+  const { data: responseData, isLoading } = useGetDraftCoursesQuery({
     keyword: currentKeyword,
     page_size: currentPageSize,
     page_index: currentPageIndex
   })
+
+  const updateStatusCourseMutation = useUpdateStatusCourseMutation()
+
+  const handleUpdateStatus = useCallback(
+    async (courseId: string) => {
+      try {
+        // Update status to PENDINGPRICING
+        await updateStatusCourseMutation.mutateAsync({
+          id: courseId,
+          data: {
+            status: 'PENDINGPRICING',
+            isDraft: false
+          }
+        })
+
+        toast({
+          description: 'Duyệt khóa học thành công'
+        })
+      } catch (error) {
+        handleErrorApi({
+          error
+        })
+      }
+    },
+    [updateStatusCourseMutation]
+  )
+
+  const handleRejectCourse = useCallback(
+    async (courseId: string) => {
+      try {
+        // Update status to REJECTED
+        await updateStatusCourseMutation.mutateAsync({
+          id: courseId,
+          data: {
+            status: 'REJECTED',
+            isDraft: false
+          }
+        })
+
+        toast({
+          description: 'Từ chối khóa học thành công'
+        })
+      } catch (error) {
+        handleErrorApi({
+          error
+        })
+      }
+    },
+    [updateStatusCourseMutation]
+  )
 
   const data = responseData?.payload.data || []
   const pagination = responseData?.payload.pagination || {
@@ -41,12 +91,6 @@ function ExpertCourse(props: { searchParams: SearchParams }) {
     maxPageSize: 0
   }
 
-  // Tính toán thống kê
-  const totalCourses = pagination.totalItem || 0
-  const visibleCourses = data.filter((course: any) => course.isVisible).length
-  const draftCourses = data.filter((course: any) => course.isDraft).length
-  const bannedCourses = data.filter((course: any) => course.isBanned).length
-
   // Cấu hình cột cho bảng
   const headerColumn = [
     { id: 1, name: 'Tên khóa học' },
@@ -56,8 +100,6 @@ function ExpertCourse(props: { searchParams: SearchParams }) {
     { id: 5, name: 'Khóa' },
     { id: 6, name: '' }
   ]
-
-  const handleReview = () => null
 
   const bodyColumn = useMemo(
     () => [
@@ -109,7 +151,7 @@ function ExpertCourse(props: { searchParams: SearchParams }) {
         render: (course: any) => (
           <div className='flex items-center min-w-[100px]'>
             <Badge variant='outline' className='w-fit bg-primary/10'>
-              {course.status || 'ACTIVE'}
+              {formatCourseStatus(course.status)}
             </Badge>
           </div>
         )
@@ -132,18 +174,23 @@ function ExpertCourse(props: { searchParams: SearchParams }) {
               item={{
                 id: course.id,
                 title: course.title,
-                status: course.isBanned ? 'Đã khóa' : 'Hoạt động',
-                slug: course.slug
+                status: course.status,
+                slug: course.slug,
+                isDraft: course.isDraft
               }}
               itemType='course'
               onView={() => router.push(`/expert/course/${course.id}`)}
-              onReview={() => handleReview}
+              onUpdateStatusCourse={() => handleUpdateStatus(course.id)}
+              onReject={() => handleRejectCourse(course.id)}
+              updateStatusLabel='Duyệt khóa học'
+              isUpdateStatusEnabled={course.status === 'PENDINGREVIEW'}
+              isActionEnabled={course.status === 'PENDINGREVIEW'}
             />
           </div>
         )
       }
     ],
-    [router]
+    [router, handleUpdateStatus, handleRejectCourse]
   )
 
   const tableData: dataListType = {
@@ -161,7 +208,7 @@ function ExpertCourse(props: { searchParams: SearchParams }) {
             <h1 className='text-2xl font-bold'>Quản lý khóa học</h1>
             <p className='text-muted-foreground mt-1'>Quản lý và theo dõi tất cả khóa học trong hệ thống</p>
           </div>
-          <Link href='/expert/course/categories'>
+          <Link href='/salesman/course/categories'>
             <Button variant='outline'>
               <LayoutList className='w-4 h-4 mr-2' />
               Quản lý danh mục
@@ -170,22 +217,13 @@ function ExpertCourse(props: { searchParams: SearchParams }) {
         </div>
       </div>
 
-      {/* Stats Cards */}
-      <CourseStats
-        isLoading={isLoading}
-        totalCourses={totalCourses}
-        visibleCourses={visibleCourses}
-        draftCourses={draftCourses}
-        bannedCourses={bannedCourses}
-      />
-
       {/* Table */}
       <TableCustom
         data={tableData}
         headerColumn={headerColumn}
         bodyColumn={bodyColumn}
         loading={isLoading}
-        href='/expert/course'
+        href='/salesman/course'
         showSearch={true}
         searchParamName='keyword'
         searchPlaceholder='Tìm kiếm khoá học...'
@@ -194,4 +232,4 @@ function ExpertCourse(props: { searchParams: SearchParams }) {
   )
 }
 
-export default ExpertCourse
+export default SalesmanCourse

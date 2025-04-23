@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button'
 import { Plus, Settings, BookOpen, MessageSquare, BarChart, ThumbsUp } from 'lucide-react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
-import { useBlogDeleteMutation, useMyBlogsQuery } from '@/queries/useBlog'
+import { useBlogDeleteMutation, useMyBlogsQuery, useBlogUpdateStatusMutation } from '@/queries/useBlog'
 import { Skeleton } from '@/components/ui/skeleton'
 import { toast } from '@/components/ui/use-toast'
 import { handleErrorApi } from '@/lib/utils'
@@ -51,6 +51,7 @@ export default function BlogPage() {
   })
 
   const deleteBlogMutation = useBlogDeleteMutation()
+  const updateStatusMutation = useBlogUpdateStatusMutation()
 
   // Dữ liệu blog từ API
   const blogs = blogsResponse?.payload.data.blogs || []
@@ -82,6 +83,23 @@ export default function BlogPage() {
       }
     },
     [deleteBlogMutation]
+  )
+
+  const handleUpdateStatus = useCallback(
+    async (id: string, currentStatus: string) => {
+      try {
+        const newStatus = currentStatus === 'VISIBLE' ? 'HIDDEN' : 'VISIBLE'
+        await updateStatusMutation.mutateAsync({ id, status: newStatus })
+        toast({
+          description: `Bài viết đã được ${newStatus === 'VISIBLE' ? 'hiển thị' : 'ẩn'}`
+        })
+      } catch (error) {
+        handleErrorApi({
+          error
+        })
+      }
+    },
+    [updateStatusMutation]
   )
 
   // Column configuration for the table
@@ -149,7 +167,7 @@ export default function BlogPage() {
         render: (blog: any) => (
           <div className='flex items-center min-w-[100px]'>
             <Badge variant={blog.status === 'VISIBLE' ? 'green' : 'secondary'} className='w-fit'>
-              {blog.status === 'VISIBLE' ? 'Đã xuất bản' : 'Bản nháp'}
+              {blog.status === 'VISIBLE' ? 'Hiển thị' : 'Ẩn'}{' '}
             </Badge>
           </div>
         )
@@ -169,14 +187,13 @@ export default function BlogPage() {
               onView={() => router.push(`/content-creator/blog/${blog.id}`)}
               onEdit={() => router.push(`/content-creator/blog/${blog.id}/edit`)}
               onDelete={() => handleDelete(blog.id)}
-              onManageComments={() => router.push(`/content-creator/blog/${blog.id}/comments`)}
-              onPreview={() => window.open(`/knowledge/${blog.slug}`, '_blank')}
+              onUpdateStatusBlog={() => handleUpdateStatus(blog.id, blog.status)}
             />
           </div>
         )
       }
     ],
-    [router, handleDelete]
+    [router, handleDelete, handleUpdateStatus]
   )
 
   const tableData: dataListType = {

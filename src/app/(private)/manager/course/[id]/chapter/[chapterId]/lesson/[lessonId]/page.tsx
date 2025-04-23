@@ -5,12 +5,10 @@ import { useGetLessonQuery, useGetCourseQuery } from '@/queries/useCourse'
 import { Breadcrumb } from '@/components/private/common/breadcrumb'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import { Clock, FileText, Video, ArrowLeft } from 'lucide-react'
+import { Clock, FileText, Video } from 'lucide-react'
 import { Skeleton } from '@/components/ui/skeleton'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
-import { Avatar, AvatarFallback } from '@/components/ui/avatar'
-import { formatDate } from '@/lib/utils'
 import { useRef, useEffect } from 'react'
 import Artplayer from 'artplayer'
 
@@ -201,16 +199,6 @@ export default function LessonDetailPage(props: {
           <Breadcrumb items={breadcrumbItems} />
         </div>
 
-        {/* Back and Action Buttons */}
-        <div className='flex items-center justify-between mb-6'>
-          <Button variant='outline' asChild>
-            <Link href={`/manager/course/${params.id}/chapter/${chapter.id}`}>
-              <ArrowLeft className='w-4 h-4 mr-2' />
-              Quay lại chương học
-            </Link>
-          </Button>
-        </div>
-
         {/* Main Content Card */}
         <Card className='mb-8 overflow-hidden'>
           {/* Header with title and lesson info */}
@@ -220,12 +208,6 @@ export default function LessonDetailPage(props: {
               <div className='flex flex-wrap items-center gap-3'>
                 <h1 className='text-3xl font-bold'>{lesson.title}</h1>
                 <LessonTypeDisplay type={lesson.type} />
-                <Badge
-                  variant={lesson.status === 'PUBLISHED' ? 'default' : 'outline'}
-                  className={lesson.status === 'PUBLISHED' ? 'bg-green-500 border-0' : ''}
-                >
-                  {lesson.status === 'PUBLISHED' ? 'Đã xuất bản' : 'Chưa xuất bản'}
-                </Badge>
               </div>
 
               {/* Metadata */}
@@ -243,17 +225,6 @@ export default function LessonDetailPage(props: {
                       : '?'}
                     /{chapter?.lessons.length || '?'}
                   </span>
-                </div>
-              </div>
-
-              {/* Author info */}
-              <div className='flex items-center gap-2 pt-2'>
-                <Avatar className='h-8 w-8'>
-                  <AvatarFallback>A</AvatarFallback>
-                </Avatar>
-                <div className='text-sm'>
-                  <p className='font-medium'>Admin</p>
-                  <p className='text-xs text-muted-foreground'>{formatDate(new Date().toISOString())}</p>
                 </div>
               </div>
             </div>

@@ -1,6 +1,6 @@
 import { Sidebar } from '@/types/sidebar'
 import SidebarLayout from '@/components/layout/sidebar-layout'
-import { LayoutDashboard, Users, Package, BookOpen, Receipt, Tags } from 'lucide-react'
+import { LayoutDashboard, Users, Package, BookOpen, Receipt } from 'lucide-react'
 
 export default function SalesmanLayout({
   children
@@ -50,12 +50,6 @@ export default function SalesmanLayout({
           href: '/salesman/product',
           icon: <Package className='h-5 w-5' />,
           label: 'Sản phẩm'
-        },
-        {
-          id: 'promotions',
-          href: '/salesman/promotions',
-          icon: <Tags className='h-5 w-5' />,
-          label: 'Khuyến mãi'
         }
       ]
     }

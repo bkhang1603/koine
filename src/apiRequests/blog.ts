@@ -15,7 +15,8 @@ import {
   BlogUpdateBodyType,
   CategoryBlogDetailResType,
   CategoryBlogResType,
-  GetMyBlogsResType
+  GetMyBlogsResType,
+  UpdateStatusBlogResType
 } from '@/schemaValidations/blog.schema'
 import { ReactDataResType, UpdateReactDataType } from '@/schemaValidations/course.schema'
 import { OnlyMessageResType } from '@/schemaValidations/special.schema'
@@ -105,7 +106,15 @@ const blogApiRequest = {
     keyword?: string | string[] | undefined
   }) => http.get<GetBlogsListAdminResType>(`/blogs?page_index=${page_index}&page_size=${page_size}&keyword=${keyword}`),
   getBlogDetailAdmin: (id: string) => http.get<GetBlogDetailAdminResType>(`/blogs/${id}`),
-  getBlogCommentsAdmin: (id: string) => http.get<GetBlogCommentsAdminResType>(`/blog-comments/${id}`),
+  getBlogCommentsAdmin: ({
+    page_index,
+    page_size,
+    id
+  }: {
+    page_index?: number | undefined
+    page_size?: number | undefined
+    id?: string | string[] | undefined
+  }) => http.get<GetBlogCommentsAdminResType>(`/blog-comments/${id}?page_index=${page_index}&page_size=${page_size}`),
   getMyBlogs: ({
     page_index,
     page_size,
@@ -117,7 +126,9 @@ const blogApiRequest = {
   }) =>
     http.get<GetMyBlogsResType>(
       `/blogs/my-blogs?page_index=${page_index}&page_size=${page_size}${keyword ? `&keyword=${keyword}` : ''}`
-    )
+    ),
+  updateIsVisibleCourse: (id: string, status: string) =>
+    http.put<UpdateStatusBlogResType>(`/blogs/status/${id}?status=${status}`, {})
 }
 
 export default blogApiRequest

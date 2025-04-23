@@ -3,8 +3,8 @@ import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContai
 
 interface EventTrendData {
   date: string
-  created: number
-  completed: number
+  events: number
+  participants: number
 }
 
 interface EventTrendChartProps {
@@ -34,21 +34,24 @@ export function EventTrendChart({ data, title, description }: EventTrendChartPro
             >
               <CartesianGrid strokeDasharray='3 3' />
               <XAxis dataKey='date' tick={{ fontSize: 12 }} tickMargin={10} />
-              <YAxis />
+              <YAxis yAxisId='left' />
+              <YAxis yAxisId='right' orientation='right' />
               <Tooltip />
               <Legend />
               <Line
+                yAxisId='left'
                 type='monotone'
-                dataKey='created'
-                name='Sự kiện tạo mới'
+                dataKey='events'
+                name='Số sự kiện diễn ra'
                 stroke='#8b5cf6'
                 activeDot={{ r: 8 }}
                 strokeWidth={2}
               />
               <Line
+                yAxisId='right'
                 type='monotone'
-                dataKey='completed'
-                name='Sự kiện đã kết thúc'
+                dataKey='participants'
+                name='Số người tham gia'
                 stroke='#f59e0b'
                 activeDot={{ r: 8 }}
                 strokeWidth={2}

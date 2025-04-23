@@ -1,261 +1,182 @@
 'use client'
 
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
-import { Progress } from '@/components/ui/progress'
-import { BookOpen, Star, MessageSquare, Eye, Clock, FileText, Users } from 'lucide-react'
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
-import Link from 'next/link'
+import { useEffect, useMemo, useState } from 'react'
+import { getDateRangeFromType, parseUrlDate, getValidRangeType, RangeType } from '@/lib/utils'
+import { BookOpen, Star, Eye, Users } from 'lucide-react'
+import { DateRangePicker } from '@/components/private/common/dashboard/date-range-picker'
+import { DateRange } from 'react-day-picker'
+import { format } from 'date-fns'
+import { StatsCard } from '@/components/private/content-creator/dashboard/stats-card'
+import { ContentTrendChart } from '@/components/private/content-creator/dashboard/content-trend-chart'
+import { ContentStatusChart } from '@/components/private/content-creator/dashboard/content-status-chart'
+import { PopularContentCard } from '@/components/private/content-creator/dashboard/popular-content-card'
+import { AgeGroupsCard } from '@/components/private/content-creator/dashboard/age-groups-card'
+import { DashboardSkeleton } from '@/components/private/content-creator/dashboard/dashboard-skeleton'
+import { useRouter, useSearchParams } from 'next/navigation'
 
-const quickStats = [
-  {
-    title: 'Tổng bài viết',
-    value: '24',
-    trend: '+4 tuần này',
-    icon: FileText,
-    color: 'blue'
-  },
-  {
-    title: 'Tổng khóa học',
-    value: '8',
-    trend: '+1 tuần này',
-    icon: BookOpen,
-    color: 'purple'
-  },
-  {
-    title: 'Bình luận mới',
-    value: '18',
-    trend: '12 chưa đọc',
-    icon: MessageSquare,
-    color: 'green'
-  },
-  {
-    title: 'Đánh giá trung bình',
-    value: '4.8',
-    trend: '142 đánh giá',
-    icon: Star,
-    color: 'yellow'
+// Import mock data
+import { statsData, contentTrendData, contentStatusData, popularContentData, ageGroupData } from './dashboard-mock-data'
+
+export default function ContentCreatorDashboard() {
+  const searchParams = useSearchParams()
+  const router = useRouter()
+
+  // Loading state
+  const [isLoading, setIsLoading] = useState(true)
+
+  // Get from/to dates from URL or use default 3-month range
+  const fromParam = searchParams.get('from')
+  const toParam = searchParams.get('to')
+  const rangeTypeParam = searchParams.get('range_type') as RangeType | null
+
+  // Validate range type from URL or use default
+  const validRangeType = useMemo(() => getValidRangeType(rangeTypeParam || '3_MONTH'), [rangeTypeParam])
+
+  // Parse URL date params or get default date range
+  const parsedDateRange = useMemo(() => {
+    if (fromParam && toParam) {
+      const fromDate = parseUrlDate(fromParam)
+      const toDate = parseUrlDate(toParam)
+
+      if (fromDate && toDate) {
+        return { from: fromDate, to: toDate }
+      }
+    }
+
+    return getDateRangeFromType(validRangeType)
+  }, [fromParam, toParam, validRangeType])
+
+  // Local state for the date range
+  const [dateRange, setDateRange] = useState<DateRange | undefined>(parsedDateRange)
+
+  useEffect(() => {
+    // Simulate API call loading
+    const timer = setTimeout(() => {
+      setIsLoading(false)
+    }, 1000)
+
+    return () => clearTimeout(timer)
+  }, [])
+
+  // Update URL when date range changes
+  const handleDateRangeChange = (range: DateRange | undefined, rangeType: RangeType) => {
+    if (!range?.from || !range?.to) return
+
+    const params = new URLSearchParams(searchParams.toString())
+    params.set('from', format(range.from, 'yyyy-MM-dd'))
+    params.set('to', format(range.to, 'yyyy-MM-dd'))
+    params.set('range_type', rangeType)
+
+    router.push(`?${params.toString()}`)
   }
-]
 
-const contentPerformance = [
-  { name: 'T2', blog: 240, course: 180 },
-  { name: 'T3', blog: 300, course: 200 },
-  { name: 'T4', blog: 280, course: 250 },
-  { name: 'T5', blog: 350, course: 280 },
-  { name: 'T6', blog: 400, course: 300 },
-  { name: 'T7', blog: 380, course: 320 },
-  { name: 'CN', blog: 420, course: 380 }
-]
-
-const popularContent = [
-  {
-    title: 'Kỹ năng tự bảo vệ bản thân',
-    type: 'Khóa học',
-    views: 1234,
-    engagement: 85,
-    ageGroup: '9-11 tuổi'
-  },
-  {
-    title: 'An toàn trên mạng xã hội',
-    type: 'Blog',
-    views: 856,
-    engagement: 92,
-    ageGroup: '12-14 tuổi'
-  },
-  {
-    title: 'Giới tính và sự phát triển',
-    type: 'Khóa học',
-    views: 654,
-    engagement: 78,
-    ageGroup: '12-14 tuổi'
+  // Handle date range change from DateRangePicker
+  const onDateRangeChange = (range: DateRange | undefined) => {
+    setDateRange(range)
   }
-]
 
-const recentActivities = [
-  {
-    type: 'comment',
-    title: 'Bình luận mới',
-    message: 'Phụ huynh Nguyễn Văn A đã bình luận về bài viết "An toàn trên mạng"',
-    time: '5 phút trước'
-  },
-  {
-    type: 'review',
-    title: 'Đánh giá khóa học',
-    message: 'Khóa học "Giới tính và sự phát triển" nhận được đánh giá 5 sao',
-    time: '30 phút trước'
-  },
-  {
-    type: 'alert',
-    title: 'Nội dung cần duyệt',
-    message: 'Có 3 bình luận mới đang chờ được duyệt',
-    time: '1 giờ trước'
+  // Handle range type change
+  const onRangeTypeChange = (rangeType: RangeType) => {
+    if (dateRange?.from && dateRange?.to) {
+      handleDateRangeChange(dateRange, rangeType)
+    }
   }
-]
 
-export default function DashboardPage() {
+  // Add enrollment data for popular courses
+  const popularCourses = popularContentData.map((course, index) => ({
+    ...course,
+    // Add simulated enrollment numbers using index to make values different
+    views: 300 - index * 50 // 300, 250, 200 enrollments based on position
+  }))
+
+  // If loading, show skeleton
+  if (isLoading) {
+    return (
+      <div className='container mx-auto px-4 py-6'>
+        <h1 className='text-2xl font-bold mb-6'>Quản lý khóa học</h1>
+        <DashboardSkeleton />
+      </div>
+    )
+  }
+
   return (
-    <div className='container mx-auto px-4 py-6 space-y-8'>
-      {/* Quick Actions */}
-      <div className='flex flex-wrap gap-4'>
-        <Button className='flex items-center gap-2' asChild>
-          <Link href='/content-creator/blog/new'>
-            <FileText className='w-4 h-4' />
-            Tạo bài viết
-          </Link>
-        </Button>
-        <Button className='flex items-center gap-2' asChild>
-          <Link href='/content-creator/course/new'>
-            <BookOpen className='w-4 h-4' />
-            Tạo khóa học
-          </Link>
-        </Button>
-        <Button variant='outline' className='flex items-center gap-2' asChild>
-          <a href='/content-creator/comments'>
-            <MessageSquare className='w-4 h-4' />
-            Quản lý bình luận
-          </a>
-        </Button>
+    <div className='container mx-auto px-4 py-6 space-y-6'>
+      {/* Header with Date Range Picker */}
+      <div className='flex flex-col md:flex-row md:items-center justify-between gap-4'>
+        <div>
+          <h1 className='text-2xl font-bold'>Quản lý khóa học</h1>
+          <p className='text-muted-foreground'>Trang tổng quan khóa học của bạn</p>
+        </div>
+        <DateRangePicker
+          value={dateRange}
+          onChange={onDateRangeChange}
+          onRangeTypeChange={onRangeTypeChange}
+          initialSelectedOption={validRangeType}
+          className='w-full md:w-auto'
+        />
       </div>
 
-      {/* Stats Overview */}
-      <div className='grid gap-4 md:grid-cols-2 lg:grid-cols-4'>
-        {quickStats.map((stat, index) => (
-          <Card key={index}>
-            <CardContent className='p-6'>
-              <div className='flex items-center justify-between'>
-                <div>
-                  <p className='text-sm font-medium text-muted-foreground'>{stat.title}</p>
-                  <h3 className='text-2xl font-bold mt-2'>{stat.value}</h3>
-                  <p className='text-xs text-muted-foreground mt-1'>{stat.trend}</p>
-                </div>
-                <div className={`p-3 bg-${stat.color}-100 rounded-full`}>
-                  <stat.icon className={`w-5 h-5 text-${stat.color}-500`} />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
+      {/* Course Stats */}
+      <div>
+        <h2 className='text-lg font-semibold mb-3'>Thống kê khóa học</h2>
+        <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4'>
+          <StatsCard
+            title='Tổng khóa học'
+            value={statsData.totalCourses}
+            description='Tổng số khóa học của bạn'
+            icon={BookOpen}
+            iconColor='text-purple-600'
+            iconBgColor='bg-purple-100'
+          />
+          <StatsCard
+            title='Tổng lượt xem'
+            value={statsData.totalCourseViews.toLocaleString()}
+            description='Trên tất cả khóa học'
+            icon={Eye}
+            iconColor='text-indigo-600'
+            iconBgColor='bg-indigo-100'
+          />
+          <StatsCard
+            title='Tổng lượt đăng ký'
+            value={statsData.totalCourseEnrollments.toLocaleString()}
+            description='Học viên đã đăng ký'
+            icon={Users}
+            iconColor='text-green-600'
+            iconBgColor='bg-green-100'
+          />
+          <StatsCard
+            title='Đánh giá trung bình'
+            value={statsData.averageCourseRating}
+            description='Trên tất cả khóa học'
+            icon={Star}
+            iconColor='text-amber-600'
+            iconBgColor='bg-amber-100'
+          />
+        </div>
       </div>
 
-      {/* Content Performance */}
-      <div className='grid gap-4 md:grid-cols-7'>
-        <Card className='md:col-span-4'>
-          <CardHeader>
-            <CardTitle>Lượt xem theo thời gian</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className='h-[300px]'>
-              <ResponsiveContainer width='100%' height='100%'>
-                <LineChart data={contentPerformance}>
-                  <CartesianGrid strokeDasharray='3 3' vertical={false} />
-                  <XAxis dataKey='name' />
-                  <YAxis />
-                  <Tooltip />
-                  <Line type='monotone' dataKey='blog' stroke='#2563eb' strokeWidth={2} name='Blog' />
-                  <Line type='monotone' dataKey='course' stroke='#7c3aed' strokeWidth={2} name='Khóa học' />
-                </LineChart>
-              </ResponsiveContainer>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className='md:col-span-3'>
-          <CardHeader>
-            <CardTitle>Nội dung nổi bật</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className='space-y-6'>
-              {popularContent.map((content, i) => (
-                <div key={i} className='space-y-2'>
-                  <div className='flex items-start justify-between'>
-                    <div className='space-y-1'>
-                      <p className='font-medium line-clamp-1'>{content.title}</p>
-                      <div className='flex items-center gap-2 text-sm text-muted-foreground'>
-                        <span className='bg-primary/10 text-primary px-2 py-0.5 rounded-full text-xs'>
-                          {content.type}
-                        </span>
-                        <span className='text-xs'>{content.ageGroup}</span>
-                      </div>
-                    </div>
-                    <div className='flex items-center gap-2 text-sm text-muted-foreground'>
-                      <Eye className='w-4 h-4' />
-                      {content.views}
-                    </div>
-                  </div>
-                  <Progress value={content.engagement} className='h-2' />
-                  <p className='text-xs text-muted-foreground text-right'>{content.engagement}% tương tác</p>
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
+      {/* Course Charts */}
+      <div className='grid grid-cols-1 gap-4 lg:grid-cols-2'>
+        <ContentTrendChart
+          data={contentTrendData}
+          title='Xu hướng lượt đăng ký khóa học'
+          description='Thống kê lượt đăng ký theo thời gian'
+        />
+        <ContentStatusChart
+          data={contentStatusData}
+          title='Trạng thái khóa học'
+          description='Phân bố trạng thái các khóa học'
+        />
       </div>
 
-      {/* Recent Activities & Age Groups */}
-      <div className='grid gap-4 md:grid-cols-7'>
-        <Card className='md:col-span-4'>
-          <CardHeader>
-            <CardTitle>Hoạt động gần đây</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className='space-y-4'>
-              {recentActivities.map((activity, i) => (
-                <div key={i} className='flex items-start gap-4 p-3 rounded-lg hover:bg-muted/50 transition-colors'>
-                  <div
-                    className={`p-2 rounded-full ${
-                      activity.type === 'comment'
-                        ? 'bg-blue-100 text-blue-500'
-                        : activity.type === 'review'
-                          ? 'bg-yellow-100 text-yellow-500'
-                          : 'bg-red-100 text-red-500'
-                    }`}
-                  >
-                    {activity.type === 'comment' ? (
-                      <MessageSquare className='w-4 h-4' />
-                    ) : activity.type === 'review' ? (
-                      <Star className='w-4 h-4' />
-                    ) : (
-                      <Clock className='w-4 h-4' />
-                    )}
-                  </div>
-                  <div>
-                    <p className='font-medium'>{activity.title}</p>
-                    <p className='text-sm text-muted-foreground mt-1'>{activity.message}</p>
-                    <p className='text-xs text-muted-foreground mt-1'>{activity.time}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className='md:col-span-3'>
-          <CardHeader>
-            <CardTitle>Phân bố độ tuổi</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className='space-y-6'>
-              {[
-                { age: '6-8 tuổi', percentage: 25, count: 1250 },
-                { age: '9-11 tuổi', percentage: 45, count: 2250 },
-                { age: '12-14 tuổi', percentage: 30, count: 1500 }
-              ].map((group, i) => (
-                <div key={i} className='space-y-2'>
-                  <div className='flex justify-between text-sm'>
-                    <span className='flex items-center gap-2'>
-                      <Users className='w-4 h-4' />
-                      {group.age}
-                    </span>
-                    <span className='font-medium'>{group.count} người xem</span>
-                  </div>
-                  <Progress value={group.percentage} className='h-2' />
-                  <p className='text-xs text-muted-foreground text-right'>{group.percentage}%</p>
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
+      {/* Popular Courses & Age Groups */}
+      <div className='grid grid-cols-1 gap-4 lg:grid-cols-2'>
+        <PopularContentCard
+          data={popularCourses}
+          title='Khóa học nổi bật'
+          description='Khóa học có nhiều học viên đăng ký nhất'
+        />
+        <AgeGroupsCard data={ageGroupData} title='Phân bố độ tuổi' description='Thống kê khóa học theo độ tuổi' />
       </div>
     </div>
   )

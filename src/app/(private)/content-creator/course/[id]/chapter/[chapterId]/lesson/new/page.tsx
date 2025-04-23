@@ -8,7 +8,7 @@ import { ArrowLeft, ChevronRight, Loader2, Save, Upload, Video, FileText } from 
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { useRef, useState, use } from 'react'
-import { useUploadVideoMutation } from '@/queries/useUpload'
+import { useUploadVideoMutation, useUploadRecordMutation } from '@/queries/useUpload'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
 import * as z from 'zod'
@@ -19,20 +19,37 @@ import { toast } from '@/components/ui/use-toast'
 import Link from 'next/link'
 import { cn } from '@/lib/utils'
 import { useCreateLessonMutation } from '@/queries/useCourse'
-import { TypeResourceValues } from '@/constants/type'
 import { CreateLessonBodyType } from '@/schemaValidations/course.schema'
+import React from 'react'
+
+// Store uploaded video URL outside component to avoid form state issues
+let uploadedVideoUrl: string | null = null
 
 // Form validation schema
-const formSchema = z.object({
-  title: z.string().min(5, { message: 'Tiêu đề phải có ít nhất 5 ký tự' }),
-  description: z.string().min(10, { message: 'Mô tả phải có ít nhất 10 ký tự' }),
-  type: z.enum(TypeResourceValues, {
-    required_error: 'Vui lòng chọn kiểu bài học'
+const formSchema = z.discriminatedUnion('type', [
+  z.object({
+    title: z.string().min(5, { message: 'Tiêu đề phải có ít nhất 5 ký tự' }),
+    description: z.string().min(10, { message: 'Mô tả phải có ít nhất 10 ký tự' }),
+    type: z.literal('DOCUMENT'),
+    content: z.string().min(50, { message: 'Nội dung phải có ít nhất 50 ký tự' }),
+    durations: z.number().min(1, { message: 'Thời lượng tối thiểu là 1 phút' })
   }),
-  content: z.string().min(50, { message: 'Nội dung phải có ít nhất 50 ký tự' }).optional().nullable(),
-  videoUrl: z.string().url({ message: 'URL video không hợp lệ' }).optional().nullable(),
-  durations: z.number().min(0, { message: 'Thời lượng không được âm' })
-})
+  z.object({
+    title: z.string().min(5, { message: 'Tiêu đề phải có ít nhất 5 ký tự' }),
+    description: z.string().min(10, { message: 'Mô tả phải có ít nhất 10 ký tự' }),
+    type: z.literal('VIDEO'),
+    videoUrl: z.any().optional(),
+    durations: z.number().min(1, { message: 'Thời lượng tối thiểu là 1 phút' })
+  }),
+  z.object({
+    title: z.string().min(5, { message: 'Tiêu đề phải có ít nhất 5 ký tự' }),
+    description: z.string().min(10, { message: 'Mô tả phải có ít nhất 10 ký tự' }),
+    type: z.literal('BOTH'),
+    content: z.string().min(50, { message: 'Nội dung phải có ít nhất 50 ký tự' }),
+    videoUrl: z.any().optional(),
+    durations: z.number().min(1, { message: 'Thời lượng tối thiểu là 1 phút' })
+  })
+])
 
 type FormValues = z.infer<typeof formSchema>
 
@@ -42,11 +59,13 @@ export default function NewLessonPage(props: { params: Promise<{ id: string; cha
 
   const createLessonMutation = useCreateLessonMutation()
   const uploadVideoMutation = useUploadVideoMutation()
+  const uploadRecordMutation = useUploadRecordMutation()
 
   const [videoFile, setVideoFile] = useState<File | null>(null)
   const [videoPreview, setVideoPreview] = useState<string | null>(null)
   const videoInputRef = useRef<HTMLInputElement>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [isVideoUploading, setIsVideoUploading] = useState(false)
 
   // Setup form with default values
   const form = useForm<FormValues>({
@@ -57,12 +76,23 @@ export default function NewLessonPage(props: { params: Promise<{ id: string; cha
       type: 'DOCUMENT',
       content: '',
       videoUrl: null,
-      durations: 0
-    }
+      durations: 1
+    } as FormValues
   })
 
   // Watch type to conditionally render form fields
   const lessonType = form.watch('type')
+
+  // Reset fields when type changes
+  React.useEffect(() => {
+    if (lessonType === 'DOCUMENT') {
+      form.setValue('videoUrl', null)
+      setVideoFile(null)
+      setVideoPreview(null)
+    } else if (lessonType === 'VIDEO') {
+      form.setValue('content', '')
+    }
+  }, [lessonType, form])
 
   // Video preview component
   const VideoPreview = ({ src, className }: { src: string | null; className?: string }) => {
@@ -111,6 +141,40 @@ export default function NewLessonPage(props: { params: Promise<{ id: string; cha
         title: 'Đã chọn video',
         description: `${file.name} (${(file.size / (1024 * 1024)).toFixed(2)}MB)`
       })
+
+      // Start uploading video immediately
+      setIsVideoUploading(true)
+
+      const formData = new FormData()
+      formData.append('file', file)
+
+      try {
+        const uploadResult = await uploadRecordMutation.mutateAsync(formData)
+
+        if (uploadResult.payload.data) {
+          const videoUrl = uploadResult.payload.data
+          // Store video URL in module variable
+          uploadedVideoUrl = videoUrl
+
+          toast({
+            description: 'Video đã được tải lên thành công',
+            variant: 'default'
+          })
+        } else {
+          throw new Error('Không thể tải video lên')
+        }
+      } catch (uploadError) {
+        toast({
+          description: 'Có lỗi xảy ra khi tải video lên',
+          variant: 'destructive'
+        })
+        handleErrorApi({
+          error: uploadError,
+          setError: form.setError
+        })
+      } finally {
+        setIsVideoUploading(false)
+      }
     }
   }
 
@@ -119,83 +183,80 @@ export default function NewLessonPage(props: { params: Promise<{ id: string; cha
     try {
       setIsSubmitting(true)
 
-      let finalVideoUrl: string | null = values.videoUrl || null
-
-      // Upload video if present
-      if (videoFile && (values.type === 'VIDEO' || values.type === 'BOTH')) {
-        const formData = new FormData()
-        formData.append('videos', videoFile)
-
-        // Show upload progress toast
-        toast({
-          title: 'Đang tải video lên S3',
-          description: `${videoFile.name} - Đang xử lý... Vui lòng đợi trong giây lát`,
-          duration: 5000
+      // Validate required fields based on type
+      if ((values.type === 'DOCUMENT' || values.type === 'BOTH') && (!values.content || values.content.length < 50)) {
+        form.setError('content', {
+          type: 'manual',
+          message: 'Nội dung phải có ít nhất 50 ký tự'
         })
+        return
+      }
 
-        try {
-          // Upload video to S3
-          const uploadResult = await uploadVideoMutation.mutateAsync(formData)
+      if ((values.type === 'VIDEO' || values.type === 'BOTH') && !videoFile) {
+        form.setError('videoUrl', {
+          type: 'manual',
+          message: 'Cần phải tải lên video'
+        })
+        toast({
+          title: 'Lỗi tạo bài học',
+          description: 'Bạn cần tải lên video cho bài học này',
+          variant: 'destructive'
+        })
+        return
+      }
 
-          if (!uploadResult?.payload?.data) {
-            throw new Error('Không nhận được URL video từ server')
+      // Get the video URL from our stored value
+      const finalVideoUrl = uploadedVideoUrl
+
+      // Prepare and validate submission data based on lesson type
+      let submissionData: CreateLessonBodyType
+
+      switch (values.type) {
+        case 'DOCUMENT':
+          submissionData = {
+            chapterId: params.chapterId,
+            title: values.title,
+            description: values.description,
+            type: 'DOCUMENT',
+            durations: values.durations,
+            content: values.content
+          }
+          break
+
+        case 'VIDEO':
+          if (!finalVideoUrl) {
+            throw new Error('Video URL is required for video lessons')
           }
 
-          // Extract video URL from response
-          finalVideoUrl = Array.isArray(uploadResult.payload.data)
-            ? uploadResult.payload.data[0]
-            : uploadResult.payload.data
+          submissionData = {
+            chapterId: params.chapterId,
+            title: values.title,
+            description: values.description,
+            type: 'VIDEO',
+            durations: values.durations,
+            videoUrl: finalVideoUrl
+          }
+          break
 
-          // Show success toast
-          toast({
-            title: 'Tải video thành công',
-            description: 'Video đã được tải lên S3 thành công',
-            duration: 3000,
-            variant: 'default'
-          })
-        } catch (uploadError) {
-          // Handle upload error
-          handleErrorApi({
-            error: uploadError,
-            setError: form.setError
-          })
+        case 'BOTH':
+          if (!finalVideoUrl) {
+            throw new Error('Video URL is required for combined lessons')
+          }
 
-          // Show more specific error message
-          toast({
-            title: 'Lỗi tải video',
-            description: 'Không thể tải video lên S3. Vui lòng thử lại.',
-            variant: 'destructive'
-          })
-
-          throw uploadError // Rethrow to stop the form submission
-        }
+          submissionData = {
+            chapterId: params.chapterId,
+            title: values.title,
+            description: values.description,
+            type: 'BOTH',
+            durations: values.durations,
+            content: values.content,
+            videoUrl: finalVideoUrl
+          }
+          break
       }
 
-      // Prepare final values based on lesson type
-      let finalContent: string | null = null
-
-      // Set content based on lesson type
-      if (values.type === 'DOCUMENT' || values.type === 'BOTH') {
-        finalContent = values.content || ''
-      }
-
-      // Set video URL based on lesson type
-      if (values.type === 'DOCUMENT') {
-        finalVideoUrl = null
-      }
-
-      // Prepare submission data with required fields
-      const submissionData: CreateLessonBodyType = {
-        chapterId: params.chapterId,
-        title: values.title,
-        description: values.description,
-        type: values.type,
-        content: finalContent,
-        videoUrl: finalVideoUrl,
-        durations: values.durations
-      }
-      console.log(submissionData)
       // Create the lesson
+      console.log(submissionData)
       await createLessonMutation.mutateAsync(submissionData)
 
       // Show success toast
@@ -218,7 +279,12 @@ export default function NewLessonPage(props: { params: Promise<{ id: string; cha
     }
   }
 
-  const isLoading = uploadVideoMutation.isPending || createLessonMutation.isPending || isSubmitting
+  const isLoading =
+    uploadVideoMutation.isPending ||
+    uploadRecordMutation.isPending ||
+    createLessonMutation.isPending ||
+    isSubmitting ||
+    isVideoUploading
 
   return (
     <div className='container max-w-4xl mx-auto px-4 py-6'>
@@ -354,13 +420,17 @@ export default function NewLessonPage(props: { params: Promise<{ id: string; cha
                 name='durations'
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Thời lượng (giây)</FormLabel>
+                    <FormLabel>Thời lượng (phút)</FormLabel>
                     <FormControl>
                       <Input
                         type='number'
                         placeholder='Nhập thời lượng bài học'
+                        min={1}
                         {...field}
-                        onChange={(e) => field.onChange(Number(e.target.value))}
+                        onChange={(e) => {
+                          const value = Number(e.target.value)
+                          field.onChange(value < 1 ? 1 : value)
+                        }}
                       />
                     </FormControl>
                     <FormMessage />
@@ -404,17 +474,26 @@ export default function NewLessonPage(props: { params: Promise<{ id: string; cha
                         accept='video/*'
                         ref={videoInputRef}
                         onChange={handleVideoChange}
-                        disabled={lessonType === 'DOCUMENT'}
+                        disabled={lessonType === 'DOCUMENT' || isVideoUploading}
                       />
                       <Button
                         type='button'
                         variant='outline'
                         onClick={() => videoInputRef.current?.click()}
-                        disabled={lessonType === 'DOCUMENT'}
+                        disabled={lessonType === 'DOCUMENT' || isVideoUploading}
                         className='flex gap-2 items-center w-full sm:w-auto'
                       >
-                        <Upload className='h-4 w-4' />
-                        Tải video lên
+                        {isVideoUploading ? (
+                          <>
+                            <Loader2 className='h-4 w-4 animate-spin' />
+                            Đang tải lên...
+                          </>
+                        ) : (
+                          <>
+                            <Upload className='h-4 w-4' />
+                            Tải video lên
+                          </>
+                        )}
                       </Button>
                       <p className='text-xs text-muted-foreground'>Hỗ trợ MP4, WebM, Ogg. Kích thước tối đa 100MB.</p>
                     </div>

@@ -1,5 +1,7 @@
 import http from '@/lib/http'
 import {
+  CreateCourseCommentBodyType,
+  CreateCourseCommentResType,
   GetCourseDetailAdminResType,
   GetCoursesListAdminResType,
   GetDraftCoursesResType
@@ -31,7 +33,11 @@ import {
   CreateLessonBodyType,
   UpdateLessonBodyType,
   UpdateChapterBodyType,
-  CreateChapterBodyType
+  CreateChapterBodyType,
+  UpdateStatusCourseResType,
+  UpdateIsVisibleCourseBodyType,
+  UpdateStatusCourseBodyType,
+  UpdateIsVisibleCourseResType
 } from '@/schemaValidations/course.schema'
 import { OnlyMessageResType } from '@/schemaValidations/special.schema'
 
@@ -155,7 +161,13 @@ const courseApiRequest = {
   }) =>
     http.get<GetDraftCoursesResType>(
       `/courses/draft?page_index=${page_index}&page_size=${page_size}${keyword ? `&keyword=${keyword}` : ''}`
-    )
+    ),
+  updateStatusCourse: (id: string, data: UpdateStatusCourseBodyType) =>
+    http.put<UpdateStatusCourseResType>(`/courses/${id}`, data),
+  updateIsVisibleCourse: (id: string, data: UpdateIsVisibleCourseBodyType) =>
+    http.put<UpdateIsVisibleCourseResType>(`/courses/${id}`, data),
+  createCourseComment: (data: CreateCourseCommentBodyType) =>
+    http.post<CreateCourseCommentResType>('/course-comments', data)
 }
 
 export default courseApiRequest

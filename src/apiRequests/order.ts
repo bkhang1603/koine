@@ -3,7 +3,9 @@ import {
   GetOrderDetailAdminResType,
   GetOrderListAdminResType,
   GetRefundRequestByIdResType,
-  GetRefundRequestsResType
+  GetRefundRequestsResType,
+  UpdateRefundRequestResType,
+  UpdateRefundRequestBodyType
 } from '@/schemaValidations/admin.schema'
 import {
   CancelOrderBody,
@@ -33,16 +35,18 @@ const orderApiRequest = {
     http.get<RefundOrderResType>(`/orders/my-refund?page_size=${page_size}&page_index=${page_index}`),
   createRefundOrder: ({ orderId, body }: { orderId: string; body: CreateRefundOrderBody }) =>
     http.post<CreateRefundOrderBodyRes>(`/orders/refund/${orderId}/request-refund`, body),
-  getAdminOrders: (pageSize: number, pageIndex: number, keyword?: string, status?: string) =>
+  getAdminOrders: (pageSize: number, pageIndex: number, keyword?: string, status?: string, userId?: string) =>
     http.get<GetOrderListAdminResType>(
-      `/orders?${keyword ? `keyword=${keyword}&` : ''}${status ? `status=${status}&` : ''}page_size=${pageSize}&page_index=${pageIndex}`
+      `/orders?${keyword ? `keyword=${keyword}&` : ''}${status ? `status=${status}&` : ''}${userId ? `userId=${userId}&` : ''}page_size=${pageSize}&page_index=${pageIndex}`
     ),
   getAdminOrderById: (id: string) => http.get<GetOrderDetailAdminResType>(`/orders/detail/${id}`),
   confirmDeliveryOrder: ({ id }: { id: string }) =>
     http.put<OnlyMessageResType>(`/deliveries/simulate-delivery/{orderId}?orderId=${id}`, {}),
   getRefundRequests: ({ page_size, page_index }: { page_size: number; page_index: number }) =>
-    http.get<GetRefundRequestsResType>(`/orders/refund?page_size=${page_size}&page_index=${page_index}`),
-  getRefundRequestById: (id: string) => http.get<GetRefundRequestByIdResType>(`/orders/${id}`)
+    http.get<GetRefundRequestsResType>(`/orders/manage-refund?page_size=${page_size}&page_index=${page_index}`),
+  getRefundRequestById: (id: string) => http.get<GetRefundRequestByIdResType>(`/orders/${id}`),
+  updateRefundRequest: ({ id, body }: { id: string; body: UpdateRefundRequestBodyType }) =>
+    http.put<UpdateRefundRequestResType>(`/orders/refund/${id}/resolve-refund`, body)
 }
 
 export default orderApiRequest

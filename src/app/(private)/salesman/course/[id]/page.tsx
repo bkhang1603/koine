@@ -1,12 +1,12 @@
 'use client'
 import { use } from 'react'
-import { useGetCourseQuery } from '@/queries/useCourse'
+import { useCourseDetailAdminQuery } from '@/queries/useCourse'
 import { useRouter } from 'next/navigation'
 
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import { Clock, FileText, LayoutList, BookOpen, Users, Star } from 'lucide-react'
+import { Clock, FileText, LayoutList, BookOpen, Users, Star, GraduationCap, Tag, Calendar, Info } from 'lucide-react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { cn, formatLevel } from '@/lib/utils'
@@ -16,6 +16,7 @@ import { vi } from 'date-fns/locale'
 import { Breadcrumb } from '@/components/private/common/breadcrumb'
 import { MoreOptions } from '@/components/private/common/more-options'
 import { LessonTypeDisplay } from '@/components/private/common/course/lesson-type-display'
+import { Separator } from '@/components/ui/separator'
 
 // Skeleton component cho course detail
 const CourseDetailSkeleton = () => {
@@ -69,7 +70,7 @@ const CourseDetailSkeleton = () => {
 
 export default function CourseDetailPage(props: { params: Promise<{ id: string }> }) {
   const params = use(props.params)
-  const { data: courseData, isLoading } = useGetCourseQuery({ id: params.id })
+  const { data: courseData, isLoading } = useCourseDetailAdminQuery({ courseId: params.id })
   const router = useRouter()
 
   const course = courseData?.payload?.data
@@ -180,6 +181,19 @@ export default function CourseDetailPage(props: { params: Promise<{ id: string }
                     <Star className='w-4 h-4 text-amber-500' />
                     <span>{course.aveRating.toFixed(1)}</span>
                   </div>
+
+                  <div className='flex items-center gap-1'>
+                    <GraduationCap className='w-4 h-4 text-muted-foreground' />
+                    <span>{course.ageStage}</span>
+                  </div>
+
+                  {course.price && (
+                    <div className='flex items-center gap-1 font-medium text-primary'>
+                      <span>
+                        {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(course.price)}
+                      </span>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
@@ -300,10 +314,12 @@ export default function CourseDetailPage(props: { params: Promise<{ id: string }
                 <CardTitle>Thông tin khóa học</CardTitle>
               </CardHeader>
               <CardContent className='p-6'>
-                <div className='space-y-4'>
+                <div className='space-y-3'>
                   <p className='text-sm text-muted-foreground'>{course.description}</p>
 
-                  <div className='grid grid-cols-2 gap-4 mt-4'>
+                  <Separator />
+
+                  <div className='grid grid-cols-2 gap-2'>
                     <div className='flex items-center gap-2'>
                       <Clock className='w-4 h-4 text-muted-foreground' />
                       <span className='text-sm'>{course.durationsDisplay}</span>
@@ -320,10 +336,23 @@ export default function CourseDetailPage(props: { params: Promise<{ id: string }
                       <Users className='w-4 h-4 text-muted-foreground' />
                       <span className='text-sm'>{course.totalEnrollment} học viên</span>
                     </div>
+                    <div className='flex items-center gap-2'>
+                      <GraduationCap className='w-4 h-4 text-muted-foreground' />
+                      <span className='text-sm'>{course.ageStage}</span>
+                    </div>
+                    <div className='flex items-center gap-2'>
+                      <Star className='w-4 h-4 text-amber-500' />
+                      <span className='text-sm'>{course.aveRating.toFixed(1)}</span>
+                    </div>
                   </div>
 
-                  <div className='pt-4 border-t'>
-                    <h4 className='font-medium mb-2'>Thể loại</h4>
+                  <Separator />
+
+                  <div>
+                    <h4 className='font-medium mb-2 flex items-center gap-2'>
+                      <Tag className='w-4 h-4 text-muted-foreground' />
+                      Thể loại
+                    </h4>
                     <div className='flex flex-wrap gap-2'>
                       {course.categories.map((category) => (
                         <Badge key={category.id} variant='secondary'>
@@ -333,12 +362,32 @@ export default function CourseDetailPage(props: { params: Promise<{ id: string }
                     </div>
                   </div>
 
-                  <div className='pt-4 border-t'>
-                    <h4 className='font-medium mb-2'>Cấp độ</h4>
+                  <Separator />
+
+                  <div>
+                    <h4 className='font-medium mb-2 flex items-center gap-2'>
+                      <BookOpen className='w-4 h-4 text-muted-foreground' />
+                      Cấp độ
+                    </h4>
                     <Badge variant='outline' className='bg-primary/10'>
                       {formatLevel(course.level)}
                     </Badge>
                   </div>
+
+                  {course.price && (
+                    <>
+                      <Separator />
+                      <div>
+                        <h4 className='font-medium mb-2 flex items-center gap-2'>
+                          <Tag className='w-4 h-4 text-muted-foreground' />
+                          Giá
+                        </h4>
+                        <span className='font-medium text-primary'>
+                          {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(course.price)}
+                        </span>
+                      </div>
+                    </>
+                  )}
                 </div>
               </CardContent>
             </Card>
@@ -351,7 +400,7 @@ export default function CourseDetailPage(props: { params: Promise<{ id: string }
                 </div>
               </CardHeader>
               <CardContent className='p-6'>
-                <div className='space-y-4'>
+                <div className='space-y-3'>
                   <div>
                     <h3 className='text-sm font-medium text-muted-foreground mb-1'>Ngày tạo</h3>
                     <div className='flex items-center gap-2'>
@@ -376,10 +425,6 @@ export default function CourseDetailPage(props: { params: Promise<{ id: string }
                       <span className='font-medium'>{course.censorId}</span>
                     </div>
                   )}
-                  <div>
-                    <h3 className='text-sm font-medium text-muted-foreground mb-1'>Người tạo</h3>
-                    <span className='font-medium'>{course.creatorId}</span>
-                  </div>
                 </div>
               </CardContent>
             </Card>

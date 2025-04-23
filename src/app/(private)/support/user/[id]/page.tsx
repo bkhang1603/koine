@@ -3,454 +3,262 @@ import { use } from 'react'
 
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
-import { ArrowLeft, Clock, DollarSign, Users, BookOpen, Star } from 'lucide-react'
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { Progress } from '@/components/ui/progress'
+import { Separator } from '@/components/ui/separator'
+import { User, AlertCircle, Mail, Phone } from 'lucide-react'
+import Image from 'next/image'
 import Link from 'next/link'
-import { getUser } from '../../_data/mock'
-import { formatDistanceToNow } from 'date-fns'
+import { Badge } from '@/components/ui/badge'
+import { useUserDetailAdminQuery } from '@/queries/useUser'
+import { Skeleton } from '@/components/ui/skeleton'
+import { format } from 'date-fns'
 import { vi } from 'date-fns/locale'
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
-import { cn } from '@/lib/utils'
+import { Breadcrumb } from '@/components/private/common/breadcrumb'
+import { UserOrders } from '@/components/private/common/user/user-orders'
+import { formatRole } from '@/lib/utils'
 
-interface UserDetailPageProps {
-  params: Promise<{
-    id: string
-  }>
-}
-
-export default function UserDetailPage(props: UserDetailPageProps) {
+export default function UserDetail(props: { params: Promise<{ id: string }> }) {
   const params = use(props.params)
-  const user = getUser(params.id)
+  const { isLoading, error, data } = useUserDetailAdminQuery({ userId: params.id })
+  const user = data?.payload.data
 
-  if (!user) {
-    return <div>Không tìm thấy người dùng</div>
-  }
+  if (isLoading) {
+    return (
+      <div className='container max-w-7xl mx-auto py-6 space-y-8'>
+        {/* Back button skeleton */}
+        <Skeleton className='w-[200px] h-10' />
 
-  return (
-    <div className='container mx-auto px-4 py-6 space-y-6'>
-      {/* Header */}
-      <div className='flex items-center gap-4'>
-        <Button variant='ghost' asChild>
-          <Link href='/support/user'>
-            <ArrowLeft className='w-4 h-4 mr-2' />
-            Quay lại
-          </Link>
-        </Button>
-        <h1 className='text-2xl font-bold'>Thông tin người dùng</h1>
-        <Badge variant={user.status === 'active' ? 'default' : 'secondary'}>
-          {user.status === 'active' ? 'Đang hoạt động' : 'Không hoạt động'}
-        </Badge>
-      </div>
+        {/* Header skeleton */}
+        <div>
+          <div className='flex items-center justify-between mb-4'>
+            <Skeleton className='w-[300px] h-8' />
+            <Skeleton className='w-[80px] h-6' />
+          </div>
+          <div className='flex items-center gap-6'>
+            <Skeleton className='w-[100px] h-5' />
+            <Skeleton className='w-[120px] h-5' />
+          </div>
+        </div>
 
-      <Tabs defaultValue='overview' className='space-y-6'>
-        <TabsList>
-          <TabsTrigger value='overview'>Tổng quan</TabsTrigger>
-          {user.role === 'parent' && (
-            <>
-              <TabsTrigger value='courses'>Khóa học</TabsTrigger>
-              <TabsTrigger value='orders'>Đơn hàng</TabsTrigger>
-              <TabsTrigger value='children'>Tài khoản con</TabsTrigger>
-            </>
-          )}
-          <TabsTrigger value='tickets'>Tickets</TabsTrigger>
-        </TabsList>
-
-        {/* Tab Tổng quan */}
-        <TabsContent value='overview'>
-          <div className='grid gap-6'>
-            {/* Thông tin chung */}
-            <div className='grid gap-6 md:grid-cols-2 lg:grid-cols-3'>
-              <Card>
-                <CardHeader className='pb-2'>
-                  <CardTitle className='text-base font-medium'>Thông tin học tập</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className='flex items-center gap-4'>
-                    <div className='p-3 bg-blue-50 rounded-full'>
-                      <BookOpen className='w-6 h-6 text-blue-500' />
-                    </div>
-                    <div>
-                      <p className='text-sm text-muted-foreground'>Khóa học đang học</p>
-                      <p className='text-2xl font-bold'>{user.courses?.length || 0}</p>
-                    </div>
-                  </div>
-                  <div className='mt-4 space-y-2'>
-                    <div className='flex justify-between text-sm'>
-                      <span className='text-muted-foreground'>Hoàn thành</span>
-                      <span className='font-medium'>
-                        {user.courses?.filter((c) => c.status === 'completed').length || 0} khóa học
-                      </span>
-                    </div>
-                    <div className='flex justify-between text-sm'>
-                      <span className='text-muted-foreground'>Điểm trung bình</span>
-                      <span className='font-medium'>
-                        {Math.round(
-                          (user.courses?.reduce((acc, cur) => acc + (cur.score || 0), 0) || 0) /
-                            (user.courses?.length || 1)
-                        )}
-                      </span>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-
-              {user.role === 'parent' && (
-                <>
-                  <Card>
-                    <CardHeader className='pb-2'>
-                      <CardTitle className='text-base font-medium'>Tài khoản con</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <div className='flex items-center gap-4'>
-                        <div className='p-3 bg-purple-50 rounded-full'>
-                          <Users className='w-6 h-6 text-purple-500' />
-                        </div>
-                        <div>
-                          <p className='text-sm text-muted-foreground'>Số tài khoản con</p>
-                          <p className='text-2xl font-bold'>{user.childAccounts?.length || 0}</p>
-                        </div>
-                      </div>
-                      <div className='mt-4 space-y-2'>
-                        <div className='flex justify-between text-sm'>
-                          <span className='text-muted-foreground'>Đang học</span>
-                          <span className='font-medium'>
-                            {user.childAccounts?.reduce((acc, cur) => acc + cur.activeCourses, 0)} khóa học
-                          </span>
-                        </div>
-                        <div className='flex justify-between text-sm'>
-                          <span className='text-muted-foreground'>Đã hoàn thành</span>
-                          <span className='font-medium'>
-                            {user.childAccounts?.reduce((acc, cur) => acc + cur.completedCourses, 0)} khóa học
-                          </span>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-
-                  <Card>
-                    <CardHeader className='pb-2'>
-                      <CardTitle className='text-base font-medium'>Tổng chi tiêu</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <div className='flex items-center gap-4'>
-                        <div className='p-3 bg-green-50 rounded-full'>
-                          <DollarSign className='w-6 h-6 text-green-500' />
-                        </div>
-                        <div>
-                          <p className='text-sm text-muted-foreground'>Đã chi tiêu</p>
-                          <p className='text-2xl font-bold'>{user.stats.totalSpent.toLocaleString()}đ</p>
-                        </div>
-                      </div>
-                      <div className='mt-4 space-y-2'>
-                        <div className='flex justify-between text-sm'>
-                          <span className='text-muted-foreground'>Số đơn hàng</span>
-                          <span className='font-medium'>{user.products?.length || 0} đơn</span>
-                        </div>
-                        <div className='flex justify-between text-sm'>
-                          <span className='text-muted-foreground'>Trung bình/đơn</span>
-                          <span className='font-medium'>
-                            {Math.round(user.stats.totalSpent / (user.products?.length || 1)).toLocaleString()}đ
-                          </span>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                </>
-              )}
-            </div>
-
-            {/* Khóa học gần đây */}
+        <div className='grid grid-cols-3 gap-6'>
+          <div className='col-span-2 space-y-6'>
+            {/* Profile Info skeleton */}
             <Card>
               <CardHeader>
-                <CardTitle>Khóa học gần đây</CardTitle>
+                <Skeleton className='w-[150px] h-6' />
+              </CardHeader>
+              <CardContent className='space-y-6'>
+                <div className='flex gap-6'>
+                  <Skeleton className='w-48 h-48 rounded-full' />
+                  <div className='space-y-4 flex-1'>
+                    <Skeleton className='w-full h-20' />
+                    <Skeleton className='w-full h-20' />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Contact Info skeleton */}
+            <Card>
+              <CardHeader>
+                <Skeleton className='w-[150px] h-6' />
               </CardHeader>
               <CardContent>
-                <div className='space-y-4'>
-                  {user.courses?.slice(0, 3).map((course) => (
-                    <div key={course.id} className='flex items-center gap-4 p-4 bg-muted rounded-lg'>
-                      <div className='p-2 bg-blue-50 rounded-full'>
-                        <BookOpen className='w-5 h-5 text-blue-500' />
-                      </div>
-                      <div className='flex-1'>
-                        <div className='flex justify-between items-start'>
-                          <div>
-                            <h4 className='font-medium'>{course.name}</h4>
-                            <p className='text-sm text-muted-foreground'>
-                              Cập nhật:{' '}
-                              {formatDistanceToNow(new Date(course.lastAccess), { addSuffix: true, locale: vi })}
-                            </p>
-                          </div>
-                          <Badge variant={course.status === 'active' ? 'default' : 'secondary'}>
-                            {course.status === 'active' ? 'Đang học' : 'Hoàn thành'}
-                          </Badge>
-                        </div>
-                        <div className='mt-2'>
-                          <div className='flex justify-between text-sm mb-1'>
-                            <span className='text-muted-foreground'>Tiến độ</span>
-                            <div className='flex items-center gap-2'>
-                              <span>{course.progress}%</span>
-                              {course.score && (
-                                <>
-                                  <span>•</span>
-                                  <div className='flex items-center gap-1'>
-                                    <Star className='w-4 h-4 fill-yellow-400' />
-                                    <span>{course.score} điểm</span>
-                                  </div>
-                                </>
-                              )}
-                            </div>
-                          </div>
-                          <Progress value={course.progress} />
-                        </div>
-                      </div>
+                <Skeleton className='w-full h-[100px]' />
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* User Info skeleton */}
+          <div className='space-y-6'>
+            <Card>
+              <CardHeader>
+                <Skeleton className='w-[150px] h-6' />
+              </CardHeader>
+              <CardContent className='space-y-6'>
+                <div className='space-y-3'>
+                  {[1, 2, 3, 4].map((item) => (
+                    <div key={item} className='flex justify-between'>
+                      <Skeleton className='w-[120px] h-5' />
+                      <Skeleton className='w-[100px] h-5' />
                     </div>
                   ))}
                 </div>
               </CardContent>
             </Card>
           </div>
-        </TabsContent>
+        </div>
+      </div>
+    )
+  }
 
-        {/* Tab Khóa học */}
-        {user.role === 'parent' && (
-          <TabsContent value='courses'>
-            <div className='space-y-6'>
-              <div className='grid gap-6 md:grid-cols-2 lg:grid-cols-3'>
-                {user.courses?.map((course) => (
-                  <Card key={course.id} className='relative overflow-hidden'>
-                    <div
-                      className={cn(
-                        'absolute inset-0 w-2',
-                        course.status === 'active' ? 'bg-blue-500' : 'bg-green-500'
-                      )}
-                    />
-                    <CardContent className='pt-6'>
-                      <div className='flex justify-between items-start mb-4'>
-                        <div>
-                          <h4 className='font-medium'>{course.name}</h4>
-                          <p className='text-sm text-muted-foreground'>
-                            Bắt đầu: {new Date(course.startDate).toLocaleDateString('vi-VN')}
-                          </p>
-                        </div>
-                        <Badge variant={course.status === 'active' ? 'default' : 'secondary'}>
-                          {course.status === 'active' ? 'Đang học' : 'Hoàn thành'}
-                        </Badge>
-                      </div>
+  if (error || !user) {
+    return (
+      <div className='flex flex-col items-center justify-center min-h-[400px] gap-4'>
+        <AlertCircle className='w-12 h-12 text-red-500' />
+        <div className='text-center'>
+          <h3 className='text-lg font-medium text-gray-900 mb-1'>Không tìm thấy người dùng</h3>
+          <p className='text-gray-500'>Người dùng không tồn tại hoặc đã bị xóa</p>
+        </div>
+        <Button variant='outline' asChild>
+          <Link href='/support/user'>Quay lại danh sách người dùng</Link>
+        </Button>
+      </div>
+    )
+  }
 
-                      <div className='space-y-4'>
-                        <div>
-                          <div className='flex justify-between text-sm mb-1'>
-                            <span className='text-muted-foreground'>Tiến độ</span>
-                            <span>{course.progress}%</span>
-                          </div>
-                          <Progress value={course.progress} />
-                        </div>
+  const breadcrumbItems = [
+    {
+      title: 'Người dùng',
+      href: '/support/user'
+    },
+    {
+      title: user.username
+    }
+  ]
 
-                        <div className='flex items-center justify-between text-sm'>
-                          <div className='flex items-center gap-2'>
-                            <Clock className='w-4 h-4 text-muted-foreground' />
-                            <span className='text-muted-foreground'>
-                              Hoạt động cuối:{' '}
-                              {formatDistanceToNow(new Date(course.lastAccess), { addSuffix: true, locale: vi })}
-                            </span>
-                          </div>
-                          {course.score && (
-                            <div className='flex items-center gap-1'>
-                              <Star className='w-4 h-4 fill-yellow-400' />
-                              <span className='font-medium'>{course.score} điểm</span>
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
-            </div>
-          </TabsContent>
-        )}
+  return (
+    <div className='container max-w-7xl mx-auto py-6 space-y-8'>
+      {/* Breadcrumb component */}
+      <div className='mb-6'>
+        <Breadcrumb items={breadcrumbItems} />
+      </div>
 
-        {/* Tab Tài khoản con */}
-        <TabsContent value='children'>
-          <div className='grid gap-6 md:grid-cols-2'>
-            {user.childAccounts.map((child) => (
-              <Card key={child.id}>
-                <CardHeader>
-                  <div className='flex items-center gap-4'>
-                    <Avatar className='w-12 h-12'>
-                      <AvatarImage src={child.avatar} />
-                      <AvatarFallback>{child.name[0]}</AvatarFallback>
-                    </Avatar>
+      {/* Header */}
+      <div>
+        <div className='flex items-center justify-between mb-4'>
+          <h1 className='text-2xl font-bold text-gray-900'>{user.username}</h1>
+          <Badge variant={user.isActive ? 'green' : 'red'}>
+            {user.isActive ? 'Đang hoạt động' : 'Không hoạt động'}
+          </Badge>
+        </div>
+        <div className='flex items-center gap-6 text-sm text-gray-500'>
+          <div className='flex items-center gap-2'>
+            <User className='h-4 w-4' />
+            {user.role}
+          </div>
+          <div className='flex items-center gap-2'>
+            <Mail className='h-4 w-4' />
+            {user.email || 'Chưa cập nhật email'}
+          </div>
+        </div>
+      </div>
+
+      <div className='grid grid-cols-3 gap-6'>
+        <div className='col-span-2 space-y-6'>
+          {/* Profile Information */}
+          <Card>
+            <CardHeader>
+              <CardTitle className='flex items-center gap-2'>
+                <User className='w-5 h-5' />
+                Thông tin cá nhân
+              </CardTitle>
+            </CardHeader>
+            <CardContent className='space-y-6'>
+              <div className='flex gap-6'>
+                <div className='relative w-48 h-48'>
+                  <Image
+                    src={user.userDetail.avatarUrl || '/images/placeholder.jpg'}
+                    alt={`Avatar của ${user.username}`}
+                    fill
+                    className='rounded-full object-cover'
+                  />
+                </div>
+                <div className='flex-1'>
+                  <div className='grid grid-cols-2 gap-4'>
                     <div>
-                      <h3 className='font-medium'>{child.name}</h3>
-                      <p className='text-sm text-muted-foreground'>
-                        {child.age} tuổi • {child.grade} • {child.school}
+                      <label className='text-sm text-gray-500'>Họ</label>
+                      <p className='font-medium'>{user.userDetail.lastName || 'Chưa cập nhật'}</p>
+                    </div>
+                    <div>
+                      <label className='text-sm text-gray-500'>Tên</label>
+                      <p className='font-medium'>{user.userDetail.firstName || 'Chưa cập nhật'}</p>
+                    </div>
+                    <div>
+                      <label className='text-sm text-gray-500'>Giới tính</label>
+                      <p className='font-medium'>
+                        {user.userDetail.gender === 'MALE'
+                          ? 'Nam'
+                          : user.userDetail.gender === 'FEMALE'
+                            ? 'Nữ'
+                            : 'Khác'}
+                      </p>
+                    </div>
+                    <div>
+                      <label className='text-sm text-gray-500'>Ngày sinh</label>
+                      <p className='font-medium'>
+                        {user.userDetail.dob
+                          ? format(new Date(user.userDetail.dob), 'dd/MM/yyyy', { locale: vi })
+                          : 'Chưa cập nhật'}
                       </p>
                     </div>
                   </div>
-                </CardHeader>
-                <CardContent className='space-y-6'>
-                  <div className='grid grid-cols-3 gap-4'>
-                    <div className='p-4 bg-muted rounded-lg'>
-                      <div className='flex items-center gap-2 text-sm text-muted-foreground mb-1'>
-                        <BookOpen className='w-4 h-4' />
-                        <span>Đang học</span>
-                      </div>
-                      <p className='text-2xl font-medium'>{child.activeCourses}</p>
-                    </div>
-                    <div className='p-4 bg-muted rounded-lg'>
-                      <div className='flex items-center gap-2 text-sm text-muted-foreground mb-1'>
-                        <Star className='w-4 h-4' />
-                        <span>Hoàn thành</span>
-                      </div>
-                      <p className='text-2xl font-medium'>{child.completedCourses}</p>
-                    </div>
-                    <div className='p-4 bg-muted rounded-lg'>
-                      <div className='flex items-center gap-2 text-sm text-muted-foreground mb-1'>
-                        <Clock className='w-4 h-4' />
-                        <span>Thời gian học</span>
-                      </div>
-                      <p className='text-2xl font-medium'>45p/ngày</p>
-                    </div>
-                  </div>
-
-                  <div>
-                    <h4 className='font-medium mb-4'>Khóa học gần đây</h4>
-                    <div className='space-y-4'>
-                      {child.courses.slice(0, 3).map((course) => (
-                        <div key={course.id} className='flex items-center gap-4 p-4 bg-muted rounded-lg'>
-                          <div className='flex-1'>
-                            <div className='flex justify-between items-start'>
-                              <div>
-                                <h5 className='font-medium'>{course.name}</h5>
-                                <div className='flex items-center gap-2 text-sm text-muted-foreground mt-1'>
-                                  {course.score && (
-                                    <div className='flex items-center gap-1'>
-                                      <Star className='w-4 h-4 fill-yellow-400' />
-                                      <span>{course.score} điểm</span>
-                                    </div>
-                                  )}
-                                  <span>•</span>
-                                  <span>{course.progress}% hoàn thành</span>
-                                </div>
-                              </div>
-                              <Badge variant={course.status === 'active' ? 'default' : 'secondary'}>
-                                {course.status === 'active' ? 'Đang học' : 'Hoàn thành'}
-                              </Badge>
-                            </div>
-                            <Progress value={course.progress} className='mt-2' />
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </TabsContent>
-
-        {/* Tab Orders */}
-        {user.role === 'parent' && (
-          <TabsContent value='orders'>
-            <Card>
-              <CardHeader>
-                <CardTitle>Lịch sử đơn hàng</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Mã đơn</TableHead>
-                      <TableHead>Sản phẩm</TableHead>
-                      <TableHead>Ngày đặt</TableHead>
-                      <TableHead>Giá tiền</TableHead>
-                      <TableHead>Trạng thái</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {user.products?.map((product) => (
-                      <TableRow key={product.id}>
-                        <TableCell className='font-medium'>{product.id}</TableCell>
-                        <TableCell>{product.name}</TableCell>
-                        <TableCell>{new Date(product.orderDate).toLocaleDateString('vi-VN')}</TableCell>
-                        <TableCell>{product.price.toLocaleString()}đ</TableCell>
-                        <TableCell>
-                          <Badge
-                            variant={
-                              product.status === 'delivered'
-                                ? 'green'
-                                : product.status === 'processing'
-                                  ? 'default'
-                                  : 'destructive'
-                            }
-                          >
-                            {product.status === 'delivered'
-                              ? 'Đã giao'
-                              : product.status === 'processing'
-                                ? 'Đang xử lý'
-                                : 'Đã hủy'}
-                          </Badge>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </CardContent>
-            </Card>
-          </TabsContent>
-        )}
-
-        {/* Tab Tickets */}
-        <TabsContent value='tickets'>
-          <Card>
-            <CardHeader>
-              <CardTitle>Lịch sử hỗ trợ</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>ID</TableHead>
-                    <TableHead>Tiêu đề</TableHead>
-                    <TableHead>Trạng thái</TableHead>
-                    <TableHead>Độ ưu tiên</TableHead>
-                    <TableHead>Ngày tạo</TableHead>
-                    <TableHead>Thao tác</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {user.tickets.map((ticket) => (
-                    <TableRow key={ticket.id}>
-                      <TableCell className='font-medium'>{ticket.id}</TableCell>
-                      <TableCell>{ticket.title}</TableCell>
-                      <TableCell>
-                        <Badge variant={ticket.status === 'pending' ? 'secondary' : 'default'}>
-                          {ticket.status === 'pending' ? 'Chờ xử lý' : 'Đã giải quyết'}
-                        </Badge>
-                      </TableCell>
-                      <TableCell>
-                        <Badge variant={ticket.priority === 'high' ? 'destructive' : 'outline'}>
-                          {ticket.priority === 'high' ? 'Cao' : 'Trung bình'}
-                        </Badge>
-                      </TableCell>
-                      <TableCell>{new Date(ticket.createdAt).toLocaleString('vi-VN')}</TableCell>
-                      <TableCell>
-                        <Button variant='ghost' size='sm' asChild>
-                          <Link href={`/support/tickets/${ticket.id}`}>Xem chi tiết</Link>
-                        </Button>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
+                </div>
+              </div>
             </CardContent>
           </Card>
-        </TabsContent>
-      </Tabs>
+
+          {/* Contact Information */}
+          <Card>
+            <CardHeader>
+              <CardTitle className='flex items-center gap-2'>
+                <Phone className='w-5 h-5' />
+                Thông tin liên hệ
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className='space-y-4'>
+                <div>
+                  <label className='text-sm text-gray-500'>Số điện thoại</label>
+                  <p className='font-medium'>{user.userDetail.phone || 'Chưa cập nhật'}</p>
+                </div>
+                <div>
+                  <label className='text-sm text-gray-500'>Địa chỉ</label>
+                  <p className='font-medium'>{user.userDetail.address || 'Chưa cập nhật'}</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* User Info */}
+        <div className='space-y-6'>
+          <Card>
+            <CardHeader>
+              <CardTitle>Thông tin tài khoản</CardTitle>
+            </CardHeader>
+            <CardContent className='space-y-4'>
+              <div className='space-y-2 text-sm'>
+                <div className='flex justify-between'>
+                  <span className='text-muted-foreground'>Vai trò</span>
+                  <Badge variant={user.role === 'ADMIN' ? 'destructive' : 'default'}>{formatRole(user.role)}</Badge>
+                </div>
+                <div className='flex justify-between'>
+                  <span className='text-muted-foreground'>Trạng thái</span>
+                  <Badge variant={user.isActive ? 'green' : 'red'}>
+                    {user.isActive ? 'Hoạt động' : 'Không hoạt động'}
+                  </Badge>
+                </div>
+              </div>
+
+              <Separator />
+
+              <div className='space-y-2 text-sm'>
+                <div className='flex justify-between'>
+                  <span className='text-muted-foreground'>Ngày tạo</span>
+                  <span>{format(new Date(user.createdAt), 'dd/MM/yyyy', { locale: vi })}</span>
+                </div>
+                <div className='flex justify-between'>
+                  <span className='text-muted-foreground'>Cập nhật lần cuối</span>
+                  <span>{format(new Date(user.updatedAt), 'dd/MM/yyyy', { locale: vi })}</span>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+
+      {/* User Orders */}
+      <UserOrders userId={params.id} href={`/support/user/${params.id}`} />
     </div>
   )
 }

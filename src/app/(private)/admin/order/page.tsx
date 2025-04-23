@@ -54,7 +54,8 @@ function AdminOrder(props: { searchParams: SearchParams }) {
     DELIVERING: { label: 'Đang giao', variant: 'primary' },
     COMPLETED: { label: 'Hoàn thành', variant: 'secondary' },
     CANCELLED: { label: 'Đã hủy', variant: 'destructive' },
-    REFUND_REQUEST: { label: 'Hoàn tiền', variant: 'destructive' }
+    REFUND_REQUEST: { label: 'Hoàn tiền', variant: 'destructive' },
+    EXCHANGE_REQUEST: { label: 'Yêu cầu đổi hàng', variant: 'warning' }
   } as const
 
   // Cấu hình phương thức thanh toán
@@ -268,6 +269,7 @@ function AdminOrder(props: { searchParams: SearchParams }) {
               <SelectItem value='CANCELLED'>Đã hủy</SelectItem>
               <SelectItem value='FAILED_PAYMENT'>Thanh toán thất bại</SelectItem>
               <SelectItem value='RETURN_REQUEST'>Yêu cầu trả hàng</SelectItem>
+              <SelectItem value='EXCHANGE_REQUEST'>Yêu cầu đổi hàng</SelectItem>
             </SelectContent>
           </Select>
         }

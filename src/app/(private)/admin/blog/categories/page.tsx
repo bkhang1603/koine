@@ -30,7 +30,7 @@ export default function BlogCategoriesPage() {
 
   // Get values from searchParams or use default values
   const currentKeyword = searchParams.get('keyword') || ''
-  const currentPageSize = Number(searchParams.get('page_size')) || 5
+  const currentPageSize = Number(searchParams.get('page_size')) || 10
   const currentPageIndex = Number(searchParams.get('page_index')) || 1
 
   const [createDialogOpen, setCreateDialogOpen] = useState(false)

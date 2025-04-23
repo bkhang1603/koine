@@ -3,8 +3,7 @@
 import NewBlogPage from '@/components/private/common/blog/blog-new'
 import { BlogDataResType } from '@/schemaValidations/blog.schema'
 import { useEffect, useState } from 'react'
-import { ChevronRight } from 'lucide-react'
-import Link from 'next/link'
+import { Breadcrumb } from '@/components/private/common/breadcrumb'
 
 const BLOG_DRAFT_KEY = 'blog_draft_data'
 
@@ -25,16 +24,20 @@ function Page() {
     fetchData()
   }, [])
 
+  const breadcrumbItems = [
+    {
+      title: 'Blog',
+      href: '/manager/blog'
+    },
+    {
+      title: 'Tạo mới'
+    }
+  ]
+
   return (
     <div className='container max-w-4xl mx-auto px-4 py-6'>
       {/* Breadcrumb */}
-      <nav className='flex items-center space-x-1 text-sm text-muted-foreground mb-6'>
-        <Link href='/manager/blog' className='hover:text-primary transition-colors'>
-          Blog
-        </Link>
-        <ChevronRight className='h-4 w-4' />
-        <span className='font-medium text-foreground'>Tạo mới</span>
-      </nav>
+      <Breadcrumb items={breadcrumbItems} />
       <div>
         <NewBlogPage localDraft={localDraft} baseUrl='/manager/blog' />
       </div>

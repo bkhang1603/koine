@@ -112,10 +112,6 @@ export default function ChapterDetailPage(props: { params: Promise<{ id: string;
   // Find chapter's lessons from the course data
   const chapterLessons = course.chapters.find((ch) => ch.id === params.chapterId)?.lessons || []
 
-  // URL generator for lesson view
-  const getViewLessonUrl = (lessonId: string) =>
-    `/manager/course/${params.id}/chapter/${params.chapterId}/lesson/${lessonId}`
-
   // Default empty state for lessons
   const emptyLessonsState = (
     <div className='p-8 text-center'>
@@ -229,7 +225,9 @@ export default function ChapterDetailPage(props: { params: Promise<{ id: string;
                             slug: ''
                           }}
                           itemType='lesson'
-                          onView={() => router.push(getViewLessonUrl(lesson.id))}
+                          onView={() =>
+                            router.push(`/manager/course/${params.id}/chapter/${params.chapterId}/lesson/${lesson.id}`)
+                          }
                         />
                       </div>
                     </div>

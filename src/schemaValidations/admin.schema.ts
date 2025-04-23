@@ -1,4 +1,4 @@
-import { DeliveryMethodValues } from '@/constants/type'
+import { DeliveryMethodValues, RoleValues } from '@/constants/type'
 import z from 'zod'
 
 export const getCoursesListAdminRes = z.object({
@@ -58,6 +58,55 @@ export const getCoursesListAdminRes = z.object({
   })
 })
 
+const questionOptionSchema = z.object({
+  isDeleted: z.boolean(),
+  createdAt: z.string(),
+  updatedAt: z.string(),
+  id: z.string(),
+  questionId: z.string(),
+  optionData: z.string(),
+  isCorrect: z.boolean()
+})
+
+const questionSchema = z.object({
+  isDeleted: z.boolean(),
+  createdAt: z.string(),
+  updatedAt: z.string(),
+  id: z.string(),
+  content: z.string(),
+  numCorrect: z.number().int(),
+  questionOptions: z.array(questionOptionSchema)
+})
+
+const lessonSchema = z.object({
+  id: z.string(),
+  chapterId: z.string(),
+  type: z.enum(['DOCUMENT', 'VIDEO', 'BOTH']),
+  title: z.string(),
+  description: z.string(),
+  durations: z.number(),
+  content: z.string().nullable(),
+  videoUrl: z.string().nullable(),
+  sequence: z.number(),
+  durationsDisplay: z.string()
+})
+
+const chapterSchema = z.object({
+  id: z.string(),
+  title: z.string(),
+  description: z.string(),
+  durations: z.number(),
+  durationsDisplay: z.string(),
+  sequence: z.number(),
+  lessons: z.array(lessonSchema),
+  questions: z.array(questionSchema)
+})
+
+const categorySchema = z.object({
+  id: z.string(),
+  name: z.string()
+})
+
 export const getCourseDetailAdminRes = z.object({
   statusCode: z.number(),
   info: z.string(),
@@ -73,47 +122,25 @@ export const getCourseDetailAdminRes = z.object({
     slug: z.string(),
     description: z.string(),
     durations: z.number(),
-    imageUrl: z.string(),
-    imageBanner: z.string(),
+    imageUrl: z.string().url().or(z.string()),
+    imageBanner: z.string().url().or(z.string()),
     price: z.number(),
     discount: z.number(),
+    level: z.string(),
+    censorId: z.string().nullable().optional(),
     totalEnrollment: z.number(),
     aveRating: z.number(),
+    status: z.string(),
     isBanned: z.boolean(),
     isCustom: z.boolean(),
-    level: z.string(),
-    censorId: z.string().optional(),
+    isDraft: z.boolean(),
+    isVisible: z.boolean(),
+    ageStage: z.string(),
     durationsDisplay: z.string(),
-    categories: z.array(
-      z.object({
-        id: z.string(),
-        name: z.string()
-      })
-    ),
-    chapters: z.array(
-      z.object({
-        id: z.string(),
-        title: z.string(),
-        description: z.string(),
-        durations: z.number(),
-        durationsDisplay: z.string(),
-        sequence: z.number(),
-        lessons: z.array(
-          z.object({
-            id: z.string(),
-            chapterId: z.string(),
-            type: z.enum(['DOCUMENT', 'VIDEO', 'BOTH']),
-            title: z.string(),
-            description: z.string(),
-            durations: z.number(),
-            content: z.string().nullable(),
-            videoUrl: z.string().nullable(),
-            sequence: z.number(),
-            durationsDisplay: z.string()
-          })
-        )
-      })
-    ) // Removed optional
+    categories: z.array(categorySchema),
+    chapters: z.array(chapterSchema),
+    createdAtFormatted: z.string(),
+    updatedAtFormatted: z.string()
   })
 })
 
@@ -455,6 +482,17 @@ export const getRefundRequestByIdRes = z.object({
   })
 })
 
+export const updateRefundRequestBody = z.object({
+  action: z.enum(['APPROVE', 'REJECT']),
+  note: z.string().optional()
+})
+
+export const updateRefundRequestRes = z.object({
+  statusCode: z.number(),
+  info: z.string(),
+  message: z.string()
+})
+
 export const getBlogsListAdminRes = z.object({
   statusCode: z.number(),
   info: z.string(),
@@ -535,45 +573,43 @@ export const getBlogDetailAdminRes = z.object({
   })
 })
 
+const CommentSchema: z.ZodTypeAny = z.lazy(() =>
+  z.object({
+    isDeleted: z.boolean(),
+    createdAt: z.string(),
+    updatedAt: z.string(),
+    id: z.string().uuid(),
+    userId: z.string().uuid(),
+    blogId: z.string().uuid(),
+    replyId: z.string().uuid().nullable(),
+    content: z.string(),
+    createdAtFormatted: z.string(),
+    updatedAtFormatted: z.string(),
+    user: z.object({
+      id: z.string().uuid(),
+      firstName: z.string(),
+      avatarUrl: z.string().url(),
+      username: z.string()
+    }),
+    replies: z.array(CommentSchema)
+  })
+)
+
 export const getBlogCommentsAdminRes = z.object({
   statusCode: z.number(),
   info: z.string(),
   message: z.string(),
   data: z.object({
-    totalComments: z.number(),
-    commentsWithReplies: z
-      .array(
-        z.object({
-          isDeleted: z.boolean(),
-          createdAt: z.string(),
-          updatedAt: z.string(),
-          id: z.string(),
-          userId: z.string(),
-          blogId: z.string(),
-          replyId: z.string().nullable(),
-          content: z.string(),
-          createdAtFormatted: z.string(),
-          updatedAtFormatted: z.string(),
-          user: z.object({
-            id: z.string(),
-            firstName: z.string(),
-            avatarUrl: z.string(),
-            username: z.string()
-          }),
-          replies: z.array(z.any()).optional()
-        })
-      )
-      .optional()
+    totalComments: z.number().int().nonnegative(),
+    commentsWithReplies: z.array(CommentSchema)
   }),
-  pagination: z
-    .object({
-      pageSize: z.number(),
-      totalItem: z.number(),
-      currentPage: z.number(),
-      maxPageSize: z.number(),
-      totalPage: z.number()
-    })
-    .optional()
+  pagination: z.object({
+    pageSize: z.number(),
+    totalItem: z.number(),
+    currentPage: z.number(),
+    maxPageSize: z.number(),
+    totalPage: z.number()
+  })
 })
 
 export const getProductListAdminRes = z.object({
@@ -730,6 +766,38 @@ export const getUserDetailAdminRes = z.object({
   })
 })
 
+export const createUserBody = z.object({
+  email: z.string().email('Email không hợp lệ'),
+  username: z
+    .string()
+    .min(6, 'Tên đăng nhập không được dưới 6 ký tự')
+    .max(100, 'Tên đăng nhập không được quá 100 ký tự')
+    .refine((val) => /^[a-zA-Z0-9]+$/.test(val), {
+      message: 'Tên đăng nhập không được chứa ký tự đặc biệt'
+    }),
+  password: z
+    .string()
+    .min(6, {
+      message: 'Mật khẩu phải có ít nhất 6 ký tự.'
+    })
+    .max(100, {
+      message: 'Mật khẩu không được quá 100 ký tự.'
+    })
+    .regex(
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+}{":;'?/>.<,])(?=.*[a-zA-Z0-9!@#$%^&*()_+}{":;'?/>.<,]).{8,}$/,
+      {
+        message: 'Mật khẩu phải có ít nhất 1 chữ hoa, 1 chữ thường, 1 số và 1 ký tự đặc biệt.'
+      }
+    ),
+  role: z.enum(RoleValues)
+})
+
+export const createUserRes = z.object({
+  statusCode: z.number(),
+  info: z.string(),
+  message: z.string()
+})
+
 export const getDashboardStatisticsRes = z.object({
   statusCode: z.number(),
   info: z.string(),
@@ -753,25 +821,25 @@ export const getDashboardStatisticsRes = z.object({
         ordersCount: z.number().int().nonnegative()
       })
     ),
-
-    // 3. Order Status Data Array
     orderStatusData: z.array(
       z.object({
         status: z.string(),
-        count: z.number().int().nonnegative()
+        count: z.string()
       })
     ),
     bestSellingProducts: z.array(
       z.object({
+        id: z.string(),
         name: z.string(),
-        quantity: z.number().int().nonnegative(),
+        quantity: z.string(),
         revenue: z.number().nonnegative()
       })
     ),
     bestSellingCourses: z.array(
       z.object({
+        id: z.string(),
         name: z.string(),
-        quantity: z.number().int().nonnegative(),
+        quantity: z.string(),
         revenue: z.number().nonnegative()
       })
     ),
@@ -802,7 +870,7 @@ export const getDraftCoursesRes = z.object({
       createdAt: z.string(),
       updatedAt: z.string(),
       id: z.string().uuid(),
-      creatorId: z.string().uuid(),
+      creatorId: z.string().uuid().nullable(),
       title: z.string(),
       titleNoTone: z.string(),
       slug: z.string(),
@@ -816,15 +884,18 @@ export const getDraftCoursesRes = z.object({
       censorId: z.string().uuid().nullable(),
       totalEnrollment: z.number().int().nonnegative(),
       aveRating: z.number().nonnegative(),
-      status: z.string(),
+      status: z.enum(['ACTIVE', 'PENDINGREVIEW', 'PENDINGPRICING', 'REJECTED']),
       isBanned: z.boolean(),
       isCustom: z.boolean(),
       isDraft: z.boolean(),
       isVisible: z.boolean(),
-      creator: z.object({
-        id: z.string().uuid(),
-        username: z.string()
-      }),
+      ageStage: z.string(),
+      creator: z
+        .object({
+          id: z.string().uuid(),
+          username: z.string()
+        })
+        .nullable(),
       censor: z
         .object({
           id: z.string().uuid(),
@@ -851,12 +922,72 @@ export const getDraftCoursesRes = z.object({
   })
 })
 
+export const createCourseCommentBody = z.object({
+  courseId: z.string(),
+  replyId: z.string(),
+  content: z.string()
+})
+
+export const createCourseCommentRes = z.object({
+  statusCode: z.number(),
+  info: z.string(),
+  message: z.string()
+})
+
+export const getRequestSupportListRes = z.object({
+  statusCode: z.number(),
+  info: z.string(),
+  message: z.string(),
+  data: z.array(
+    z.object({
+      id: z.string().uuid(),
+      type: z.enum(['GUEST', 'COURSE']),
+      content: z.string(),
+      objectId: z.string().nullable(),
+      isResolve: z.boolean(),
+      resolveContent: z.string().nullable(),
+      createdAt: z.string(),
+      updatedAt: z.string(),
+      createdAtFormatted: z.string(),
+      updatedAtFormatted: z.string(),
+      isGuestRequest: z.boolean(),
+      guestInfo: z.object({
+        name: z.string(),
+        email: z.string().email(),
+        phone: z.string()
+      })
+    })
+  ),
+  pagination: z.object({
+    pageSize: z.number().int(),
+    totalItem: z.number().int(),
+    currentPage: z.number().int(),
+    maxPageSize: z.number().int(),
+    totalPage: z.number().int()
+  })
+})
+
+export const updateRequestSupportBody = z.object({
+  isResolve: z.boolean(),
+  resolveContent: z.string().nullable()
+})
+
+export const updateRequestSupportRes = z.object({
+  statusCode: z.number(),
+  info: z.string(),
+  message: z.string()
+})
+
 // Courses
 export type GetCoursesListAdminResType = z.infer<typeof getCoursesListAdminRes>
 
 export type GetCourseDetailAdminResType = z.infer<typeof getCourseDetailAdminRes>
 
 export type GetDraftCoursesResType = z.infer<typeof getDraftCoursesRes>
+
+export type CreateCourseCommentBodyType = z.infer<typeof createCourseCommentBody>
+
+export type CreateCourseCommentResType = z.infer<typeof createCourseCommentRes>
 
 // Orders
 export type GetOrderListAdminResType = z.TypeOf<typeof getOrderListAdminRes>
@@ -866,6 +997,11 @@ export type GetOrderDetailAdminResType = z.TypeOf<typeof getOrderDetailAdminRes>
 export type GetRefundRequestsResType = z.TypeOf<typeof getRefundRequestsRes>
 
 export type GetRefundRequestByIdResType = z.TypeOf<typeof getRefundRequestByIdRes>
+
+export type UpdateRefundRequestBodyType = z.TypeOf<typeof updateRefundRequestBody>
+
+export type UpdateRefundRequestResType = z.TypeOf<typeof updateRefundRequestRes>
+
 // Blogs
 export type GetBlogsListAdminResType = z.TypeOf<typeof getBlogsListAdminRes>
 
@@ -883,5 +1019,16 @@ export type GetUserListAdminResType = z.TypeOf<typeof getUserListAdminRes>
 
 export type GetUserDetailAdminResType = z.TypeOf<typeof getUserDetailAdminRes>
 
+export type CreateUserBodyType = z.TypeOf<typeof createUserBody>
+
+export type CreateUserResType = z.TypeOf<typeof createUserRes>
+
 // Dashboard
 export type GetDashboardStatisticsResType = z.TypeOf<typeof getDashboardStatisticsRes>
+
+// Request Support
+export type GetRequestSupportListResType = z.TypeOf<typeof getRequestSupportListRes>
+
+export type UpdateRequestSupportBodyType = z.TypeOf<typeof updateRequestSupportBody>
+
+export type UpdateRequestSupportResType = z.TypeOf<typeof updateRequestSupportRes>

@@ -27,7 +27,8 @@ const translateStatus = (status: string): string => {
     CANCELLED: 'Đã hủy',
     PENDING: 'Chờ xử lý',
     REFUNDED: 'Hoàn tiền',
-    REFUND_REQUEST: 'Yêu cầu hoàn tiền'
+    REFUND_REQUEST: 'Yêu cầu hoàn tiền',
+    EXCHANGE_REQUEST: 'Yêu cầu đổi hàng'
   }
 
   return statusMap[status] || status
@@ -39,7 +40,8 @@ const DEFAULT_STATUSES = [
   { status: 'DELIVERING', count: 0 },
   { status: 'COMPLETED', count: 0 },
   { status: 'CANCELLED', count: 0 },
-  { status: 'REFUND_REQUEST', count: 0 }
+  { status: 'REFUND_REQUEST', count: 0 },
+  { status: 'EXCHANGE_REQUEST', count: 0 }
 ]
 
 export function OrderStatusChart({ data, colors }: OrderStatusChartProps) {
@@ -126,8 +128,8 @@ export function OrderStatusChart({ data, colors }: OrderStatusChartProps) {
         <div className='flex flex-col h-[400px]'>
           {/* Status counts summary */}
           <div className='grid grid-cols-2 md:grid-cols-3 gap-2 mb-5 mx-auto w-full'>
-            {displayData.slice(0, 5).map((item, index) => {
-              // Only show the first 5 statuses
+            {displayData.slice(0, 6).map((item, index) => {
+              // Only show the first 6 statuses
               const statusColor = getStatusColor(item.status)
               return (
                 <div

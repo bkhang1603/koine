@@ -171,3 +171,18 @@ export const useUpdateProductMutation = ({ id }: { id: string }) => {
     }
   })
 }
+
+export const useGetProductCommentsQuery = ({
+  id,
+  page_index,
+  page_size
+}: {
+  id: string
+  page_index: number
+  page_size: number
+}) => {
+  return useQuery({
+    queryKey: ['productComments', id, page_index, page_size],
+    queryFn: () => productApiRequest.getProductComments({ id, page_index, page_size })
+  })
+}

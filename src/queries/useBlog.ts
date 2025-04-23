@@ -59,6 +59,9 @@ export const useBlogCommentCreateMutation = () => {
       queryClient.invalidateQueries({
         queryKey: ['blogComments']
       })
+      queryClient.invalidateQueries({
+        queryKey: ['blogCommentsAdmin']
+      })
     }
   })
 }
@@ -93,6 +96,9 @@ export const useBlogCommentDeleteMutation = () => {
       queryClient.invalidateQueries({
         queryKey: ['blogComments']
       })
+      queryClient.invalidateQueries({
+        queryKey: ['blogCommentsAdmin']
+      })
     }
   })
 }
@@ -105,6 +111,9 @@ export const useBlogCommentUpdateMutation = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: ['blogComments']
+      })
+      queryClient.invalidateQueries({
+        queryKey: ['blogCommentsAdmin']
       })
     }
   })
@@ -257,13 +266,26 @@ export const useBlogDetailAdminQuery = ({ id }: { id: string }) => {
   })
 }
 
-export const useBlogCommentsAdminQuery = ({ id }: { id: string }) => {
-  return useQuery({
-    queryKey: ['blogCommentsAdmin', id],
-    queryFn: () => blogApiRequest.getBlogCommentsAdmin(id)
+export const useBlogCommentsAdminQuery = ({
+  id,
+  page_index,
+  page_size
+}: {
+  id: string
+  page_index?: number | undefined
+  page_size?: number | undefined
+}) => {
+  return useInfiniteQuery({
+    queryKey: ['blogCommentsAdmin', id, page_index, page_size],
+    queryFn: () => blogApiRequest.getBlogCommentsAdmin({ id, page_index, page_size }),
+    getNextPageParam: (lastPage) => {
+      if (lastPage?.payload?.pagination?.currentPage < lastPage?.payload?.pagination?.totalPage) {
+        return lastPage.payload.pagination.currentPage + 1
+      }
+    },
+    initialPageParam: 1
   })
 }
-
 export const useMyBlogsQuery = ({
   page_index,
   page_size,
@@ -276,5 +298,19 @@ export const useMyBlogsQuery = ({
   return useQuery({
     queryKey: ['myBlogs', page_index, page_size, keyword],
     queryFn: () => blogApiRequest.getMyBlogs({ page_index, page_size, keyword })
+  })
+}
+
+export const useBlogUpdateStatusMutation = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: ({ id, status }: { id: string; status: 'VISIBLE' | 'HIDDEN' }) =>
+      blogApiRequest.updateIsVisibleCourse(id, status),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ['myBlogs']
+      })
+    }
   })
 }

@@ -1,5 +1,5 @@
 'use client'
-import { use } from 'react'
+import { use, useState } from 'react'
 
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -10,17 +10,93 @@ import Link from 'next/link'
 import { format } from 'date-fns'
 import { vi } from 'date-fns/locale'
 import { Badge } from '@/components/ui/badge'
-import { useGetRefundRequestById } from '@/queries/useOrder'
+import { useGetRefundRequestById, useUpdateRefundRequestMutation } from '@/queries/useOrder'
 import { Skeleton } from '@/components/ui/skeleton'
-import { formatOrderStatus, formatPaymentStatus, formatPrice } from '@/lib/utils'
+import { formatOrderStatus, formatPaymentStatus, formatPrice, handleErrorApi } from '@/lib/utils'
 import { Breadcrumb } from '@/components/private/common/breadcrumb'
 import { Textarea } from '@/components/ui/textarea'
+import { toast } from '@/components/ui/use-toast'
+import { useRouter } from 'next/navigation'
 
 export default function RefundDetailPage(props: { params: Promise<{ id: string }> }) {
   const params = use(props.params)
   const refundId = params.id
+  const router = useRouter()
+  const [note, setNote] = useState('')
 
   const { isLoading, error, data } = useGetRefundRequestById({ id: refundId })
+  const updateRefundMutation = useUpdateRefundRequestMutation()
+
+  const handleApproveRefund = () => {
+    try {
+      if (updateRefundMutation.isPending) return
+
+      updateRefundMutation.mutate(
+        {
+          id: refundId,
+          body: {
+            action: 'APPROVE',
+            note: note.trim() || undefined
+          }
+        },
+        {
+          onSuccess: () => {
+            toast({
+              title: 'Thành công',
+              description: 'Đã chấp nhận hoàn tiền thành công',
+              variant: 'success'
+            })
+            router.push('/support/refunds')
+          },
+          onError: (error) => {
+            handleErrorApi({ error })
+          }
+        }
+      )
+    } catch (error) {
+      handleErrorApi({ error })
+    }
+  }
+
+  const handleRejectRefund = () => {
+    try {
+      if (updateRefundMutation.isPending) return
+
+      if (!note.trim()) {
+        toast({
+          title: 'Lỗi',
+          description: 'Vui lòng nhập lý do từ chối hoàn tiền',
+          variant: 'destructive'
+        })
+        return
+      }
+
+      updateRefundMutation.mutate(
+        {
+          id: refundId,
+          body: {
+            action: 'REJECT',
+            note: note
+          }
+        },
+        {
+          onSuccess: () => {
+            toast({
+              title: 'Thành công',
+              description: 'Đã từ chối yêu cầu hoàn tiền',
+              variant: 'success'
+            })
+            router.push('/support/refunds')
+          },
+          onError: (error) => {
+            handleErrorApi({ error })
+          }
+        }
+      )
+    } catch (error) {
+      handleErrorApi({ error })
+    }
+  }
 
   if (isLoading) {
     return (
@@ -139,6 +215,8 @@ export default function RefundDetailPage(props: { params: Promise<{ id: string }
     }
   ]
 
+  const isProcessingMutation = updateRefundMutation.isPending
+
   return (
     <div className='container max-w-7xl mx-auto py-6 space-y-8'>
       {/* Breadcrumb component */}
@@ -232,10 +310,27 @@ export default function RefundDetailPage(props: { params: Promise<{ id: string }
               <CardTitle>Xử lý hoàn tiền</CardTitle>
             </CardHeader>
             <CardContent className='space-y-4'>
-              <Textarea placeholder='Nhập ghi chú xử lý...' className='min-h-[100px]' />
+              <Textarea
+                placeholder='Nhập ghi chú xử lý...'
+                className='min-h-[100px]'
+                value={note}
+                onChange={(e) => setNote(e.target.value)}
+                disabled={isProcessingMutation || refundData.status !== 'REFUND_REQUEST'}
+              />
               <div className='flex justify-end gap-2'>
-                <Button variant='outline'>Từ chối</Button>
-                <Button>Chấp nhận hoàn tiền</Button>
+                <Button
+                  variant='outline'
+                  onClick={handleRejectRefund}
+                  disabled={isProcessingMutation || refundData.status !== 'REFUND_REQUEST'}
+                >
+                  {isProcessingMutation ? 'Đang xử lý...' : 'Từ chối'}
+                </Button>
+                <Button
+                  onClick={handleApproveRefund}
+                  disabled={isProcessingMutation || refundData.status !== 'REFUND_REQUEST'}
+                >
+                  {isProcessingMutation ? 'Đang xử lý...' : 'Chấp nhận hoàn tiền'}
+                </Button>
               </div>
             </CardContent>
           </Card>

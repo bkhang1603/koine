@@ -1,10 +1,13 @@
 import courseApiRequest from '@/apiRequests/course'
+import { CreateCourseCommentBodyType } from '@/schemaValidations/admin.schema'
 import {
   CreateCourseBodyType,
   UpdateCategoryCourseBodyType,
   UpdateLessonBodyType,
   CreateChapterBodyType,
-  UpdateChapterBodyType
+  UpdateChapterBodyType,
+  UpdateStatusCourseBodyType,
+  UpdateIsVisibleCourseBodyType
 } from '@/schemaValidations/course.schema'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 
@@ -193,7 +196,7 @@ export const useAddCourseMutation = () => {
     mutationFn: courseApiRequest.addCourse,
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: ['course']
+        queryKey: ['draftCourses']
       })
     }
   })
@@ -206,7 +209,7 @@ export const useUpdateCourseMutation = ({ id }: { id: string }) => {
     mutationFn: (data: CreateCourseBodyType) => courseApiRequest.updateCourse(id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: ['course']
+        queryKey: ['draftCourses']
       })
     }
   })
@@ -219,7 +222,7 @@ export const useDeleteCourseMutation = () => {
     mutationFn: courseApiRequest.deleteCourse,
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: ['course']
+        queryKey: ['draftCourses']
       })
     }
   })
@@ -409,5 +412,45 @@ export const useGetDraftCoursesQuery = ({
   return useQuery({
     queryKey: ['draftCourses', page_index, page_size, keyword],
     queryFn: () => courseApiRequest.getDraftCourses({ page_index, page_size, keyword })
+  })
+}
+
+export const useUpdateStatusCourseMutation = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: ({ id, data }: { id: string; data: UpdateStatusCourseBodyType }) =>
+      courseApiRequest.updateStatusCourse(id, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ['draftCourses']
+      })
+    }
+  })
+}
+
+export const useUpdateIsVisibleCourseMutation = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: ({ id, data }: { id: string; data: UpdateIsVisibleCourseBodyType }) =>
+      courseApiRequest.updateIsVisibleCourse(id, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ['draftCourses']
+      })
+    }
+  })
+}
+
+export const useCreateCourseCommentMutation = () => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (data: CreateCourseCommentBodyType) => courseApiRequest.createCourseComment(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ['courseReview']
+      })
+    }
   })
 }

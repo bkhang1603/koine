@@ -150,8 +150,18 @@ export const redirectSettingRole = (role: string) => {
   switch (role) {
     case 'ADULT':
       return '/setting'
-    case 'TEACHER':
-      return '/teacher/setting'
+    case 'CHILD':
+      return '/kid/setting'
+    case 'CONTENT_CREATOR':
+      return '/content-creator/setting'
+    case 'SUPPORTER':
+      return '/support/setting'
+    case 'EXPERT':
+      return '/expert/setting'
+    case 'SALESMAN':
+      return '/salesman/setting'
+    case 'MANAGER':
+      return '/manager/setting'
     case 'ADMIN':
       return '/admin/setting'
     default:
@@ -448,6 +458,10 @@ export const formatOrderStatus = (status: string) => {
       return 'Hoàn thành'
     case 'CANCELLED':
       return 'Đã hủy'
+    case 'EXCHANGE_REQUEST':
+      return 'Yêu cầu đổi hàng'
+    case 'REFUND_REQUEST':
+      return 'Yêu cầu hoàn tiền'
     default:
       return status
   }
@@ -629,4 +643,19 @@ export type RevenueDataItem = {
   amount: number
   ordersCount: number
   isFilled?: boolean
+}
+
+export const formatCourseStatus = (status: string) => {
+  switch (status) {
+    case 'ACTIVE':
+      return 'Đang hoạt động'
+    case 'PENDINGREVIEW':
+      return 'Chờ duyệt'
+    case 'PENDINGPRICING':
+      return 'Chờ định giá'
+    case 'REJECTED':
+      return 'Đã từ chối'
+    default:
+      return status
+  }
 }

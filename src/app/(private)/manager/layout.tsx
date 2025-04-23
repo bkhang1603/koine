@@ -13,7 +13,7 @@ export default function Layout({
       group: [
         {
           id: 'overviewDashboard',
-          href: '/admin',
+          href: '/manager',
           icon: <AreaChart className='h-5 w-5' />,
           label: 'Tổng quan'
         }
@@ -24,31 +24,31 @@ export default function Layout({
       group: [
         {
           id: 'orderDashboard',
-          href: '/admin/order',
+          href: '/manager/order',
           icon: <ShoppingCart className='h-5 w-5' />,
           label: 'Đơn hàng'
         },
         {
           id: 'coursesDashboard',
-          href: '/admin/course',
+          href: '/manager/course',
           icon: <BookOpen className='h-5 w-5' />,
           label: 'Khoá học'
         },
         {
           id: 'blogDashboard',
-          href: '/admin/blog',
+          href: '/manager/blog',
           icon: <FileText className='h-5 w-5' />,
           label: 'Bài viết'
         },
         {
           id: 'productDashboard',
-          href: '/admin/product',
+          href: '/manager/product',
           icon: <Package className='h-5 w-5' />,
           label: 'Sản phẩm'
         },
         {
           id: 'user',
-          href: '/admin/user',
+          href: '/manager/user',
           icon: <Users className='h-5 w-5' />,
           label: 'Người dùng'
         }
@@ -59,7 +59,7 @@ export default function Layout({
       group: [
         {
           id: 'settings',
-          href: '/admin/settings',
+          href: '/manager/settings',
           icon: <Settings className='h-5 w-5' />,
           label: 'Cài đặt'
         }

@@ -2,8 +2,7 @@
 
 import { use } from 'react'
 import { SearchParams } from '@/types/query'
-import { useCoursesAdminQuery } from '@/queries/useCourse'
-import { CourseStats } from '@/components/private/manager/course/course-stats'
+import { useGetDraftCoursesQuery, useUpdateIsVisibleCourseMutation } from '@/queries/useCourse'
 import { Button } from '@/components/ui/button'
 import { LayoutList } from 'lucide-react'
 import Link from 'next/link'
@@ -15,10 +14,14 @@ import { vi } from 'date-fns/locale'
 import { MoreOptions } from '@/components/private/common/more-options'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
+import { formatCourseStatus } from '@/lib/utils'
+import { toast } from '@/components/ui/use-toast'
+import { handleErrorApi } from '@/lib/utils'
 
-function Courses(props: { searchParams: SearchParams }) {
+function ManagerCourse(props: { searchParams: SearchParams }) {
   const searchParams = use(props.searchParams)
   const router = useRouter()
+  const updateIsVisibleCourseMutation = useUpdateIsVisibleCourseMutation()
 
   // Lấy giá trị từ searchParams hoặc sử dụng giá trị mặc định
   const currentKeyword = (searchParams.keyword as string) || ''
@@ -26,7 +29,7 @@ function Courses(props: { searchParams: SearchParams }) {
   const currentPageIndex = Number(searchParams.page_index) || 1
 
   // Gọi API với giá trị từ URL
-  const { data: responseData, isLoading } = useCoursesAdminQuery({
+  const { data: responseData, isLoading } = useGetDraftCoursesQuery({
     keyword: currentKeyword,
     page_size: currentPageSize,
     page_index: currentPageIndex
@@ -41,13 +44,31 @@ function Courses(props: { searchParams: SearchParams }) {
     maxPageSize: 0
   }
 
-  // Tính toán thống kê
-  const totalCourses = pagination.totalItem || 0
-  const totalEnrollments = data.reduce((sum: number, course: any) => sum + (course.totalEnrollment || 0), 0)
-  const averageRating =
-    data.length > 0 ? data.reduce((sum: number, course: any) => sum + (course.aveRating || 0), 0) / data.length : 0
-  const displayAverageRating = !isNaN(averageRating) ? Number(averageRating.toFixed(1)) : 0
-  const bannedCourses = data.filter((course: any) => course.isBanned).length
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const handleToggleVisibility = (courseId: string, isVisible: boolean) => {
+    try {
+      if (updateIsVisibleCourseMutation.isPending) return
+
+      updateIsVisibleCourseMutation.mutate(
+        {
+          id: courseId,
+          data: { isVisible: !isVisible }
+        },
+        {
+          onSuccess: () => {
+            toast({
+              description: 'Khóa học đã được cập nhật trạng thái thành công'
+            })
+          },
+          onError: (error) => {
+            handleErrorApi({ error })
+          }
+        }
+      )
+    } catch (error) {
+      handleErrorApi({ error })
+    }
+  }
 
   // Cấu hình cột cho bảng
   const headerColumn = [
@@ -56,11 +77,9 @@ function Courses(props: { searchParams: SearchParams }) {
     { id: 3, name: 'Người tạo' },
     { id: 4, name: 'Người duyệt' },
     { id: 5, name: 'Trạng thái' },
-    { id: 6, name: '' }
+    { id: 6, name: 'Hiển thị' },
+    { id: 7, name: '' }
   ]
-
-  const handleReview = () => null
-
   const bodyColumn = useMemo(
     () => [
       {
@@ -117,7 +136,7 @@ function Courses(props: { searchParams: SearchParams }) {
         render: (course: any) => (
           <div className='flex items-center min-w-[100px]'>
             <Badge variant={course.isBanned ? 'destructive' : 'green'} className='w-fit'>
-              {course.isBanned ? 'Đã khóa' : 'Hoạt động'}
+              {formatCourseStatus(course.status)}
             </Badge>
           </div>
         )
@@ -125,23 +144,34 @@ function Courses(props: { searchParams: SearchParams }) {
       {
         id: 6,
         render: (course: any) => (
+          <div className='flex items-center min-w-[100px]'>
+            <Badge variant={course.isVisible ? 'green' : 'secondary'} className='w-fit'>
+              {course.isVisible ? 'Hiển thị' : 'Ẩn'}
+            </Badge>
+          </div>
+        )
+      },
+      {
+        id: 7,
+        render: (course: any) => (
           <div className='flex justify-end min-w-[40px]'>
             <MoreOptions
               item={{
                 id: course.id,
                 title: course.title,
                 status: course.isBanned ? 'Đã khóa' : 'Hoạt động',
-                slug: course.slug
+                slug: course.slug,
+                isVisible: course.isVisible
               }}
               itemType='course'
               onView={() => router.push(`/manager/course/${course.id}`)}
-              onReview={() => handleReview}
+              onToggleVisibility={() => handleToggleVisibility(course.id, course.isVisible)}
             />
           </div>
         )
       }
     ],
-    [router]
+    [router, handleToggleVisibility]
   )
 
   const tableData: dataListType = {
@@ -168,15 +198,6 @@ function Courses(props: { searchParams: SearchParams }) {
         </div>
       </div>
 
-      {/* Stats Cards */}
-      <CourseStats
-        isLoading={isLoading}
-        totalCourses={totalCourses}
-        totalEnrollments={totalEnrollments}
-        averageRating={displayAverageRating}
-        bannedCourses={bannedCourses}
-      />
-
       {/* Table */}
       <TableCustom
         data={tableData}
@@ -192,4 +213,4 @@ function Courses(props: { searchParams: SearchParams }) {
   )
 }
 
-export default Courses
+export default ManagerCourse
