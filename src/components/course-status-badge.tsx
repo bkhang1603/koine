@@ -1,5 +1,13 @@
 import { Badge } from '@/components/ui/badge'
-import type { CourseStatus } from '@/app/(private)/salesman/_mock/data'
+//import type { CourseStatus } from '@/app/(private)/salesman/_mock/data'
+
+export type CourseStatus =
+  | 'draft' // Đang tạo nội dung
+  | 'pending_price' // Chờ thiết lập giá
+  | 'pending_review' // Chờ duyệt
+  | 'published' // Đã xuất bản
+  | 'unpublished' // Tạm ẩn
+  | 'rejected' // Bị từ chối
 
 const statusConfig: Record<
   CourseStatus,

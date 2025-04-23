@@ -16,6 +16,7 @@ async function CourseList({ searchParams }: { searchParams?: searchParams }) {
   const sortOptions = ['pa', 'pd', 'na', 'nd'] as const
   const sort = sortOptions.includes(searchParams?.sort as any) ? searchParams?.sort : 'pa'
   const range = isNaN(Number(searchParams?.range)) ? undefined : Number(searchParams?.range)
+  const age = searchParams?.age ?? ''
   let category = searchParams?.category ?? ''
   category = (typeof category === 'string' ? category : '')
     .split(',')
@@ -25,11 +26,12 @@ async function CourseList({ searchParams }: { searchParams?: searchParams }) {
   const data = await wrapServerApi(() =>
     courseApiRequest.getCoursesCache({
       page_index: page_index,
-      page_size: 9,
+      page_size: 8,
       keyword: keyword,
       sort: sort,
       range: range,
-      category: category
+      category: category,
+      age: age
     })
   )
 

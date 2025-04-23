@@ -1,4 +1,4 @@
-import { RoleValues, GenderValues, OrderTypeValues } from '@/constants/type'
+import { RoleValues, GenderValues, OrderTypeValues, TicketTypeValues, ReportTypeValues } from '@/constants/type'
 import z from 'zod'
 
 export const accountRes = z.object({
@@ -552,6 +552,64 @@ export const myOrdersReviewsRes = z.object({
   statusCode: z.number()
 })
 
+export const createTicketBody = z.object({
+  type: z.enum(TicketTypeValues),
+  name: z.string(),
+  email: z.string(),
+  phone: z.string(),
+  objectId: z.string().nullable(),
+  content: z.string()
+})
+
+export const createReportBody = z.object({
+  type: z.enum(ReportTypeValues),
+  reportedEntityId: z.string(),
+  reasonId: z.string(),
+  reasonDetail: z.string()
+})
+
+export const updateChildProfileBody = z.object({
+  firstName: z.string(),
+  lastName: z.string(),
+  dob: z.string(),
+  gender: z.string(),
+  avatarUrl: z.string()
+})
+
+export const plusGamePointBody = z.object({
+  point: z.number()
+})
+
+export const topRanking = z.object({
+  userId: z.string(),
+  username: z.string(),
+  gamePoints: z.number(),
+  avatarUrl: z.string(),
+  firstName: z.string(),
+  lastName: z.string()
+})
+
+export const topRankingRes = z.object({
+  data: z.array(topRanking),
+  message: z.string(),
+  statusCode: z.number()
+})
+
+export const myCertificate = z.object({
+  courseId: z.string(),
+  courseTitle: z.string(),
+  courseImageUrl: z.string(),
+  certificateUrl: z.string(),
+  completedDate: z.string(),
+  score: z.number()
+})
+
+export const myCertificateRes = z.object({
+  data: z.array(myCertificate),
+  message: z.string(),
+  statusCode: z.number()
+})
+
 export type AccountResType = z.TypeOf<typeof accountRes>
 
 export type CourseByAccountResType = z.TypeOf<typeof courseByAccountRes>
@@ -595,3 +653,15 @@ export type CreateOrderNeedReviewBodyType = z.TypeOf<typeof createOrderNeedRevie
 export type ProfileChildResType = z.TypeOf<typeof profileChildRes>
 
 export type MyOrdersReviewsResType = z.TypeOf<typeof myOrdersReviewsRes>
+
+export type CreateTicketBodyType = z.TypeOf<typeof createTicketBody>
+
+export type CreateReportBodyType = z.TypeOf<typeof createReportBody>
+
+export type UpdateChildProfileBodyType = z.TypeOf<typeof updateChildProfileBody>
+
+export type PlusGamePointBodyType = z.TypeOf<typeof plusGamePointBody>
+
+export type TopRankingResType = z.TypeOf<typeof topRankingRes>
+
+export type MyCertificateResType = z.TypeOf<typeof myCertificateRes>

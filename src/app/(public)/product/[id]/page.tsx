@@ -7,6 +7,7 @@ import ProductDescription from '@/components/public/parent/product/product-descr
 import { wrapServerApi } from '@/lib/server-utils'
 import RecommendedProducts from '@/components/public/parent/product/recommended-products'
 import { searchParams } from '@/types/query'
+import { ReportProductButton } from '@/components/public/parent/report-button'
 
 export default async function ProductDetail(props: {
   params: Promise<{ id: string }>
@@ -38,9 +39,12 @@ export default async function ProductDetail(props: {
 
         {/* Product info */}
         <div>
-          <p className='text-gray-500 mb-2'>
-            {product.categories && changeCategoriesToString(product.categories.map((category) => category.name))}
-          </p>
+          <div className='flex justify-between items-start'>
+            <p className='text-gray-500 mb-2'>
+              {product.categories && changeCategoriesToString(product.categories.map((category) => category.name))}
+            </p>
+            <ReportProductButton productId={id} productName={product.name} buttonVariant='icon' />
+          </div>
           <h2 className='text-4xl mb-4'>{product.name}</h2>
           <div className='mb-4 flex items-center gap-2'>
             <p className='text-2xl'>{(product.price - product.price * product.discount).toLocaleString()}đ</p>

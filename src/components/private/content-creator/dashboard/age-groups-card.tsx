@@ -1,7 +1,7 @@
 'use client'
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LabelList } from 'recharts'
+import { BarChart, Bar, XAxis, CartesianGrid, Tooltip, ResponsiveContainer, LabelList } from 'recharts'
 import { Users } from 'lucide-react'
 
 interface AgeGroup {
@@ -17,6 +17,7 @@ interface AgeGroupsCardProps {
 }
 
 // Custom tooltip component for the chart
+// eslint-disable-next-line no-unused-vars
 const CustomTooltip = ({ active, payload, label }: any) => {
   if (active && payload && payload.length) {
     return (

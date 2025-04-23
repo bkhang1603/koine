@@ -87,13 +87,13 @@ export default function LoginForm({ className, onSuccess }: { className?: string
             router.push('/salesman')
             break
           case 'ADULT':
-            router.back()
+            router.push('/')
             break
           case 'CHILD':
             router.push('/kid')
             break
-          case 'EXPERT':
-            router.push('/expert')
+          case 'MANAGER':
+            router.push('/manager')
             break
           default:
             router.back()

@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback, useMemo, useRef } from 'react'
 import Image from 'next/image'
-import { Minus, Plus, Trash2, ChevronRight, ShoppingCart, MapPin, BookOpen, PackageOpen } from 'lucide-react'
+import { Minus, Plus, Trash2, ChevronRight, ShoppingCart, MapPin, BookOpen, PackageOpen, Package } from 'lucide-react'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import Link from 'next/link'
@@ -61,7 +61,7 @@ export default function Cart() {
   useEffect(() => {
     if (data) {
       const inStockItems = data.payload.data.cartDetails
-        .filter((item) => item.product?.stockQuantity! > 0 || item.course !== null)
+        .filter((item) => item.product?.stockQuantity! > 0 || item.course !== null || item.comboId !== null)
         .map((item) => item.id)
       setSelectedItems(new Set(inStockItems))
     }
@@ -77,7 +77,7 @@ export default function Cart() {
   const toggleSelectAll = useCallback(() => {
     if (!data) return
     const inStockItems = data.payload.data.cartDetails
-      .filter((item) => item.product?.stockQuantity! > 0 || item.course !== null)
+      .filter((item) => item.product?.stockQuantity! > 0 || item.course !== null || item.comboId !== null)
       .map((item) => item.id)
     if (selectedItems.size === inStockItems.length) {
       setSelectedItems(new Set())
@@ -184,20 +184,22 @@ export default function Cart() {
   const cartDetails = useMemo(() => data?.payload.data.cartDetails || [], [data])
   const isCartEmpty = !isLoading && cartDetails.length === 0
 
-  // Determine if cart has both products and courses
-  const hasMixedItemTypes = useMemo(() => {
-    const hasProducts = cartDetails.some((item) => item.product !== null)
-    const hasCourses = cartDetails.some((item) => item.course !== null)
-    return hasProducts && hasCourses
-  }, [cartDetails])
-
   // Group cart items by type
-  const { productItems, courseItems, customCourseItems } = useMemo(() => {
+  const { productItems, courseItems, customCourseItems, comboItems } = useMemo(() => {
     return {
       productItems: cartDetails.filter((item) => item.product !== null),
       courseItems: cartDetails.filter((item) => item.course !== null && !item.course.isCustom),
-      customCourseItems: cartDetails.filter((item) => item.course !== null && item.course.isCustom)
+      customCourseItems: cartDetails.filter((item) => item.course !== null && item.course.isCustom),
+      comboItems: cartDetails.filter((item) => item.comboId !== null)
     }
+  }, [cartDetails])
+
+  // Determine if cart has mixed item types
+  const hasMixedItemTypes = useMemo(() => {
+    const hasProducts = cartDetails.some((item) => item.product !== null)
+    const hasCourses = cartDetails.some((item) => item.course !== null)
+    const hasCombos = cartDetails.some((item) => item.comboId !== null)
+    return (hasProducts && hasCourses) || (hasProducts && hasCombos) || (hasCourses && hasCombos)
   }, [cartDetails])
 
   const handleCheckout = () => {
@@ -235,7 +237,9 @@ export default function Cart() {
                       id='select-all'
                       checked={
                         selectedItems.size ===
-                        cartDetails.filter((item) => item.product?.stockQuantity! > 0 || item.course !== null).length
+                        cartDetails.filter(
+                          (item) => item.product?.stockQuantity! > 0 || item.course !== null || item.comboId !== null
+                        ).length
                       }
                       onCheckedChange={toggleSelectAll}
                     />
@@ -277,6 +281,104 @@ export default function Cart() {
                 {/* When cart has mixed item types, group them */}
                 {hasMixedItemTypes ? (
                   <>
+                    {/* Combo section */}
+                    {comboItems.length > 0 && (
+                      <>
+                        <div className='p-3 pl-4 bg-gray-50 border-b flex items-center'>
+                          <Package className='w-4 h-4 mr-2 text-indigo-500' />
+                          <h3 className='font-medium text-sm text-indigo-700'>Combo</h3>
+                        </div>
+                        {comboItems.map((item, index) => (
+                          <div
+                            key={item.id}
+                            className={`p-4 ${index !== comboItems.length - 1 ? 'border-b' : productItems.length > 0 || courseItems.length > 0 ? 'border-b' : ''}`}
+                          >
+                            <div className='flex items-start'>
+                              <div className='flex w-1/2'>
+                                <div className='flex items-center'>
+                                  <Checkbox
+                                    checked={selectedItems.has(item.id)}
+                                    onCheckedChange={() => toggleSelectItem(item.id)}
+                                  />
+                                  <Image
+                                    src={item.combo?.imageUrl || '/placeholder.png'}
+                                    alt={item.combo?.name || 'Combo'}
+                                    width={500}
+                                    height={500}
+                                    className='ml-4 w-20 h-20 object-cover rounded-md'
+                                  />
+                                </div>
+                                <div className='ml-4 flex-grow h-full'>
+                                  <h3 className='font-medium text-sm'>{item.combo?.name}</h3>
+                                  <div className='mt-1 flex items-center'>
+                                    <span className='text-xs font-medium px-2 py-0.5 bg-indigo-100 text-indigo-800 rounded-full'>
+                                      Combo
+                                    </span>
+                                  </div>
+                                </div>
+                              </div>
+                              <div className='grid grid-cols-4 gap-4 w-1/2 items-center'>
+                                <span className='text-center text-sm'>
+                                  {(item.unitPrice - item.unitPrice * item.discount).toLocaleString()}đ
+                                </span>
+                                <div className='flex items-center justify-center'>
+                                  <>
+                                    <Button
+                                      variant={'icon'}
+                                      disabled={item?.quantity === 1}
+                                      onClick={() => handleQuantityChange(item?.id, -1)}
+                                      className='p-1 h-full rounded-full hover:bg-gray-100 transition duration-200'
+                                    >
+                                      <Minus className='w-4 h-4' />
+                                    </Button>
+                                    <span className='mx-2 w-6 text-center text-sm'>
+                                      {quantities[item?.id] ?? item?.quantity}
+                                    </span>
+                                    <Button
+                                      variant={'icon'}
+                                      onClick={() => handleQuantityChange(item?.id, 1)}
+                                      className='p-1 h-full rounded-full hover:bg-gray-100 transition duration-200'
+                                    >
+                                      <Plus className='w-4 h-4' />
+                                    </Button>
+                                  </>
+                                </div>
+                                <span className='text-center text-sm font-medium text-red-600'>
+                                  {item.totalPrice.toLocaleString()}đ
+                                </span>
+                                <div className='flex justify-center'>
+                                  <AlertDialog>
+                                    <AlertDialogTrigger asChild>
+                                      <Button variant='ghost' size='icon' className='h-8 w-8'>
+                                        <Trash2 className='h-4 w-4' />
+                                      </Button>
+                                    </AlertDialogTrigger>
+                                    <AlertDialogContent>
+                                      <AlertDialogHeader>
+                                        <AlertDialogTitle>Xóa combo</AlertDialogTitle>
+                                        <AlertDialogDescription>
+                                          Bạn có chắc chắn muốn xóa combo này khỏi giỏ hàng không?
+                                        </AlertDialogDescription>
+                                      </AlertDialogHeader>
+                                      <AlertDialogFooter>
+                                        <AlertDialogAction
+                                          onClick={() => removeItem(item.id)}
+                                          className='bg-red-500 hover:bg-red-600 text-white'
+                                        >
+                                          Xóa
+                                        </AlertDialogAction>
+                                        <AlertDialogCancel>Hủy</AlertDialogCancel>
+                                      </AlertDialogFooter>
+                                    </AlertDialogContent>
+                                  </AlertDialog>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </>
+                    )}
+
                     {/* Products section */}
                     {productItems.length > 0 && (
                       <>
@@ -298,7 +400,7 @@ export default function Cart() {
                                     disabled={item.product?.stockQuantity === 0}
                                   />
                                   <Image
-                                    src={item.product?.imageUrl || '/placeholder.svg'}
+                                    src={item.product?.imageUrl || '/placeholder.png'}
                                     alt={item.product?.name || 'Product image'}
                                     width={500}
                                     height={500}
@@ -313,7 +415,9 @@ export default function Cart() {
                                 </div>
                               </div>
                               <div className='grid grid-cols-4 gap-4 w-1/2 items-center'>
-                                <span className='text-center text-sm'>{item.unitPrice.toLocaleString()}đ</span>
+                                <span className='text-center text-sm'>
+                                  {(item.unitPrice - item.unitPrice * item.discount).toLocaleString()}đ
+                                </span>
                                 <div className='flex items-center justify-center'>
                                   {item.product?.stockQuantity! > 0 ? (
                                     <>
@@ -395,7 +499,7 @@ export default function Cart() {
                                         onCheckedChange={() => toggleSelectItem(item.id)}
                                       />
                                       <Image
-                                        src={item.course?.imageUrl || '/placeholder.svg'}
+                                        src={item.course?.imageUrl || '/placeholder.png'}
                                         alt={item.course?.title || 'Course image'}
                                         width={500}
                                         height={500}
@@ -407,7 +511,9 @@ export default function Cart() {
                                     </div>
                                   </div>
                                   <div className='grid grid-cols-4 gap-4 w-1/2 items-center'>
-                                    <span className='text-center text-sm'>{item.unitPrice.toLocaleString()}đ</span>
+                                    <span className='text-center text-sm'>
+                                      {(item.unitPrice - item.unitPrice * item.discount).toLocaleString()}đ
+                                    </span>
                                     <div className='flex items-center justify-center'>
                                       <>
                                         <Button
@@ -486,7 +592,7 @@ export default function Cart() {
                                         onCheckedChange={() => toggleSelectItem(item.id)}
                                       />
                                       <Image
-                                        src={item.course?.imageUrl || '/placeholder.svg'}
+                                        src={item.course?.imageUrl || '/placeholder.png'}
                                         alt={item.course?.title || 'Course image'}
                                         width={500}
                                         height={500}
@@ -564,6 +670,88 @@ export default function Cart() {
                   // Original rendering when only one type is present
                   cartDetails.map((item, index) => (
                     <div key={item.id} className={`p-4 ${index !== cartDetails.length - 1 ? 'border-b' : ''}`}>
+                      {item.comboId !== null && (
+                        <div className='flex items-start'>
+                          <div className='flex w-1/2'>
+                            <div className='flex items-center'>
+                              <Checkbox
+                                checked={selectedItems.has(item.id)}
+                                onCheckedChange={() => toggleSelectItem(item.id)}
+                              />
+                              <Image
+                                src={item.combo?.imageUrl || '/placeholder.png'}
+                                alt={item.combo?.name || 'Combo'}
+                                width={500}
+                                height={500}
+                                className='ml-4 w-20 h-20 object-cover rounded-md'
+                              />
+                            </div>
+                            <div className='ml-4 flex-grow h-full'>
+                              <h3 className='font-medium text-sm'>{item.combo?.name}</h3>
+                              <div className='mt-1 flex items-center'>
+                                <span className='text-xs font-medium px-2 py-0.5 bg-indigo-100 text-indigo-800 rounded-full'>
+                                  Combo
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+                          <div className='grid grid-cols-4 gap-4 w-1/2 items-center'>
+                            <span className='text-center text-sm'>{item.unitPrice.toLocaleString()}đ</span>
+                            <div className='flex items-center justify-center'>
+                              <>
+                                <Button
+                                  variant={'icon'}
+                                  disabled={item?.quantity === 1}
+                                  onClick={() => handleQuantityChange(item?.id, -1)}
+                                  className='p-1 h-full rounded-full hover:bg-gray-100 transition duration-200'
+                                >
+                                  <Minus className='w-4 h-4' />
+                                </Button>
+                                <span className='mx-2 w-6 text-center text-sm'>
+                                  {quantities[item?.id] ?? item?.quantity}
+                                </span>
+                                <Button
+                                  variant={'icon'}
+                                  onClick={() => handleQuantityChange(item?.id, 1)}
+                                  className='p-1 h-full rounded-full hover:bg-gray-100 transition duration-200'
+                                >
+                                  <Plus className='w-4 h-4' />
+                                </Button>
+                              </>
+                            </div>
+                            <span className='text-center text-sm font-medium text-red-600'>
+                              {item.totalPrice.toLocaleString()}đ
+                            </span>
+                            <div className='flex justify-center'>
+                              <AlertDialog>
+                                <AlertDialogTrigger asChild>
+                                  <Button variant='ghost' size='icon' className='h-8 w-8'>
+                                    <Trash2 className='h-4 w-4' />
+                                  </Button>
+                                </AlertDialogTrigger>
+                                <AlertDialogContent>
+                                  <AlertDialogHeader>
+                                    <AlertDialogTitle>Xóa combo</AlertDialogTitle>
+                                    <AlertDialogDescription>
+                                      Bạn có chắc chắn muốn xóa combo này khỏi giỏ hàng không?
+                                    </AlertDialogDescription>
+                                  </AlertDialogHeader>
+                                  <AlertDialogFooter>
+                                    <AlertDialogAction
+                                      onClick={() => removeItem(item.id)}
+                                      className='bg-red-500 hover:bg-red-600 text-white'
+                                    >
+                                      Xóa
+                                    </AlertDialogAction>
+                                    <AlertDialogCancel>Hủy</AlertDialogCancel>
+                                  </AlertDialogFooter>
+                                </AlertDialogContent>
+                              </AlertDialog>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+
                       {item.product !== null && (
                         <div className='flex items-start'>
                           <div className='flex w-1/2'>
@@ -574,7 +762,7 @@ export default function Cart() {
                                 disabled={item.product?.stockQuantity === 0}
                               />
                               <Image
-                                src={item.product?.imageUrl || '/placeholder.svg'}
+                                src={item.product?.imageUrl || '/placeholder.png'}
                                 alt={item.product?.name || 'Product image'}
                                 width={500}
                                 height={500}
@@ -661,7 +849,7 @@ export default function Cart() {
                                 onCheckedChange={() => toggleSelectItem(item.id)}
                               />
                               <Image
-                                src={item.course?.imageUrl || '/placeholder.svg'}
+                                src={item.course?.imageUrl || '/placeholder.png'}
                                 alt={item.course?.title || 'Course image'}
                                 width={500}
                                 height={500}

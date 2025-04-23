@@ -7,7 +7,6 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog'
 import { toast } from '@/components/ui/use-toast'
 import { Search, Plus, CalendarIcon, Eye, EyeOff, Users } from 'lucide-react'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { useGetChildAccount, useRegisterChildAccountMutation } from '@/queries/useAccount'
 import { EmptyChildAccounts } from '@/components/public/parent/setting/empty-child-accounts'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -23,14 +22,12 @@ import { Skeleton } from '@/components/ui/skeleton'
 // Thêm interface cho filters
 type Filters = {
   search: string
-  sort: 'a-z' | 'z-a'
 }
 
 export default function ChildAccountPage() {
   const [showAddDialog, setShowAddDialog] = useState(false)
   const [filters, setFilters] = useState<Filters>({
-    search: '',
-    sort: 'a-z'
+    search: ''
   })
 
   const { data, isLoading } = useGetChildAccount()
@@ -109,24 +106,11 @@ export default function ChildAccountPage() {
                 placeholder='Tìm kiếm tài khoản con...'
                 value={filters.search}
                 onChange={(e) => setFilters((prev) => ({ ...prev, search: e.target.value }))}
-                className='pl-9 md:w-[300px] border-gray-200 focus:border-primary/30 focus:ring-primary/20'
+                className='pl-9 md:w-[400px] border-gray-200 focus:border-primary/30 focus:ring-primary/20'
               />
             </div>
 
             <div className='flex flex-col sm:flex-row gap-4 w-full md:w-auto'>
-              <Select
-                value={filters.sort}
-                onValueChange={(value: any) => setFilters((prev) => ({ ...prev, sort: value }))}
-              >
-                <SelectTrigger className='w-full sm:w-[180px] border-gray-200'>
-                  <SelectValue placeholder='Sắp xếp theo' />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value='a-z'>Tên</SelectItem>
-                  <SelectItem value='z-a'>Số khóa học</SelectItem>
-                </SelectContent>
-              </Select>
-
               <Button
                 onClick={handleAddAccount}
                 className='w-full sm:w-auto bg-gradient-to-r from-primary to-primary/90 shadow-lg shadow-primary/25'

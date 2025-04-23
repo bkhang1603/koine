@@ -1,5 +1,6 @@
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
+import configRoute from '@/config/route'
 import { BookOpen, Search } from 'lucide-react'
 import Link from 'next/link'
 
@@ -18,7 +19,7 @@ export function EmptyCourses({ title, description }: EmptyCoursesProps) {
         <h3 className='text-xl font-semibold text-gray-900 mb-2'>{title}</h3>
         <p className='text-gray-500 max-w-md mb-6'>{description}</p>
         <Button asChild variant='outline'>
-          <Link href='/courses'>
+          <Link href={configRoute.course}>
             <Search className='h-4 w-4 mr-2' />
             Tìm khóa học cho con
           </Link>

@@ -1,6 +1,6 @@
 // Mock data for Support Dashboard
 
-import { addDays, format, subDays } from 'date-fns'
+import { format, subDays } from 'date-fns'
 
 // Type definitions to match component interfaces
 interface Activity {
@@ -15,33 +15,6 @@ interface Activity {
 }
 
 // Generate dates for the last 30 days
-const generateDates = (count: number) => {
-  const today = new Date()
-  return Array.from({ length: count }).map((_, i) => {
-    const date = subDays(today, count - 1 - i)
-    return format(date, 'dd/MM')
-  })
-}
-
-const dates = generateDates(30)
-
-// Generate performance data
-const generatePerformanceData = () => {
-  return dates.map((date, index) => {
-    const baseTickets = Math.floor(Math.random() * 15) + 10
-    const baseResolved = Math.floor(Math.random() * baseTickets)
-    const baseSatisfaction = 3.5 + Math.random() * 1.5
-
-    return {
-      date,
-      rawDate: format(subDays(new Date(), 30 - 1 - index), 'yyyy-MM-dd'),
-      tickets: baseTickets,
-      resolved: baseResolved,
-      responseTime: Math.floor(Math.random() * 30) + 5, // minutes
-      satisfaction: parseFloat(baseSatisfaction.toFixed(1))
-    }
-  })
-}
 
 // Generate mock ticket data based on the schema from the tickets page
 const generateTicketData = () => {

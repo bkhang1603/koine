@@ -275,8 +275,23 @@ export default function OrderDetailPage(props: { params: Promise<{ id: string }>
                 {comboItems.map((item) => (
                   <div key={item.id} className='py-4 first:pt-0 last:pb-0'>
                     <div className='flex gap-4'>
+                      <div className='relative w-16 h-16'>
+                        <Image
+                          src={(item.combo as any).imageUrl || (item as any).itemImageUrl || '/placeholder.svg'}
+                          alt={item.combo.name}
+                          fill
+                          className='object-cover rounded-lg'
+                        />
+                      </div>
                       <div className='flex-1'>
-                        <h3 className='font-medium'>{item.combo.name}</h3>
+                        <div className='flex items-center gap-4'>
+                          <h3 className='font-medium'>{item.combo.name}</h3>
+                          <div className='flex flex-wrap items-center gap-2'>
+                            <span className='text-xs font-medium px-2 py-0.5 bg-indigo-100 text-indigo-800 rounded-full'>
+                              Combo
+                            </span>
+                          </div>
+                        </div>
                         <div className='flex items-center justify-between mt-2'>
                           <div className='text-sm text-muted-foreground'>
                             Số lượng: <span className='font-medium'>{item.quantity}</span>
@@ -549,7 +564,44 @@ export default function OrderDetailPage(props: { params: Promise<{ id: string }>
               {/* Nút yêu cầu hoàn tiền khi đơn hàng đã hoàn thành */}
               {order.status === 'COMPLETED' && (
                 <div className='pt-2'>
-                  <RefundOrderDialog orderId={order.id} orderDetails={order.orderDetails || []} />
+                  {(() => {
+                    // Tính thời gian đã trôi qua kể từ khi hoàn thành đơn hàng
+                    const completedHistoryEntry = order.orderStatusHistory?.find(
+                      (history) => history.status === OrderStatus.COMPLETED
+                    )
+                    const completedDate = completedHistoryEntry
+                      ? new Date(completedHistoryEntry.timestamp)
+                      : new Date(order.updatedAt)
+
+                    const currentDate = new Date()
+                    const daysPassed = Math.floor(
+                      (currentDate.getTime() - completedDate.getTime()) / (1000 * 60 * 60 * 24)
+                    )
+                    const isWithinRefundPeriod = daysPassed <= 3
+
+                    if (isWithinRefundPeriod) {
+                      return (
+                        <RefundOrderDialog
+                          orderId={order.id}
+                          orderDetails={order.orderDetails || []}
+                          buttonText={hasOnlyCourses ? 'Yêu cầu hoàn tiền' : 'Yêu cầu hoàn tiền/đổi trả'}
+                        />
+                      )
+                    } else {
+                      return (
+                        <div className='p-3 bg-gray-50 border border-gray-200 rounded-md text-sm text-gray-500'>
+                          <div className='flex items-start gap-2'>
+                            <AlertCircle className='h-5 w-5 text-gray-400 flex-shrink-0 mt-0.5' />
+                            <div>
+                              Thời hạn yêu cầu hoàn tiền/đổi trả đã kết thúc. Bạn chỉ được phép yêu cầu trong vòng 3
+                              ngày kể từ khi đơn hàng hoàn thành ({format(completedDate, 'dd/MM/yyyy', { locale: vi })}
+                              ).
+                            </div>
+                          </div>
+                        </div>
+                      )
+                    }
+                  })()}
                 </div>
               )}
             </CardContent>

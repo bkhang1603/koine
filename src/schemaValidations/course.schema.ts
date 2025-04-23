@@ -46,6 +46,8 @@ export const CourseData = z
     ageStage: z.string().optional(),
     censorId: z.string(),
     durationsDisplay: z.string(),
+    isCombo: z.boolean(),
+    isVisible: z.boolean(),
     categories: z.array(
       z.object({
         id: z.string(),
@@ -560,6 +562,41 @@ export const updateLessonBody = z.object({
   videoUrl: z.string().nullable()
 })
 
+export const CourseComboDetail = z.object({
+  id: z.string(),
+  name: z.string(),
+  nameNoTone: z.string(),
+  slug: z.string(),
+  description: z.string(),
+  price: z.number(),
+  discount: z.number(),
+  imageUrl: z.string(),
+  createdAt: z.string(),
+  updatedAt: z.string(),
+  courseInfos: z.array(
+    z.object({
+      id: z.string(),
+      title: z.string(),
+      titleNoTone: z.string(),
+      slug: z.string(),
+      description: z.string(),
+      durations: z.number(),
+      imageUrl: z.string(),
+      imageBanner: z.string(),
+      price: z.number(),
+      discount: z.number(),
+      totalEnrollment: z.number(),
+      aveRating: z.number()
+    })
+  )
+})
+
+export const CourseComboDetailRes = z.object({
+  data: CourseComboDetail,
+  message: z.string(),
+  statusCode: z.number()
+})
+
 export const updateStatusCourseBody = z.object({
   status: z.enum(['ACTIVE', 'PENDINGREVIEW', 'PENDINGPRICING', 'REJECTED']),
   isDraft: z.boolean()
@@ -636,6 +673,8 @@ export type UpdateChapterBodyType = z.infer<typeof updateChapterSchema>
 export type CreateLessonBodyType = z.infer<typeof createLessonBody>
 
 export type UpdateLessonBodyType = z.infer<typeof updateLessonBody>
+
+export type CourseComboDetailResType = z.infer<typeof CourseComboDetailRes>
 
 export type UpdateStatusCourseBodyType = z.infer<typeof updateStatusCourseBody>
 

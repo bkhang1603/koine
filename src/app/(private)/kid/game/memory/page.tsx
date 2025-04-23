@@ -6,6 +6,8 @@ import { Brain, Timer, Trophy, Star, ArrowLeft } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
 import { useState, useEffect } from 'react'
+import { usePlusGamePointMutation } from '@/queries/useAccount'
+import { toast } from '@/components/ui/use-toast'
 
 // Định nghĩa kiểu cho thẻ bài
 type Card = {
@@ -28,6 +30,9 @@ const MemoryGame = () => {
   const [bestTime, setBestTime] = useState<number | null>(null)
   const [bestScore, setBestScore] = useState(0)
   const [round, setRound] = useState(1)
+  const [gameCompleted, setGameCompleted] = useState(false)
+
+  const plusGamePointMutation = usePlusGamePointMutation()
 
   // Khởi tạo game
   const initializeGame = () => {
@@ -47,6 +52,7 @@ const MemoryGame = () => {
     setMoves(0)
     setTimer(0)
     setIsPlaying(true)
+    setGameCompleted(false)
   }
 
   // Timer
@@ -100,22 +106,62 @@ const MemoryGame = () => {
   // Xử lý khi hoàn thành game
   const handleGameComplete = () => {
     setIsPlaying(false)
+    setGameCompleted(true)
     const score = calculateScore()
+
     if (score > bestScore) {
       setBestScore(score)
     }
+
     if (!bestTime || timer < bestTime) {
       setBestTime(timer)
     }
+
     setRound((prev) => prev + 1)
+
+    // Cập nhật điểm vào hệ thống
+    plusGamePointMutation.mutate(
+      { point: score },
+      {
+        onSuccess: () => {
+          toast({
+            title: 'Cập nhật điểm thành công',
+            description: `Bạn đã nhận được ${score} điểm!`
+          })
+        },
+        onError: () => {
+          toast({
+            title: 'Không thể cập nhật điểm',
+            description: 'Đã xảy ra lỗi khi cập nhật điểm',
+            variant: 'destructive'
+          })
+        }
+      }
+    )
   }
 
-  // Tính điểm
+  // Tính điểm - giảm điểm để phù hợp với hệ thống level
   const calculateScore = () => {
-    const baseScore = 1000
-    const timeDeduction = timer * 2
-    const movesDeduction = moves * 10
-    return Math.max(0, baseScore - timeDeduction - movesDeduction)
+    // Điểm cơ bản thấp hơn (từ 250 xuống 100)
+    const baseScore = 100
+
+    // Tính toán độ chính xác (%)
+    const accuracy = moves > 0 ? (matches * 2 * 100) / moves : 0
+
+    // Bonus cho độ chính xác (giảm xuống)
+    const accuracyBonus = Math.round(accuracy / 4)
+
+    // Điểm thưởng nếu hoàn thành nhanh (giảm xuống)
+    const timeBonus = timer < 60 ? 20 : timer < 90 ? 10 : 0
+
+    // Tăng điểm trừ theo thời gian
+    const timePenalty = Math.round(timer / 3)
+
+    // Kết hợp và đảm bảo điểm không âm
+    const finalScore = Math.max(5, Math.round(baseScore * (accuracy / 100) - timePenalty + accuracyBonus + timeBonus))
+
+    // Giới hạn điểm tối đa là 100
+    return Math.min(100, finalScore)
   }
 
   // Format thời gian
@@ -275,6 +321,12 @@ const MemoryGame = () => {
                 </div>
                 <Progress value={moves > 0 ? (matches * 2 * 100) / moves : 0} className='h-2' />
               </div>
+
+              {gameCompleted && (
+                <div className='p-3 bg-blue-50 rounded-lg border border-blue-100 text-center'>
+                  <p className='text-blue-600 font-medium'>Hoàn thành! Bạn đã nhận được {calculateScore()} điểm</p>
+                </div>
+              )}
             </div>
           </Card>
 

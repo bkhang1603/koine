@@ -230,7 +230,56 @@ export const useGetChildProfileQuery = ({ enabled }: { enabled?: boolean }) => {
 
 export const useGetMyOrdersReviews = () => {
   return useQuery({
-    queryKey: ['my-orders-reviews'],
+    queryKey: ['list-order-need-review'],
     queryFn: accountApiRequest.getMyOrdersReviews
+  })
+}
+
+export const useCreateTicketMutation = () => {
+  return useMutation({
+    mutationFn: accountApiRequest.createTicket
+  })
+}
+
+export const useCreateReportMutation = () => {
+  return useMutation({
+    mutationFn: accountApiRequest.createReport
+  })
+}
+
+export const useUpdateChildProfileMutation = ({ id }: { id: string }) => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: accountApiRequest.updateChildProfile,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['account-profile-child'] })
+      queryClient.invalidateQueries({ queryKey: ['child-account-by-id', id] })
+    }
+  })
+}
+
+export const usePlusGamePointMutation = () => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: accountApiRequest.plusGamePoint,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['account-profile-child'] })
+      queryClient.invalidateQueries({ queryKey: ['top-ranking-kids'] })
+    }
+  })
+}
+
+export const useGetTopRanking = () => {
+  return useQuery({
+    queryKey: ['top-ranking-kids'],
+    queryFn: accountApiRequest.topRanking
+  })
+}
+
+export const useGetMyCertificate = () => {
+  return useQuery({
+    queryKey: ['my-certificate'],
+    queryFn: accountApiRequest.getMyCertificate
   })
 }

@@ -7,6 +7,8 @@ import { Card } from '@/components/ui/card'
 import { ArrowLeft, Palette, Heart, Trophy } from 'lucide-react'
 import { Progress } from '@/components/ui/progress'
 import Link from 'next/link'
+import { usePlusGamePointMutation } from '@/queries/useAccount'
+import { toast } from '@/components/ui/use-toast'
 
 const COLORS = [
   { name: 'Đỏ', value: '#ef4444', bgClass: 'bg-red-500' },
@@ -42,6 +44,9 @@ export default function ColorPatternGame() {
   const [consecutiveCorrect, setConsecutiveCorrect] = useState(0)
   const [activePatternIndex, setActivePatternIndex] = useState(-1)
   const [statusMessage, setStatusMessage] = useState('')
+  const [pointsUpdated, setPointsUpdated] = useState(false)
+
+  const plusGamePointMutation = usePlusGamePointMutation()
 
   // Generate a random pattern based on the current level
   const generatePattern = useCallback(() => {
@@ -133,6 +138,7 @@ export default function ColorPatternGame() {
     setActivePatternIndex(-1)
     setProgress(0)
     setShowingPattern(false)
+    setPointsUpdated(false)
 
     // Start with a delay to ensure UI is reset
     setTimeout(() => {
@@ -163,6 +169,31 @@ export default function ColorPatternGame() {
           // Game over if no lives left
           setGameState('gameover')
           setStatusMessage('Trò chơi kết thúc! Bạn đã hết mạng')
+
+          // Update points when game is over
+          if (!pointsUpdated) {
+            // Limit points to a maximum of 50 (reduced from 100)
+            const finalScore = Math.min(50, Math.floor(score / 3))
+            plusGamePointMutation.mutate(
+              { point: finalScore },
+              {
+                onSuccess: () => {
+                  toast({
+                    title: 'Cập nhật điểm thành công',
+                    description: `Bạn đã nhận được ${finalScore} điểm!`
+                  })
+                  setPointsUpdated(true)
+                },
+                onError: () => {
+                  toast({
+                    title: 'Không thể cập nhật điểm',
+                    description: 'Đã xảy ra lỗi khi cập nhật điểm',
+                    variant: 'destructive'
+                  })
+                }
+              }
+            )
+          }
         } else {
           // Try again - show the pattern again
           setGameState('wrong')
@@ -199,11 +230,48 @@ export default function ColorPatternGame() {
             // Thắng toàn bộ trò chơi
             setGameState('gameover')
             setStatusMessage(`Chúc mừng! Bạn đã hoàn thành tất cả ${LEVELS.length} cấp độ!`)
+
+            // Update points when game is completed
+            if (!pointsUpdated) {
+              // Limit points to a maximum of 50 (reduced from 100)
+              const finalScore = Math.min(50, Math.floor(score / 3))
+              plusGamePointMutation.mutate(
+                { point: finalScore },
+                {
+                  onSuccess: () => {
+                    toast({
+                      title: 'Cập nhật điểm thành công',
+                      description: `Bạn đã nhận được ${finalScore} điểm!`
+                    })
+                    setPointsUpdated(true)
+                  },
+                  onError: () => {
+                    toast({
+                      title: 'Không thể cập nhật điểm',
+                      description: 'Đã xảy ra lỗi khi cập nhật điểm',
+                      variant: 'destructive'
+                    })
+                  }
+                }
+              )
+            }
           }
         }, 1500)
       }
     },
-    [gameState, showingPattern, playerPattern, pattern, lives, consecutiveCorrect, level, startWatching]
+    [
+      gameState,
+      showingPattern,
+      playerPattern,
+      pattern,
+      lives,
+      consecutiveCorrect,
+      level,
+      startWatching,
+      score,
+      plusGamePointMutation,
+      pointsUpdated
+    ]
   )
 
   return (

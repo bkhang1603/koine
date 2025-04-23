@@ -14,7 +14,8 @@ import {
   Receipt,
   RefreshCcw,
   BellRing,
-  Star
+  Star,
+  Award
 } from 'lucide-react'
 
 const sidebarNavItems: NavItem[] = [
@@ -57,6 +58,11 @@ const sidebarNavItems: NavItem[] = [
         title: 'Khóa học đã mua',
         icon: <Archive className='h-4 w-4' />,
         href: '/setting/purchased-courses'
+      },
+      {
+        title: 'Chứng nhận của tôi',
+        icon: <Award className='h-4 w-4' />,
+        href: '/setting/my-certificate'
       },
       {
         title: 'Quản lý tài khoản con',

@@ -201,16 +201,6 @@ export default function LessonDetailPage(props: {
           <Breadcrumb items={breadcrumbItems} />
         </div>
 
-        {/* Back and Action Buttons */}
-        <div className='flex items-center justify-between mb-6'>
-          <Button variant='outline' asChild>
-            <Link href={`/expert/course/${params.id}/chapter/${chapter.id}`}>
-              <ArrowLeft className='w-4 h-4 mr-2' />
-              Quay lại chương học
-            </Link>
-          </Button>
-        </div>
-
         {/* Main Content Card */}
         <Card className='mb-8 overflow-hidden'>
           {/* Header with title and lesson info */}

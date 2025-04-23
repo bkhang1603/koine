@@ -25,9 +25,10 @@ interface CourseProps {
 interface CourseCardListProps {
   courses: CourseProps[]
   emptyState: React.ReactNode
+  isCourseLoading?: boolean
 }
 
-export function CourseCardList({ courses, emptyState }: CourseCardListProps) {
+export function CourseCardList({ courses, emptyState, isCourseLoading = false }: CourseCardListProps) {
   const params = useParams()
   const childId = params.id as string
   const updateVisibleCourseForChildMutation = useUpdateVisibleCourseForChildMutation({ id: childId })
@@ -52,7 +53,7 @@ export function CourseCardList({ courses, emptyState }: CourseCardListProps) {
     }
   }
 
-  if (courses.length === 0) {
+  if (courses.length === 0 && !isCourseLoading) {
     return emptyState
   }
 
@@ -62,6 +63,11 @@ export function CourseCardList({ courses, emptyState }: CourseCardListProps) {
         <CourseCard
           key={course.id}
           course={course}
+          isPending={
+            (isCourseLoading && updateVisibleCourseForChildMutation.variables?.courseId === course.id) ||
+            (updateVisibleCourseForChildMutation.isPending &&
+              updateVisibleCourseForChildMutation.variables?.courseId === course.id)
+          }
           onToggleVisibility={() => handleToggleCourseVisibility(course.id, course.isVisible || false)}
         />
       ))}
@@ -71,9 +77,11 @@ export function CourseCardList({ courses, emptyState }: CourseCardListProps) {
 
 function CourseCard({
   course,
+  isPending = false,
   onToggleVisibility
 }: {
   course: CourseProps
+  isPending?: boolean
   onToggleVisibility?: (courseId: string) => void
 }) {
   const params = useParams()
@@ -172,16 +180,21 @@ function CourseCard({
 
         {/* Parent Actions */}
         <div className='flex gap-2 mt-3'>
-          <Button variant='outline' className='flex-1 gap-2' onClick={handleToggleVisibility}>
-            {course.isVisible ? (
+          <Button variant='outline' className='flex-1 gap-2' onClick={handleToggleVisibility} disabled={isPending}>
+            {isPending ? (
+              <>
+                <div className='h-4 w-4 rounded-full border-2 border-current border-r-transparent animate-spin' />
+                <span>Đang cập nhật...</span>
+              </>
+            ) : course.isVisible ? (
               <>
                 <EyeOff className='h-4 w-4' />
-                Ẩn khóa học
+                <span>Ẩn khóa học</span>
               </>
             ) : (
               <>
                 <Eye className='h-4 w-4' />
-                Hiện khóa học
+                <span>Hiện khóa học</span>
               </>
             )}
           </Button>

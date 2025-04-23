@@ -1,88 +1,3 @@
-// import { NextResponse } from 'next/server'
-// import type { NextRequest } from 'next/server'
-
-// const maintenanceMode = false
-// // const privatePaths = ['/content-creator', '/content-creator/blog']
-
-// const publicPaths = ['/', '/course', '/knowledge', '/about', '/contact', '/help/faq']
-// const privatePaths = [
-//   '/setting',
-//   '/setting/:path*',
-//   '/learn',
-//   '/learn/:path*',
-//   '/content-creator',
-//   '/content-creator/:path*'
-// ]
-// const unAuthPaths = ['/login', '/register']
-
-// // This function can be marked `async` if using `await` inside
-// export function middleware(request: NextRequest) {
-//   const { pathname } = request.nextUrl
-
-//   const refreshToken = request.cookies.get('refreshToken')?.value
-//   const accessToken = request.cookies.get('accessToken')?.value
-
-//   if (maintenanceMode) {
-//     const url = new URL('/maintenance', request.url)
-//     return NextResponse.redirect(url)
-//   }
-
-//   // 1. Chưa đăng nhập thì không cho vào private paths
-//   if (privatePaths.some((path) => pathname.startsWith(path)) && !refreshToken) {
-//     const url = new URL('/login', request.url)
-//     url.searchParams.set('clearTokens', 'true')
-//     return NextResponse.redirect(url)
-//   }
-
-//   // 2. Trường hợp đã đăng nhập
-//   if (refreshToken) {
-//     // 2.1 Nếu cố tình vào trang login sẽ redirect về trang chủ
-//     if (unAuthPaths.some((path) => pathname.startsWith(path))) {
-//       return NextResponse.redirect(new URL('/', request.url))
-//     }
-
-//     // 2.2 Nhưng access token lại hết hạn
-//     if (publicPaths.some((path) => pathname.startsWith(path)) && !accessToken) {
-//       const url = new URL('/refresh-token', request.url)
-//       url.searchParams.set('refreshToken', refreshToken)
-//       url.searchParams.set('redirect', pathname)
-//       return NextResponse.redirect(url)
-//     }
-
-//     // 2.2 Nhưng access token lại hết hạn
-//     if (privatePaths.some((path) => pathname.startsWith(path)) && !accessToken) {
-//       const url = new URL('/refresh-token', request.url)
-//       url.searchParams.set('refreshToken', refreshToken)
-//       url.searchParams.set('redirect', pathname)
-//       return NextResponse.redirect(url)
-//     }
-
-//     return NextResponse.next()
-//   }
-
-//   return NextResponse.next()
-// }
-
-// // See "Matching Paths" below to learn more
-// export const config = {
-//   matcher: [
-//     '/',
-//     '/login',
-//     '/register',
-//     '/course',
-//     '/about',
-//     '/knowledge',
-//     '/contact',
-//     '/help/faq',
-//     '/setting',
-//     '/setting/:path*',
-//     '/content-creator',
-//     '/content-creator/:path*',
-//     '/learn',
-//     '/learn/:path*'
-//   ]
-// }
-
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 
@@ -112,8 +27,24 @@ const unAuthPrivatePaths = [...Object.values(roleBasedPaths).flat()]
 
 const unAuthPaths = ['/login', '/register']
 
-// Đường dẫn không cho phép truy cấp nếu không phải adult
-const blockedPaths = ['/knowledge', '/knowledge/:path*', '/course', '/course/:path*', '/product', '/product/:path*']
+// Danh sách đường dẫn chỉ dành cho người dùng ADULT
+const adultOnlyPaths = [
+  '/',
+  '/setting',
+  '/setting/:path*',
+  '/product',
+  '/product/:path*',
+  '/course',
+  '/course/:path*',
+  '/cart',
+  '/checkout',
+  '/event',
+  '/event/:path*',
+  '/knowledge',
+  '/knowledge/:path*',
+  '/contact',
+  '/help/faq'
+]
 
 // Hàm decode JWT không cần thư viện
 function decodeJwt(token: string) {
@@ -148,7 +79,7 @@ function hasPermission(path: string, role?: string) {
     }
   }
 
-  // Đường dẫn không thuộc role nào cụ thể
+  // Đường dẫn không thuộc role nào cụ thể (common paths)
   return true
 }
 
@@ -159,7 +90,16 @@ export function middleware(request: NextRequest) {
   const accessToken = request.cookies.get('accessToken')?.value
 
   // Decode JWT token để lấy role
-  let userRole: 'ADMIN' | 'CONTENT-CREATOR' | 'CHILD' | 'ADULT' | undefined
+  let userRole:
+    | 'ADMIN'
+    | 'CONTENT_CREATOR'
+    | 'CHILD'
+    | 'ADULT'
+    | 'MANAGER'
+    | 'EXPERT'
+    | 'SALESMAN'
+    | 'SUPPORTER'
+    | undefined
   if (accessToken) {
     const decodedToken = decodeJwt(accessToken)
     userRole = decodedToken?.role || decodedToken?.sub?.role
@@ -191,16 +131,44 @@ export function middleware(request: NextRequest) {
       return NextResponse.rewrite(new URL('/unauthorized', request.url))
     }
 
-    // 2.1 Nếu là role khác ADULT và cố truy cập trang chủ
-    // if (pathname === '/' && userRole && userRole !== 'ADULT') {
-    //   const redirectPath = roleBasedPaths[userRole as keyof typeof roleBasedPaths]?.[0] || '/'
-    //   return NextResponse.redirect(new URL(redirectPath, request.url))
-    // }
-
-    // 2.2 Nếu là role khác ADULT và cố truy cập trang chủ
-    if (blockedPaths.some((path) => pathname.startsWith(path.split('/:')[0])) && userRole && userRole !== 'ADULT') {
+    // 2.1 Nếu không phải role ADULT và cố truy cập các trang chỉ dành cho ADULT
+    if (adultOnlyPaths.some((path) => pathname.startsWith(path.split('/:')[0])) && userRole !== 'ADULT') {
+      // Tìm đường dẫn phù hợp với role của người dùng
       const redirectPath = roleBasedPaths[userRole as keyof typeof roleBasedPaths]?.[0] || '/'
-      return NextResponse.redirect(new URL(redirectPath, request.url))
+      // Chỉ redirect nếu không phải CHILD hoặc nếu là CHILD nhưng cố truy cập đường dẫn không phải /kid
+      if (userRole === 'CHILD' && !pathname.startsWith('/kid')) {
+        return NextResponse.redirect(new URL(redirectPath, request.url))
+      }
+
+      // Nếu là ADMIN nhưng cố truy cập đường dẫn không phải /admin
+      if (userRole === 'ADMIN' && !pathname.startsWith('/admin')) {
+        return NextResponse.redirect(new URL(redirectPath, request.url))
+      }
+
+      // Nếu là MANAGER nhưng cố truy cập đường dẫn không phải /manager
+      if (userRole === 'MANAGER' && !pathname.startsWith('/manager')) {
+        return NextResponse.redirect(new URL(redirectPath, request.url))
+      }
+
+      // Nếu là CONTENT_CREATOR nhưng cố truy cập đường dẫn không phải /content-creator
+      if (userRole === 'CONTENT_CREATOR' && !pathname.startsWith('/content-creator')) {
+        return NextResponse.redirect(new URL(redirectPath, request.url))
+      }
+
+      // Nếu là EXPERT nhưng cố truy cập đường dẫn không phải /expert
+      if (userRole === 'EXPERT' && !pathname.startsWith('/expert')) {
+        return NextResponse.redirect(new URL(redirectPath, request.url))
+      }
+
+      // Nếu là SALESMAN nhưng cố truy cập đường dẫn không phải /salesman
+      if (userRole === 'SALESMAN' && !pathname.startsWith('/salesman')) {
+        return NextResponse.redirect(new URL(redirectPath, request.url))
+      }
+
+      // Nếu là SUPPORTER nhưng cố truy cập đường dẫn không phải /support
+      if (userRole === 'SUPPORTER' && !pathname.startsWith('/support')) {
+        return NextResponse.redirect(new URL(redirectPath, request.url))
+      }
     }
   }
 
@@ -235,27 +203,34 @@ export const config = {
     '/login',
     '/register',
     '/course',
+    '/course/:path*',
     '/product',
+    '/product/:path*',
     '/about',
     '/knowledge',
+    '/knowledge/:path*',
+    '/event',
+    '/event/:path*',
     '/contact',
     '/help/faq',
+    '/order/:path*',
 
     // Thêm các đường dẫn giới hạn theo role
     '/setting/:path*',
     '/learn/:path*',
-    '/admin/:path*',
     '/admin',
-    '/content-creator/:path*',
-    '/content-creator',
-    '/support/:path*',
-    '/support',
-    '/salesman/:path*',
-    '/salesman',
-    '/expert/:path*',
-    '/expert',
-    '/manager/:path*',
+    '/admin/:path*',
     '/manager',
+    '/manager/:path*',
+    '/support',
+    '/support/:path*',
+    '/salesman',
+    '/salesman/:path*',
+    '/expert',
+    '/expert/:path*',
+    '/content-creator',
+    '/content-creator/:path*',
+    '/kid',
     '/kid/:path*',
     '/unauthorized',
     '/cart',

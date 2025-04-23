@@ -5,6 +5,8 @@ import { Card } from '@/components/ui/card'
 import { ArrowLeft, RefreshCw, Swords, Trophy, X, CircleIcon as Circle, Star } from 'lucide-react'
 import Link from 'next/link'
 import { useState, useEffect, useCallback } from 'react'
+import { usePlusGamePointMutation } from '@/queries/useAccount'
+import { toast } from '@/components/ui/use-toast'
 
 type Player = 'X' | 'O'
 type BoardState = (Player | null)[]
@@ -77,6 +79,10 @@ export default function TicTacToeGamePage() {
   const [xWins, setXWins] = useState(0)
   const [oWins, setOWins] = useState(0)
   const [draws, setDraws] = useState(0)
+  const [gamePoints, setGamePoints] = useState(0)
+  const [pointsAwarded, setPointsAwarded] = useState(false)
+
+  const plusGamePointMutation = usePlusGamePointMutation()
 
   // AI move
   const makeAIMove = useCallback(() => {
@@ -109,11 +115,43 @@ export default function TicTacToeGamePage() {
     const result = checkWinner(board)
     if (result) {
       setWinner(result)
-      if (result === 'X') setXWins((prev) => prev + 1)
-      else if (result === 'O') setOWins((prev) => prev + 1)
-      else setDraws((prev) => prev + 1)
+
+      if (result === 'X') {
+        // Khi người chơi thắng
+        setXWins((prev) => prev + 1)
+        // Cộng điểm dựa trên số lần thắng liên tiếp (giảm từ 20 xuống 2)
+        const newPoints = 2
+        setGamePoints((prev) => prev + newPoints)
+
+        // Cập nhật điểm vào hệ thống
+        if (!pointsAwarded) {
+          plusGamePointMutation.mutate(
+            { point: newPoints },
+            {
+              onSuccess: () => {
+                toast({
+                  title: 'Cập nhật điểm thành công',
+                  description: `Bạn đã nhận được ${newPoints} điểm!`
+                })
+                setPointsAwarded(true)
+              },
+              onError: () => {
+                toast({
+                  title: 'Không thể cập nhật điểm',
+                  description: 'Đã xảy ra lỗi khi cập nhật điểm',
+                  variant: 'destructive'
+                })
+              }
+            }
+          )
+        }
+      } else if (result === 'O') {
+        setOWins((prev) => prev + 1)
+      } else {
+        setDraws((prev) => prev + 1)
+      }
     }
-  }, [board])
+  }, [board, plusGamePointMutation, pointsAwarded])
 
   // AI's turn
   useEffect(() => {
@@ -136,6 +174,7 @@ export default function TicTacToeGamePage() {
     setBoard(Array(9).fill(null))
     setCurrentPlayer('X')
     setWinner(null)
+    setPointsAwarded(false)
   }
 
   const renderCell = (index: number) => {
@@ -275,6 +314,9 @@ export default function TicTacToeGamePage() {
                       <span className='text-indigo-500'>O Thắng!</span>
                     )}
                   </div>
+                  {winner === 'X' && pointsAwarded && (
+                    <div className='mb-4 p-2 bg-rose-50 rounded text-rose-600 text-sm font-medium'>+10 điểm game</div>
+                  )}
                 </div>
               )}
 
@@ -297,6 +339,11 @@ export default function TicTacToeGamePage() {
                     <span className='font-medium text-slate-800'>Người chơi O</span>
                   </div>
                   <span className='text-xl font-bold text-indigo-500'>{oWins}</span>
+                </div>
+
+                <div className='flex items-center justify-between pt-2'>
+                  <span className='font-medium text-slate-800'>Tổng điểm</span>
+                  <span className='text-xl font-bold text-purple-500'>{gamePoints}</span>
                 </div>
               </div>
             </div>

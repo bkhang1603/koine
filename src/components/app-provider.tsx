@@ -105,10 +105,11 @@ export const useAppStore = create<AppStoreType>((set) => ({
   user: undefined,
   setUser: (user?: AccountResType['data'] | undefined) => set({ user }),
   checkoutData: undefined as CartDetailResType['data'] | undefined,
-  setCheckoutData: (data?: CartDetailResType['data'] | undefined) => {
+  setCheckoutData: async (data?: CartDetailResType['data'] | undefined) => {
     set({ checkoutData: data })
 
     if (data) {
+      removeCheckoutDataFromLocalStorage()
       removeCheckoutBuyNowFromLocalStorage()
       setCheckoutDataToLocalStorage(data)
     } else {
@@ -119,10 +120,11 @@ export const useAppStore = create<AppStoreType>((set) => ({
   pickAddress: undefined,
   setPickAddress: (address?: AccountOneAddressResType['data'] | undefined) => set({ pickAddress: address }),
   checkoutBuyNow: undefined,
-  setCheckoutBuyNow: (data?: OrderBuyNowResType['data'] | undefined) => {
+  setCheckoutBuyNow: async (data?: OrderBuyNowResType['data'] | undefined) => {
     set({ checkoutBuyNow: data })
 
     if (data) {
+      removeCheckoutBuyNowFromLocalStorage()
       removeCheckoutDataFromLocalStorage()
       setCheckoutBuyNowToLocalStorage(data)
     } else {

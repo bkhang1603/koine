@@ -27,7 +27,7 @@ export function SettingBreadcrumb({ items, backButton, className, isLoading }: S
           <Skeleton className='h-5 w-4 rounded-full' />
           <Skeleton className='h-5 w-40' />
         </div>
-        <Skeleton className='h-8 w-32 rounded-md' />
+        {backButton && <Skeleton className='h-8 w-32 rounded-md' />}
       </div>
     )
   }

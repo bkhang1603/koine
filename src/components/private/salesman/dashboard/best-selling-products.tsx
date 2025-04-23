@@ -13,10 +13,12 @@ interface ProductsProps {
   products: Product[]
   title: string
   icon: React.ReactNode
+  // eslint-disable-next-line no-unused-vars
   onItemClick?: (product: Product) => void
 }
 
 // Common component for rendering a list of products
+// eslint-disable-next-line no-unused-vars
 function ProductList({ items, onItemClick }: { items: Product[]; onItemClick?: (product: Product) => void }) {
   // Limit to 5 items to match distribution charts
   const displayItems = items.slice(0, 5)
@@ -81,6 +83,7 @@ export function BestSellingPhysicalProducts({
   onItemClick
 }: {
   products: Product[]
+  // eslint-disable-next-line no-unused-vars
   onItemClick?: (product: Product) => void
 }) {
   return (
@@ -99,6 +102,7 @@ export function BestSellingCourses({
   onItemClick
 }: {
   courses: Product[]
+  // eslint-disable-next-line no-unused-vars
   onItemClick?: (course: Product) => void
 }) {
   return (
@@ -120,7 +124,9 @@ export function BestSellingProducts({
 }: {
   products: Product[]
   courses: Product[]
+  // eslint-disable-next-line no-unused-vars
   onProductClick?: (product: Product) => void
+  // eslint-disable-next-line no-unused-vars
   onCourseClick?: (course: Product) => void
 }) {
   return (

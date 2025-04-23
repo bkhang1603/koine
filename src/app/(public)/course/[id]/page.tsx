@@ -1,5 +1,5 @@
 import courseApiRequest from '@/apiRequests/course'
-import { FileText, Video, MonitorPlay, Clock, Users2, BarChart, PlayCircle, HelpCircle } from 'lucide-react'
+import { FileText, Video, MonitorPlay, Clock, Users2, BarChart, HelpCircle } from 'lucide-react'
 import Image from 'next/image'
 import { Card } from '@/components/ui/card'
 import EnrollButton from '@/components/public/parent/course/enroll-button'
@@ -15,6 +15,7 @@ import { Breadcrumb } from '@/components/public/parent/setting/Breadcrumb'
 import configRoute from '@/config/route'
 import { formatDuration } from '@/lib/utils'
 import PreviewButton from '@/components/public/parent/course/preview-button'
+import { ReportCourseButton } from '@/components/public/parent/report-button'
 
 // const formatDuration = (minutes: number) => {
 //   const hours = Math.floor(minutes / 60)
@@ -79,26 +80,26 @@ export default async function CourseDetail(props: {
 
               <Card className='p-5 sm:p-6 lg:p-8 bg-white/80 backdrop-blur-md border-none shadow-2xl'>
                 {/* Categories & Stats */}
-                <div className='flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-4 sm:pb-6 mb-4 sm:mb-6 border-b'>
-                  <div className='flex flex-wrap gap-2'>
+                <div className='flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 pb-4 sm:pb-6 mb-4 sm:mb-6 border-b'>
+                  <div className='flex flex-wrap gap-2 max-w-full overflow-hidden'>
                     {courseData.categories.map((category) => (
                       <span
                         key={category.id}
                         className='px-3 py-1 sm:px-4 sm:py-1.5 bg-primary/5 text-primary rounded-full text-xs sm:text-sm font-medium
-                            hover:bg-primary/10 transition-colors'
+                            hover:bg-primary/10 transition-colors truncate max-w-[150px]'
                       >
                         {category.name}
                       </span>
                     ))}
                   </div>
 
-                  <div className='flex flex-wrap items-center divide-x divide-gray-200 text-sm sm:text-base'>
-                    <div className='flex items-center gap-1.5 pr-3 sm:px-4'>
+                  <div className='flex flex-wrap items-center gap-3 text-sm sm:text-base'>
+                    <div className='flex items-center gap-1.5'>
                       <Users2 className='w-4 h-4 sm:w-5 sm:h-5 text-primary' />
                       <span className='font-medium'>{courseData.totalEnrollment.toLocaleString()}</span>
                       <span className='text-gray-500'>học viên</span>
                     </div>
-                    <div className='flex items-center gap-1.5 px-3 sm:px-4'>
+                    <div className='flex items-center gap-1.5'>
                       <div className='flex items-center gap-1 text-amber-500'>
                         <BarChart className='w-4 h-4 sm:w-5 sm:h-5' />
                         <span className='font-medium'>
@@ -107,7 +108,7 @@ export default async function CourseDetail(props: {
                       </div>
                       <span className='text-gray-500'>đánh giá</span>
                     </div>
-                    <div className='flex items-center gap-1.5 pl-3 sm:pl-4'>
+                    <div className='flex items-center gap-1.5'>
                       <Clock className='w-4 h-4 sm:w-5 sm:h-5 text-blue-500' />
                       <span className='font-medium'>{formatDuration(Number(courseData.durations))}</span>
                     </div>
@@ -116,22 +117,17 @@ export default async function CourseDetail(props: {
 
                 {/* Title & Description */}
                 <div>
-                  <h1
-                    className='text-2xl sm:text-3xl lg:text-4xl font-bold mb-3 lg:mb-4 bg-gradient-to-r from-gray-900 to-gray-700 
+                  <div className='flex justify-between items-start mb-3'>
+                    <h1
+                      className='text-2xl sm:text-3xl lg:text-4xl font-bold lg:mb-4 bg-gradient-to-r from-gray-900 to-gray-700 
                       bg-clip-text text-transparent'
-                  >
-                    {courseData.title}
-                  </h1>
-                  <div className='flex gap-4 items-start'>
-                    <p className='flex-1 text-gray-600 text-base sm:text-lg leading-relaxed line-clamp-3 sm:line-clamp-none'>
-                      {courseData.description}
-                    </p>
-                    <div className='hidden sm:flex flex-col items-center gap-2 pt-2 flex-shrink-0'>
-                      <div className='p-2 sm:p-3 rounded-full bg-primary/5'>
-                        <PlayCircle className='w-5 h-5 sm:w-6 sm:h-6 text-primary' />
-                      </div>
-                      <span className='text-xs sm:text-sm font-medium text-gray-600'>Xem giới thiệu</span>
-                    </div>
+                    >
+                      {courseData.title}
+                    </h1>
+                    <ReportCourseButton courseId={courseData.id} courseName={courseData.title} buttonVariant='icon' />
+                  </div>
+                  <div>
+                    <p className='text-gray-600 text-base sm:text-lg leading-relaxed'>{courseData.description}</p>
                   </div>
                 </div>
               </Card>
@@ -175,7 +171,8 @@ export default async function CourseDetail(props: {
                           title: courseData.title,
                           imageUrl: courseData.imageBanner,
                           price: courseData.price,
-                          discount: courseData.discount
+                          discount: courseData.discount,
+                          isCombo: courseData.isCombo
                         }}
                         className='w-full h-12 text-base font-medium'
                       />
@@ -192,7 +189,8 @@ export default async function CourseDetail(props: {
                           title: courseData.title,
                           imageUrl: courseData.imageBanner,
                           price: courseData.price,
-                          discount: courseData.discount
+                          discount: courseData.discount,
+                          isCombo: courseData.isCombo
                         }}
                         variant='outline'
                         className='w-full h-12 text-base font-medium'

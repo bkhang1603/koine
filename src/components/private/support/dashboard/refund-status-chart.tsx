@@ -140,7 +140,7 @@ export function RefundStatusChart({ data, title, description }: RefundStatusChar
                   layout='horizontal'
                   verticalAlign='bottom'
                   align='center'
-                  formatter={(value, entry, index) => <span className='text-xs font-medium'>{value}</span>}
+                  formatter={(value) => <span className='text-xs font-medium'>{value}</span>}
                   wrapperStyle={{ paddingTop: '10px' }}
                 />
               </PieChart>

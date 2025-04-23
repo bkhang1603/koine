@@ -3,7 +3,9 @@
 import { motion } from 'framer-motion'
 import { Card } from '@/components/ui/card'
 import { Progress } from '@/components/ui/progress'
-import { Medal, Star, Trophy, Crown, Target, Zap, Gift, ArrowRight } from 'lucide-react'
+import { Medal, Star, Trophy, Crown, Target, Zap, Gift, ArrowRight, BookOpen } from 'lucide-react'
+import { useAppStore } from '@/components/app-provider'
+import { useCourseByAccount } from '@/queries/useAccount'
 
 interface AchievementCardProps {
   title: string
@@ -64,37 +66,51 @@ const AchievementCard = ({ title, description, progress, reward, color, icon, is
 )
 
 export const AchievementSection = () => {
+  const childProfile = useAppStore((state) => state.childProfile)
+  const { data: courseData } = useCourseByAccount({ page_size: 10, page_index: 1 })
+  const courses = courseData?.payload.data ?? []
+
+  const totalPoints = childProfile?.totalPoints || 0
+  const totalCourses = childProfile?.totalCourses || 0
+  const completedCourses = courses.filter((course) => (course.completionRate || 0) >= 100).length
+
+  // Total learning time in hours (assuming totalLearningTimes is in minutes)
+  const learningHours = Math.round((childProfile?.totalLearningTimes || 0) / 60)
+
+  // Calculate the highest completion rate for a course
+  const highestCompletionRate = Math.max(0, ...courses.map((course) => course.completionRate || 0))
+
+  // Dynamic achievements based on user data
   const achievements = [
     {
       title: 'Nhà thám hiểm',
-      description: 'Hoàn thành 5 khóa học trong tuần này',
-      progress: 100,
-      reward: '500 điểm',
+      description: `Hoàn thành ${completedCourses}/${totalCourses} khóa học`,
+      progress: totalCourses ? Math.round((completedCourses / totalCourses) * 100) : 0,
+      reward: `${completedCourses * 100} điểm`,
       color: 'bg-gradient-to-r from-sky-100 via-blue-200 to-indigo-200',
-      icon: <Star className='w-5 h-5 text-blue-500' />
+      icon: <BookOpen className='w-5 h-5 text-blue-500' />
     },
     {
       title: 'Chiến binh bền bỉ',
-      description: 'Duy trì chuỗi học tập 7 ngày',
-      progress: 85,
-      reward: 'Nhân vật mới',
+      description: `Học tập liên tục ${learningHours} giờ`,
+      progress: Math.min(100, learningHours >= 10 ? 100 : learningHours * 10),
+      reward: 'Huy hiệu đặc biệt',
       color: 'bg-gradient-to-r from-fuchsia-100 via-purple-200 to-pink-200',
       icon: <Crown className='w-5 h-5 text-purple-500' />
     },
     {
-      title: 'Thiên tài toán học',
-      description: 'Đạt điểm tuyệt đối 3 bài kiểm tra',
-      progress: 33,
-      reward: '1000 điểm',
+      title: 'Ngôi sao sáng',
+      description: `Tích lũy ${totalPoints} điểm thành tích`,
+      progress: Math.min(100, totalPoints >= 1000 ? 100 : Math.round((totalPoints / 1000) * 100)),
+      reward: 'Nhân vật mới',
       color: 'bg-gradient-to-r from-rose-100 via-amber-200 to-orange-200',
-      icon: <Trophy className='w-5 h-5 text-amber-500' />,
-      isLocked: true
+      icon: <Star className='w-5 h-5 text-amber-500' />
     },
     {
-      title: 'Siêu sao sáng tạo',
-      description: 'Hoàn thành 3 dự án cá nhân',
-      progress: 45,
-      reward: 'Khóa học VIP',
+      title: 'Siêu sao tiến bộ',
+      description: `Tiến độ cao nhất đạt ${Math.round(highestCompletionRate)}%`,
+      progress: highestCompletionRate,
+      reward: 'Khóa học miễn phí',
       color: 'bg-gradient-to-r from-teal-100 via-emerald-200 to-green-200',
       icon: <Zap className='w-5 h-5 text-emerald-500' />
     }
@@ -120,7 +136,7 @@ export const AchievementSection = () => {
                 transition={{ duration: 2, repeat: Infinity }}
                 className='absolute -top-2 -right-2 w-6 h-6 rounded-full bg-white shadow-sm flex items-center justify-center'
               >
-                <span className='text-sm font-bold text-amber-500'>4</span>
+                <span className='text-sm font-bold text-amber-500'>{achievements.length}</span>
               </motion.div>
             </div>
             <div>
@@ -133,7 +149,7 @@ export const AchievementSection = () => {
             <div className='bg-gradient-to-r from-amber-50 to-white px-4 py-2 rounded-xl'>
               <div className='flex items-center gap-2'>
                 <Target className='w-4 h-4 text-amber-500' />
-                <span className='text-sm font-medium text-slate-700'>2000 điểm</span>
+                <span className='text-sm font-medium text-slate-700'>{totalPoints + 1000} điểm</span>
               </div>
               <div className='text-xs text-slate-600'>Cấp độ tiếp theo</div>
             </div>

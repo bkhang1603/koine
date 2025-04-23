@@ -922,6 +922,87 @@ export const getDraftCoursesRes = z.object({
   })
 })
 
+export const getReturnOrders = z.object({
+  id: z.string(),
+  userId: z.string(),
+  orderDate: z.string(),
+  orderCode: z.number(),
+  orderCodeFormatted: z.string(),
+  orderDateFormatted: z.string(),
+  totalAmount: z.number(),
+  deliMethod: z.string(),
+  deliAmount: z.number(),
+  status: z.string(),
+  note: z.string(),
+  expiredAt: z.string(),
+  createdAtFormatted: z.string(),
+  orderDetails: z.array(
+    z.object({
+      id: z.string(),
+      orderId: z.string(),
+      productId: z.string(),
+      courseId: z.string(),
+      comboId: z.string(),
+      quantity: z.number(),
+      unitPrice: z.number(),
+      discount: z.number(),
+      totalPrice: z.number(),
+      itemName: z.string(),
+      itemDescription: z.string(),
+      itemImageUrl: z.string(),
+      itemType: z.string()
+    })
+  ),
+  payment: z.object({
+    isDeleted: z.boolean(),
+    createdAt: z.string(),
+    updatedAt: z.string(),
+    id: z.string(),
+    orderId: z.string(),
+    payMethod: z.string(),
+    payDate: z.string(),
+    payAmount: z.number(),
+    payStatus: z.string()
+  }),
+  delivery: z.object({
+    isDeleted: z.boolean(),
+    createdAt: z.string(),
+    updatedAt: z.string(),
+    id: z.string(),
+    orderId: z.string(),
+    name: z.string(),
+    phone: z.string(),
+    address: z.string()
+  }),
+  orderStatusHistory: z.array(
+    z.object({
+      status: z.string(),
+      timestamp: z.string(),
+      timestampFormatted: z.string()
+    })
+  ),
+  exchangeRequestDate: z.string(),
+  exchangeRequestDateFormatted: z.string(),
+  exchangeReason: z.string(),
+  exchangeNote: z.string(),
+  exchangeProcessedDate: z.string(),
+  exchangeProcessedDateFormatted: z.string(),
+  returnRequestImages: z.array(z.string()),
+  customerInfo: z.object({
+    id: z.string(),
+    name: z.string(),
+    phone: z.string(),
+    email: z.string()
+  })
+})
+
+export const getReturnOrdersRes = z.object({
+  statusCode: z.number(),
+  info: z.string(),
+  message: z.string(),
+  data: z.array(getReturnOrders)
+})
+
 export const createCourseCommentBody = z.object({
   courseId: z.string(),
   replyId: z.string(),
@@ -1025,6 +1106,9 @@ export type CreateUserResType = z.TypeOf<typeof createUserRes>
 
 // Dashboard
 export type GetDashboardStatisticsResType = z.TypeOf<typeof getDashboardStatisticsRes>
+
+// Return Orders
+export type GetReturnOrdersResType = z.TypeOf<typeof getReturnOrdersRes>
 
 // Request Support
 export type GetRequestSupportListResType = z.TypeOf<typeof getRequestSupportListRes>

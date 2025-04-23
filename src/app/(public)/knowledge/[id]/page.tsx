@@ -4,6 +4,7 @@ import { CalendarDays } from 'lucide-react'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { wrapServerApi } from '@/lib/server-utils'
 import { Breadcrumb } from '@/components/public/parent/setting/Breadcrumb'
+import { ReportBlogButton } from '@/components/public/parent/report-button'
 
 async function BlogDetailPage(props: { params: Promise<{ id: string }> }) {
   const params = await props.params
@@ -32,24 +33,28 @@ async function BlogDetailPage(props: { params: Promise<{ id: string }> }) {
           />
 
           {/* Author & Date */}
-          <div className='flex items-center gap-4 mb-8'>
-            <div className='relative w-14 h-14 rounded-full overflow-hidden border-4 border-white shadow-md'>
-              <Avatar className='w-full h-full'>
-                <AvatarImage src={blog.creatorInfo.avatarUrl} />
-                <AvatarFallback>{blog.creatorInfo.firstName.charAt(0)}</AvatarFallback>
-              </Avatar>
-            </div>
-            <div>
-              <div className='font-semibold text-gray-900'>{blog.creatorInfo.firstName}</div>
-              <div className='flex items-center gap-3 text-sm text-gray-500 mt-0.5'>
-                <time className='flex items-center gap-1.5'>
-                  <CalendarDays className='w-4 h-4' />
-                  {new Date(blog.createdAt).toLocaleDateString('vi-VN')}
-                </time>
-                <span>•</span>
-                <span>5 phút đọc</span>
+          <div className='flex justify-between items-start'>
+            <div className='flex items-center gap-4 mb-8'>
+              <div className='relative w-14 h-14 rounded-full overflow-hidden border-4 border-white shadow-md'>
+                <Avatar className='w-full h-full'>
+                  <AvatarImage src={blog.creatorInfo.avatarUrl} />
+                  <AvatarFallback>{blog.creatorInfo.firstName.charAt(0)}</AvatarFallback>
+                </Avatar>
+              </div>
+              <div>
+                <div className='font-semibold text-gray-900'>{blog.creatorInfo.firstName}</div>
+                <div className='flex items-center gap-3 text-sm text-gray-500 mt-0.5'>
+                  <time className='flex items-center gap-1.5'>
+                    <CalendarDays className='w-4 h-4' />
+                    {new Date(blog.createdAt).toLocaleDateString('vi-VN')}
+                  </time>
+                  <span>•</span>
+                  <span>5 phút đọc</span>
+                </div>
               </div>
             </div>
+
+            <ReportBlogButton blogId={id} blogTitle={blog.title} buttonVariant='icon' />
           </div>
 
           {/* Title */}
