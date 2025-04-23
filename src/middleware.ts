@@ -12,7 +12,8 @@ const roleBasedPaths = {
   CONTENT_CREATOR: ['/content-creator', '/content-creator/:path*'],
   EXPERT: ['/expert', '/expert/:path*'],
   CHILD: ['/kid', '/kid/:path*'],
-  SALESMAN: ['/salesman', '/salesman/:path*']
+  SALESMAN: ['/salesman', '/salesman/:path*'],
+  SUPPORTER: ['/support', '/support/:path*']
 }
 
 // Đường dẫn cần xác thực nhưng không ràng buộc role
@@ -78,7 +79,7 @@ function hasPermission(path: string, role?: string) {
     }
   }
 
-  // Đường dẫn không thuộc role nào cụ thể
+  // Đường dẫn không thuộc role nào cụ thể (common paths)
   return true
 }
 
@@ -89,7 +90,16 @@ export function middleware(request: NextRequest) {
   const accessToken = request.cookies.get('accessToken')?.value
 
   // Decode JWT token để lấy role
-  let userRole: 'ADMIN' | 'CONTENT-CREATOR' | 'CHILD' | 'ADULT' | undefined
+  let userRole:
+    | 'ADMIN'
+    | 'CONTENT-CREATOR'
+    | 'CHILD'
+    | 'ADULT'
+    | 'MANAGER'
+    | 'EXPERT'
+    | 'SALESMAN'
+    | 'SUPPORTER'
+    | undefined
   if (accessToken) {
     const decodedToken = decodeJwt(accessToken)
     userRole = decodedToken?.role || decodedToken?.sub?.role
@@ -123,12 +133,13 @@ export function middleware(request: NextRequest) {
 
     // 2.1 Nếu không phải role ADULT và cố truy cập các trang chỉ dành cho ADULT
     if (adultOnlyPaths.some((path) => pathname.startsWith(path.split('/:')[0])) && userRole !== 'ADULT') {
+      // Tìm đường dẫn phù hợp với role của người dùng
       const redirectPath = roleBasedPaths[userRole as keyof typeof roleBasedPaths]?.[0] || '/'
-      return NextResponse.redirect(new URL(redirectPath, request.url))
+      // Chỉ redirect nếu không phải CHILD hoặc nếu là CHILD nhưng cố truy cập đường dẫn không phải /kid
+      if (userRole !== 'CHILD' || !pathname.startsWith('/kid')) {
+        return NextResponse.redirect(new URL(redirectPath, request.url))
+      }
     }
-
-    // Code cũ trước khi sửa
-    // (pathname === '/' && userRole && userRole !== 'ADULT')
   }
 
   // 3. Trường hợp đã đăng nhập

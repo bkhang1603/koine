@@ -57,6 +57,8 @@ function AvatarNotification() {
   const router = useRouter()
 
   const handleLogout = async () => {
+    if (logoutMutation.isPending) return
+
     try {
       await logoutMutation.mutateAsync()
       setRole()
@@ -65,7 +67,9 @@ function AvatarNotification() {
       setUser()
       router.push(configRoute.login)
     } catch (error: any) {
-      handleErrorApi(error)
+      handleErrorApi({
+        error
+      })
     }
   }
 
