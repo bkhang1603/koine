@@ -92,7 +92,7 @@ export function middleware(request: NextRequest) {
   // Decode JWT token để lấy role
   let userRole:
     | 'ADMIN'
-    | 'CONTENT-CREATOR'
+    | 'CONTENT_CREATOR'
     | 'CHILD'
     | 'ADULT'
     | 'MANAGER'
@@ -136,7 +136,37 @@ export function middleware(request: NextRequest) {
       // Tìm đường dẫn phù hợp với role của người dùng
       const redirectPath = roleBasedPaths[userRole as keyof typeof roleBasedPaths]?.[0] || '/'
       // Chỉ redirect nếu không phải CHILD hoặc nếu là CHILD nhưng cố truy cập đường dẫn không phải /kid
-      if (userRole !== 'CHILD' || !pathname.startsWith('/kid')) {
+      if (userRole === 'CHILD' && !pathname.startsWith('/kid')) {
+        return NextResponse.redirect(new URL(redirectPath, request.url))
+      }
+
+      // Nếu là ADMIN nhưng cố truy cập đường dẫn không phải /admin
+      if (userRole === 'ADMIN' && !pathname.startsWith('/admin')) {
+        return NextResponse.redirect(new URL(redirectPath, request.url))
+      }
+
+      // Nếu là MANAGER nhưng cố truy cập đường dẫn không phải /manager
+      if (userRole === 'MANAGER' && !pathname.startsWith('/manager')) {
+        return NextResponse.redirect(new URL(redirectPath, request.url))
+      }
+
+      // Nếu là CONTENT_CREATOR nhưng cố truy cập đường dẫn không phải /content-creator
+      if (userRole === 'CONTENT_CREATOR' && !pathname.startsWith('/content-creator')) {
+        return NextResponse.redirect(new URL(redirectPath, request.url))
+      }
+
+      // Nếu là EXPERT nhưng cố truy cập đường dẫn không phải /expert
+      if (userRole === 'EXPERT' && !pathname.startsWith('/expert')) {
+        return NextResponse.redirect(new URL(redirectPath, request.url))
+      }
+
+      // Nếu là SALESMAN nhưng cố truy cập đường dẫn không phải /salesman
+      if (userRole === 'SALESMAN' && !pathname.startsWith('/salesman')) {
+        return NextResponse.redirect(new URL(redirectPath, request.url))
+      }
+
+      // Nếu là SUPPORTER nhưng cố truy cập đường dẫn không phải /support
+      if (userRole === 'SUPPORTER' && !pathname.startsWith('/support')) {
         return NextResponse.redirect(new URL(redirectPath, request.url))
       }
     }
