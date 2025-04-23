@@ -1,7 +1,7 @@
 /* eslint-disable no-unused-vars */
 import { useState } from 'react'
 import { Card } from '@/components/ui/card'
-import { Clock, BarChart3, Users, Gift } from 'lucide-react'
+import { Clock, BarChart3, Users, Gift, Send } from 'lucide-react'
 import Image from 'next/image'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
@@ -161,14 +161,34 @@ export function PurchasedCourseCard({ courseData, listChildAccount = [], onActiv
         {/* Categories */}
         <div className='flex flex-wrap gap-2'>
           {course.categories && course.categories.length > 0 ? (
-            course.categories.map((category) => (
-              <span
-                key={category.id}
-                className='inline-flex items-center rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-medium text-gray-600'
-              >
-                {category.name}
-              </span>
-            ))
+            <>
+              {course.categories.slice(0, 3).map((category) => (
+                <span
+                  key={category.id}
+                  className='inline-flex items-center rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-medium text-gray-600'
+                >
+                  {category.name}
+                </span>
+              ))}
+              {course.categories.length > 3 && (
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <span className='inline-flex items-center rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-medium text-gray-600 cursor-default'>
+                        +{course.categories.length - 3}
+                      </span>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <div className='flex flex-col gap-1'>
+                        {course.categories.slice(2).map((category) => (
+                          <span key={category.id}>{category.name}</span>
+                        ))}
+                      </div>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              )}
+            </>
           ) : (
             <span className='inline-flex items-center rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-medium text-gray-600'>
               Cá nhân hóa
@@ -210,7 +230,7 @@ export function PurchasedCourseCard({ courseData, listChildAccount = [], onActiv
                       disabled={availableChildren.length === 0}
                     >
                       <SelectTrigger className='w-[50px] px-2'>
-                        <Gift className='h-4 w-4' />
+                        <Send className='h-4 w-4' />
                       </SelectTrigger>
                       <SelectContent>
                         {availableChildren.map((child) => (

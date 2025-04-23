@@ -15,7 +15,8 @@ import {
   RefreshCcw,
   BellRing,
   Star,
-  Award
+  Award,
+  Gift
 } from 'lucide-react'
 
 const sidebarNavItems: NavItem[] = [
@@ -89,6 +90,17 @@ const sidebarNavItems: NavItem[] = [
         title: 'Hoàn tiền & Đổi trả',
         icon: <RefreshCcw className='h-4 w-4' />,
         href: '/setting/refund'
+      }
+    ]
+  },
+  {
+    title: 'Quà tặng',
+    icon: <Gift className='h-5 w-5' />,
+    children: [
+      {
+        title: 'Danh sách quà tặng',
+        icon: <Gift className='h-4 w-4' />,
+        href: '/setting/gift'
       }
     ]
   }
