@@ -99,31 +99,32 @@ function CommentList(props: { params: Promise<{ id: string }>; searchParams: Sea
       return
     }
 
-    createCommentMutation.mutate(
-      {
-        courseId: courseId,
-        replyId: reviewId,
-        content: replyContent
+    const commentData = {
+      courseId: courseId,
+      replyId: reviewId,
+      content: replyContent
+    }
+
+    console.log('Comment data before sending:', commentData)
+
+    createCommentMutation.mutate(commentData, {
+      onSuccess: () => {
+        toast({
+          title: 'Thành công',
+          description: 'Trả lời đã được gửi thành công'
+        })
+        setReplyContent('')
+        setActiveReply(null)
       },
-      {
-        onSuccess: () => {
-          toast({
-            title: 'Thành công',
-            description: 'Trả lời đã được gửi thành công'
-          })
-          setReplyContent('')
-          setActiveReply(null)
-        },
-        onError: (error) => {
-          toast({
-            title: 'Lỗi',
-            description: 'Có lỗi xảy ra khi gửi trả lời',
-            variant: 'destructive'
-          })
-          handleErrorApi({ error })
-        }
+      onError: (error) => {
+        toast({
+          title: 'Lỗi',
+          description: 'Có lỗi xảy ra khi gửi trả lời',
+          variant: 'destructive'
+        })
+        handleErrorApi({ error })
       }
-    )
+    })
   }
 
   const breadcrumbItems = [
@@ -162,16 +163,13 @@ function CommentList(props: { params: Promise<{ id: string }>; searchParams: Sea
 
           <div className='flex items-center text-xs text-slate-500 gap-3'>
             <div>{review.createdAtFormatted}</div>
-            <button
-              onClick={() => handleToggleReply(`review-${review.user.id}`)}
-              className='font-medium hover:underline'
-            >
+            <button onClick={() => handleToggleReply(review.user.id)} className='font-medium hover:underline'>
               Trả lời
             </button>
           </div>
 
           {/* Reply form */}
-          {activeReply === `review-${review.user.id}` && (
+          {activeReply === review.user.id && (
             <div className='mt-2 flex gap-2'>
               <Avatar className='h-7 w-7 mt-1'>
                 <AvatarFallback>
@@ -191,7 +189,7 @@ function CommentList(props: { params: Promise<{ id: string }>; searchParams: Sea
                   </Button>
                   <Button
                     size='sm'
-                    onClick={() => handleCreateReply(`review-${review.user.id}`)}
+                    onClick={() => handleCreateReply(review.user.id)}
                     disabled={createCommentMutation.isPending || !replyContent.trim()}
                   >
                     {createCommentMutation.isPending ? 'Đang gửi...' : 'Phản hồi'}

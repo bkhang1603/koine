@@ -5,6 +5,7 @@ import { useGetLessonQuery, useGetCourseQuery } from '@/queries/useCourse'
 import { Breadcrumb } from '@/components/private/common/breadcrumb'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
+// eslint-disable-next-line no-unused-vars
 import { Clock, FileText, Video, ArrowLeft } from 'lucide-react'
 import { Skeleton } from '@/components/ui/skeleton'
 import Link from 'next/link'
