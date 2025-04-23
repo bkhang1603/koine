@@ -961,12 +961,12 @@ export default function Cart() {
                       <span className='text-muted-foreground'>|</span>
                       <span>{pickAddress.phone}</span>
                       {pickAddress.isDefault && (
-                        <>
+                        <span className='flex lg:hidden 2xl:flex items-center gap-2'>
                           <span className='text-muted-foreground'>|</span>
                           <span className='text-xs bg-primary/10 text-primary px-2 py-1 rounded-full font-medium'>
                             Mặc định
                           </span>
-                        </>
+                        </span>
                       )}
                     </div>
                     <div className='text-muted-foreground'>
