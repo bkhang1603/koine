@@ -7,6 +7,9 @@ import Link from 'next/link'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Breadcrumb } from '@/components/private/common/breadcrumb'
 import { CourseDetail } from '@/components/private/manager/course/course-detail'
+import { CourseEnrollmentsChart } from '@/components/private/common/course/course-enrollments-chart'
+import { CourseCompletionChart } from '@/components/private/common/course/course-completion-chart'
+import { courseCompletionData, courseMonthlyEnrollments } from '@/app/(private)/admin/course/[id]/mock-data'
 
 // Adapter function to transform course data to match CourseDetail props
 const adaptCourseForDetailView = (course: any) => {
@@ -18,6 +21,7 @@ const adaptCourseForDetailView = (course: any) => {
     imageBanner: course.imageBanner,
     isBanned: course.isBanned,
     level: course.level,
+    ageStage: course.ageStage,
     categories: course.categories,
     durationsDisplay: course.durationsDisplay,
     chapters: course.chapters.map((chapter: any) => ({
@@ -33,7 +37,12 @@ const adaptCourseForDetailView = (course: any) => {
     totalEnrollment: course.totalEnrollment,
     aveRating: course.aveRating,
     createdAt: course.createdAt,
-    updatedAt: course.updatedAt
+    updatedAt: course.updatedAt,
+    creatorId: course.creatorId,
+    creator: course.creator,
+    censorId: course.censorId,
+    censor: course.censor,
+    price: course.price
   }
 }
 
@@ -43,6 +52,40 @@ const CourseDetailSkeleton = () => {
     <div className='min-h-screen bg-background'>
       <div className='container mx-auto px-4 py-4'>
         <Skeleton className='h-8 w-48 mb-6' />
+
+        {/* Chart Skeletons - moved to top */}
+        <div className='mb-8'>
+          <Skeleton className='h-8 w-48 mb-4' />
+          <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
+            <div className='bg-card rounded-lg border shadow-sm'>
+              <div className='p-6'>
+                <Skeleton className='h-7 w-48 mb-2' />
+                <Skeleton className='h-4 w-64 mb-6' />
+                <Skeleton className='h-[300px] w-full' />
+                <div className='mt-3 pt-3 border-t'>
+                  <div className='flex justify-between'>
+                    <Skeleton className='h-4 w-32' />
+                    <Skeleton className='h-4 w-32' />
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div className='bg-card rounded-lg border shadow-sm'>
+              <div className='p-6'>
+                <Skeleton className='h-7 w-48 mb-2' />
+                <Skeleton className='h-4 w-64 mb-6' />
+                <Skeleton className='h-[300px] w-full' />
+                <div className='mt-3 pt-3 border-t'>
+                  <div className='flex justify-between'>
+                    <Skeleton className='h-4 w-32' />
+                    <Skeleton className='h-4 w-32' />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
         <Skeleton className='w-full aspect-[21/9] rounded-xl' />
       </div>
 
@@ -118,6 +161,15 @@ export default function CourseDetailPage(props: { params: Promise<{ id: string }
         {/* Breadcrumb component */}
         <div className='mb-6'>
           <Breadcrumb items={breadcrumbItems} />
+        </div>
+
+        {/* Charts section - moved to top */}
+        <div className='mb-8'>
+          <h2 className='text-2xl font-bold mb-4'>Thống kê khóa học</h2>
+          <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
+            <CourseEnrollmentsChart data={courseMonthlyEnrollments} />
+            <CourseCompletionChart data={courseCompletionData} />
+          </div>
         </div>
 
         <CourseDetail course={adaptCourseForDetailView(course)} />

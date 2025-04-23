@@ -4,7 +4,9 @@ import {
   GetOrderListAdminResType,
   GetRefundRequestByIdResType,
   GetRefundRequestsResType,
-  GetReturnOrdersResType
+  GetReturnOrdersResType,
+  UpdateRefundRequestResType,
+  UpdateRefundRequestBodyType
 } from '@/schemaValidations/admin.schema'
 import {
   CancelOrderBody,
@@ -38,9 +40,9 @@ const orderApiRequest = {
     http.post<CreateRefundOrderBodyRes>(`/orders/refund/${orderId}/request-refund`, body),
   createReturnOrder: ({ orderId, body }: { orderId: string; body: CreateReturnOrderBody }) =>
     http.post<CreateReturnOrderBodyRes>(`/orders/exchange/${orderId}/request-exchange`, body),
-  getAdminOrders: (pageSize: number, pageIndex: number, keyword?: string, status?: string) =>
+  getAdminOrders: (pageSize: number, pageIndex: number, keyword?: string, status?: string, userId?: string) =>
     http.get<GetOrderListAdminResType>(
-      `/orders?${keyword ? `keyword=${keyword}&` : ''}${status ? `status=${status}&` : ''}page_size=${pageSize}&page_index=${pageIndex}`
+      `/orders?${keyword ? `keyword=${keyword}&` : ''}${status ? `status=${status}&` : ''}${userId ? `userId=${userId}&` : ''}page_size=${pageSize}&page_index=${pageIndex}`
     ),
   getAdminOrderById: (id: string) => http.get<GetOrderDetailAdminResType>(`/orders/detail/${id}`),
   confirmDeliveryOrder: ({ id }: { id: string }) =>
@@ -49,7 +51,9 @@ const orderApiRequest = {
     http.get<GetRefundRequestsResType>(`/orders/refund?page_size=${page_size}&page_index=${page_index}`),
   getRefundRequestById: (id: string) => http.get<GetRefundRequestByIdResType>(`/orders/${id}`),
   getReturnOrders: ({ page_size, page_index }: { page_size: number; page_index: number }) =>
-    http.get<GetReturnOrdersResType>(`/orders/my-exchange?page_size=${page_size}&page_index=${page_index}`)
+    http.get<GetReturnOrdersResType>(`/orders/my-exchange?page_size=${page_size}&page_index=${page_index}`),
+  updateRefundRequest: ({ id, body }: { id: string; body: UpdateRefundRequestBodyType }) =>
+    http.put<UpdateRefundRequestResType>(`/orders/refund/${id}/resolve-refund`, body)
 }
 
 export default orderApiRequest

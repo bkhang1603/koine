@@ -150,7 +150,6 @@ function AdminProduct(props: { searchParams: SearchParams }) {
             onView={() => router.push(`${configRoute.salesman.product}/${product.id}`)}
             onEdit={() => router.push(`${configRoute.salesman.product}/${product.id}/edit`)}
             onDelete={() => handleDelete(product.id)}
-            onPreview={() => window.open(`/product/${product.slug}`, '_blank')}
           />
         )
       }

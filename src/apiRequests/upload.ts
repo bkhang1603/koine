@@ -4,7 +4,7 @@ import { UploadImageResType, UploadVideoResType } from '@/schemaValidations/uplo
 const uploadApiRequest = {
   uploadImage: (formData: FormData) => http.post<UploadImageResType>('/buckets/image', formData),
   uploadRecord: (formData: FormData) => http.post<any>('/buckets/file', formData),
-  uploadVideo: (formData: FormData) => http.post<UploadVideoResType>('/buckets/video', formData)
+  uploadVideo: (formData: FormData) => http.post<UploadVideoResType>('/buckets/file', formData)
 }
 
 export default uploadApiRequest

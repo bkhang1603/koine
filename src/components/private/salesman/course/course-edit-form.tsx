@@ -10,6 +10,9 @@ import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar'
 import { CreateCourseBodyType, createCourseBody } from '@/schemaValidations/course.schema'
 import { Badge } from '@/components/ui/badge'
 
+// Define the partial type for salesman update
+type SalesmanCourseUpdateType = Pick<CreateCourseBodyType, 'price' | 'discount'>
+
 // Course level options text display
 const getLevelLabel = (value: string) => {
   switch (value) {
@@ -21,6 +24,26 @@ const getLevelLabel = (value: string) => {
       return 'Trung cấp'
     case 'ADVANCED':
       return 'Nâng cao'
+    default:
+      return value
+  }
+}
+
+// Age stage label display
+const getAgeStageLabel = (value: string) => {
+  switch (value) {
+    case '3-6':
+      return '3-6 tuổi'
+    case '7-9':
+      return '7-9 tuổi'
+    case '10-12':
+      return '10-12 tuổi'
+    case '13-15':
+      return '13-15 tuổi'
+    case '16-18':
+      return '16-18 tuổi'
+    case '18+':
+      return 'Từ 18 tuổi trở lên'
     default:
       return value
   }
@@ -47,7 +70,8 @@ export function CourseEditForm({ course, categoryOptions, onSubmit, isLoading }:
       imageBanner: '',
       price: 0,
       discount: 0,
-      level: 'ALL'
+      level: 'ALL',
+      ageStage: '18+'
     }
   })
 
@@ -62,27 +86,22 @@ export function CourseEditForm({ course, categoryOptions, onSubmit, isLoading }:
         imageBanner: course.imageBanner,
         price: course.price,
         discount: course.discount,
-        level: course.level
+        level: course.level,
+        ageStage: course?.ageStage || '18+'
       })
     }
   }, [course, form])
 
   // Define the form values we will actually send on submit
   const handleSubmit = (values: CreateCourseBodyType) => {
-    // Create a new object with only the editable fields and preserve the others from the original course
-    const updatedValues = {
-      ...values,
-      // Only allow editing of price and discount
-      // Keep the original values for other fields
-      title: course.title,
-      description: course.description,
-      categoryIds: course.categories.map((cat: any) => cat.id),
-      imageUrl: course.imageUrl,
-      imageBanner: course.imageBanner,
-      level: course.level
+    // Create a new object with only the editable fields (price and discount)
+    // Salesmen can only update price and discount
+    const updatedValues: SalesmanCourseUpdateType = {
+      price: values.price,
+      discount: values.discount
     }
 
-    onSubmit(updatedValues)
+    onSubmit(updatedValues as CreateCourseBodyType)
   }
 
   return (
@@ -148,6 +167,12 @@ export function CourseEditForm({ course, categoryOptions, onSubmit, isLoading }:
             <FormItem>
               <FormLabel>Cấp độ</FormLabel>
               <div className='p-2 border rounded-md bg-muted/10'>{getLevelLabel(course?.level)}</div>
+            </FormItem>
+
+            {/* Age Stage Field - Read Only */}
+            <FormItem>
+              <FormLabel>Độ tuổi</FormLabel>
+              <div className='p-2 border rounded-md bg-muted/10'>{getAgeStageLabel(course?.ageStage || '18+')}</div>
             </FormItem>
 
             {/* Price and Discount Fields - Editable */}

@@ -34,7 +34,7 @@ export default function CourseCategoriesPage() {
 
   // Get values from searchParams or use default values
   const currentKeyword = searchParams.get('keyword') || ''
-  const currentPageSize = Number(searchParams.get('page_size')) || 5
+  const currentPageSize = Number(searchParams.get('page_size')) || 10
   const currentPageIndex = Number(searchParams.get('page_index')) || 1
 
   // Function to update URL when values change
@@ -302,7 +302,7 @@ export default function CourseCategoriesPage() {
         data={tableData}
         headerColumn={headerColumn}
         bodyColumn={bodyColumn}
-        href={'/salesman/product/categories'}
+        href={'/manager/product/categories'}
         loading={isLoading}
         showSearch={true}
         searchParamName='keyword'

@@ -13,6 +13,9 @@ import { toast } from '@/components/ui/use-toast'
 import { CreateCourseBodyType } from '@/schemaValidations/course.schema'
 import { CourseEditForm } from '@/components/private/salesman/course/course-edit-form'
 
+// Define the partial type for salesman update
+type SalesmanCourseUpdateType = Pick<CreateCourseBodyType, 'price' | 'discount'>
+
 export default function EditCoursePage(props: { params: Promise<{ id: string }> }) {
   const params = use(props.params)
   const router = useRouter()
@@ -34,13 +37,18 @@ export default function EditCoursePage(props: { params: Promise<{ id: string }> 
     try {
       setIsSubmitting(true)
 
-      await updateCourseMutation.mutateAsync({
-        ...values
-      })
+      // For salesmen, we only update price and discount
+      const updateData: SalesmanCourseUpdateType = {
+        price: values.price,
+        discount: values.discount
+      }
+
+      // Cast to any to bypass the type check for the mutation
+      await updateCourseMutation.mutateAsync(updateData as any)
 
       toast({
         title: 'Cập nhật thành công',
-        description: 'Khóa học đã được cập nhật',
+        description: 'Giá và khuyến mãi khóa học đã được cập nhật',
         variant: 'default'
       })
 

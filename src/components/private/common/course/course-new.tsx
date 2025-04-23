@@ -30,6 +30,16 @@ const levelOptions = [
   { value: 'ADVANCED', label: 'Nâng cao' }
 ]
 
+// Age stage options
+const ageStageOptions = [
+  { value: '3-6', label: '3-6 tuổi' },
+  { value: '7-9', label: '7-9 tuổi' },
+  { value: '10-12', label: '10-12 tuổi' },
+  { value: '13-15', label: '13-15 tuổi' },
+  { value: '16-18', label: '16-18 tuổi' },
+  { value: '18+', label: 'Từ 18 tuổi trở lên' }
+]
+
 interface NewCoursePageProps {
   localDraft: any | null
   baseUrl: string
@@ -65,7 +75,8 @@ export default function NewCoursePage({ localDraft, baseUrl }: NewCoursePageProp
       imageBanner: localDraft?.imageBanner || '',
       price: 0,
       discount: 0,
-      level: localDraft?.level || 'ALL'
+      level: localDraft?.level || 'ALL',
+      ageStage: localDraft?.ageStage || '18+'
     }
   })
 
@@ -180,7 +191,8 @@ export default function NewCoursePage({ localDraft, baseUrl }: NewCoursePageProp
         imageBanner: data.imageBanner,
         price: 0,
         discount: 0,
-        level: data.level
+        level: data.level,
+        ageStage: data.ageStage
       })
 
       // Clear draft from localStorage after successful submission
@@ -387,6 +399,32 @@ export default function NewCoursePage({ localDraft, baseUrl }: NewCoursePageProp
                       </FormControl>
                       <SelectContent>
                         {levelOptions.map((option) => (
+                          <SelectItem key={option.value} value={option.value}>
+                            {option.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              {/* Age Stage Field */}
+              <FormField
+                control={form.control}
+                name='ageStage'
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Độ tuổi</FormLabel>
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder='Chọn độ tuổi phù hợp' />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {ageStageOptions.map((option) => (
                           <SelectItem key={option.value} value={option.value}>
                             {option.label}
                           </SelectItem>

@@ -1,47 +1,23 @@
 'use client'
 
-import { use, useEffect, useMemo } from 'react'
+import { use, useMemo, useEffect } from 'react'
 import { useUsersAdminQuery } from '@/queries/useUser'
 import { TableCustom, dataListType } from '@/components/table-custom'
 import configRoute from '@/config/route'
 import { SearchParams } from '@/types/query'
-import { useRouter, usePathname } from 'next/navigation'
+import { useRouter } from 'next/navigation'
 import Image from 'next/image'
-import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
+import { formatRole, handleErrorApi } from '@/lib/utils'
 import { MoreOptions } from '@/components/private/common/more-options'
-import { formatRole } from '@/lib/utils'
 
 function SupportUser(props: { searchParams: SearchParams }) {
   const searchParams = use(props.searchParams)
   const router = useRouter()
-  const pathname = usePathname()
 
   const currentPageSize = Number(searchParams.page_size) || 10
   const currentPageIndex = Number(searchParams.page_index) || 1
   const currentKeyword = (searchParams.keyword as string) || ''
-
-  const updateSearchParams = (newParams: { page_size?: number; page_index?: number; keyword?: string }) => {
-    const params = new URLSearchParams(searchParams as Record<string, string>)
-
-    if (newParams.keyword !== undefined) {
-      if (newParams.keyword === '') {
-        params.delete('keyword')
-      } else {
-        params.set('keyword', newParams.keyword)
-      }
-    }
-
-    if (newParams.page_size !== undefined) {
-      params.set('page_size', newParams.page_size.toString())
-    }
-
-    if (newParams.page_index !== undefined) {
-      params.set('page_index', newParams.page_index.toString())
-    }
-
-    router.push(`${pathname}?${params.toString()}`)
-  }
 
   const {
     data: responseData,
@@ -54,19 +30,12 @@ function SupportUser(props: { searchParams: SearchParams }) {
   })
 
   useEffect(() => {
-    if (responseData) {
-      console.log('Dữ liệu người dùng từ admin:', responseData)
-    }
     if (error) {
-      console.error('Lỗi khi tải người dùng:', error)
+      handleErrorApi({
+        error
+      })
     }
-  }, [responseData, error])
-
-  useEffect(() => {
-    console.log('Search params:', searchParams)
-    console.log('Current page index:', currentPageIndex)
-    console.log('Current page size:', currentPageSize)
-  }, [searchParams, currentPageIndex, currentPageSize])
+  }, [error])
 
   const users = responseData?.payload.data || []
   const pagination = responseData?.payload.pagination || {
@@ -95,8 +64,11 @@ function SupportUser(props: { searchParams: SearchParams }) {
           <div className='flex items-center gap-3 min-w-[250px] max-w-[350px]'>
             <div className='relative h-12 w-12 flex-shrink-0'>
               <Image
-                src={user.userDetail.avatarUrl ?? '/images/placeholder.jpg'}
-                alt={`Avatar của ${user.username}`}
+                src={
+                  user?.userDetail?.avatarUrl ||
+                  `https://avatar.iran.liara.run/public/${user?.userDetail?.gender || 'boy'}?username=${user?.username || 'default'}`
+                }
+                alt={`Avatar của ${user?.username || 'người dùng'}`}
                 fill
                 className='rounded-full object-cover'
                 sizes='48px'
@@ -104,9 +76,9 @@ function SupportUser(props: { searchParams: SearchParams }) {
               />
             </div>
             <div className='space-y-0.5 overflow-hidden'>
-              <div className='font-medium truncate'>{user.username}</div>
+              <div className='font-medium truncate'>{user?.username || 'Chưa có tên'}</div>
               <div className='text-xs text-muted-foreground line-clamp-1'>
-                {user.userDetail.firstName} {user.userDetail.lastName}
+                {user?.userDetail?.firstName || ''} {user?.userDetail?.lastName || ''}
               </div>
             </div>
           </div>
@@ -131,7 +103,7 @@ function SupportUser(props: { searchParams: SearchParams }) {
       {
         id: 6,
         render: (user: any) => (
-          <MoreOptions item={user} itemType='user' onView={() => router.push(`/support/user/${user.id}`)} />
+          <MoreOptions itemType='user' onView={() => router.push(`/support/user/${user.id}`)} item={user} />
         )
       }
     ],
@@ -152,16 +124,6 @@ function SupportUser(props: { searchParams: SearchParams }) {
         <p className='text-muted-foreground mt-1'>Quản lý danh sách người dùng trong hệ thống</p>
       </div>
 
-      {/* Search */}
-      <div className='flex flex-col sm:flex-row gap-4'>
-        <Input
-          placeholder='Tìm kiếm người dùng...'
-          className='w-full sm:w-[300px]'
-          value={currentKeyword}
-          onChange={(e) => updateSearchParams({ keyword: e.target.value, page_index: 1 })}
-        />
-      </div>
-
       {/* Table */}
       <TableCustom
         data={tableData}
@@ -169,6 +131,9 @@ function SupportUser(props: { searchParams: SearchParams }) {
         bodyColumn={bodyColumn}
         href={configRoute.support.user}
         loading={isLoading}
+        showSearch={true}
+        searchParamName='keyword'
+        searchPlaceholder='Tìm kiếm người dùng...'
       />
     </div>
   )

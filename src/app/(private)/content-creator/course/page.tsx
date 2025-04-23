@@ -11,12 +11,12 @@ import { Badge } from '@/components/ui/badge'
 import { format } from 'date-fns'
 import { vi } from 'date-fns/locale'
 import { MoreOptions } from '@/components/private/common/more-options'
-import { useDeleteCourseMutation, useGetDraftCoursesQuery } from '@/queries/useCourse'
+import { useDeleteCourseMutation, useGetDraftCoursesQuery, useUpdateStatusCourseMutation } from '@/queries/useCourse'
 import { Skeleton } from '@/components/ui/skeleton'
 import Image from 'next/image'
 import { Button } from '@/components/ui/button'
 import { toast } from '@/components/ui/use-toast'
-import { handleErrorApi } from '@/lib/utils'
+import { formatCourseStatus, handleErrorApi } from '@/lib/utils'
 
 function ContentCreatorCourse(props: { searchParams: SearchParams }) {
   const searchParams = use(props.searchParams)
@@ -35,6 +35,7 @@ function ContentCreatorCourse(props: { searchParams: SearchParams }) {
   })
 
   const deleteCourseMutation = useDeleteCourseMutation()
+  const updateStatusCourseMutation = useUpdateStatusCourseMutation()
 
   const handleDelete = useCallback(
     async (courseId: string) => {
@@ -52,6 +53,28 @@ function ContentCreatorCourse(props: { searchParams: SearchParams }) {
     [deleteCourseMutation]
   )
 
+  const handleUpdateStatus = useCallback(
+    async (courseId: string) => {
+      try {
+        await updateStatusCourseMutation.mutateAsync({
+          id: courseId,
+          data: {
+            status: 'PENDINGREVIEW',
+            isDraft: false
+          }
+        })
+        toast({
+          description: 'Gửi yêu cầu xét duyệt thành công'
+        })
+      } catch (error) {
+        handleErrorApi({
+          error
+        })
+      }
+    },
+    [updateStatusCourseMutation]
+  )
+
   const data = responseData?.payload.data || []
   const pagination = responseData?.payload.pagination || {
     pageSize: 0,
@@ -66,10 +89,8 @@ function ContentCreatorCourse(props: { searchParams: SearchParams }) {
     { id: 1, name: 'Tên khóa học' },
     { id: 2, name: 'Ngày tạo' },
     { id: 3, name: 'Hiển thị' },
-    { id: 4, name: 'Nháp' },
-    { id: 5, name: 'Trạng thái' },
-    { id: 6, name: 'Khóa' },
-    { id: 7, name: '' }
+    { id: 4, name: 'Trạng thái' },
+    { id: 5, name: '' }
   ]
 
   const bodyColumn = useMemo(
@@ -120,8 +141,11 @@ function ContentCreatorCourse(props: { searchParams: SearchParams }) {
         id: 4,
         render: (course: any) => (
           <div className='flex items-center min-w-[100px]'>
-            <Badge variant={course.isDraft ? 'yellow' : 'outline'} className='w-fit'>
-              {course.isDraft ? 'Nháp' : 'Đã xuất bản'}
+            <Badge
+              variant={course.status === 'REJECTED' ? 'destructive' : course.isDraft ? 'yellow' : 'outline'}
+              className='w-fit'
+            >
+              {course.status === 'REJECTED' ? 'Từ chối' : course.isDraft ? 'Nháp' : formatCourseStatus(course.status)}
             </Badge>
           </div>
         )
@@ -129,45 +153,22 @@ function ContentCreatorCourse(props: { searchParams: SearchParams }) {
       {
         id: 5,
         render: (course: any) => (
-          <div className='flex items-center min-w-[100px]'>
-            <Badge variant='outline' className='w-fit bg-primary/10'>
-              {course.status || 'ACTIVE'}
-            </Badge>
-          </div>
-        )
-      },
-      {
-        id: 6,
-        render: (course: any) => (
-          <div className='flex items-center min-w-[100px]'>
-            <Badge variant={course.isBanned ? 'destructive' : 'green'} className='w-fit'>
-              {course.isBanned ? 'Đã khóa' : 'Không khóa'}
-            </Badge>
-          </div>
-        )
-      },
-      {
-        id: 7,
-        render: (course: any) => (
           <div className='flex justify-end min-w-[40px]'>
             <MoreOptions
-              item={{
-                id: course.id,
-                title: course.title,
-                status: course.isBanned ? 'Đã khóa' : 'Hoạt động',
-                slug: course.slug
-              }}
+              item={course}
               itemType='course'
               onView={() => router.push(`/content-creator/course/${course.id}`)}
               onEdit={() => router.push(`/content-creator/course/${course.id}/edit`)}
-              onPreview={() => router.push(`/course/${course.slug}`)}
               onDelete={() => handleDelete(course.id)}
+              onUpdateStatusCourse={() => handleUpdateStatus(course.id)}
+              updateStatusLabel='Yêu cầu xét duyệt'
+              isUpdateStatusEnabled={course.isDraft}
             />
           </div>
         )
       }
     ],
-    [router, handleDelete]
+    [router, handleDelete, handleUpdateStatus]
   )
 
   const tableData: dataListType = {

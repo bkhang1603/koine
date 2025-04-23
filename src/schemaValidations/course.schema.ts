@@ -1,5 +1,6 @@
 import { TypeResourceValues } from '@/constants/type'
 import z from 'zod'
+import { TypeResource } from '@/constants/type'
 
 export const QuestionOptionData = z.object({
   isDeleted: z.boolean(),
@@ -42,9 +43,9 @@ export const CourseData = z
     isBanned: z.boolean(),
     isCustom: z.boolean(),
     level: z.string(),
+    ageStage: z.string().optional(),
     censorId: z.string(),
     durationsDisplay: z.string(),
-    ageStage: z.string(),
     isCombo: z.boolean(),
     isVisible: z.boolean(),
     categories: z.array(
@@ -429,7 +430,8 @@ export const createCourseBody = z.object({
     .number()
     .min(0, { message: 'Giảm giá không được âm' })
     .max(100, { message: 'Giảm giá không được quá 100%' }),
-  level: z.string().min(1, { message: 'Vui lòng chọn cấp độ' })
+  level: z.string().min(1, { message: 'Vui lòng chọn cấp độ' }),
+  ageStage: z.string().min(1, { message: 'Độ tuổi khoá học không được để trống' })
 })
 
 export const createCourseBodyRes = z.object({
@@ -523,15 +525,33 @@ export const createChapterSchema = z.object({
 
 export const updateChapterSchema = createChapterSchema.omit({ courseId: true })
 
-export const createLessonBody = z.object({
-  chapterId: z.string(),
-  type: z.enum(TypeResourceValues),
-  title: z.string().min(5, { message: 'Tiêu đề phải có ít nhất 5 ký tự' }),
-  description: z.string().min(10, { message: 'Mô tả phải có ít nhất 10 ký tự' }),
-  durations: z.number(),
-  content: z.string().nullable(),
-  videoUrl: z.string().nullable()
-})
+export const createLessonBody = z.discriminatedUnion('type', [
+  z.object({
+    chapterId: z.string(),
+    type: z.literal(TypeResource.Document),
+    title: z.string().min(5, { message: 'Tiêu đề phải có ít nhất 5 ký tự' }),
+    description: z.string().min(10, { message: 'Mô tả phải có ít nhất 10 ký tự' }),
+    durations: z.number().min(1, { message: 'Thời lượng tối thiểu là 1 phút' }),
+    content: z.string().min(50, { message: 'Nội dung phải có ít nhất 50 ký tự' })
+  }),
+  z.object({
+    chapterId: z.string(),
+    type: z.literal(TypeResource.Video),
+    title: z.string().min(5, { message: 'Tiêu đề phải có ít nhất 5 ký tự' }),
+    description: z.string().min(10, { message: 'Mô tả phải có ít nhất 10 ký tự' }),
+    durations: z.number().min(1, { message: 'Thời lượng tối thiểu là 1 phút' }),
+    videoUrl: z.string().url({ message: 'URL video không hợp lệ' })
+  }),
+  z.object({
+    chapterId: z.string(),
+    type: z.literal(TypeResource.Both),
+    title: z.string().min(5, { message: 'Tiêu đề phải có ít nhất 5 ký tự' }),
+    description: z.string().min(10, { message: 'Mô tả phải có ít nhất 10 ký tự' }),
+    durations: z.number().min(1, { message: 'Thời lượng tối thiểu là 1 phút' }),
+    content: z.string().min(50, { message: 'Nội dung phải có ít nhất 50 ký tự' }),
+    videoUrl: z.string().url({ message: 'URL video không hợp lệ' })
+  })
+])
 
 export const updateLessonBody = z.object({
   type: z.enum(TypeResourceValues),
@@ -573,6 +593,25 @@ export const CourseComboDetail = z.object({
 
 export const CourseComboDetailRes = z.object({
   data: CourseComboDetail,
+  message: z.string(),
+  statusCode: z.number()
+})
+
+export const updateStatusCourseBody = z.object({
+  status: z.enum(['ACTIVE', 'PENDINGREVIEW', 'PENDINGPRICING', 'REJECTED']),
+  isDraft: z.boolean()
+})
+
+export const updateStatusCourseRes = z.object({
+  message: z.string(),
+  statusCode: z.number()
+})
+
+export const updateIsVisibleCourseBody = z.object({
+  isVisible: z.boolean()
+})
+
+export const updateIsVisibleCourseRes = z.object({
   message: z.string(),
   statusCode: z.number()
 })
@@ -636,3 +675,11 @@ export type CreateLessonBodyType = z.infer<typeof createLessonBody>
 export type UpdateLessonBodyType = z.infer<typeof updateLessonBody>
 
 export type CourseComboDetailResType = z.infer<typeof CourseComboDetailRes>
+
+export type UpdateStatusCourseBodyType = z.infer<typeof updateStatusCourseBody>
+
+export type UpdateStatusCourseResType = z.infer<typeof updateStatusCourseRes>
+
+export type UpdateIsVisibleCourseBodyType = z.infer<typeof updateIsVisibleCourseBody>
+
+export type UpdateIsVisibleCourseResType = z.infer<typeof updateIsVisibleCourseRes>

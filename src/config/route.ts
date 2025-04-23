@@ -91,8 +91,11 @@ const configRoute = {
     order: '/support/order',
     user: '/support/user',
     refund: '/support/refund',
-    faq: '/support/faq',
-    settings: '/support/settings'
+    blog: '/support/blog',
+    course: '/support/course',
+    settings: '/support/settings',
+    tickets: '/support/tickets',
+    product: '/support/product'
   }
 }
 

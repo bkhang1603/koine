@@ -13,8 +13,10 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { format } from 'date-fns'
 import { vi } from 'date-fns/locale'
 import { Breadcrumb } from '@/components/private/common/breadcrumb'
+import { UserOrders } from '@/components/private/common/user/user-orders'
+import { formatRole } from '@/lib/utils'
 
-export default function AdminUserDetail(props: { params: Promise<{ id: string }> }) {
+export default function UserDetail(props: { params: Promise<{ id: string }> }) {
   const params = use(props.params)
   const { isLoading, error, data } = useUserDetailAdminQuery({ userId: params.id })
   const user = data?.payload.data
@@ -227,16 +229,8 @@ export default function AdminUserDetail(props: { params: Promise<{ id: string }>
             <CardContent className='space-y-4'>
               <div className='space-y-2 text-sm'>
                 <div className='flex justify-between'>
-                  <span className='text-muted-foreground'>ID</span>
-                  <span className='font-medium'>{user.id}</span>
-                </div>
-                <div className='flex justify-between'>
-                  <span className='text-muted-foreground'>Loại tài khoản</span>
-                  <span className='font-medium'>{user.accountType}</span>
-                </div>
-                <div className='flex justify-between'>
                   <span className='text-muted-foreground'>Vai trò</span>
-                  <Badge variant={user.role === 'ADMIN' ? 'destructive' : 'default'}>{user.role}</Badge>
+                  <Badge variant={user.role === 'ADMIN' ? 'destructive' : 'default'}>{formatRole(user.role)}</Badge>
                 </div>
                 <div className='flex justify-between'>
                   <span className='text-muted-foreground'>Trạng thái</span>
@@ -262,6 +256,9 @@ export default function AdminUserDetail(props: { params: Promise<{ id: string }>
           </Card>
         </div>
       </div>
+
+      {/* User Orders */}
+      <UserOrders userId={params.id} href={`/salesman/user/${params.id}`} />
     </div>
   )
 }

@@ -97,7 +97,9 @@ export default function SupportOrderDetailPage(props: { params: Promise<{ id: st
     PROCESSING: { label: 'Đang xử lý', variant: 'default' },
     DELIVERING: { label: 'Đang giao', variant: 'primary' },
     COMPLETED: { label: 'Hoàn thành', variant: 'secondary' },
-    CANCELLED: { label: 'Đã hủy', variant: 'destructive' }
+    CANCELLED: { label: 'Đã hủy', variant: 'destructive' },
+    EXCHANGE_REQUEST: { label: 'Yêu cầu đổi hàng', variant: 'warning' },
+    REFUND_REQUEST: { label: 'Hoàn tiền', variant: 'destructive' }
   } as const
 
   const formatStatus = (status: string) => {

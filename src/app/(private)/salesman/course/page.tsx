@@ -1,8 +1,7 @@
 'use client'
 
-import { use, useMemo } from 'react'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { BookOpen, Users, Star, GraduationCap } from 'lucide-react'
+import { use, useMemo, useCallback } from 'react'
+import { LayoutList } from 'lucide-react'
 import { TableCustom, dataListType } from '@/components/table-custom'
 import { SearchParams } from '@/types/query'
 import { useRouter } from 'next/navigation'
@@ -10,11 +9,18 @@ import { Badge } from '@/components/ui/badge'
 import { format } from 'date-fns'
 import { vi } from 'date-fns/locale'
 import { MoreOptions } from '@/components/private/common/more-options'
-import { useCoursesAdminQuery } from '@/queries/useCourse'
-import { Skeleton } from '@/components/ui/skeleton'
+import {
+  useGetDraftCoursesQuery,
+  useUpdateStatusCourseMutation,
+  useUpdateIsVisibleCourseMutation
+} from '@/queries/useCourse'
 import Image from 'next/image'
+import { Button } from '@/components/ui/button'
+import Link from 'next/link'
+import { toast } from '@/components/ui/use-toast'
+import { formatCourseStatus, handleErrorApi } from '@/lib/utils'
 
-function ContentCreatorCourse(props: { searchParams: SearchParams }) {
+function SalesmanCourse(props: { searchParams: SearchParams }) {
   const searchParams = use(props.searchParams)
   const router = useRouter()
 
@@ -24,11 +30,46 @@ function ContentCreatorCourse(props: { searchParams: SearchParams }) {
   const currentPageIndex = Number(searchParams.page_index) || 1
 
   // Gọi API với giá trị từ URL
-  const { data: responseData, isLoading } = useCoursesAdminQuery({
+  const { data: responseData, isLoading } = useGetDraftCoursesQuery({
     keyword: currentKeyword,
     page_size: currentPageSize,
     page_index: currentPageIndex
   })
+
+  const updateStatusCourseMutation = useUpdateStatusCourseMutation()
+  const updateIsVisibleCourseMutation = useUpdateIsVisibleCourseMutation()
+
+  const handleUpdateStatus = useCallback(
+    async (courseId: string) => {
+      try {
+        // First update the status
+        await updateStatusCourseMutation.mutateAsync({
+          id: courseId,
+          data: {
+            status: 'ACTIVE',
+            isDraft: false
+          }
+        })
+
+        // Then update the visibility
+        await updateIsVisibleCourseMutation.mutateAsync({
+          id: courseId,
+          data: {
+            isVisible: false
+          }
+        })
+
+        toast({
+          description: 'Kích hoạt khóa học thành công'
+        })
+      } catch (error) {
+        handleErrorApi({
+          error
+        })
+      }
+    },
+    [updateStatusCourseMutation, updateIsVisibleCourseMutation]
+  )
 
   const data = responseData?.payload.data || []
   const pagination = responseData?.payload.pagination || {
@@ -43,10 +84,9 @@ function ContentCreatorCourse(props: { searchParams: SearchParams }) {
   const headerColumn = [
     { id: 1, name: 'Tên khóa học' },
     { id: 2, name: 'Ngày tạo' },
-    { id: 3, name: 'Đánh giá' },
-    { id: 4, name: 'Số người học' },
-    { id: 5, name: 'Trạng thái' },
-    { id: 6, name: '' }
+    { id: 3, name: 'Hiển thị' },
+    { id: 4, name: 'Trạng thái' },
+    { id: 5, name: '' }
   ]
 
   const bodyColumn = useMemo(
@@ -75,36 +115,11 @@ function ContentCreatorCourse(props: { searchParams: SearchParams }) {
       {
         id: 2,
         render: (course: any) => {
-          // Parse the date string safely
-          let dateObj
-          try {
-            // Try to parse the date format "YYYY-MM-DD HH:MM:SS"
-            const [datePart, timePart] = course.createdAt.split(' ')
-            const [year, month, day] = datePart.split('-')
-            const [hour, minute, second] = timePart.split(':')
-
-            dateObj = new Date(
-              parseInt(year),
-              parseInt(month) - 1,
-              parseInt(day),
-              parseInt(hour),
-              parseInt(minute),
-              parseInt(second)
-            )
-
-            // Check if date is valid
-            if (isNaN(dateObj.getTime())) {
-              throw new Error('Invalid date')
-            }
-          } catch (error) {
-            // Fallback to current date if parsing fails
-            dateObj = new Date()
-          }
-
+          const date = course.createdAt ? new Date(course.createdAt) : new Date()
           return (
             <div className='min-w-[120px]'>
-              <div className='text-sm'>{format(dateObj, 'dd/MM/yyyy', { locale: vi })}</div>
-              <div className='text-xs text-muted-foreground'>{format(dateObj, 'HH:mm', { locale: vi })}</div>
+              <div className='text-sm'>{format(date, 'dd/MM/yyyy', { locale: vi })}</div>
+              <div className='text-xs text-muted-foreground'>{format(date, 'HH:mm', { locale: vi })}</div>
             </div>
           )
         }
@@ -112,8 +127,10 @@ function ContentCreatorCourse(props: { searchParams: SearchParams }) {
       {
         id: 3,
         render: (course: any) => (
-          <div className='flex items-center min-w-[80px]'>
-            <span className='text-sm font-medium'>{course.aveRating ? course.aveRating.toFixed(1) : 5}</span>
+          <div className='flex items-center min-w-[100px]'>
+            <Badge variant={course.isVisible ? 'green' : 'destructive'} className='w-fit'>
+              {course.isVisible ? 'Hiển thị' : 'Ẩn'}
+            </Badge>
           </div>
         )
       },
@@ -121,129 +138,60 @@ function ContentCreatorCourse(props: { searchParams: SearchParams }) {
         id: 4,
         render: (course: any) => (
           <div className='flex items-center min-w-[100px]'>
-            <span className='text-sm font-medium'>{course.totalEnrollment}</span>
+            <Badge variant='outline' className='w-fit bg-primary/10'>
+              {formatCourseStatus(course.status)}
+            </Badge>
           </div>
         )
       },
       {
         id: 5,
         render: (course: any) => (
-          <div className='flex items-center min-w-[100px]'>
-            <Badge variant={course.isBanned ? 'destructive' : 'green'} className='w-fit'>
-              {course.isBanned ? 'Đã khóa' : 'Hoạt động'}
-            </Badge>
-          </div>
-        )
-      },
-      {
-        id: 6,
-        render: (course: any) => (
           <div className='flex justify-end min-w-[40px]'>
             <MoreOptions
               item={{
                 id: course.id,
                 title: course.title,
-                status: course.isBanned ? 'Đã khóa' : 'Hoạt động',
-                slug: course.slug
+                status: course.status,
+                slug: course.slug,
+                isDraft: course.isDraft
               }}
               itemType='course'
               onView={() => router.push(`/salesman/course/${course.id}`)}
               onEdit={() => router.push(`/salesman/course/${course.id}/edit`)}
-              onPreview={() => router.push(`/course/${course.slug}`)}
+              onUpdateStatusCourse={() => handleUpdateStatus(course.id)}
+              updateStatusLabel='Duyệt lên trang'
+              isUpdateStatusEnabled={course.status == 'PENDINGPRICING'}
             />
           </div>
         )
       }
     ],
-    [router]
+    [router, handleUpdateStatus]
   )
 
   const tableData: dataListType = {
     data,
-    message: responseData?.payload.message || '',
+    message: '',
     pagination
   }
-
-  // Tính toán thống kê
-  const totalCourses = pagination.totalItem || 0
-  const totalEnrollments = data.reduce((sum: number, course: any) => sum + course.totalEnrollment, 0)
-  const averageRating =
-    data.length > 0
-      ? (data.reduce((sum: number, course: any) => sum + course.aveRating, 0) / data.length).toFixed(1)
-      : 5
-  const bannedCourses = data.filter((course: any) => course.isBanned).length
 
   return (
     <div className='container mx-auto px-4 py-6 space-y-6'>
       {/* Header */}
-      <div className='flex items-center justify-between'>
-        <div>
-          <h1 className='text-2xl font-bold'>Quản lý khóa học</h1>
-          <p className='text-muted-foreground mt-1'>Quản lý và theo dõi tất cả khóa học của bạn</p>
+      <div>
+        <div className='flex items-center justify-between'>
+          <div>
+            <h1 className='text-2xl font-bold'>Quản lý khóa học</h1>
+            <p className='text-muted-foreground mt-1'>Quản lý và theo dõi tất cả khóa học trong hệ thống</p>
+          </div>
+          <Link href='/salesman/course/categories'>
+            <Button variant='outline'>
+              <LayoutList className='w-4 h-4 mr-2' />
+              Quản lý danh mục
+            </Button>
+          </Link>
         </div>
-      </div>
-
-      {/* Stats Cards với Skeleton */}
-      <div className='grid grid-cols-1 md:grid-cols-4 gap-4'>
-        {isLoading ? (
-          // Stats Cards Skeleton
-          [...Array(4)].map((_, i) => (
-            <Card key={i}>
-              <CardHeader className='flex flex-row items-center justify-between pb-2'>
-                <Skeleton className='h-5 w-[120px]' />
-                <Skeleton className='h-5 w-5 rounded-full' />
-              </CardHeader>
-              <CardContent>
-                <Skeleton className='h-9 w-[80px] mb-2' />
-                <Skeleton className='h-4 w-[160px]' />
-              </CardContent>
-            </Card>
-          ))
-        ) : (
-          // Actual Stats Cards
-          <>
-            <Card>
-              <CardHeader className='flex flex-row items-center justify-between pb-2'>
-                <CardTitle className='text-sm font-medium'>Tổng khóa học</CardTitle>
-                <BookOpen className='h-4 w-4 text-muted-foreground' />
-              </CardHeader>
-              <CardContent>
-                <div className='text-2xl font-bold'>{totalCourses}</div>
-                <p className='text-xs text-muted-foreground'>Số lượng khóa học của bạn</p>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardHeader className='flex flex-row items-center justify-between pb-2'>
-                <CardTitle className='text-sm font-medium'>Tổng lượt đăng ký</CardTitle>
-                <Users className='h-4 w-4 text-muted-foreground' />
-              </CardHeader>
-              <CardContent>
-                <div className='text-2xl font-bold'>{totalEnrollments}</div>
-                <p className='text-xs text-muted-foreground'>Số lượt đăng ký khóa học</p>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardHeader className='flex flex-row items-center justify-between pb-2'>
-                <CardTitle className='text-sm font-medium'>Đánh giá trung bình</CardTitle>
-                <Star className='h-4 w-4 text-muted-foreground' />
-              </CardHeader>
-              <CardContent>
-                <div className='text-2xl font-bold'>{averageRating}</div>
-                <p className='text-xs text-muted-foreground'>Điểm đánh giá trung bình</p>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardHeader className='flex flex-row items-center justify-between pb-2'>
-                <CardTitle className='text-sm font-medium'>Khóa học bị khóa</CardTitle>
-                <GraduationCap className='h-4 w-4 text-muted-foreground' />
-              </CardHeader>
-              <CardContent>
-                <div className='text-2xl font-bold'>{bannedCourses}</div>
-                <p className='text-xs text-muted-foreground'>Số khóa học đang bị khóa</p>
-              </CardContent>
-            </Card>
-          </>
-        )}
       </div>
 
       {/* Table */}
@@ -251,14 +199,14 @@ function ContentCreatorCourse(props: { searchParams: SearchParams }) {
         data={tableData}
         headerColumn={headerColumn}
         bodyColumn={bodyColumn}
-        href='/salesman/course'
         loading={isLoading}
+        href='/salesman/course'
         showSearch={true}
         searchParamName='keyword'
-        searchPlaceholder='Tìm kiếm khóa học...'
+        searchPlaceholder='Tìm kiếm khoá học...'
       />
     </div>
   )
 }
 
-export default ContentCreatorCourse
+export default SalesmanCourse

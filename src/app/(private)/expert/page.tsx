@@ -15,14 +15,7 @@ import { DashboardSkeleton } from '@/components/private/expert/dashboard/dashboa
 import { useRouter, useSearchParams } from 'next/navigation'
 
 // Import mock data
-import {
-  statsData,
-  courseTrendData,
-  eventTrendData,
-  courseStatusData,
-  eventStatusData,
-  courseStatusColors
-} from './dashboard-mock-data'
+import { statsData, courseTrendData, eventTrendData, courseStatusData, eventStatusData } from './dashboard-mock-data'
 
 function ExpertDashboard() {
   const searchParams = useSearchParams()
@@ -104,8 +97,8 @@ function ExpertDashboard() {
       {/* Header with Date Range Picker */}
       <div className='flex flex-col md:flex-row md:items-center justify-between gap-4'>
         <div>
-          <h1 className='text-2xl font-bold'>Dashboard</h1>
-          <p className='text-muted-foreground'>Thống kê khóa học và sự kiện của bạn</p>
+          <h1 className='text-2xl font-bold'>Thống kê</h1>
+          <p className='text-muted-foreground'>Khóa học và sự kiện của bạn</p>
         </div>
         <DateRangePicker
           value={dateRange}
@@ -127,10 +120,9 @@ function ExpertDashboard() {
             icon={BookOpen}
             iconColor='text-blue-600'
             iconBgColor='bg-blue-100'
-            trend={{ value: 12, label: 'so với tháng trước' }}
           />
           <StatsCard
-            title='Khóa học đang diễn ra'
+            title='Khóa học đang hoạt động'
             value={statsData.activeCourses}
             description={`${formatPercentage(statsData.activeCourses / statsData.totalCourses)} khóa học`}
             icon={GraduationCap}
@@ -144,7 +136,6 @@ function ExpertDashboard() {
             icon={Users}
             iconColor='text-indigo-600'
             iconBgColor='bg-indigo-100'
-            trend={{ value: 15, label: 'so với tháng trước' }}
           />
           <StatsCard
             title='Đánh giá trung bình'
@@ -153,7 +144,6 @@ function ExpertDashboard() {
             icon={Award}
             iconColor='text-amber-600'
             iconBgColor='bg-amber-100'
-            trend={{ value: 0.2, label: 'so với tháng trước' }}
           />
         </div>
       </div>
@@ -163,13 +153,12 @@ function ExpertDashboard() {
         <CourseTrendChart
           data={courseTrendData}
           title='Xu hướng khóa học'
-          description='Số lượng khóa học tạo mới và hoàn thành theo thời gian'
+          description='Số lượng khóa học tạo mới và lượt đăng ký theo thời gian'
         />
         <CourseStatusChart
           data={courseStatusData}
           title='Trạng thái khóa học'
           description='Phân bố trạng thái các khóa học'
-          colors={courseStatusColors}
         />
       </div>
 
@@ -184,12 +173,11 @@ function ExpertDashboard() {
             icon={Calendar}
             iconColor='text-purple-600'
             iconBgColor='bg-purple-100'
-            trend={{ value: 8, label: 'so với tháng trước' }}
           />
           <StatsCard
-            title='Sự kiện đang diễn ra'
+            title='Sự kiện sắp tới'
             value={statsData.activeEvents}
-            description={`${formatPercentage(statsData.activeEvents / statsData.totalEvents)} sự kiện`}
+            description={`Sự kiện`}
             icon={Video}
             iconColor='text-amber-600'
             iconBgColor='bg-amber-100'
@@ -201,7 +189,6 @@ function ExpertDashboard() {
             icon={Users}
             iconColor='text-indigo-600'
             iconBgColor='bg-indigo-100'
-            trend={{ value: 23, label: 'so với tháng trước' }}
           />
           <StatsCard
             title='Đánh giá trung bình'
@@ -210,7 +197,6 @@ function ExpertDashboard() {
             icon={Award}
             iconColor='text-amber-600'
             iconBgColor='bg-amber-100'
-            trend={{ value: 0.3, label: 'so với tháng trước' }}
           />
         </div>
       </div>
@@ -220,7 +206,7 @@ function ExpertDashboard() {
         <EventTrendChart
           data={eventTrendData}
           title='Xu hướng sự kiện'
-          description='Số lượng sự kiện tạo mới và đã kết thúc theo thời gian'
+          description='Số lượng sự kiện diễn ra và người tham gia theo thời gian'
         />
         <EventStatusChart
           data={eventStatusData}

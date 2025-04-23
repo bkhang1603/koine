@@ -103,7 +103,6 @@ export default function EditBlogPage(props: { params: Promise<{ id: string }> })
         formData.append('images', file)
 
         toast({
-          title: 'Đang tải ảnh lên',
           description: 'Vui lòng đợi trong giây lát...'
         })
 
@@ -123,7 +122,6 @@ export default function EditBlogPage(props: { params: Promise<{ id: string }> })
           }
         } catch (uploadError) {
           toast({
-            title: 'Lỗi tải ảnh',
             description: 'Không thể tải ảnh lên. Vui lòng thử lại.',
             variant: 'destructive'
           })
@@ -136,7 +134,6 @@ export default function EditBlogPage(props: { params: Promise<{ id: string }> })
       })
 
       toast({
-        title: 'Cập nhật thành công',
         description: 'Bài viết đã được cập nhật',
         variant: 'default'
       })
@@ -242,7 +239,7 @@ export default function EditBlogPage(props: { params: Promise<{ id: string }> })
           <p className='text-sm text-muted-foreground mt-1'>Cập nhật nội dung bài viết của bạn</p>
         </div>
         <div className='flex items-center gap-4'>
-          <Button type='button' variant='outline' onClick={() => form.reset()}>
+          <Button type='button' variant='outline' onClick={() => router.push(`/manager/blog/${params.id}`)}>
             Hủy thay đổi
           </Button>
           <Button type='submit' disabled={isLoading} onClick={form.handleSubmit(onSubmit)}>

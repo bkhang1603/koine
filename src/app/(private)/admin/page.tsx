@@ -29,6 +29,7 @@ import { DataNote } from '@/components/private/admin/dashboard/data-note'
 import { DashboardSkeleton } from '@/components/private/admin/dashboard/dashboard-skeleton'
 import { useDashboardStatisticsQuery } from '@/queries/useDashboard'
 import { useRouter, useSearchParams } from 'next/navigation'
+import configRoute from '@/config/route'
 
 // Chart colors and settings
 const chartColors = {
@@ -42,7 +43,8 @@ const orderStatusColors = {
   PROCESSING: '#f59e0b', // Amber
   DELIVERING: '#3b82f6', // Blue
   COMPLETED: '#22c55e', // Green
-  CANCELLED: '#ef4444' // Red
+  CANCELLED: '#ef4444', // Red
+  EXCHANGE_REQUEST: '#8b5cf6' // Purple
 }
 
 export default function AdminDashboard() {
@@ -141,7 +143,8 @@ export default function AdminDashboard() {
 
     // Format best selling products
     const bestSellingProducts = (data.bestSellingProducts || []).map(
-      (product: { name?: string; quantity: string | number; revenue: number }) => ({
+      (product: { id?: string; name?: string; quantity: string | number; revenue: number }) => ({
+        id: product.id,
         name: product.name || 'Unnamed Product',
         quantity: Number(product.quantity),
         revenue: Number(product.revenue)
@@ -150,7 +153,8 @@ export default function AdminDashboard() {
 
     // Format best selling courses
     const bestSellingCourses = (data.bestSellingCourses || []).map(
-      (course: { name?: string; quantity: string | number; revenue: number }) => ({
+      (course: { id?: string; name?: string; quantity: string | number; revenue: number }) => ({
+        id: course.id,
         name: course.name || 'Unnamed Course',
         quantity: Number(course.quantity),
         revenue: Number(course.revenue)
@@ -305,58 +309,62 @@ export default function AdminDashboard() {
       {/* Charts */}
       <div className='grid gap-4 grid-cols-1 lg:grid-cols-3'>
         <RevenueChart data={filteredRevenueData} chartColors={chartColors} />
-        {processedData.orderStatusData.length > 0 && (
-          <OrderStatusChart data={processedData.orderStatusData} colors={orderStatusColors} />
-        )}
+        <OrderStatusChart data={processedData.orderStatusData} colors={orderStatusColors} />
       </div>
 
       {/* Distribution Chart and Best Selling Product sections */}
       {/* First row - Distribution Charts (Geographic and Age) */}
       <div className='grid gap-6 md:grid-cols-2'>
         {/* Geographic distribution */}
-        {processedData.locationDistribution.length > 0 && (
-          <div>
-            <DistributionChart
-              title='Phân Bố Địa Lý'
-              description='Vị trí khách hàng'
-              data={processedData.locationDistribution}
-              color={chartColors.locationDistribution}
-              icon={MapPin}
-              isVertical={false}
-            />
-          </div>
-        )}
+        <div>
+          <DistributionChart
+            title='Phân Bố Địa Lý'
+            description='Vị trí khách hàng'
+            data={processedData.locationDistribution}
+            color={chartColors.locationDistribution}
+            icon={MapPin}
+            isVertical={false}
+          />
+        </div>
 
         {/* Age distribution */}
-        {processedData.ageDistribution.length > 0 && (
-          <div>
-            <DistributionChart
-              title='Phân Bố Độ Tuổi'
-              description='Độ tuổi khách hàng'
-              data={processedData.ageDistribution}
-              color={chartColors.ageDistribution}
-              icon={UserRound}
-              isVertical={true}
-            />
-          </div>
-        )}
+        <div>
+          <DistributionChart
+            title='Phân Bố Độ Tuổi'
+            description='Độ tuổi khách hàng'
+            data={processedData.ageDistribution}
+            color={chartColors.ageDistribution}
+            icon={UserRound}
+            isVertical={true}
+          />
+        </div>
       </div>
 
       {/* Second row - Best Selling Products and Courses */}
       <div className='grid gap-6 md:grid-cols-2'>
         {/* Best selling physical products */}
-        {processedData.bestSellingProducts.length > 0 && (
-          <div>
-            <BestSellingPhysicalProducts products={processedData.bestSellingProducts} />
-          </div>
-        )}
+        <div>
+          <BestSellingPhysicalProducts
+            products={processedData.bestSellingProducts}
+            onItemClick={(product) => {
+              if (product?.id) {
+                router.push(`${configRoute.admin.product}/${product.id}`)
+              }
+            }}
+          />
+        </div>
 
         {/* Best selling courses */}
-        {processedData.bestSellingCourses.length > 0 && (
-          <div>
-            <BestSellingCourses courses={processedData.bestSellingCourses} />
-          </div>
-        )}
+        <div>
+          <BestSellingCourses
+            courses={processedData.bestSellingCourses}
+            onItemClick={(course) => {
+              if (course?.id) {
+                router.push(`${configRoute.admin.course}/${course.id}`)
+              }
+            }}
+          />
+        </div>
       </div>
 
       <DataNote filledStats={periodStats.filledStats} daysWithRevenue={periodStats.daysWithRevenue} />

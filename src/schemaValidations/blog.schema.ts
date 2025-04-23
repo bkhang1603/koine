@@ -235,6 +235,11 @@ export const getMyBlogsRes = z.object({
   })
 })
 
+export const updateStatusBlogRes = z.object({
+  message: z.string(),
+  statusCode: z.number()
+})
+
 export type BlogsResType = z.TypeOf<typeof BlogsRes>
 
 export type BlogResType = z.TypeOf<typeof BlogRes>
@@ -260,3 +265,5 @@ export type CategoryBlogCreateReqType = z.TypeOf<typeof CategoryBlogCreateReq>
 export type BlogUpdateBodyType = z.TypeOf<typeof blogUpdateBody>
 
 export type GetMyBlogsResType = z.TypeOf<typeof getMyBlogsRes>
+
+export type UpdateStatusBlogResType = z.TypeOf<typeof updateStatusBlogRes>

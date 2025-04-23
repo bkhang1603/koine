@@ -11,7 +11,7 @@ import { Badge } from '@/components/ui/badge'
 import { format } from 'date-fns'
 import { vi } from 'date-fns/locale'
 import { MoreOptions } from '@/components/private/common/more-options'
-import { useBlogDeleteMutation, useMyBlogsQuery } from '@/queries/useBlog'
+import { useBlogDeleteMutation, useMyBlogsQuery, useBlogUpdateStatusMutation } from '@/queries/useBlog'
 import { Skeleton } from '@/components/ui/skeleton'
 import Image from 'next/image'
 import { Button } from '@/components/ui/button'
@@ -41,6 +41,7 @@ function AdminBlog(props: { searchParams: SearchParams }) {
 
   // Thêm mutation và hàm xử lý xóa blog
   const deleteBlogMutation = useBlogDeleteMutation()
+  const updateStatusMutation = useBlogUpdateStatusMutation()
 
   const handleDelete = useCallback(
     async (blogId: string) => {
@@ -56,6 +57,23 @@ function AdminBlog(props: { searchParams: SearchParams }) {
       }
     },
     [deleteBlogMutation]
+  )
+
+  const handleUpdateStatus = useCallback(
+    async (id: string, currentStatus: string) => {
+      try {
+        const newStatus = currentStatus === 'VISIBLE' ? 'HIDDEN' : 'VISIBLE'
+        await updateStatusMutation.mutateAsync({ id, status: newStatus })
+        toast({
+          description: `Bài viết đã được ${newStatus === 'VISIBLE' ? 'hiển thị' : 'ẩn'}`
+        })
+      } catch (error) {
+        handleErrorApi({
+          error
+        })
+      }
+    },
+    [updateStatusMutation]
   )
 
   useEffect(() => {
@@ -157,7 +175,7 @@ function AdminBlog(props: { searchParams: SearchParams }) {
         render: (blog: any) => (
           <div className='flex items-center min-w-[100px]'>
             <Badge variant={blog.status === 'VISIBLE' ? 'green' : 'secondary'} className='w-fit'>
-              {blog.status === 'VISIBLE' ? 'Đã xuất bản' : 'Bản nháp'}
+              {blog.status === 'VISIBLE' ? 'Hiển thị' : 'Ẩn'}
             </Badge>
           </div>
         )
@@ -177,14 +195,13 @@ function AdminBlog(props: { searchParams: SearchParams }) {
               onView={() => router.push(`/admin/blog/${blog.id}`)}
               onEdit={() => router.push(`/admin/blog/${blog.id}/edit`)}
               onDelete={() => handleDelete(blog.id)}
-              onManageComments={() => router.push(`/admin/blog/${blog.id}/comments`)}
-              onPreview={() => window.open(`/knowledge/${blog.slug}`, '_blank')}
+              onUpdateStatusBlog={() => handleUpdateStatus(blog.id, blog.status)}
             />
           </div>
         )
       }
     ],
-    [router, handleDelete]
+    [router, handleDelete, handleUpdateStatus]
   )
 
   const tableData: dataListType = {

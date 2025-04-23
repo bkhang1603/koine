@@ -9,9 +9,6 @@ import { useRouter } from 'next/navigation'
 import Image from 'next/image'
 import { Badge } from '@/components/ui/badge'
 import { formatRole, handleErrorApi } from '@/lib/utils'
-import { Skeleton } from '@/components/ui/skeleton'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Users, UserCheck, UserX } from 'lucide-react'
 import { MoreOptions } from '@/components/private/common/more-options'
 
 function UsersPage(props: { searchParams: SearchParams }) {
@@ -49,11 +46,6 @@ function UsersPage(props: { searchParams: SearchParams }) {
     maxPageSize: 0
   }
   const message = responseData?.payload.message || ''
-  const statistics = {
-    totalUsers: users.length,
-    activeUsers: users.filter((user: any) => user.isActive).length,
-    inactiveUsers: users.filter((user: any) => !user.isActive).length
-  }
 
   // Cấu hình cột cho bảng
   const headerColumn = [
@@ -130,59 +122,6 @@ function UsersPage(props: { searchParams: SearchParams }) {
       <div>
         <h1 className='text-2xl font-bold'>Quản lý người dùng</h1>
         <p className='text-muted-foreground mt-1'>Quản lý danh sách người dùng trong hệ thống</p>
-      </div>
-
-      {/* Stats Cards */}
-      <div className='grid grid-cols-1 md:grid-cols-3 gap-4'>
-        {isLoading ? (
-          // Stats Cards Skeleton
-          [...Array(3)].map((_, i) => (
-            <Card key={i}>
-              <CardHeader className='flex flex-row items-center justify-between pb-2'>
-                <Skeleton className='h-5 w-[120px]' />
-                <Skeleton className='h-5 w-5 rounded-full' />
-              </CardHeader>
-              <CardContent>
-                <Skeleton className='h-9 w-[80px] mb-2' />
-                <Skeleton className='h-4 w-[160px]' />
-              </CardContent>
-            </Card>
-          ))
-        ) : (
-          // Actual Stats Cards
-          <>
-            <Card>
-              <CardHeader className='flex flex-row items-center justify-between pb-2'>
-                <CardTitle className='text-sm font-medium'>Tổng người dùng</CardTitle>
-                <Users className='h-4 w-4 text-muted-foreground' />
-              </CardHeader>
-              <CardContent>
-                <div className='text-2xl font-bold'>{statistics.totalUsers}</div>
-                <p className='text-xs text-muted-foreground'>Số lượng người dùng trong hệ thống</p>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardHeader className='flex flex-row items-center justify-between pb-2'>
-                <CardTitle className='text-sm font-medium'>Người dùng hoạt động</CardTitle>
-                <UserCheck className='h-4 w-4 text-muted-foreground' />
-              </CardHeader>
-              <CardContent>
-                <div className='text-2xl font-bold'>{statistics.activeUsers}</div>
-                <p className='text-xs text-muted-foreground'>Số người dùng đang hoạt động</p>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardHeader className='flex flex-row items-center justify-between pb-2'>
-                <CardTitle className='text-sm font-medium'>Người dùng không hoạt động</CardTitle>
-                <UserX className='h-4 w-4 text-muted-foreground' />
-              </CardHeader>
-              <CardContent>
-                <div className='text-2xl font-bold'>{statistics.inactiveUsers}</div>
-                <p className='text-xs text-muted-foreground'>Số người dùng không hoạt động</p>
-              </CardContent>
-            </Card>
-          </>
-        )}
       </div>
 
       {/* Table */}

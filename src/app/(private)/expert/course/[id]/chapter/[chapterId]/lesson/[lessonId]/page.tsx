@@ -5,6 +5,7 @@ import { useGetLessonQuery, useGetCourseQuery } from '@/queries/useCourse'
 import { Breadcrumb } from '@/components/private/common/breadcrumb'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
+// eslint-disable-next-line no-unused-vars
 import { Clock, FileText, Video, ArrowLeft } from 'lucide-react'
 import { Skeleton } from '@/components/ui/skeleton'
 import Link from 'next/link'
@@ -199,16 +200,6 @@ export default function LessonDetailPage(props: {
         {/* Breadcrumb */}
         <div className='mb-6'>
           <Breadcrumb items={breadcrumbItems} />
-        </div>
-
-        {/* Back and Action Buttons */}
-        <div className='flex items-center justify-between mb-6'>
-          <Button variant='outline' asChild>
-            <Link href={`/expert/course/${params.id}/chapter/${chapter.id}`}>
-              <ArrowLeft className='w-4 h-4 mr-2' />
-              Quay lại chương học
-            </Link>
-          </Button>
         </div>
 
         {/* Main Content Card */}

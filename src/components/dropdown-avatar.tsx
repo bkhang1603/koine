@@ -3,17 +3,15 @@
 import Link from 'next/link'
 
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
-import { Button } from '@/components/ui/button'
 
-import { handleErrorApi, redirectSettingRole, translateRole } from '@/lib/utils'
+import { formatRole, handleErrorApi, redirectSettingRole } from '@/lib/utils'
 import configRoute from '@/config/route'
 import { useAppStore } from '@/components/app-provider'
 import { useAccountProfile } from '@/queries/useAccount'
 import { useLogoutMutation } from '@/queries/useAuth'
 import { useRouter } from 'next/navigation'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
-import { Separator } from '@/components/ui/separator'
-import { ChevronRight, LogOut, MessageCircleQuestion, Settings } from 'lucide-react'
+import { ChevronRight, LogOut, Settings } from 'lucide-react'
 
 export default function DropdownAvatar() {
   const role = useAppStore((state) => state.role)
@@ -34,11 +32,11 @@ export default function DropdownAvatar() {
       icon: <Settings />,
       href: redirectSettingRole(role!)
     },
-    {
-      title: 'Trợ giúp',
-      icon: <MessageCircleQuestion />,
-      href: configRoute.setting
-    },
+    // {
+    //   title: 'Trợ giúp',
+    //   icon: <MessageCircleQuestion />,
+    //   href: configRoute.setting
+    // },
     {
       title: 'Đăng xuất',
       icon: <LogOut />,
@@ -79,13 +77,9 @@ export default function DropdownAvatar() {
 
             <div>
               <p className='font-medium text-base'>{account?.username || account?.email}</p>
-              <p className='text-gray-400 text-xs'>{translateRole(account?.role!)}</p>
+              <p className='text-gray-400 text-xs'>{formatRole(account?.role!)}</p>
             </div>
           </div>
-          <Separator />
-          <Button asChild variant={'custom'} className='w-full'>
-            <Link href={configRoute.home}>Quay trở lại trang chủ</Link>
-          </Button>
         </div>
 
         <div className='flex flex-col mt-4 space-y-2'>

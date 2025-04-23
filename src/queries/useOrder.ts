@@ -91,10 +91,16 @@ export const useCreateRefundOrderMutation = () => {
 }
 
 // get order cho admin
-export const useGetAdminOrdersQuery = (pageSize: number, pageIndex: number, keyword?: string, status?: string) => {
+export const useGetAdminOrdersQuery = (
+  pageSize: number,
+  pageIndex: number,
+  keyword?: string,
+  status?: string,
+  userId?: string
+) => {
   return useQuery({
-    queryKey: ['adminOrders', keyword, status, pageSize, pageIndex],
-    queryFn: () => orderApiRequest.getAdminOrders(pageSize, pageIndex, keyword, status)
+    queryKey: ['adminOrders', keyword, status, pageSize, pageIndex, userId],
+    queryFn: () => orderApiRequest.getAdminOrders(pageSize, pageIndex, keyword, status, userId)
   })
 }
 
@@ -145,5 +151,18 @@ export const useGetReturnOrdersQuery = ({ page_size, page_index }: { page_size: 
   return useQuery({
     queryKey: ['return-orders', page_size, page_index],
     queryFn: () => orderApiRequest.getReturnOrders({ page_size, page_index })
+  })
+}
+
+export const useUpdateRefundRequestMutation = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: orderApiRequest.updateRefundRequest,
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ['refund-requests']
+      })
+    }
   })
 }

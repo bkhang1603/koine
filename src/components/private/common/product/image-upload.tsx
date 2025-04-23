@@ -96,9 +96,6 @@ export function ImageUpload({ form, onFilesChange }: ImageUploadProps) {
                 />
                 <div className='text-sm text-muted-foreground'>
                   <p>Tải lên các hình ảnh cho sản phẩm. Bạn có thể tải nhiều ảnh cùng lúc.</p>
-                  <p className='text-amber-600 font-medium mt-1'>
-                    Hình ảnh sẽ được tải lên khi bạn nhấn nút &quot;Tạo sản phẩm&quot;.
-                  </p>
                 </div>
               </div>
 
@@ -106,9 +103,6 @@ export function ImageUpload({ form, onFilesChange }: ImageUploadProps) {
                 <div className='grid grid-cols-5 gap-4'>
                   {previews.map((url, index) => (
                     <div key={index} className='relative aspect-square group'>
-                      <div className='absolute top-0 right-0 z-10 bg-yellow-400 text-xs px-1 rounded-bl-md'>
-                        Chưa tải lên
-                      </div>
                       <Image
                         src={url}
                         alt={`Hình ảnh sản phẩm ${index + 1}`}

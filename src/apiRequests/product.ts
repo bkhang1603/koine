@@ -114,7 +114,9 @@ const productApiRequest = {
   updateCategoryProduct: (id: string, data: UpdateCategoryProductBodyType) =>
     http.put<UpdateCategoryProductResType>(`/category-products/${id}`, data),
   deleteCategoryProduct: (id: string) => http.delete<DeleteCategoryProductResType>(`/category-products/${id}`),
-  getCategoryProductDetail: (id: string) => http.get<GetCategoryProductDetailResType>(`/category-products/${id}`)
+  getCategoryProductDetail: (id: string) => http.get<GetCategoryProductDetailResType>(`/category-products/${id}`),
+  getProductComments: ({ id, page_index, page_size }: { id: string; page_index: number; page_size: number }) =>
+    http.get<ProductReviewsResType>(`/products/${id}/reviews?page_index=${page_index}&page_size=${page_size}`)
 }
 
 export default productApiRequest

@@ -70,7 +70,6 @@ export default function BlogCategoriesPage() {
     try {
       await createCategoryMutation.mutateAsync(trimmedData)
       toast({
-        title: 'Thành công',
         description: 'Thêm danh mục mới thành công'
       })
       setCreateDialogOpen(false)
@@ -110,7 +109,6 @@ export default function BlogCategoriesPage() {
 
     if (!hasChanges) {
       toast({
-        title: 'Thông báo',
         description: 'Không có thay đổi nào để cập nhật',
         variant: 'default'
       })
@@ -125,7 +123,6 @@ export default function BlogCategoriesPage() {
         data: trimmedData
       })
       toast({
-        title: 'Thành công',
         description: 'Cập nhật danh mục thành công'
       })
       setEditDialogOpen(false)
@@ -143,7 +140,6 @@ export default function BlogCategoriesPage() {
       if (deleteCategoryMutation.isPending) return
       await deleteCategoryMutation.mutateAsync(id)
       toast({
-        title: 'Thành công',
         description: 'Xóa danh mục thành công'
       })
       setDeleteDialogOpen(false)
@@ -252,7 +248,7 @@ export default function BlogCategoriesPage() {
         data={tableData}
         headerColumn={headerColumn}
         bodyColumn={bodyColumn}
-        href={'/manager/blog/categories'}
+        href={'/admin/blog/categories'}
         loading={isLoading}
         showSearch={true}
         searchParamName='keyword'

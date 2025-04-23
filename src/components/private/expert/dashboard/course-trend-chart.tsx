@@ -4,7 +4,7 @@ import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContai
 interface CourseTrendData {
   date: string
   created: number
-  completed: number
+  enrolled: number
 }
 
 interface CourseTrendChartProps {
@@ -41,15 +41,15 @@ export function CourseTrendChart({ data, title, description }: CourseTrendChartP
                 type='monotone'
                 dataKey='created'
                 name='Khóa học tạo mới'
-                stroke='#2563eb'
+                stroke='#3b82f6'
                 activeDot={{ r: 8 }}
                 strokeWidth={2}
               />
               <Line
                 type='monotone'
-                dataKey='completed'
-                name='Khóa học hoàn thành'
-                stroke='#16a34a'
+                dataKey='enrolled'
+                name='Lượt đăng ký'
+                stroke='#22c55e'
                 activeDot={{ r: 8 }}
                 strokeWidth={2}
               />

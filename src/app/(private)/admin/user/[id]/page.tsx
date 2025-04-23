@@ -13,6 +13,7 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { format } from 'date-fns'
 import { vi } from 'date-fns/locale'
 import { Breadcrumb } from '@/components/private/common/breadcrumb'
+import { UserOrders } from '@/components/private/common/user/user-orders'
 
 export default function AdminUserDetail(props: { params: Promise<{ id: string }> }) {
   const params = use(props.params)
@@ -262,6 +263,9 @@ export default function AdminUserDetail(props: { params: Promise<{ id: string }>
           </Card>
         </div>
       </div>
+
+      {/* User Orders */}
+      <UserOrders userId={params.id} href={`/admin/user/${params.id}`} />
     </div>
   )
 }

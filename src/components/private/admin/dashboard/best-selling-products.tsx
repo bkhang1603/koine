@@ -6,16 +6,20 @@ interface Product {
   name: string
   quantity: number | string
   revenue: number
+  id?: string
 }
 
 interface ProductsProps {
   products: Product[]
   title: string
   icon: React.ReactNode
+  // eslint-disable-next-line no-unused-vars
+  onItemClick?: (product: Product) => void
 }
 
 // Common component for rendering a list of products
-function ProductList({ items }: { items: Product[] }) {
+// eslint-disable-next-line no-unused-vars
+function ProductList({ items, onItemClick }: { items: Product[]; onItemClick?: (product: Product) => void }) {
   // Limit to 5 items to match distribution charts
   const displayItems = items.slice(0, 5)
 
@@ -33,7 +37,11 @@ function ProductList({ items }: { items: Product[] }) {
   return (
     <div className='space-y-5'>
       {displayItems.map((item, index) => (
-        <div key={index} className='flex justify-between items-center border-b pb-3'>
+        <div
+          key={index}
+          className='flex justify-between items-center border-b pb-3 cursor-pointer hover:bg-gray-50 rounded p-2 transition-colors relative group'
+          onClick={() => onItemClick?.(item)}
+        >
           <div className='max-w-[70%]'>
             <p className='font-medium truncate'>{item.name}</p>
             <p className='text-sm text-muted-foreground'>Đã bán: {formatQuantity(item.quantity)}</p>
@@ -48,7 +56,7 @@ function ProductList({ items }: { items: Product[] }) {
 }
 
 // Generic product card component
-function ProductCard({ products, title, icon }: ProductsProps) {
+function ProductCard({ products, title, icon, onItemClick }: ProductsProps) {
   // Validate data to prevent NaN errors
   const safeProducts = products.map((product) => ({
     ...product,
@@ -63,40 +71,68 @@ function ProductCard({ products, title, icon }: ProductsProps) {
         {icon}
       </CardHeader>
       <CardContent>
-        <ProductList items={safeProducts} />
+        <ProductList items={safeProducts} onItemClick={onItemClick} />
       </CardContent>
     </Card>
   )
 }
 
 // Physical Products Component
-export function BestSellingPhysicalProducts({ products }: { products: Product[] }) {
+export function BestSellingPhysicalProducts({
+  products,
+  onItemClick
+}: {
+  products: Product[]
+  // eslint-disable-next-line no-unused-vars
+  onItemClick?: (product: Product) => void
+}) {
   return (
     <ProductCard
       products={products}
       title='Sản Phẩm Bán Chạy'
       icon={<Package2 className='h-4 w-4 text-muted-foreground' />}
+      onItemClick={onItemClick}
     />
   )
 }
 
 // Digital Courses Component
-export function BestSellingCourses({ courses }: { courses: Product[] }) {
+export function BestSellingCourses({
+  courses,
+  onItemClick
+}: {
+  courses: Product[]
+  // eslint-disable-next-line no-unused-vars
+  onItemClick?: (course: Product) => void
+}) {
   return (
     <ProductCard
       products={courses}
       title='Khóa Học Bán Chạy'
       icon={<BookOpen className='h-4 w-4 text-muted-foreground' />}
+      onItemClick={onItemClick}
     />
   )
 }
 
 // Legacy component for backward compatibility
-export function BestSellingProducts({ products, courses }: { products: Product[]; courses: Product[] }) {
+export function BestSellingProducts({
+  products,
+  courses,
+  onProductClick,
+  onCourseClick
+}: {
+  products: Product[]
+  courses: Product[]
+  // eslint-disable-next-line no-unused-vars
+  onProductClick?: (product: Product) => void
+  // eslint-disable-next-line no-unused-vars
+  onCourseClick?: (course: Product) => void
+}) {
   return (
     <div className='grid gap-4 md:grid-cols-2'>
-      <BestSellingPhysicalProducts products={products} />
-      <BestSellingCourses courses={courses} />
+      <BestSellingPhysicalProducts products={products} onItemClick={onProductClick} />
+      <BestSellingCourses courses={courses} onItemClick={onCourseClick} />
     </div>
   )
 }
