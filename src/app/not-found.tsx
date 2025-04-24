@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { motion } from 'framer-motion'
 import { Button } from '@/components/ui/button'
 import { ArrowLeft, Home, SearchX } from 'lucide-react'
+import configRoute from '@/config/route'
 
 export default function NotFoundPage() {
   return (
@@ -89,7 +90,7 @@ export default function NotFoundPage() {
                     size='lg'
                     className='h-16 px-10 text-lg rounded-full bg-gradient-to-r from-indigo-500 to-indigo-600 hover:from-indigo-600 hover:to-indigo-700 text-white shadow-lg shadow-indigo-500/20 hover:shadow-indigo-500/30 transition-all duration-300 group'
                   >
-                    <Link href='/'>
+                    <Link href={configRoute.home}>
                       <Home className='w-6 h-6 mr-2' />
                       Về trang chủ
                     </Link>

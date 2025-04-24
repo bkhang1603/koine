@@ -66,7 +66,7 @@ export default async function RecommendedCourses({ currentCourseId, categoryIds 
             <CarouselContent className='-ml-2 md:-ml-3'>
               {recommendedCourses.map((course) => (
                 <CarouselItem key={course.id} className='pl-2 md:pl-3 basis-1/2 md:basis-1/3 lg:basis-1/5 xl:basis-1/6'>
-                  <Link href={`/course/${course.id}`}>
+                  <Link href={`${configRoute.course}/${course.id}`}>
                     <article className='cursor-pointer group/product h-full'>
                       <div className='w-full aspect-square rounded-lg overflow-hidden relative'>
                         <Image

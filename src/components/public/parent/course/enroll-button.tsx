@@ -8,6 +8,7 @@ import { useActiveCourseMutation, useGetUserCoursesQuery } from '@/queries/useCo
 import { toast } from '@/components/ui/use-toast'
 import { handleErrorApi } from '@/lib/utils'
 import Link from 'next/link'
+import configRoute from '@/config/route'
 
 interface EnrollButtonProps {
   id: string
@@ -46,7 +47,7 @@ export default function EnrollButton({ id, className }: EnrollButtonProps) {
     <div>
       {isEnrolled && (
         <Button className={className} asChild>
-          <Link href={`/learn/${id}`}>
+          <Link href={`${configRoute.learn}/${id}`}>
             <GraduationCap className='w-4 h-4 mr-2' />
             Tiếp tục học
           </Link>

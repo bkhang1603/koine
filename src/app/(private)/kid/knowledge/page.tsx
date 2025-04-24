@@ -10,6 +10,7 @@ import { Input } from '@/components/ui/input'
 import { useState, useEffect, useMemo } from 'react'
 import { motion } from 'framer-motion'
 import { Skeleton } from '@/components/ui/skeleton'
+import configRoute from '@/config/route'
 
 const categories = [
   { name: 'Tất cả', icon: '✨', color: 'slate' },
@@ -264,7 +265,7 @@ function KnowledgePage() {
             .map((_, index) => <BlogCardSkeleton key={index} />)
         ) : filteredBlogs.length > 0 ? (
           filteredBlogs.map((blog) => (
-            <Link href={`/kid/knowledge/${blog.slug}`} key={blog.id}>
+            <Link href={`${configRoute.kid.knowledge}/${blog.slug}`} key={blog.id}>
               <Card className='group h-full hover:shadow-lg transition-all border-none bg-white'>
                 <div className='relative h-48'>
                   <Image src={blog.imageUrl} alt={blog.title} fill className='object-cover rounded-t-lg' />

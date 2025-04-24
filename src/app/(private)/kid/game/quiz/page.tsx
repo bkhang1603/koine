@@ -15,6 +15,7 @@ import {
   DialogTitle,
   DialogFooter
 } from '@/components/ui/dialog'
+import configRoute from '@/config/route'
 
 export default function QuizGamePage() {
   // Lấy 10 câu hỏi ngẫu nhiên khi bắt đầu game
@@ -112,7 +113,7 @@ export default function QuizGamePage() {
           </div>
         </div>
 
-        <Link href='/kid/game'>
+        <Link href={configRoute.kid.game}>
           <Button variant='ghost' className='text-slate-600 hover:text-emerald-600'>
             <ArrowLeft className='h-5 w-5 mr-2' />
             Quay lại

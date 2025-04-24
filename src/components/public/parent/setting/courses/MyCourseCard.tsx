@@ -5,6 +5,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
+import configRoute from '@/config/route'
 
 interface CourseCardProps {
   course: {
@@ -52,7 +53,7 @@ export function MyCourseCard({ course }: CourseCardProps) {
 
   return (
     <Card className='group relative overflow-hidden border-0 bg-white transition-all hover:shadow-lg hover:shadow-gray-200/80'>
-      <Link href={`/learn/${course.id}`} className='block'>
+      <Link href={`${configRoute.learn}/${course.id}`} className='block'>
         {/* Course Image Container */}
         <div className='relative'>
           <div className='aspect-[4/3] relative overflow-hidden'>
@@ -115,7 +116,7 @@ export function MyCourseCard({ course }: CourseCardProps) {
         <Progress value={course.completionRate} className='h-1.5 bg-gray-100' />
 
         {/* Continue Learning Button */}
-        <Link href={`/learn/${course.id}`} className='block mt-3'>
+        <Link href={`${configRoute.learn}/${course.id}`} className='block mt-3'>
           <Button
             className={cn(
               'w-full gap-2 font-medium',

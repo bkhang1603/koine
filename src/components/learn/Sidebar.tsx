@@ -4,6 +4,7 @@ import { QuizItem } from '@/components/learn/QuizItem'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { Progress } from '@/components/ui/progress'
+import configRoute from '@/config/route'
 import { ArrowLeft, BookOpen } from 'lucide-react'
 import Link from 'next/link'
 
@@ -34,7 +35,7 @@ export const Sidebar = ({
     <div className='space-y-5'>
       {forKid && (
         <Button variant='outline' size='lg' className='w-full rounded-xl gap-2 bg-white/50 backdrop-blur-sm' asChild>
-          <Link href={`/kid/course/${courseId}`}>
+          <Link href={`${configRoute.kid.course}/${courseId}`}>
             <ArrowLeft className='h-4 w-4' /> Quay lại khóa học
           </Link>
         </Button>

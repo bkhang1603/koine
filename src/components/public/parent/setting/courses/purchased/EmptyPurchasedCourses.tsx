@@ -2,6 +2,7 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { ShoppingCart, Search } from 'lucide-react'
 import Link from 'next/link'
+import configRoute from '@/config/route'
 
 interface EmptyPurchasedCoursesProps {
   isEmpty: boolean
@@ -62,7 +63,7 @@ export function EmptyPurchasedCourses({ isEmpty, searchTerm, filterMode }: Empty
           Bạn chưa mua khóa học nào. Hãy khám phá danh sách khóa học để tìm nội dung phù hợp với bạn.
         </p>
         <Button asChild variant='outline' className='shadow-sm border-gray-200 hover:border-primary/20'>
-          <Link href='/courses'>
+          <Link href={configRoute.course}>
             <Search className='h-3.5 w-3.5 mr-2' />
             Khám phá khóa học
           </Link>

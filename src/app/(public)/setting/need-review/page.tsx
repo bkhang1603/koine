@@ -14,6 +14,7 @@ import { useGetListOrderNeedReview, useGetMyOrdersReviews } from '@/queries/useA
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
+import configRoute from '@/config/route'
 
 interface BaseReviewItem {
   orderDetailId: string
@@ -333,7 +334,7 @@ function NeedReviewPage() {
                           {/* Footer with buttons */}
                           <div className='mt-4 pt-3 border-t border-gray-100 flex justify-between items-center'>
                             <Button variant='outline' size='sm' asChild>
-                              <Link href={`/setting/need-review/${item.orderId}`}>Xem chi tiết</Link>
+                              <Link href={`${configRoute.setting.review}/${item.orderId}`}>Xem chi tiết</Link>
                             </Button>
 
                             {!isReviewedItem && (

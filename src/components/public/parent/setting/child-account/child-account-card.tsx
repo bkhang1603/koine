@@ -2,6 +2,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent } from '@/components/ui/card'
 import { Progress } from '@/components/ui/progress'
+import configRoute from '@/config/route'
 import { GraduationCap, ChevronRight } from 'lucide-react'
 import Link from 'next/link'
 
@@ -29,7 +30,7 @@ export function ChildAccountCard({ account }: ChildAccountCardProps) {
     .slice(0, 2)
 
   return (
-    <Link href={`/setting/child-account/${account.childId}`}>
+    <Link href={`${configRoute.setting.childAccount}/${account.childId}`}>
       <Card
         className='overflow-hidden border-gray-100 hover:border-primary/20 transition-all duration-300 
                      hover:shadow-md group'

@@ -18,6 +18,7 @@ import { useResendOTPMutation, useSendOTPMutation } from '@/queries/useAuth'
 import { useAppStore } from '@/components/app-provider'
 import { handleErrorApi } from '@/lib/utils'
 import { toast } from '@/components/ui/use-toast'
+import configRoute from '@/config/route'
 
 // Tạo schema cho form OTP
 const otpSchema = z.object({
@@ -269,7 +270,7 @@ export default function OTPPage() {
       <div className='container relative flex justify-center items-center min-h-screen'>
         {/* Logo ở góc trên bên trái */}
         <div className='absolute top-6 left-6'>
-          <Link href='/'>
+          <Link href={configRoute.home}>
             <Image src={icons.logo} alt='logo' width={100} height={36} className='object-contain' />
           </Link>
         </div>
@@ -439,7 +440,7 @@ export default function OTPPage() {
                         asChild
                         className='w-full h-12 rounded-full bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white shadow-lg shadow-green-200/50 transition-all duration-300 font-medium'
                       >
-                        <Link href='/'>Trở về trang chủ</Link>
+                        <Link href={configRoute.home}>Trở về trang chủ</Link>
                       </Button>
                     </motion.div>
                   </div>
@@ -482,7 +483,7 @@ export default function OTPPage() {
                           asChild
                           className='w-full h-12 rounded-full bg-gradient-to-r from-red-500 to-rose-600 hover:from-red-600 hover:to-rose-700 text-white shadow-lg shadow-red-200/50 transition-all duration-300 font-medium'
                         >
-                          <Link href='/contact'>Liên hệ hỗ trợ</Link>
+                          <Link href={configRoute.contact}>Liên hệ hỗ trợ</Link>
                         </Button>
                       </div>
                     </motion.div>

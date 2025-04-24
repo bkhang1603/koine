@@ -7,6 +7,7 @@ import { Badge } from '@/components/ui/badge'
 import { Separator } from '@/components/ui/separator'
 import { ArrowLeft, Calendar, RefreshCcw, Receipt, User, CheckCircle2, XCircle, CircleDot } from 'lucide-react'
 import Link from 'next/link'
+import configRoute from '@/config/route'
 
 interface RefundItem {
   id: string
@@ -101,7 +102,7 @@ export default function RefundDetailPage(props: { params: Promise<{ id: string }
     <div className='container max-w-7xl mx-auto py-6 space-y-6'>
       {/* Back button */}
       <Button variant='ghost' asChild>
-        <Link href='/setting/refund' className='flex items-center gap-2'>
+        <Link href={configRoute.setting.refund} className='flex items-center gap-2'>
           <ArrowLeft className='h-4 w-4' />
           Quay lại danh sách
         </Link>

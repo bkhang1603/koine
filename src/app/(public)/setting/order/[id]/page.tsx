@@ -88,7 +88,7 @@ export default function OrderDetailPage(props: { params: Promise<{ id: string }>
           <p className='text-gray-500'>Đơn hàng không tồn tại hoặc đã bị xóa</p>
         </div>
         <Button variant='outline' asChild>
-          <Link href='/setting/order'>Quay lại danh sách đơn hàng</Link>
+          <Link href={configRoute.setting.order}>Quay lại danh sách đơn hàng</Link>
         </Button>
       </div>
     )

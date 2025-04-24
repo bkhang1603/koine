@@ -6,6 +6,7 @@ import { ArrowRight, BookOpen, Clock, Users } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
 import images from '@/assets/images'
+import configRoute from '@/config/route'
 
 const courses = [
   {
@@ -151,7 +152,7 @@ export default function Recommend() {
                       variant='outline'
                       className='w-full rounded-xl border-primary/20 hover:bg-primary/5 group/btn'
                     >
-                      <Link href={`/course`}>
+                      <Link href={configRoute.course}>
                         Xem chi tiết
                         <ArrowRight className='w-4 h-4 ml-2 group-hover/btn:translate-x-1 transition-transform' />
                       </Link>
@@ -171,7 +172,7 @@ export default function Recommend() {
           className='text-center mt-12'
         >
           <Button asChild size='lg' className='rounded-full px-8 group'>
-            <Link href='/course'>
+            <Link href={configRoute.course}>
               Xem tất cả khóa học
               <ArrowRight className='w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform' />
             </Link>

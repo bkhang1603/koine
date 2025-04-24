@@ -10,6 +10,7 @@ import { UserCourseProgressResType } from '@/schemaValidations/course.schema'
 import { Breadcrumb } from '@/components/learn/Breadcrumb'
 import { LoadingSkeletonForKid } from '@/components/learn/LoadingSkeletonForKid'
 import { LearnPageContent } from '@/components/learn/LearnPageContent'
+import configRoute from '@/config/route'
 
 type Lesson = UserCourseProgressResType['data']['chapters'][0]['lessons'][0]
 
@@ -133,7 +134,7 @@ function LearnPage(props: { params: Promise<{ courseId: string }> }) {
           <h3 className='text-lg font-medium text-gray-900'>Không tìm thấy khóa học</h3>
           <p className='text-gray-500'>Khóa học không tồn tại hoặc đã bị xóa</p>
           <Button asChild>
-            <Link href='/kid/course'>Quay lại danh sách khóa học</Link>
+            <Link href={configRoute.kid.course}>Quay lại danh sách khóa học</Link>
           </Button>
         </div>
       </div>

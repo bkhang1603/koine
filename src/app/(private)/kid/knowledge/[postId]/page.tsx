@@ -9,6 +9,7 @@ import Link from 'next/link'
 import { use } from 'react'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Home, ChevronRight } from 'lucide-react'
+import configRoute from '@/config/route'
 
 function KnowledgeDetailPage(props: { params: Promise<{ postId: string }> }) {
   const params = use(props.params)
@@ -19,12 +20,15 @@ function KnowledgeDetailPage(props: { params: Promise<{ postId: string }> }) {
   // Breadcrumb component
   const Breadcrumb = () => (
     <div className='mb-6 flex items-center gap-1 text-sm'>
-      <Link href='/kid' className='flex items-center gap-1 text-gray-500 hover:text-primary transition-colors'>
+      <Link
+        href={configRoute.kid.dashboard}
+        className='flex items-center gap-1 text-gray-500 hover:text-primary transition-colors'
+      >
         <Home className='h-4 w-4' />
         <span className='hidden sm:inline'>Trang chính</span>
       </Link>
       <ChevronRight className='h-4 w-4 text-gray-400' />
-      <Link href='/kid/knowledge' className='text-gray-500 hover:text-primary transition-colors'>
+      <Link href={configRoute.kid.knowledge} className='text-gray-500 hover:text-primary transition-colors'>
         Kiến thức
       </Link>
       {!isLoading && blog && (
@@ -48,7 +52,7 @@ function KnowledgeDetailPage(props: { params: Promise<{ postId: string }> }) {
           <h2 className='text-2xl font-bold mb-4'>Không tìm thấy bài viết</h2>
           <p className='text-gray-600 mb-6'>Bài viết này không tồn tại hoặc đã bị xóa</p>
           <Button asChild>
-            <Link href='/kid/knowledge'>Quay lại trang kiến thức</Link>
+            <Link href={configRoute.kid.knowledge}>Quay lại trang kiến thức</Link>
           </Button>
         </div>
       </div>

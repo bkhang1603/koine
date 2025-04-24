@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { Sliders, BookOpen, Users, Target, Clock, ArrowRight } from 'lucide-react'
 import Link from 'next/link'
+import configRoute from '@/config/route'
 
 const features = [
   {
@@ -164,7 +165,7 @@ export default function CustomCourse() {
           className='text-center'
         >
           <Button asChild size='lg' className='h-12 px-6 text-base rounded-full group'>
-            <Link href='/course'>
+            <Link href={configRoute.course}>
               Bắt đầu tùy chỉnh
               <ArrowRight className='w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform' />
             </Link>

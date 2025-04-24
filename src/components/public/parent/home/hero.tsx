@@ -53,7 +53,7 @@ export default function Hero() {
 
               <div className='mt-8 flex flex-col sm:flex-row gap-4'>
                 <Button asChild size='lg' className='h-12 px-6 text-base rounded-full group'>
-                  <Link href='/course'>
+                  <Link href={configRoute.course}>
                     Bắt đầu ngay
                     <ArrowRight className='w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform' />
                   </Link>

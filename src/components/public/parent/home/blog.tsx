@@ -8,6 +8,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { Badge } from '@/components/ui/badge'
 import images from '@/assets/images'
+import configRoute from '@/config/route'
 
 const blogs = [
   {
@@ -99,7 +100,7 @@ export default function Blog() {
         >
           {blogs.map((blog) => (
             <motion.div key={blog.id} variants={itemVariants}>
-              <Link href={`/knowledge`} className='group block'>
+              <Link href={configRoute.knowledge} className='group block'>
                 <Card
                   className='overflow-hidden border-none bg-white hover:shadow-[0_8px_30px_rgb(0,0,0,0.12)] 
                   transition-all duration-500 relative'
@@ -108,7 +109,7 @@ export default function Blog() {
                   <div
                     className='absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500
                     pointer-events-none bg-gradient-to-r from-transparent via-white/10 to-transparent 
-                    -translate-x-full group-hover:translate-x-full transform transition-transform duration-1000'
+                    -translate-x-full group-hover:translate-x-full transform'
                   />
 
                   <div className='relative h-56 overflow-hidden'>
@@ -151,7 +152,7 @@ export default function Blog() {
           className='text-center mt-12'
         >
           <Button size='lg' className='bg-white hover:bg-white/90 text-primary' asChild>
-            <Link href='/knowledge' className='group'>
+            <Link href={configRoute.knowledge} className='group'>
               Xem tất cả bài viết
               <ArrowRight className='w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform' />
             </Link>

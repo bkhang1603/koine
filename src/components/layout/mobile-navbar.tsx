@@ -49,13 +49,13 @@ function MobileNavbar() {
 
       {/* Additional Links */}
       <div className='space-y-2 text-sm text-gray-600'>
-        <Link href='/help' className='block hover:text-primary'>
+        <Link href={configRoute.help} className='block hover:text-primary'>
           Trung tâm hỗ trợ
         </Link>
-        <Link href='/terms' className='block hover:text-primary'>
+        <Link href={configRoute.help} className='block hover:text-primary'>
           Điều khoản sử dụng
         </Link>
-        <Link href='/privacy' className='block hover:text-primary'>
+        <Link href={configRoute.help} className='block hover:text-primary'>
           Chính sách bảo mật
         </Link>
       </div>

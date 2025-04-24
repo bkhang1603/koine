@@ -5,6 +5,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import images from '@/assets/images'
 import icons from '@/assets/icons'
+import configRoute from '@/config/route'
 
 const footerLinks = {
   company: [
@@ -14,10 +15,10 @@ const footerLinks = {
     { label: 'Đối tác', href: '/' }
   ],
   support: [
-    { label: 'FAQs', href: '/help/faq' },
-    { label: 'Chính sách bảo mật', href: '/' },
-    { label: 'Điều khoản sử dụng', href: '/' },
-    { label: 'Hướng dẫn sử dụng', href: '/' }
+    { label: 'FAQs', href: configRoute.help },
+    { label: 'Chính sách bảo mật', href: configRoute.help },
+    { label: 'Điều khoản sử dụng', href: configRoute.help },
+    { label: 'Hướng dẫn sử dụng', href: configRoute.help }
   ],
   contact: [
     { icon: <Phone className='w-5 h-5' />, info: '0934 600 600' },
@@ -38,7 +39,7 @@ export default function Footer() {
           <div className='grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8 lg:gap-12'>
             {/* Brand */}
             <div className='col-span-2 md:col-span-1'>
-              <Link href='/' className='block mb-2'>
+              <Link href={configRoute.home} className='block mb-2'>
                 <Image src={icons.logo} alt='Logo' width={100} height={40} />
               </Link>
               <p className='text-muted-foreground text-sm mb-6'>
@@ -114,10 +115,16 @@ export default function Footer() {
               © {new Date().getFullYear()} Your Company. All rights reserved.
             </p>
             <div className='flex items-center gap-6'>
-              <Link href='/' className='text-sm text-muted-foreground hover:text-primary transition-colors'>
+              <Link
+                href={configRoute.help}
+                className='text-sm text-muted-foreground hover:text-primary transition-colors'
+              >
                 Privacy Policy
               </Link>
-              <Link href='/' className='text-sm text-muted-foreground hover:text-primary transition-colors'>
+              <Link
+                href={configRoute.help}
+                className='text-sm text-muted-foreground hover:text-primary transition-colors'
+              >
                 Terms of Service
               </Link>
             </div>

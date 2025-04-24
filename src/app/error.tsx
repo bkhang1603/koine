@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { motion } from 'framer-motion'
 import { Button } from '@/components/ui/button'
 import { AlertCircle, ArrowLeft, Home } from 'lucide-react'
+import configRoute from '@/config/route'
 
 export default function Error({ error, reset }: { error: Error & { digest?: string }; reset: () => void }) {
   useEffect(() => {
@@ -94,7 +95,7 @@ export default function Error({ error, reset }: { error: Error & { digest?: stri
                     variant='outline'
                     className='h-16 px-10 text-lg rounded-full border-2 border-gray-200 hover:bg-gray-50 hover:border-gray-300 transition-all duration-300'
                   >
-                    <Link href='/'>
+                    <Link href={configRoute.home}>
                       <Home className='w-6 h-6 mr-2' />
                       Về trang chủ
                     </Link>

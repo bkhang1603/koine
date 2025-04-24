@@ -9,6 +9,7 @@ import { Progress } from '@/components/ui/progress'
 import Link from 'next/link'
 import { usePlusGamePointMutation } from '@/queries/useAccount'
 import { toast } from '@/components/ui/use-toast'
+import configRoute from '@/config/route'
 
 const COLORS = [
   { name: 'Đỏ', value: '#ef4444', bgClass: 'bg-red-500' },
@@ -295,7 +296,7 @@ export default function ColorPatternGame() {
             ))}
           </Card>
 
-          <Link href='/kid/game'>
+          <Link href={configRoute.kid.game}>
             <Button variant='ghost' className='text-slate-600 hover:text-rose-600'>
               <ArrowLeft className='h-5 w-5 mr-2' />
               Quay lại
@@ -350,7 +351,7 @@ export default function ColorPatternGame() {
                     </p>
                     <p className='text-slate-500 mb-8'>Đạt tới cấp độ: {level + 1}</p>
                     <div className='flex gap-4 justify-center'>
-                      <Link href='/kid/game'>
+                      <Link href={configRoute.kid.game}>
                         <Button variant='outline' className='flex items-center gap-1'>
                           <ArrowLeft className='h-4 w-4' />
                           Quay lại

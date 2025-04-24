@@ -7,6 +7,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import icons from '@/assets/icons'
 import images from '@/assets/images'
+import configRoute from '@/config/route'
 
 export default function Promo() {
   return (
@@ -41,13 +42,13 @@ export default function Promo() {
 
             <div className='flex flex-col sm:flex-row gap-4'>
               <Button size='lg' asChild>
-                <Link href='/course' className='group'>
+                <Link href={configRoute.course} className='group'>
                   Khám phá khóa học
                   <ArrowRight className='w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform' />
                 </Link>
               </Button>
               <Button size='lg' variant='outline' asChild>
-                <Link href='/contact'>Tư vấn miễn phí</Link>
+                <Link href={configRoute.contact}>Tư vấn miễn phí</Link>
               </Button>
             </div>
           </motion.div>

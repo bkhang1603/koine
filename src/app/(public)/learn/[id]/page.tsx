@@ -188,7 +188,7 @@ function LearnPage(props: { params: Promise<{ id: string }> }) {
                   Đây là bản xem thử của bài học. Để truy cập toàn bộ khóa học, vui lòng ghi danh khóa học.
                 </p>
                 <Button asChild className='w-full'>
-                  <Link href={`/course/${id}`}>Quay lại trang khóa học</Link>
+                  <Link href={`${configRoute.course}/${id}`}>Quay lại trang khóa học</Link>
                 </Button>
               </div>
             </Card>
@@ -226,7 +226,7 @@ function LearnPage(props: { params: Promise<{ id: string }> }) {
                       <h3 className='text-lg font-medium text-gray-900 mb-2'>Không tìm thấy bài học</h3>
                       <p className='text-gray-500 mb-6'>Bài học này không khả dụng hoặc không tồn tại</p>
                       <Button asChild>
-                        <Link href={`/course/${id}`}>Quay lại trang khóa học</Link>
+                        <Link href={`${configRoute.course}/${id}`}>Quay lại trang khóa học</Link>
                       </Button>
                     </div>
                   )}
@@ -241,7 +241,7 @@ function LearnPage(props: { params: Promise<{ id: string }> }) {
                   <div className='flex flex-col sm:flex-row justify-between items-center gap-4'>
                     <p className='text-sm text-muted-foreground'>Để tiếp tục học, hãy ghi danh khóa học</p>
                     <Button asChild>
-                      <Link href={`/course/${id}`}>Ghi danh khóa học</Link>
+                      <Link href={`${configRoute.course}/${id}`}>Ghi danh khóa học</Link>
                     </Button>
                   </div>
                 </div>

@@ -11,6 +11,7 @@ import { useParams } from 'next/navigation'
 import Link from 'next/link'
 import { useUpdateVisibleCourseForChildMutation } from '@/queries/useAccount'
 import { toast } from '@/components/ui/use-toast'
+import configRoute from '@/config/route'
 
 interface CourseProps {
   id: string
@@ -200,7 +201,7 @@ function CourseCard({
           </Button>
 
           <Button variant='outline' className='px-3' asChild>
-            <Link href={`/setting/child-account/detail/${childId}/course/${course.id}`}>
+            <Link href={`${configRoute.setting.childAccount}/detail/${childId}/course/${course.id}`}>
               <LinkIcon className='h-4 w-4' />
             </Link>
           </Button>

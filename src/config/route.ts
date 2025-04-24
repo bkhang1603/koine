@@ -23,7 +23,8 @@ const configRoute = {
     notifications: '/setting/notifications',
     security: '/setting/security',
     childAccount: '/setting/child-account',
-    review: '/setting/need-review'
+    review: '/setting/need-review',
+    refund: '/setting/refund'
   },
   profile: '/profile',
   contentCreator: {

@@ -5,6 +5,7 @@ import { Calendar, Clock, Gift, PlayCircle, Sparkles, Tag, Users2 } from 'lucide
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 import Image from 'next/image'
 import Link from 'next/link'
+import configRoute from '@/config/route'
 
 interface PurchasedCourseCardProps {
   courseItem: {
@@ -175,7 +176,7 @@ export function PurchasedCourseCard({ courseItem, childAccounts }: PurchasedCour
                 ) : status === 'activated' ? (
                   activationType === 'self' ? (
                     <Button asChild className='w-full bg-gradient-to-r from-primary to-primary/90 shadow-sm'>
-                      <Link href={`/learn/${course.id}`}>
+                      <Link href={`${configRoute.learn}/${course.id}`}>
                         <PlayCircle className='w-4 h-4 mr-2' />
                         Vào học ngay
                       </Link>

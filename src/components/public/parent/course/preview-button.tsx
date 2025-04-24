@@ -5,6 +5,7 @@ import { Eye } from 'lucide-react'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 import { useAppStore } from '@/components/app-provider'
 import { useAuthModal } from '@/components/auth/auth-modal-provider'
+import configRoute from '@/config/route'
 
 interface PreviewButtonProps {
   courseId: string
@@ -23,7 +24,7 @@ export default function PreviewButton({ courseId, lessonId }: PreviewButtonProps
       <Tooltip>
         <TooltipTrigger asChild>
           {isAuth ? (
-            <Link href={`/learn/${courseId}?lessonId=${lessonId}&preview=true`} className={buttonClass}>
+            <Link href={`${configRoute.learn}/${courseId}?lessonId=${lessonId}&preview=true`} className={buttonClass}>
               <Eye className='w-3.5 h-3.5' />
               <span>Học thử</span>
             </Link>

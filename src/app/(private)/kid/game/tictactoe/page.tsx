@@ -7,6 +7,7 @@ import Link from 'next/link'
 import { useState, useEffect, useCallback } from 'react'
 import { usePlusGamePointMutation } from '@/queries/useAccount'
 import { toast } from '@/components/ui/use-toast'
+import configRoute from '@/config/route'
 
 type Player = 'X' | 'O'
 type BoardState = (Player | null)[]
@@ -210,7 +211,7 @@ export default function TicTacToeGamePage() {
           </div>
         </div>
 
-        <Link href='/kid/game'>
+        <Link href={configRoute.kid.game}>
           <Button variant='ghost' className='text-slate-600 hover:text-rose-600'>
             <ArrowLeft className='h-5 w-5 mr-2' />
             Quay lại

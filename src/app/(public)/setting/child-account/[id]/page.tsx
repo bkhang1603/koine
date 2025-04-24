@@ -157,7 +157,7 @@ export default function ChildAccountDetailPage(props: { params: Promise<{ id: st
               cập.
             </p>
             <Button asChild>
-              <Link href='/setting/child-account'>Quay lại danh sách tài khoản</Link>
+              <Link href={configRoute.setting.childAccount}>Quay lại danh sách tài khoản</Link>
             </Button>
           </CardContent>
         </Card>

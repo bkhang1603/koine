@@ -1,6 +1,7 @@
 import { Star } from 'lucide-react'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
+import configRoute from '@/config/route'
 
 export function EmptyReview() {
   return (
@@ -13,7 +14,7 @@ export function EmptyReview() {
         Bạn đã đánh giá tất cả sản phẩm và khóa học đã mua. Các sản phẩm mới mua sẽ xuất hiện ở đây.
       </p>
       <Button variant='outline' asChild>
-        <Link href='/products'>Tiếp tục mua sắm</Link>
+        <Link href={configRoute.product}>Tiếp tục mua sắm</Link>
       </Button>
     </div>
   )

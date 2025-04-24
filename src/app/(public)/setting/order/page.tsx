@@ -34,6 +34,7 @@ import { Pagination } from '@/components/pagination'
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area'
 import { OrderStatus, OrderStatusValues } from '@/constants/type'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
+import configRoute from '@/config/route'
 
 // Define a custom type for our extended status options
 type OrderStatusWithAll = (typeof OrderStatusValues)[number] | 'ALL'
@@ -331,7 +332,7 @@ export default function OrderPage() {
                 Hãy khám phá các khóa học và sản phẩm của chúng tôi để bắt đầu học tập và nâng cao kỹ năng của bạn.
               </p>
               <Button asChild>
-                <Link href='/course'>
+                <Link href={configRoute.course}>
                   <ShoppingBasket className='mr-2 h-4 w-4' />
                   Khám phá khóa học
                 </Link>
@@ -365,7 +366,7 @@ export default function OrderPage() {
           orders?.length > 0 &&
           orders.map((order, idx) => (
             <Card key={order?.id || `order-${idx}`}>
-              <Link href={`/setting/order/${order?.id}`}>
+              <Link href={`${configRoute.setting.order}/${order?.id}`}>
                 <CardContent className='p-6'>
                   <div className='space-y-6'>
                     {/* Order Header */}

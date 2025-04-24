@@ -27,6 +27,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/
 import { CoursesDetailSkeleton } from '@/components/public/parent/setting/child-account/detail/course/course-detail-skeleton'
 import { cn } from '@/lib/utils'
 import { useGetCourseDetailForChild } from '@/queries/useAccount'
+import configRoute from '@/config/route'
 
 // Tạo component trang chi tiết khóa học
 export default function ChildCourseDetailPage(props: { params: Promise<{ childId: string; courseId: string }> }) {
@@ -86,7 +87,7 @@ export default function ChildCourseDetailPage(props: { params: Promise<{ childId
             <h3 className='text-xl font-semibold mb-2'>Không tìm thấy thông tin khóa học</h3>
             <p className='text-gray-500 mb-6'>Khóa học không tồn tại hoặc bạn không có quyền truy cập.</p>
             <Button asChild>
-              <Link href={`/setting/child-account/${childId}`}>Quay lại</Link>
+              <Link href={`${configRoute.setting.childAccount}/${childId}`}>Quay lại</Link>
             </Button>
           </Card>
         </div>
@@ -112,11 +113,14 @@ export default function ChildCourseDetailPage(props: { params: Promise<{ childId
       {/* Header với breadcrumb và toolbar */}
       <div className='flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-2'>
         <div className='flex items-center gap-2 text-sm'>
-          <Link href='/setting/child-account' className='text-muted-foreground hover:text-foreground'>
+          <Link href={configRoute.setting.childAccount} className='text-muted-foreground hover:text-foreground'>
             Tài khoản con
           </Link>
           <ChevronRight className='h-4 w-4 text-muted-foreground' />
-          <Link href={`/setting/child-account/${childId}`} className='text-muted-foreground hover:text-foreground'>
+          <Link
+            href={`${configRoute.setting.childAccount}/${childId}`}
+            className='text-muted-foreground hover:text-foreground'
+          >
             Chi tiết
           </Link>
           <ChevronRight className='h-4 w-4 text-muted-foreground' />
