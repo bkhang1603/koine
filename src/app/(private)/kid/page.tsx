@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { Progress } from '@/components/ui/progress'
 import { Skeleton } from '@/components/ui/skeleton'
-import { useCourseByAccount, useSuggestCoursesFree } from '@/queries/useAccount'
+import { useCourseByAccount, useSuggestCoursesFree, useGetChildProfileQuery } from '@/queries/useAccount'
 import { BookOpen, Target, Scroll } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
@@ -16,15 +16,14 @@ import { PlayerCard } from '@/components/private/kid/home/PlayerCard'
 import { AchievementSection } from '@/components/private/kid/home/AchievementSection'
 import { formatLevel } from '@/lib/utils'
 
-// Types
-
 const KidAdventureDashboard = () => {
-  const childProfile = useAppStore((state) => state.childProfile)
   const username = useAppStore((state) => state.username)
   const { data: courseData, isLoading: coursesLoading } = useCourseByAccount({ page_size: 10, page_index: 1 })
   const courses = courseData?.payload.data ?? []
   const { data: suggestCoursesData, isLoading: suggestionsLoading } = useSuggestCoursesFree()
   const suggestCourses = suggestCoursesData?.payload.data ?? []
+  const { data: childProfileData, isLoading: profileLoading } = useGetChildProfileQuery({ enabled: true })
+  const childProfile = childProfileData?.payload.data
 
   const playerName = username?.split(' ')[0] || 'Nhà thám hiểm'
   const totalPoints = childProfile?.totalPoints || 0
@@ -36,7 +35,7 @@ const KidAdventureDashboard = () => {
       <div className='min-h-screen pt-4 pb-16'>
         <PlayerCard
           playerName={playerName}
-          loading={coursesLoading}
+          loading={coursesLoading || profileLoading}
           childProfile={childProfile}
           totalPoints={totalPoints}
         />
@@ -102,7 +101,7 @@ const KidAdventureDashboard = () => {
           ) : courses.length > 0 ? (
             <div className='grid gap-6'>
               {courses.slice(0, 2).map((course) => (
-                <Link href={`/kid/course/${course.id}`} key={course.id}>
+                <Link href={`/kid/course/${course.id}?isEnrolled=true`} key={course.id}>
                   <Card className='border-0 overflow-hidden bg-white/80 backdrop-blur-sm hover:bg-white transition-all shadow-md hover:shadow-lg group'>
                     <div className='relative p-5'>
                       {/* Quest decorator */}
@@ -317,7 +316,7 @@ const KidAdventureDashboard = () => {
         </motion.section>
 
         {/* AchievementSection */}
-        <AchievementSection />
+        <AchievementSection childProfile={childProfile} courses={courses} loading={profileLoading} />
       </div>
     </div>
   )

@@ -82,6 +82,12 @@ export const useActiveCourseMutation = () => {
       queryClient.invalidateQueries({
         queryKey: ['courseProgress']
       })
+      queryClient.invalidateQueries({
+        queryKey: ['course-by-account']
+      })
+      queryClient.invalidateQueries({
+        queryKey: ['suggest-courses-free']
+      })
     }
   })
 }

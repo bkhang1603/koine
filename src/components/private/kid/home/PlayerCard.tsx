@@ -72,12 +72,12 @@ export const PlayerCard = ({ playerName, loading, childProfile, totalPoints }: P
                 </div>
                 <span className='text-sm font-medium text-blue-700'>{totalPoints} điểm</span>
               </div>
-              <div className='flex items-center gap-2 bg-purple-50 px-3 py-1.5 rounded-full'>
+              {/* <div className='flex items-center gap-2 bg-purple-50 px-3 py-1.5 rounded-full'>
                 <div className='w-6 h-6 bg-purple-100 rounded-full flex items-center justify-center'>
                   <Crown className='w-4 h-4 text-purple-600' />
                 </div>
                 <span className='text-sm font-medium text-purple-700'>{childProfile?.streak || 0} ngày liên tiếp</span>
-              </div>
+              </div> */}
             </div>
           </div>
 

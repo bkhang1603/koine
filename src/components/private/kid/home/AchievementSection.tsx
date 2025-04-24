@@ -4,8 +4,31 @@ import { motion } from 'framer-motion'
 import { Card } from '@/components/ui/card'
 import { Progress } from '@/components/ui/progress'
 import { Medal, Star, Trophy, Crown, Target, Zap, Gift, ArrowRight, BookOpen } from 'lucide-react'
-import { useAppStore } from '@/components/app-provider'
-import { useCourseByAccount } from '@/queries/useAccount'
+
+interface ChildProfile {
+  id: string
+  firstName: string
+  lastName: string
+  dob: string
+  gender: string
+  avatarUrl: string
+  level: string
+  totalCourses: number
+  totalLearningTimes: number
+  totalPoints: number
+}
+
+interface Course {
+  id: string
+  title: string
+  description?: string
+  imageUrl?: string
+  level?: string
+  completionRate?: number
+  totalLesson?: number
+  totalLessonFinished?: number
+  categories?: Array<{ id: string; name: string }>
+}
 
 interface AchievementCardProps {
   title: string
@@ -15,6 +38,12 @@ interface AchievementCardProps {
   color: string
   icon: React.ReactNode
   isLocked?: boolean
+}
+
+interface AchievementSectionProps {
+  childProfile?: ChildProfile
+  courses: Course[]
+  loading?: boolean
 }
 
 const AchievementCard = ({ title, description, progress, reward, color, icon, isLocked }: AchievementCardProps) => (
@@ -65,11 +94,7 @@ const AchievementCard = ({ title, description, progress, reward, color, icon, is
   </Card>
 )
 
-export const AchievementSection = () => {
-  const childProfile = useAppStore((state) => state.childProfile)
-  const { data: courseData } = useCourseByAccount({ page_size: 10, page_index: 1 })
-  const courses = courseData?.payload.data ?? []
-
+export const AchievementSection = ({ childProfile, courses }: AchievementSectionProps) => {
   const totalPoints = childProfile?.totalPoints || 0
   const totalCourses = childProfile?.totalCourses || 0
   const completedCourses = courses.filter((course) => (course.completionRate || 0) >= 100).length
@@ -79,6 +104,13 @@ export const AchievementSection = () => {
 
   // Calculate the highest completion rate for a course
   const highestCompletionRate = Math.max(0, ...courses.map((course) => course.completionRate || 0))
+
+  // Tính điểm cho cấp độ tiếp theo cấp 1 khi đạt đến 100, cấp 2 khi đạt đến 500, cấp cuối là 1000 trở lên. Tính bằng cách lấy điểm yêu cầu của cấp tiếp theo trừ đi điểm hiện tại
+  const nextLevelPoints = () => {
+    if (1000 > totalPoints && totalPoints >= 500) return 1000 - totalPoints
+    if (500 > totalPoints && totalPoints >= 100) return 500 - totalPoints
+    return 100 - totalPoints
+  }
 
   // Dynamic achievements based on user data
   const achievements = [
@@ -149,7 +181,7 @@ export const AchievementSection = () => {
             <div className='bg-gradient-to-r from-amber-50 to-white px-4 py-2 rounded-xl'>
               <div className='flex items-center gap-2'>
                 <Target className='w-4 h-4 text-amber-500' />
-                <span className='text-sm font-medium text-slate-700'>{totalPoints + 1000} điểm</span>
+                <span className='text-sm font-medium text-slate-700'>{nextLevelPoints()} điểm</span>
               </div>
               <div className='text-xs text-slate-600'>Cấp độ tiếp theo</div>
             </div>
