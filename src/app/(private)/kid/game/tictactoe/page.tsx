@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { ArrowLeft, RefreshCw, Swords, Trophy, X, CircleIcon as Circle, Star } from 'lucide-react'
 import Link from 'next/link'
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { usePlusGamePointMutation } from '@/queries/useAccount'
 import { toast } from '@/components/ui/use-toast'
 import configRoute from '@/config/route'
@@ -82,6 +82,12 @@ export default function TicTacToeGamePage() {
   const [draws, setDraws] = useState(0)
   const [gamePoints, setGamePoints] = useState(0)
   const [pointsAwarded, setPointsAwarded] = useState(false)
+  const [consecutiveWins, setConsecutiveWins] = useState(0)
+
+  // Use a ref to track game state changes
+  const gameStateRef = useRef({
+    resultProcessed: false
+  })
 
   const plusGamePointMutation = usePlusGamePointMutation()
 
@@ -114,18 +120,23 @@ export default function TicTacToeGamePage() {
   // Check for winner after each move
   useEffect(() => {
     const result = checkWinner(board)
-    if (result) {
+
+    // Only process result if it exists and hasn't been processed yet for this game
+    if (result && !gameStateRef.current.resultProcessed) {
       setWinner(result)
+      gameStateRef.current.resultProcessed = true
 
       if (result === 'X') {
-        // Khi người chơi thắng
+        // Player wins
         setXWins((prev) => prev + 1)
-        // Cộng điểm dựa trên số lần thắng liên tiếp (giảm từ 20 xuống 2)
-        const newPoints = 2
-        setGamePoints((prev) => prev + newPoints)
+        setConsecutiveWins((prev) => prev + 1)
 
-        // Cập nhật điểm vào hệ thống
+        // Award points if not already awarded for this game
         if (!pointsAwarded) {
+          // Fixed points amount - consistent 2 points per win
+          const newPoints = 2
+          setGamePoints((prev) => prev + newPoints)
+
           plusGamePointMutation.mutate(
             { point: newPoints },
             {
@@ -147,12 +158,15 @@ export default function TicTacToeGamePage() {
           )
         }
       } else if (result === 'O') {
+        // AI wins - reset consecutive wins counter
         setOWins((prev) => prev + 1)
+        setConsecutiveWins(0)
       } else {
+        // Draw - maintain consecutive wins counter
         setDraws((prev) => prev + 1)
       }
     }
-  }, [board, plusGamePointMutation, pointsAwarded])
+  }, [board, plusGamePointMutation, pointsAwarded, consecutiveWins])
 
   // AI's turn
   useEffect(() => {
@@ -176,6 +190,8 @@ export default function TicTacToeGamePage() {
     setCurrentPlayer('X')
     setWinner(null)
     setPointsAwarded(false)
+    // Reset the result processed flag for the new game
+    gameStateRef.current.resultProcessed = false
   }
 
   const renderCell = (index: number) => {
@@ -316,7 +332,9 @@ export default function TicTacToeGamePage() {
                     )}
                   </div>
                   {winner === 'X' && pointsAwarded && (
-                    <div className='mb-4 p-2 bg-rose-50 rounded text-rose-600 text-sm font-medium'>+10 điểm game</div>
+                    <div className='mb-4 p-2 bg-rose-50 rounded text-rose-600 text-sm font-medium'>
+                      +2 điểm game ({consecutiveWins} thắng liên tiếp)
+                    </div>
                   )}
                 </div>
               )}
