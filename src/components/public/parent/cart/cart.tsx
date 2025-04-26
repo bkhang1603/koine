@@ -41,7 +41,7 @@ export default function Cart() {
   const setPickAddress = useAppStore((state) => state.setPickAddress)
   const setCheckoutData = useAppStore((state) => state.setCheckoutData)
 
-  const { data, isLoading } = useCartDetailQuery()
+  const { data, isLoading } = useCartDetailQuery({})
   const updateMutation = useCartDetailUpdateMutation()
   const deleteCartDetailMutation = useCartDetailDeleteListMutation()
   const deleteMultipleCartMutation = useCartDetailDeleteMultipleMutation()

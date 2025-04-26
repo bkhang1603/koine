@@ -13,36 +13,15 @@ import { useAppStore } from '@/components/app-provider'
 import { useGetChatForUser, useStartChat, useGetChatMessages } from '@/queries/useChat'
 import { getAccessTokenFromLocalStorage } from '@/lib/utils'
 import socket from '@/lib/socket'
+import { ChatForUserType, ChatMessageDataType } from '@/schemaValidations/chat.schema'
 
-// Type for chat room
-interface ChatRoom {
-  id: string
-  name: string
-  imageUrl: string
-  isGroup: boolean
-  isClose: boolean
-  isDeleted: boolean
-  createdAt: string
-  updatedAt: string
-  unreadCount?: number
-}
+// Type alias for a single message element
+type ChatMessageElement = ChatMessageDataType['messages'][number]
 
-// Message type
-interface Message {
-  id: string
-  content: string
-  attachments: string[]
-  isRead: boolean
-  senderId: string
-  roomId: string
-  sender: {
-    id: string
-    username: string
-    name: string
-    avatarUrl: string
-  }
-  createdAt: string
-  updatedAt: string
+// Extended type to add fields we need for UI display
+interface ExtendedChatMessage extends ChatMessageElement {
+  isRead?: boolean
+  createdAt?: string
 }
 
 const ChatSupportButton = () => {
@@ -61,10 +40,10 @@ const ChatSupportButton = () => {
   const startChatMutation = useStartChat()
 
   // Parse chat data safely
-  const chatRoom = useMemo(() => (chatData?.payload?.data || null) as ChatRoom | null, [chatData?.payload?.data])
+  const chatRoom = useMemo(() => (chatData?.payload?.data || null) as ChatForUserType | null, [chatData?.payload?.data])
   const isChatClosed = useMemo(() => chatRoom?.isClose || false, [chatRoom])
   const isChatEmpty = useMemo(() => chatData === null || chatData?.payload?.data === null, [chatData])
-  const unreadCount = useMemo(() => chatRoom?.unreadCount || 0, [chatRoom])
+  const unreadCount = useMemo(() => (chatRoom as any)?.unreadCount || 0, [chatRoom])
 
   // Get chat messages using the separate hook
   const {
@@ -80,7 +59,32 @@ const ChatSupportButton = () => {
   // Parse messages safely
   const messages = useMemo(() => {
     if (!messagesData?.payload?.data?.messages) return []
-    return messagesData.payload.data.messages as Message[]
+
+    return messagesData.payload.data.messages
+      .map((msg: any) => {
+        if (!msg) return null
+
+        return {
+          id: msg.id || '',
+          content: msg.content || '',
+          senderId: msg.senderId || '',
+          roomId: msg.roomId || '',
+          sender: {
+            id: msg.sender?.id || '',
+            username: msg.sender?.username || '',
+            createdAt: msg.sender?.createdAt || new Date().toISOString(),
+            userDetail: {
+              firstName: msg.sender?.userDetail?.firstName || '',
+              lastName: msg.sender?.userDetail?.lastName || '',
+              avatarUrl: msg.sender?.userDetail?.avatarUrl || ''
+            }
+          },
+          // Add UI-specific fields
+          isRead: msg.isRead || false,
+          createdAt: msg.createdAt || msg.sender?.createdAt || new Date().toISOString()
+        }
+      })
+      .filter(Boolean) as ExtendedChatMessage[]
   }, [messagesData])
 
   // Check viewport size
@@ -238,11 +242,15 @@ const ChatSupportButton = () => {
   }
 
   // Determine if we should show the date separator
-  const shouldShowDateSeparator = (message: Message, index: number) => {
+  const shouldShowDateSeparator = (message: ExtendedChatMessage, index: number) => {
     if (index === 0) return true
 
-    const currentDate = new Date(message.createdAt)
-    const prevDate = new Date(messages[index - 1].createdAt)
+    // Safely access previous message
+    const prevMessage = messages[index - 1]
+    if (!prevMessage || !message) return false
+
+    const currentDate = new Date(message.createdAt || message.sender?.createdAt || new Date())
+    const prevDate = new Date(prevMessage.createdAt || prevMessage.sender?.createdAt || new Date())
 
     return (
       currentDate.getDate() !== prevDate.getDate() ||
@@ -252,11 +260,13 @@ const ChatSupportButton = () => {
   }
 
   // Group messages by sender for better UI
-  const getMessageGroupClass = (message: Message, index: number) => {
-    const isUser = message.senderId === user?.id
+  const getMessageGroupClass = (message: ExtendedChatMessage, index: number) => {
+    if (!message || !user) return 'justify-start mt-3'
+
+    const isUser = message.senderId === user.id
     const classes = isUser ? 'justify-end' : 'justify-start'
 
-    if (index > 0 && messages[index - 1].senderId === message.senderId) {
+    if (index > 0 && messages[index - 1]?.senderId === message.senderId) {
       return `${classes} mt-1`
     }
 
@@ -370,19 +380,23 @@ const ChatSupportButton = () => {
                             </p>
                           </div>
                         ) : (
-                          messages.map((msg: Message, index: number) => (
-                            <div key={msg.id || index}>
+                          messages.map((msg: ExtendedChatMessage, index: number) => (
+                            <div key={msg?.id || index}>
                               {shouldShowDateSeparator(msg, index) && (
                                 <div className='flex justify-center my-4'>
                                   <span className='text-xs bg-gray-200 text-gray-600 px-3 py-1 rounded-full'>
-                                    {format(new Date(msg.createdAt), 'dd MMMM yyyy', {
-                                      locale: vi
-                                    })}
+                                    {format(
+                                      new Date(msg?.createdAt || msg?.sender?.createdAt || new Date()),
+                                      'dd MMMM yyyy',
+                                      {
+                                        locale: vi
+                                      }
+                                    )}
                                   </span>
                                 </div>
                               )}
                               <div className={`flex ${getMessageGroupClass(msg, index)}`}>
-                                {msg.senderId !== user?.id && (
+                                {msg?.senderId !== user?.id && (
                                   <Avatar className='h-8 w-8 mr-2 mt-0.5 flex-shrink-0'>
                                     <AvatarImage src={chatRoom?.imageUrl} />
                                     <AvatarFallback className='bg-primary/10 text-primary'>
@@ -392,22 +406,22 @@ const ChatSupportButton = () => {
                                 )}
                                 <div
                                   className={`max-w-[80%] px-4 py-2.5 rounded-2xl ${
-                                    msg.senderId === user?.id
+                                    msg?.senderId === user?.id
                                       ? 'bg-primary text-white rounded-tr-none'
                                       : 'bg-white border border-gray-100 text-gray-800 rounded-tl-none shadow-sm'
                                   }`}
                                 >
                                   <p className='text-sm whitespace-pre-wrap break-words leading-relaxed'>
-                                    {msg.content}
+                                    {msg?.content}
                                   </p>
                                   <div
                                     className={`flex justify-end mt-1 text-[10px] ${
-                                      msg.senderId === user?.id ? 'text-white/70' : 'text-gray-500'
+                                      msg?.senderId === user?.id ? 'text-white/70' : 'text-gray-500'
                                     }`}
                                   >
-                                    {formatMessageDate(msg.createdAt)}
-                                    {msg.senderId === user?.id && (
-                                      <span className='ml-1'>{msg.isRead ? '✓✓' : '✓'}</span>
+                                    {formatMessageDate(msg?.createdAt || msg?.sender?.createdAt || '')}
+                                    {msg?.senderId === user?.id && (
+                                      <span className='ml-1'>{msg?.isRead ? '✓✓' : '✓'}</span>
                                     )}
                                   </div>
                                 </div>

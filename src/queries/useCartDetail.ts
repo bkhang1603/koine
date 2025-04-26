@@ -1,10 +1,11 @@
 import cartDetailApiRequest from '@/apiRequests/cart-detail'
 import { useQueryClient, useMutation, useQuery } from '@tanstack/react-query'
 
-export const useCartDetailQuery = () => {
+export const useCartDetailQuery = ({ enabled }: { enabled?: boolean }) => {
   return useQuery({
     queryKey: ['cartDetails'],
-    queryFn: cartDetailApiRequest.getCart
+    queryFn: cartDetailApiRequest.getCart,
+    enabled
   })
 }
 

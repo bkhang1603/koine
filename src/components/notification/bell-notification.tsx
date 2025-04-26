@@ -20,8 +20,12 @@ import { useCartDetailQuery } from '@/queries/useCartDetail'
 
 function BellNotification() {
   const user = useAppStore((state) => state.user)
+  const role = useAppStore((state) => state.role)
+
   const { data, isLoading, refetch } = useGetAccountNotifications({ page_index: 1, page_size: 100 })
-  const { refetch: refetchCart } = useCartDetailQuery()
+  const { refetch: refetchCart } = useCartDetailQuery({
+    enabled: !!role && role === 'ADULT'
+  })
   const notifications = data?.payload.data || []
   const updateNotificationsMutation = useUpdateAccountNotificationsMutation()
   const token = getAccessTokenFromLocalStorage()

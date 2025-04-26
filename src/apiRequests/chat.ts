@@ -12,7 +12,7 @@ import {
 const chatApiRequest = {
   getChats: () => http.get<ChatDataResType>('/chats'),
   getChatMessages: (id: string, limit: number) =>
-    http.get<ChatMessageDataResType>(`/chats/rooms/${id}/messages?limit=${limit}&sort=desc&sortBy=createdAt`),
+    http.get<ChatMessageDataResType>(`/chats/rooms/${id}/messages?limit=${limit}`),
   getChatForUser: () => http.get<ChatForUserResType>('/chats/support-request'),
   createChatForUser: (body: CreateChatForUserBodyType) =>
     http.post<CreateChatForUserBodyResType>('/chats/support-request', body),

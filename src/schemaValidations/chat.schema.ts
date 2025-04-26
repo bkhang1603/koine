@@ -21,18 +21,18 @@ export const ChatMessageData = z.object({
     z.object({
       id: z.string(),
       content: z.string(),
-      attachments: z.array(z.string()),
-      isRead: z.boolean(),
       senderId: z.string(),
       roomId: z.string(),
       sender: z.object({
         id: z.string(),
+        userDetail: z.object({
+          avatarUrl: z.string(),
+          firstName: z.string(),
+          lastName: z.string()
+        }),
         username: z.string(),
-        name: z.string(),
-        avatarUrl: z.string()
-      }),
-      createdAt: z.string(),
-      updatedAt: z.string()
+        createdAt: z.string()
+      })
     })
   ),
   hasMore: z.boolean()
@@ -79,14 +79,14 @@ export const SupporterChatRoomListRes = z.object({
       isDeleted: z.boolean(),
       createdAt: z.string(),
       updatedAt: z.string(),
-      id: z.string().uuid(),
+      id: z.string(),
       name: z.string(),
       imageUrl: z.string().nullable(),
       isGroup: z.boolean(),
       isClose: z.boolean(),
       members: z.array(
         z.object({
-          id: z.string().uuid(),
+          id: z.string(),
           username: z.string(),
           name: z.string(),
           avatarUrl: z.string(),
@@ -97,12 +97,12 @@ export const SupporterChatRoomListRes = z.object({
         isDeleted: z.boolean(),
         createdAt: z.string(),
         updatedAt: z.string(),
-        id: z.string().uuid(),
+        id: z.string(),
         content: z.string(),
         attachments: z.array(z.string()),
         isRead: z.boolean(),
-        senderId: z.string().uuid().nullable(),
-        roomId: z.string().uuid()
+        senderId: z.string().nullable(),
+        roomId: z.string()
       }),
       unreadCount: z.number(),
       isPendingSupport: z.boolean()

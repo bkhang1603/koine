@@ -4,7 +4,7 @@ import { useCartDetailQuery } from '@/queries/useCartDetail'
 import { ShoppingBag } from 'lucide-react'
 
 function CartNotification() {
-  const { data } = useCartDetailQuery()
+  const { data } = useCartDetailQuery({})
   const cartData = data?.payload?.data || {
     cartDetails: [],
     totalAmount: 0,

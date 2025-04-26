@@ -12,10 +12,14 @@ import { useLogoutMutation } from '@/queries/useAuth'
 import { useRouter } from 'next/navigation'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { ChevronRight, LogOut, Settings } from 'lucide-react'
+import { useEffect } from 'react'
 
 export default function DropdownAvatar() {
   const role = useAppStore((state) => state.role)
   const setRole = useAppStore((state) => state.setRole)
+  const setUser = useAppStore((state) => state.setUser)
+  const setAvatar = useAppStore((state) => state.setAvatar)
+  const setUsername = useAppStore((state) => state.setUsername)
 
   // Tôi muốn chỉ gọi api account profile khi role có giá trị
   const { data } = useAccountProfile({
@@ -25,6 +29,14 @@ export default function DropdownAvatar() {
   const account = data?.payload.data
   const logoutMutation = useLogoutMutation()
   const router = useRouter()
+
+  useEffect(() => {
+    if (account) {
+      setAvatar(account.avatarUrl || '')
+      setUsername(account.username || '')
+      setUser(account)
+    }
+  }, [account, setAvatar, setUsername, setUser])
 
   const dropMenuItems = [
     {
@@ -48,6 +60,9 @@ export default function DropdownAvatar() {
     try {
       await logoutMutation.mutateAsync()
       setRole()
+      setAvatar()
+      setUsername()
+      setUser()
       router.push(configRoute.home)
       router.refresh()
     } catch (error: any) {
