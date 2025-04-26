@@ -16,6 +16,7 @@ interface PopularContentCardProps {
   data: PopularCourse[]
   title: string
   description: string
+  // eslint-disable-next-line no-unused-vars
   onItemClick?: (course: PopularCourse) => void
 }
 

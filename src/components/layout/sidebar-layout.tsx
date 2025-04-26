@@ -63,7 +63,6 @@ export default function SidebarLayout({ children, sidebarData }: { children: Rea
             </SheetContent>
           </Sheet>
           <div className='flex flex-1 items-center justify-end gap-3'>
-            <BellNotification />
             <DropdownAvatar />
           </div>
         </header>

@@ -1,22 +1,20 @@
 'use client'
 
-import { use, useEffect, useMemo, useState } from 'react'
+import { use, useMemo } from 'react'
 import { SearchParams } from '@/types/query'
 import { format } from 'date-fns'
 import { vi } from 'date-fns/locale'
-import { useBlogCommentCreateMutation, useBlogCommentDeleteMutation } from '@/queries/useBlog'
 import { handleErrorApi } from '@/lib/utils'
 import { Breadcrumb } from '@/components/private/common/breadcrumb'
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { ChevronDown, ChevronUp, Loader2, MessageCircle, User } from 'lucide-react'
-import { Textarea } from '@/components/ui/textarea'
 import { Skeleton } from '@/components/ui/skeleton'
-import { toast } from '@/components/ui/use-toast'
 import { useInfiniteQuery } from '@tanstack/react-query'
 import blogApiRequest from '@/apiRequests/blog'
 import configRoute from '@/config/route'
+import { useState, useEffect } from 'react'
 
 // Define interface for comment structure
 interface CommentUser {
@@ -48,11 +46,7 @@ interface BlogInfo {
 function CommentList(props: { params: Promise<{ id: string }>; searchParams: SearchParams }) {
   // Use React.use() to properly unwrap the params and searchParams
   const params = use(props.params)
-  // unwrap searchParams and cast to the right type (non-Promise version)
-
   const blogId = params.id
-  const [activeReply, setActiveReply] = useState<string | null>(null)
-  const [replyContent, setReplyContent] = useState('')
   const [expandedComments, setExpandedComments] = useState<Record<string, boolean>>({})
 
   // Use useInfiniteQuery for comments
@@ -86,10 +80,6 @@ function CommentList(props: { params: Promise<{ id: string }>; searchParams: Sea
     initialPageParam: 1
   })
 
-  // Comment mutations
-  const createCommentMutation = useBlogCommentCreateMutation()
-  const deleteCommentMutation = useBlogCommentDeleteMutation()
-
   useEffect(() => {
     if (error) {
       handleErrorApi({
@@ -119,16 +109,6 @@ function CommentList(props: { params: Promise<{ id: string }>; searchParams: Sea
     [blogId]
   )
 
-  const handleToggleReply = (commentId: string) => {
-    if (activeReply === commentId) {
-      setActiveReply(null)
-      setReplyContent('')
-    } else {
-      setActiveReply(commentId)
-      setReplyContent('')
-    }
-  }
-
   // Initialize expandedComments with all comments expanded by default
   useEffect(() => {
     if (comments.length > 0) {
@@ -145,69 +125,6 @@ function CommentList(props: { params: Promise<{ id: string }>; searchParams: Sea
       ...prev,
       [commentId]: !prev[commentId]
     }))
-  }
-
-  const handleCreateReply = (parentId: string) => {
-    if (!replyContent.trim()) {
-      toast({
-        title: 'Thông báo',
-        description: 'Vui lòng nhập nội dung trả lời',
-        variant: 'destructive'
-      })
-      return
-    }
-
-    createCommentMutation.mutate(
-      {
-        identifier: blogId,
-        content: replyContent,
-        replyId: parentId
-      },
-      {
-        onSuccess: () => {
-          toast({
-            title: 'Thành công',
-            description: 'Trả lời đã được gửi thành công'
-          })
-          setReplyContent('')
-          setActiveReply(null)
-          // Automatically expand replies after adding a new one
-          setExpandedComments((prev) => ({
-            ...prev,
-            [parentId]: true
-          }))
-        },
-        onError: (error) => {
-          toast({
-            title: 'Lỗi',
-            description: 'Có lỗi xảy ra khi gửi trả lời',
-            variant: 'destructive'
-          })
-          handleErrorApi({ error })
-        }
-      }
-    )
-  }
-
-  const handleDeleteComment = (commentId: string) => {
-    if (confirm('Bạn có chắc chắn muốn xóa bình luận này?')) {
-      deleteCommentMutation.mutate(commentId, {
-        onSuccess: () => {
-          toast({
-            title: 'Thành công',
-            description: 'Bình luận đã được xóa thành công'
-          })
-        },
-        onError: (error) => {
-          toast({
-            title: 'Lỗi',
-            description: 'Có lỗi xảy ra khi xóa bình luận',
-            variant: 'destructive'
-          })
-          handleErrorApi({ error })
-        }
-      })
-    }
   }
 
   const breadcrumbItems = [
@@ -247,44 +164,7 @@ function CommentList(props: { params: Promise<{ id: string }>; searchParams: Sea
 
           <div className='flex items-center text-xs text-slate-500 gap-3'>
             <div>{format(new Date(comment.createdAt), 'dd/MM/yyyy HH:mm', { locale: vi })}</div>
-            <button onClick={() => handleToggleReply(comment.id)} className='font-medium hover:underline'>
-              Trả lời
-            </button>
-            <button onClick={() => handleDeleteComment(comment.id)} className='text-red-500 hover:underline'>
-              Xóa
-            </button>
           </div>
-
-          {/* Reply form */}
-          {activeReply === comment.id && (
-            <div className='mt-2 flex gap-2'>
-              <Avatar className='h-7 w-7 mt-1'>
-                <AvatarFallback>
-                  <User className='h-3 w-3' />
-                </AvatarFallback>
-              </Avatar>
-              <div className='flex-1'>
-                <Textarea
-                  placeholder='Viết phản hồi...'
-                  className='min-h-16 mb-2 text-sm'
-                  value={replyContent}
-                  onChange={(e) => setReplyContent(e.target.value)}
-                />
-                <div className='flex justify-end gap-2'>
-                  <Button variant='outline' size='sm' onClick={() => setActiveReply(null)}>
-                    Hủy
-                  </Button>
-                  <Button
-                    size='sm'
-                    onClick={() => handleCreateReply(comment.id)}
-                    disabled={createCommentMutation.isPending || !replyContent.trim()}
-                  >
-                    {createCommentMutation.isPending ? 'Đang gửi...' : 'Phản hồi'}
-                  </Button>
-                </div>
-              </div>
-            </div>
-          )}
 
           {/* Show/hide replies button - Only show for comments with replies */}
           {comment.replies && comment.replies.length > 0 && (
