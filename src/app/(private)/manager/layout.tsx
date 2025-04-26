@@ -1,6 +1,6 @@
 import { Sidebar } from '@/types/sidebar'
 import SidebarLayout from '@/components/layout/sidebar-layout'
-import { AreaChart, Users, ShoppingCart, BookOpen, FileText, Package, Settings } from 'lucide-react'
+import { AreaChart, ShoppingCart, BookOpen, FileText, Package, Settings } from 'lucide-react'
 
 export default function Layout({
   children
@@ -45,12 +45,17 @@ export default function Layout({
           href: '/manager/product',
           icon: <Package className='h-5 w-5' />,
           label: 'Sản phẩm'
-        },
+        }
+      ]
+    },
+    {
+      title: 'Báo cáo',
+      group: [
         {
-          id: 'user',
-          href: '/manager/user',
-          icon: <Users className='h-5 w-5' />,
-          label: 'Người dùng'
+          id: 'report',
+          href: '/manager/report',
+          icon: <FileText className='h-5 w-5' />,
+          label: 'Báo cáo'
         }
       ]
     },

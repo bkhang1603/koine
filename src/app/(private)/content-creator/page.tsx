@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useMemo, useState } from 'react'
-import { getDateRangeFromType, parseUrlDate, getValidRangeType, RangeType } from '@/lib/utils'
+import { getDateRangeFromType, parseUrlDate, getValidRangeType, RangeType, formatDateForApi } from '@/lib/utils'
 import { BookOpen, Star, Eye, Users } from 'lucide-react'
 import { DateRangePicker } from '@/components/private/common/dashboard/date-range-picker'
 import { DateRange } from 'react-day-picker'
@@ -9,20 +9,19 @@ import { format } from 'date-fns'
 import { StatsCard } from '@/components/private/content-creator/dashboard/stats-card'
 import { ContentTrendChart } from '@/components/private/content-creator/dashboard/content-trend-chart'
 import { ContentStatusChart } from '@/components/private/content-creator/dashboard/content-status-chart'
-import { PopularContentCard } from '@/components/private/content-creator/dashboard/popular-content-card'
+import { PopularContentCard, PopularCourse } from '@/components/private/content-creator/dashboard/popular-content-card'
 import { AgeGroupsCard } from '@/components/private/content-creator/dashboard/age-groups-card'
 import { DashboardSkeleton } from '@/components/private/content-creator/dashboard/dashboard-skeleton'
 import { useRouter, useSearchParams } from 'next/navigation'
-
-// Import mock data
-import { statsData, contentTrendData, contentStatusData, popularContentData, ageGroupData } from './dashboard-mock-data'
+import { useDashboardContentCreatorQuery } from '@/queries/useDashboard'
+import configRoute from '@/config/route'
 
 export default function ContentCreatorDashboard() {
   const searchParams = useSearchParams()
   const router = useRouter()
 
   // Loading state
-  const [isLoading, setIsLoading] = useState(true)
+  const [isClient, setIsClient] = useState(false)
 
   // Get from/to dates from URL or use default 3-month range
   const fromParam = searchParams.get('from')
@@ -49,13 +48,28 @@ export default function ContentCreatorDashboard() {
   // Local state for the date range
   const [dateRange, setDateRange] = useState<DateRange | undefined>(parsedDateRange)
 
-  useEffect(() => {
-    // Simulate API call loading
-    const timer = setTimeout(() => {
-      setIsLoading(false)
-    }, 1000)
+  // Get formatted start and end dates for API
+  const start_date = useMemo(() => formatDateForApi(dateRange?.from), [dateRange?.from])
+  const end_date = useMemo(() => formatDateForApi(dateRange?.to), [dateRange?.to])
 
-    return () => clearTimeout(timer)
+  // Fetch dashboard data using the query hook
+  const { data: dashboardData, isLoading } = useDashboardContentCreatorQuery({
+    range_type: validRangeType,
+    start_date: validRangeType === 'DAY' ? start_date : undefined,
+    end_date: validRangeType === 'DAY' ? end_date : undefined
+  })
+
+  // Initialize client-side
+  useEffect(() => {
+    setIsClient(true)
+
+    // If there are no URL parameters, set defaults and update URL
+    if (!searchParams.has('range_type')) {
+      const defaultRange = getDateRangeFromType('3_MONTH')
+      setDateRange(defaultRange)
+      handleDateRangeChange(defaultRange, '3_MONTH')
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   // Update URL when date range changes
@@ -79,18 +93,69 @@ export default function ContentCreatorDashboard() {
   const onRangeTypeChange = (rangeType: RangeType) => {
     if (dateRange?.from && dateRange?.to) {
       handleDateRangeChange(dateRange, rangeType)
+    } else if (rangeType !== 'DAY') {
+      // If no date range is selected but a preset is chosen, set the default range for that preset
+      const newRange = getDateRangeFromType(rangeType)
+      setDateRange(newRange)
+      handleDateRangeChange(newRange, rangeType)
     }
   }
 
-  // Add enrollment data for popular courses
-  const popularCourses = popularContentData.map((course, index) => ({
-    ...course,
-    // Add simulated enrollment numbers using index to make values different
-    views: 300 - index * 50 // 300, 250, 200 enrollments based on position
-  }))
+  // Handle course click
+  const handleCourseClick = (course: PopularCourse) => {
+    if (course?.id) {
+      router.push(`${configRoute.contentCreator.course}/${course.id}`)
+    }
+  }
 
-  // If loading, show skeleton
-  if (isLoading) {
+  // Process API data
+  const contentData = useMemo(() => {
+    if (!dashboardData?.payload?.data) {
+      return {
+        courseStatistic: {
+          totalCourses: 0,
+          activeCourses: 0,
+          totalCourseEnrollments: 0,
+          averageCourseRating: 0
+        },
+        contentTrendData: [],
+        contentStatusData: { course: [] },
+        popularContentData: [],
+        ageGroupData: []
+      }
+    }
+
+    const { data } = dashboardData.payload
+
+    // Map API data to the format expected by components
+    return {
+      courseStatistic: data.courseStatistic,
+      contentTrendData: data.courseTrendData.map((item) => ({
+        date: item.date,
+        enrollments: Number(item.enrollments)
+      })),
+      contentStatusData: {
+        course: data.courseStatusData.map((item) => ({
+          status: item.status,
+          count: Number(item.count)
+        }))
+      },
+      popularContentData: data.popularCourseData.map((item) => ({
+        id: item.id,
+        title: item.title,
+        enrollments: Number(item.enrollments),
+        views: Number(item.enrollments) // Use enrollments for views since API doesn't provide views
+      })),
+      ageGroupData: data.ageGroupData.map((item) => ({
+        group: item.group,
+        percentage: item.percentage,
+        count: item.count
+      }))
+    }
+  }, [dashboardData])
+
+  // If loading or not client-side rendered yet, show skeleton
+  if (!isClient || isLoading) {
     return (
       <div className='container mx-auto px-4 py-6'>
         <h1 className='text-2xl font-bold mb-6'>Quản lý khóa học</h1>
@@ -122,23 +187,23 @@ export default function ContentCreatorDashboard() {
         <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4'>
           <StatsCard
             title='Tổng khóa học'
-            value={statsData.totalCourses}
+            value={contentData.courseStatistic.totalCourses}
             description='Tổng số khóa học của bạn'
             icon={BookOpen}
             iconColor='text-purple-600'
             iconBgColor='bg-purple-100'
           />
           <StatsCard
-            title='Tổng lượt xem'
-            value={statsData.totalCourseViews.toLocaleString()}
-            description='Trên tất cả khóa học'
+            title='Khóa học hoạt động'
+            value={contentData.courseStatistic.activeCourses}
+            description='Số khóa học đang hoạt động'
             icon={Eye}
             iconColor='text-indigo-600'
             iconBgColor='bg-indigo-100'
           />
           <StatsCard
             title='Tổng lượt đăng ký'
-            value={statsData.totalCourseEnrollments.toLocaleString()}
+            value={contentData.courseStatistic.totalCourseEnrollments.toLocaleString()}
             description='Học viên đã đăng ký'
             icon={Users}
             iconColor='text-green-600'
@@ -146,7 +211,7 @@ export default function ContentCreatorDashboard() {
           />
           <StatsCard
             title='Đánh giá trung bình'
-            value={statsData.averageCourseRating}
+            value={contentData.courseStatistic.averageCourseRating}
             description='Trên tất cả khóa học'
             icon={Star}
             iconColor='text-amber-600'
@@ -158,12 +223,12 @@ export default function ContentCreatorDashboard() {
       {/* Course Charts */}
       <div className='grid grid-cols-1 gap-4 lg:grid-cols-2'>
         <ContentTrendChart
-          data={contentTrendData}
+          data={contentData.contentTrendData}
           title='Xu hướng lượt đăng ký khóa học'
           description='Thống kê lượt đăng ký theo thời gian'
         />
         <ContentStatusChart
-          data={contentStatusData}
+          data={contentData.contentStatusData}
           title='Trạng thái khóa học'
           description='Phân bố trạng thái các khóa học'
         />
@@ -172,11 +237,16 @@ export default function ContentCreatorDashboard() {
       {/* Popular Courses & Age Groups */}
       <div className='grid grid-cols-1 gap-4 lg:grid-cols-2'>
         <PopularContentCard
-          data={popularCourses}
+          data={contentData.popularContentData}
           title='Khóa học nổi bật'
           description='Khóa học có nhiều học viên đăng ký nhất'
+          onItemClick={handleCourseClick}
         />
-        <AgeGroupsCard data={ageGroupData} title='Phân bố độ tuổi' description='Thống kê khóa học theo độ tuổi' />
+        <AgeGroupsCard
+          data={contentData.ageGroupData}
+          title='Phân bố độ tuổi'
+          description='Thống kê khóa học theo độ tuổi'
+        />
       </div>
     </div>
   )

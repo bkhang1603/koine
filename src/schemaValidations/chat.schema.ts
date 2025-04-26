@@ -70,6 +70,58 @@ export const CreateChatForUserBodyRes = z.object({
   statusCode: z.number()
 })
 
+export const SupporterChatRoomListRes = z.object({
+  statusCode: z.number(),
+  info: z.string(),
+  message: z.string(),
+  data: z.array(
+    z.object({
+      isDeleted: z.boolean(),
+      createdAt: z.string(),
+      updatedAt: z.string(),
+      id: z.string().uuid(),
+      name: z.string(),
+      imageUrl: z.string().nullable(),
+      isGroup: z.boolean(),
+      isClose: z.boolean(),
+      members: z.array(
+        z.object({
+          id: z.string().uuid(),
+          username: z.string(),
+          name: z.string(),
+          avatarUrl: z.string(),
+          isAdmin: z.boolean()
+        })
+      ),
+      latestMessage: z.object({
+        isDeleted: z.boolean(),
+        createdAt: z.string(),
+        updatedAt: z.string(),
+        id: z.string().uuid(),
+        content: z.string(),
+        attachments: z.array(z.string()),
+        isRead: z.boolean(),
+        senderId: z.string().uuid().nullable(),
+        roomId: z.string().uuid()
+      }),
+      unreadCount: z.number(),
+      isPendingSupport: z.boolean()
+    })
+  ),
+  pagination: z.object({
+    pageSize: z.number(),
+    totalItem: z.number(),
+    currentPage: z.number(),
+    maxPageSize: z.number(),
+    totalPage: z.number()
+  })
+})
+
+export const RequestJoinChatRoomRes = z.object({
+  message: z.string(),
+  statusCode: z.number()
+})
+
 export type ChatDataType = z.infer<typeof ChatData>
 
 export type ChatDataResType = z.infer<typeof ChatDataRes>
@@ -85,3 +137,7 @@ export type ChatForUserResType = z.infer<typeof ChatForUserRes>
 export type CreateChatForUserBodyType = z.infer<typeof CreateChatForUserBody>
 
 export type CreateChatForUserBodyResType = z.infer<typeof CreateChatForUserBodyRes>
+
+export type SupporterChatRoomListResType = z.infer<typeof SupporterChatRoomListRes>
+
+export type RequestJoinChatRoomResType = z.infer<typeof RequestJoinChatRoomRes>

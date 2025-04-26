@@ -20,7 +20,7 @@ export default function SupportLayout({
       ]
     },
     {
-      title: 'Hỗ trợ người dùng',
+      title: 'Hỗ trợ khách hàng',
       group: [
         {
           id: 'ticket',
@@ -35,10 +35,22 @@ export default function SupportLayout({
           label: 'Hoàn tiền'
         },
         {
+          id: 'exchange',
+          href: '/support/exchange',
+          icon: <RefreshCcw className='h-5 w-5' />,
+          label: 'Đổi trả'
+        },
+        {
+          id: 'chat',
+          href: '/support/chat',
+          icon: <MessageSquare className='h-5 w-5' />,
+          label: 'Chat'
+        },
+        {
           id: 'users',
           href: '/support/user',
           icon: <Users className='h-5 w-5' />,
-          label: 'Người dùng'
+          label: 'Khách hàng'
         },
         {
           id: 'orders',

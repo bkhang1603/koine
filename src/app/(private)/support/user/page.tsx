@@ -120,8 +120,8 @@ function SupportUser(props: { searchParams: SearchParams }) {
     <div className='container mx-auto px-4 py-6 space-y-6'>
       {/* Header */}
       <div>
-        <h1 className='text-2xl font-bold'>Quản lý người dùng</h1>
-        <p className='text-muted-foreground mt-1'>Quản lý danh sách người dùng trong hệ thống</p>
+        <h1 className='text-2xl font-bold'>Quản lý khách hàng</h1>
+        <p className='text-muted-foreground mt-1'>Quản lý danh sách khách hàng trong hệ thống</p>
       </div>
 
       {/* Table */}
@@ -133,7 +133,7 @@ function SupportUser(props: { searchParams: SearchParams }) {
         loading={isLoading}
         showSearch={true}
         searchParamName='keyword'
-        searchPlaceholder='Tìm kiếm người dùng...'
+        searchPlaceholder='Tìm kiếm khách hàng...'
       />
     </div>
   )

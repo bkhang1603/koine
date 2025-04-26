@@ -4,9 +4,6 @@ import { use } from 'react'
 import { SearchParams } from '@/types/query'
 import { useGetDraftCoursesQuery, useUpdateIsVisibleCourseMutation } from '@/queries/useCourse'
 import { CourseStats } from '@/components/private/admin/course/course-stats'
-import { Button } from '@/components/ui/button'
-import { LayoutList } from 'lucide-react'
-import Link from 'next/link'
 import { useMemo } from 'react'
 import { TableCustom, dataListType } from '@/components/table-custom'
 import { Badge } from '@/components/ui/badge'
@@ -18,6 +15,7 @@ import { useRouter } from 'next/navigation'
 import { formatCourseStatus } from '@/lib/utils'
 import { toast } from '@/components/ui/use-toast'
 import { handleErrorApi } from '@/lib/utils'
+import configRoute from '@/config/route'
 
 function AdminCourse(props: { searchParams: SearchParams }) {
   const searchParams = use(props.searchParams)
@@ -173,8 +171,9 @@ function AdminCourse(props: { searchParams: SearchParams }) {
                 isVisible: course.isVisible
               }}
               itemType='course'
-              onView={() => router.push(`/admin/course/${course.id}`)}
+              onView={() => router.push(`${configRoute.admin.course}/${course.id}`)}
               onToggleVisibility={() => handleToggleVisibility(course.id, course.isVisible)}
+              onManageComments={() => router.push(`${configRoute.admin.course}/${course.id}/comment`)}
             />
           </div>
         )
@@ -198,12 +197,6 @@ function AdminCourse(props: { searchParams: SearchParams }) {
             <h1 className='text-2xl font-bold'>Quản lý khóa học</h1>
             <p className='text-muted-foreground mt-1'>Quản lý và theo dõi tất cả khóa học trong hệ thống</p>
           </div>
-          <Link href='/admin/course/categories'>
-            <Button variant='outline'>
-              <LayoutList className='w-4 h-4 mr-2' />
-              Quản lý danh mục
-            </Button>
-          </Link>
         </div>
       </div>
 
@@ -222,7 +215,7 @@ function AdminCourse(props: { searchParams: SearchParams }) {
         headerColumn={headerColumn}
         bodyColumn={bodyColumn}
         loading={isLoading}
-        href='/admin/course'
+        href={configRoute.admin.course}
         showSearch={true}
         searchParamName='keyword'
         searchPlaceholder='Tìm kiếm khoá học...'

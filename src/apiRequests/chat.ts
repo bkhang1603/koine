@@ -4,7 +4,9 @@ import {
   ChatForUserResType,
   ChatMessageDataResType,
   CreateChatForUserBodyResType,
-  CreateChatForUserBodyType
+  CreateChatForUserBodyType,
+  RequestJoinChatRoomResType,
+  SupporterChatRoomListResType
 } from '@/schemaValidations/chat.schema'
 
 const chatApiRequest = {
@@ -13,7 +15,18 @@ const chatApiRequest = {
     http.get<ChatMessageDataResType>(`/chats/rooms/${id}/messages?limit=${limit}&sort=desc&sortBy=createdAt`),
   getChatForUser: () => http.get<ChatForUserResType>('/chats/support-request'),
   createChatForUser: (body: CreateChatForUserBodyType) =>
-    http.post<CreateChatForUserBodyResType>('/chats/support-request', body)
+    http.post<CreateChatForUserBodyResType>('/chats/support-request', body),
+  getSupporterChatRoomList: ({
+    page_index,
+    page_size
+  }: {
+    page_index?: number | undefined
+    page_size?: number | undefined
+  }) =>
+    http.get<SupporterChatRoomListResType>(`/chats/supporter/rooms?page_index=${page_index}&page_size=${page_size}`),
+  requestJoinChatRoom: (id: string) =>
+    http.put<RequestJoinChatRoomResType>(`/chats/support-request/${id}/join-support`, {}),
+  closeChatRoom: (id: string) => http.put<RequestJoinChatRoomResType>(`/chats/support-request/${id}/close`, {})
 }
 
 export default chatApiRequest

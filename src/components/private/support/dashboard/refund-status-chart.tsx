@@ -1,5 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
-import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from 'recharts'
+import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts'
 import { formatPercentage } from '@/lib/utils'
 
 interface RefundStatusData {
@@ -14,11 +14,10 @@ interface RefundStatusChartProps {
   description: string
 }
 
-// Default status values to ensure we always display all statuses even if they're zero
+// Only the three main statuses
 const DEFAULT_STATUSES = [
   { name: 'Chờ duyệt', value: 0, color: '#f59e0b' },
-  { name: 'Đang xử lý', value: 0, color: '#3b82f6' },
-  { name: 'Đã hoàn tiền', value: 0, color: '#22c55e' },
+  { name: 'Đã duyệt', value: 0, color: '#22c55e' },
   { name: 'Từ chối', value: 0, color: '#ef4444' }
 ]
 
@@ -36,13 +35,6 @@ export function RefundStatusChart({ data, title, description }: RefundStatusChar
     color: dataMap.has(item.name) ? dataMap.get(item.name)!.color : item.color
   }))
 
-  // Add any additional statuses from the data that aren't in our defaults
-  data.forEach((item) => {
-    if (!mergedData.some((d) => d.name === item.name)) {
-      mergedData.push(item)
-    }
-  })
-
   // Calculate total for percentage
   const total = mergedData.reduce((sum, item) => sum + item.value, 0)
 
@@ -52,23 +44,9 @@ export function RefundStatusChart({ data, title, description }: RefundStatusChar
     percentage: total > 0 ? (item.value / total) * 100 : 0
   }))
 
-  const PieChartTooltip = ({ active, payload }: any) => {
-    if (active && payload && payload.length) {
-      const { name, value, percentage } = payload[0].payload
-      return (
-        <div className='bg-white p-3 border rounded-md shadow-sm'>
-          <p className='mb-1 font-medium text-gray-900'>{name}</p>
-          <p className='text-sm text-gray-700'>
-            <span className='font-medium'>Số lượng:</span> {value}
-          </p>
-          <p className='text-sm text-gray-700'>
-            <span className='font-medium'>Tỷ lệ:</span> {formatPercentage(percentage / 100)}
-          </p>
-        </div>
-      )
-    }
-    return null
-  }
+  // Empty state message
+  const hasData = total > 0
+  const emptyStateData = [{ name: 'Không có dữ liệu', value: 1, color: '#e5e7eb', percentage: 100 }]
 
   return (
     <Card className='h-full'>
@@ -77,57 +55,25 @@ export function RefundStatusChart({ data, title, description }: RefundStatusChar
         <CardDescription>{description}</CardDescription>
       </CardHeader>
       <CardContent>
-        <div className='flex flex-col h-[400px]'>
-          {/* Status counts summary */}
-          <div className='grid grid-cols-2 sm:grid-cols-4 gap-2 mb-5 mx-auto w-full'>
-            {displayData.map((item, index) => (
-              <div
-                key={index}
-                className='flex flex-col rounded-md p-1.5 transition-all hover:shadow-sm w-full'
-                style={{
-                  backgroundColor: `${item.color}10`,
-                  borderLeft: `3px solid ${item.color}`
-                }}
-              >
-                <div className='flex items-center gap-1.5'>
-                  <div className='min-w-2 h-2 rounded-full' style={{ backgroundColor: item.color }} />
-                  <span className='text-xs font-medium truncate' title={item.name}>
-                    {item.name}
-                  </span>
-                </div>
-                <div className='flex justify-between items-center mt-0.5 px-1'>
-                  <span className='text-lg font-bold'>{item.value}</span>
-                  <span className='text-xs text-gray-500'>{formatPercentage(item.percentage / 100)}</span>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          {/* Pie chart */}
-          <div className='flex-1 min-h-0'>
+        <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
+          {/* Left side: Pie chart */}
+          <div className='flex items-center justify-center h-[250px] relative'>
             <ResponsiveContainer width='100%' height='100%'>
               <PieChart>
                 <Pie
-                  data={
-                    displayData.filter((item) => item.value > 0).length > 0
-                      ? displayData.filter((item) => item.value > 0)
-                      : [{ name: 'Không có dữ liệu', value: 1, color: '#e5e7eb', percentage: 100 }]
-                  }
+                  data={hasData ? displayData : emptyStateData}
                   cx='50%'
                   cy='50%'
                   labelLine={false}
                   nameKey='name'
                   dataKey='value'
-                  innerRadius={60}
+                  innerRadius={70}
                   outerRadius={100}
                   paddingAngle={2}
                   stroke='#fff'
                   strokeWidth={2}
                 >
-                  {(displayData.filter((item) => item.value > 0).length > 0
-                    ? displayData.filter((item) => item.value > 0)
-                    : [{ name: 'Không có dữ liệu', value: 1, color: '#e5e7eb', percentage: 100 }]
-                  ).map((entry, index) => (
+                  {(hasData ? displayData : emptyStateData).map((entry, index) => (
                     <Cell
                       key={`cell-${index}`}
                       fill={entry.color}
@@ -135,16 +81,49 @@ export function RefundStatusChart({ data, title, description }: RefundStatusChar
                     />
                   ))}
                 </Pie>
-                <Tooltip content={<PieChartTooltip />} />
-                <Legend
-                  layout='horizontal'
-                  verticalAlign='bottom'
-                  align='center'
-                  formatter={(value) => <span className='text-xs font-medium'>{value}</span>}
-                  wrapperStyle={{ paddingTop: '10px' }}
+                <Tooltip
+                  content={({ active, payload }) => {
+                    if (active && payload && payload.length) {
+                      const data = payload[0].payload
+                      return (
+                        <div className='bg-white p-3 border rounded-md shadow-sm'>
+                          <p className='font-medium'>{data.name}</p>
+                          <p className='text-sm'>
+                            {data.value} ({formatPercentage(data.percentage / 100)})
+                          </p>
+                        </div>
+                      )
+                    }
+                    return null
+                  }}
                 />
               </PieChart>
             </ResponsiveContainer>
+            {!hasData && (
+              <div className='absolute inset-0 flex items-center justify-center'>
+                <p className='text-sm text-gray-400'>Không có dữ liệu</p>
+              </div>
+            )}
+          </div>
+
+          {/* Right side: Status cards */}
+          <div className='flex flex-col justify-center space-y-4'>
+            {displayData.map((item, index) => (
+              <div
+                key={index}
+                className='flex justify-between items-center p-4 rounded-md'
+                style={{ backgroundColor: `${item.color}10` }}
+              >
+                <div className='flex items-center gap-2'>
+                  <div className='w-3 h-3 rounded-full' style={{ backgroundColor: item.color }}></div>
+                  <span className='font-medium'>{item.name}</span>
+                </div>
+                <div className='flex items-center gap-4'>
+                  <span className='text-lg font-bold'>{item.value}</span>
+                  <span className='text-sm text-gray-500'>{formatPercentage(item.percentage / 100)}</span>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       </CardContent>

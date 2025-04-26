@@ -127,10 +127,18 @@ export const useConfirmDeliveryOrderMutation = ({ id }: { id: string }) => {
   })
 }
 
-export const useGetRefundRequestsQuery = ({ page_size, page_index }: { page_size: number; page_index: number }) => {
+export const useGetRefundRequestsQuery = ({
+  page_size,
+  page_index,
+  status
+}: {
+  page_size: number
+  page_index: number
+  status?: string
+}) => {
   return useQuery({
-    queryKey: ['refund-requests', page_size, page_index],
-    queryFn: () => orderApiRequest.getRefundRequests({ page_size, page_index })
+    queryKey: ['refund-requests', page_size, page_index, status],
+    queryFn: () => orderApiRequest.getRefundRequests({ page_size, page_index, status })
   })
 }
 
@@ -162,6 +170,34 @@ export const useUpdateRefundRequestMutation = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: ['refund-requests']
+      })
+    }
+  })
+}
+
+export const useGetExchangeRequestsQuery = ({
+  page_size,
+  page_index,
+  status
+}: {
+  page_size: number
+  page_index: number
+  status?: string
+}) => {
+  return useQuery({
+    queryKey: ['exchange-requests', page_size, page_index, status],
+    queryFn: () => orderApiRequest.getExchangeRequests({ page_size, page_index, status })
+  })
+}
+
+export const useUpdateExchangeRequestMutation = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: orderApiRequest.updateExchangeRequest,
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ['exchange-requests']
       })
     }
   })

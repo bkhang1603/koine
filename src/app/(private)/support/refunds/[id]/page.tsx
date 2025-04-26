@@ -216,6 +216,7 @@ export default function RefundDetailPage(props: { params: Promise<{ id: string }
   ]
 
   const isProcessingMutation = updateRefundMutation.isPending
+  const canApproveOrReject = refundData.status === 'REFUND_REQUEST'
 
   return (
     <div className='container max-w-7xl mx-auto py-6 space-y-8'>
@@ -304,36 +305,31 @@ export default function RefundDetailPage(props: { params: Promise<{ id: string }
             </CardContent>
           </Card>
 
-          {/* Action box */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Xử lý hoàn tiền</CardTitle>
-            </CardHeader>
-            <CardContent className='space-y-4'>
-              <Textarea
-                placeholder='Nhập ghi chú xử lý...'
-                className='min-h-[100px]'
-                value={note}
-                onChange={(e) => setNote(e.target.value)}
-                disabled={isProcessingMutation || refundData.status !== 'REFUND_REQUEST'}
-              />
-              <div className='flex justify-end gap-2'>
-                <Button
-                  variant='outline'
-                  onClick={handleRejectRefund}
-                  disabled={isProcessingMutation || refundData.status !== 'REFUND_REQUEST'}
-                >
-                  {isProcessingMutation ? 'Đang xử lý...' : 'Từ chối'}
-                </Button>
-                <Button
-                  onClick={handleApproveRefund}
-                  disabled={isProcessingMutation || refundData.status !== 'REFUND_REQUEST'}
-                >
-                  {isProcessingMutation ? 'Đang xử lý...' : 'Chấp nhận hoàn tiền'}
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
+          {/* Action box - Only show if status is REFUND_REQUEST */}
+          {canApproveOrReject && (
+            <Card>
+              <CardHeader>
+                <CardTitle>Xử lý hoàn tiền</CardTitle>
+              </CardHeader>
+              <CardContent className='space-y-4'>
+                <Textarea
+                  placeholder='Nhập ghi chú xử lý...'
+                  className='min-h-[100px]'
+                  value={note}
+                  onChange={(e) => setNote(e.target.value)}
+                  disabled={isProcessingMutation}
+                />
+                <div className='flex justify-end gap-2'>
+                  <Button variant='outline' onClick={handleRejectRefund} disabled={isProcessingMutation}>
+                    {isProcessingMutation ? 'Đang xử lý...' : 'Từ chối'}
+                  </Button>
+                  <Button onClick={handleApproveRefund} disabled={isProcessingMutation}>
+                    {isProcessingMutation ? 'Đang xử lý...' : 'Chấp nhận hoàn tiền'}
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          )}
         </div>
 
         {/* Sidebar */}

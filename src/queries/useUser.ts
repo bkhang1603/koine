@@ -79,3 +79,29 @@ export const useUpdateRequestSupportMutation = () => {
     }
   })
 }
+
+export const useBanUserMutation = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: (userId: string) => userApiRequest.banUser(userId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ['users']
+      })
+    }
+  })
+}
+
+export const useUnBanUserMutation = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: (userId: string) => userApiRequest.unBanUser(userId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ['users']
+      })
+    }
+  })
+}

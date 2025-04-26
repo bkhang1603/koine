@@ -1,7 +1,14 @@
 'use client'
 
 import { useEffect, useMemo, useState } from 'react'
-import { formatPercentage, getDateRangeFromType, parseUrlDate, getValidRangeType, RangeType } from '@/lib/utils'
+import {
+  formatPercentage,
+  getDateRangeFromType,
+  parseUrlDate,
+  getValidRangeType,
+  RangeType,
+  formatDateForApi
+} from '@/lib/utils'
 import { BookOpen, Users, Calendar, Video, GraduationCap, Award } from 'lucide-react'
 import { DateRangePicker } from '@/components/private/common/dashboard/date-range-picker'
 import { DateRange } from 'react-day-picker'
@@ -13,16 +20,14 @@ import { CourseTrendChart } from '@/components/private/expert/dashboard/course-t
 import { EventTrendChart } from '@/components/private/expert/dashboard/event-trend-chart'
 import { DashboardSkeleton } from '@/components/private/expert/dashboard/dashboard-skeleton'
 import { useRouter, useSearchParams } from 'next/navigation'
-
-// Import mock data
-import { statsData, courseTrendData, eventTrendData, courseStatusData, eventStatusData } from './dashboard-mock-data'
+import { useDashboardExpertStatisticsQuery } from '@/queries/useDashboard'
 
 function ExpertDashboard() {
   const searchParams = useSearchParams()
   const router = useRouter()
 
-  // Initial data states (simulate loading data)
-  const [isLoading, setIsLoading] = useState(true)
+  // State to control client-side rendering
+  const [isClient, setIsClient] = useState(false)
 
   // Get from/to dates from URL or use default 3-month range
   const fromParam = searchParams.get('from')
@@ -49,48 +54,105 @@ function ExpertDashboard() {
   // Local state for the date range
   const [dateRange, setDateRange] = useState<DateRange | undefined>(parsedDateRange)
 
+  // Initialize on client-side
   useEffect(() => {
-    // Simulate API call loading
-    const timer = setTimeout(() => {
-      setIsLoading(false)
-    }, 1500)
+    setIsClient(true)
 
-    return () => clearTimeout(timer)
+    // If there are no URL parameters, set defaults and update URL
+    if (!searchParams.has('range_type')) {
+      const defaultRange = getDateRangeFromType('3_MONTH')
+      setDateRange(defaultRange)
+      updateUrlParams({
+        range_type: '3_MONTH'
+      })
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  // Update URL when date range changes
-  const handleDateRangeChange = (range: DateRange | undefined, rangeType: RangeType) => {
-    if (!range?.from || !range?.to) return
+  // Function to update URL with new params
+  const updateUrlParams = (params: { range_type?: RangeType; start_date?: string; end_date?: string }) => {
+    const urlParams = new URLSearchParams(searchParams.toString())
 
-    const params = new URLSearchParams(searchParams.toString())
-    params.set('from', format(range.from, 'yyyy-MM-dd'))
-    params.set('to', format(range.to, 'yyyy-MM-dd'))
-    params.set('range_type', rangeType)
+    if (params.range_type) {
+      urlParams.set('range_type', params.range_type)
+    }
 
-    router.push(`?${params.toString()}`)
+    if (params.start_date) {
+      urlParams.set('start_date', params.start_date)
+    } else if (params.range_type !== 'DAY') {
+      urlParams.delete('start_date')
+    }
+
+    if (params.end_date) {
+      urlParams.set('end_date', params.end_date)
+    } else if (params.range_type !== 'DAY') {
+      urlParams.delete('end_date')
+    }
+
+    router.push(`?${urlParams.toString()}`)
   }
 
-  // Handle date range change from DateRangePicker
-  const onDateRangeChange = (range: DateRange | undefined) => {
-    setDateRange(range)
-  }
+  // Get formatted start and end dates for API
+  const start_date = useMemo(() => formatDateForApi(dateRange?.from), [dateRange?.from])
+  const end_date = useMemo(() => formatDateForApi(dateRange?.to), [dateRange?.to])
 
-  // Handle range type change
-  const onRangeTypeChange = (rangeType: RangeType) => {
-    if (dateRange?.from && dateRange?.to) {
-      handleDateRangeChange(dateRange, rangeType)
+  // Fetch dashboard data from API
+  const { data: dashboardData, isLoading } = useDashboardExpertStatisticsQuery({
+    range_type: validRangeType,
+    start_date,
+    end_date
+  })
+
+  // Handler for date range changes
+  const handleDateRangeChange = (newRange: DateRange | undefined) => {
+    if (newRange?.from && newRange?.to) {
+      setDateRange(newRange)
+
+      // Update URL params for custom date range
+      updateUrlParams({
+        range_type: 'DAY',
+        start_date: format(newRange.from, 'dd/MM/yyyy'),
+        end_date: format(newRange.to, 'dd/MM/yyyy')
+      })
     }
   }
 
-  // If loading, show skeleton
-  if (isLoading) {
-    return (
-      <div className='container mx-auto px-4 py-6'>
-        <h1 className='text-2xl font-bold mb-6'>Dashboard</h1>
-        <DashboardSkeleton />
-      </div>
-    )
+  // Handler for range type changes
+  const handleRangeTypeChange = (newRangeType: RangeType) => {
+    // Update URL with new range type
+    updateUrlParams({ range_type: newRangeType })
+
+    // Also update date range state to match the new range type
+    if (newRangeType !== 'DAY') {
+      setDateRange(getDateRangeFromType(newRangeType))
+    }
   }
+
+  // Return a loading state until client-side rendering is ready or data is loading
+  if (!isClient || isLoading) {
+    return <DashboardSkeleton />
+  }
+
+  // Get statistics data from API response
+  const { courseStatistic, eventStatistic, courseTrendData, eventTrendData, courseStatusData, eventStatusData } =
+    dashboardData?.payload?.data || {
+      courseStatistic: {
+        totalCourses: 0,
+        activeCourses: 0,
+        coursesEnrollments: 0,
+        courseAverageRating: 0
+      },
+      eventStatistic: {
+        totalEvents: 0,
+        activeEvents: 0,
+        eventParticipants: 0,
+        eventAverageRating: 0
+      },
+      courseTrendData: [],
+      eventTrendData: [],
+      courseStatusData: [],
+      eventStatusData: []
+    }
 
   return (
     <div className='container mx-auto px-4 py-6 space-y-6'>
@@ -102,8 +164,8 @@ function ExpertDashboard() {
         </div>
         <DateRangePicker
           value={dateRange}
-          onChange={onDateRangeChange}
-          onRangeTypeChange={onRangeTypeChange}
+          onChange={handleDateRangeChange}
+          onRangeTypeChange={handleRangeTypeChange}
           initialSelectedOption={validRangeType}
           className='w-full md:w-auto'
         />
@@ -115,7 +177,7 @@ function ExpertDashboard() {
         <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4'>
           <StatsCard
             title='Tổng khóa học'
-            value={statsData.totalCourses}
+            value={courseStatistic.totalCourses}
             description='Khóa học đã tạo'
             icon={BookOpen}
             iconColor='text-blue-600'
@@ -123,15 +185,15 @@ function ExpertDashboard() {
           />
           <StatsCard
             title='Khóa học đang hoạt động'
-            value={statsData.activeCourses}
-            description={`${formatPercentage(statsData.activeCourses / statsData.totalCourses)} khóa học`}
+            value={courseStatistic.activeCourses}
+            description={`${formatPercentage(courseStatistic.activeCourses / courseStatistic.totalCourses)} khóa học`}
             icon={GraduationCap}
             iconColor='text-green-600'
             iconBgColor='bg-green-100'
           />
           <StatsCard
             title='Tổng số học viên'
-            value={statsData.coursesEnrollments}
+            value={courseStatistic.coursesEnrollments}
             description='Đã đăng ký khóa học'
             icon={Users}
             iconColor='text-indigo-600'
@@ -139,7 +201,7 @@ function ExpertDashboard() {
           />
           <StatsCard
             title='Đánh giá trung bình'
-            value={statsData.courseAverageRating}
+            value={courseStatistic.courseAverageRating}
             description='Dựa trên tất cả khóa học'
             icon={Award}
             iconColor='text-amber-600'
@@ -151,12 +213,12 @@ function ExpertDashboard() {
       {/* Course Charts */}
       <div className='grid grid-cols-1 gap-4 lg:grid-cols-2'>
         <CourseTrendChart
-          data={courseTrendData}
+          data={courseTrendData || []}
           title='Xu hướng khóa học'
           description='Số lượng khóa học tạo mới và lượt đăng ký theo thời gian'
         />
         <CourseStatusChart
-          data={courseStatusData}
+          data={courseStatusData || []}
           title='Trạng thái khóa học'
           description='Phân bố trạng thái các khóa học'
         />
@@ -168,7 +230,7 @@ function ExpertDashboard() {
         <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4'>
           <StatsCard
             title='Tổng sự kiện'
-            value={statsData.totalEvents}
+            value={eventStatistic.totalEvents}
             description='Sự kiện đã tạo'
             icon={Calendar}
             iconColor='text-purple-600'
@@ -176,7 +238,7 @@ function ExpertDashboard() {
           />
           <StatsCard
             title='Sự kiện sắp tới'
-            value={statsData.activeEvents}
+            value={eventStatistic.activeEvents}
             description={`Sự kiện`}
             icon={Video}
             iconColor='text-amber-600'
@@ -184,7 +246,7 @@ function ExpertDashboard() {
           />
           <StatsCard
             title='Tổng số người tham gia'
-            value={statsData.eventParticipants}
+            value={eventStatistic.eventParticipants}
             description='Đã tham gia sự kiện'
             icon={Users}
             iconColor='text-indigo-600'
@@ -192,7 +254,7 @@ function ExpertDashboard() {
           />
           <StatsCard
             title='Đánh giá trung bình'
-            value={statsData.eventAverageRating}
+            value={eventStatistic.eventAverageRating}
             description='Dựa trên tất cả sự kiện'
             icon={Award}
             iconColor='text-amber-600'
@@ -204,12 +266,12 @@ function ExpertDashboard() {
       {/* Event Charts */}
       <div className='grid grid-cols-1 gap-4 lg:grid-cols-2'>
         <EventTrendChart
-          data={eventTrendData}
+          data={eventTrendData || []}
           title='Xu hướng sự kiện'
           description='Số lượng sự kiện diễn ra và người tham gia theo thời gian'
         />
         <EventStatusChart
-          data={eventStatusData}
+          data={eventStatusData || []}
           title='Trạng thái sự kiện'
           description='Phân bố trạng thái các sự kiện'
         />

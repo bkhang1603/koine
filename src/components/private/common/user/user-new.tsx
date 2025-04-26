@@ -13,7 +13,7 @@ import { handleErrorApi } from '@/lib/utils'
 import { useRouter } from 'next/navigation'
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import { createUserBody } from '@/schemaValidations/admin.schema'
-import { Role, RoleValues } from '@/constants/type'
+import { Role } from '@/constants/type'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 
 interface NewUserPageProps {
@@ -33,7 +33,7 @@ export default function NewUserPage({ baseUrl }: NewUserPageProps) {
       email: '',
       username: '',
       password: 'P@5sWord',
-      role: Role.Adult
+      role: Role.Manager
     }
   })
 
@@ -64,6 +64,9 @@ export default function NewUserPage({ baseUrl }: NewUserPageProps) {
   }
 
   const isLoading = createUserMutation.isPending || isSubmitting
+
+  // Filter only the staff roles we want to show
+  const staffRoles = [Role.Manager, Role.ContentCreator, Role.Expert, Role.Salesman, Role.Supporter]
 
   return (
     <>
@@ -138,7 +141,7 @@ export default function NewUserPage({ baseUrl }: NewUserPageProps) {
                           <SelectValue placeholder='Chọn vai trò người dùng' />
                         </SelectTrigger>
                         <SelectContent>
-                          {RoleValues.map((role) => (
+                          {staffRoles.map((role) => (
                             <SelectItem key={role} value={role}>
                               {role === 'MANAGER' && 'Quản lý'}
                               {role === 'CONTENT_CREATOR' && 'Người tạo nội dung'}

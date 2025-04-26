@@ -6,18 +6,16 @@ import { format } from 'date-fns'
 import { DateRange } from 'react-day-picker'
 import { MessageSquare, DollarSign, ShoppingCart, BookText, Star, Sparkles } from 'lucide-react'
 
-import { ticketData, refundData, orderData } from './_data/mock'
-import { activityTrendData, contentDistributionData, contentSummaryData } from './_data/content-mock'
 import { DateRangePicker } from '@/components/private/common/dashboard/date-range-picker'
-import { getDateRangeFromType, parseUrlDate, getValidRangeType, RangeType } from '@/lib/utils'
+import { getDateRangeFromType, parseUrlDate, getValidRangeType, RangeType, formatDateForApi } from '@/lib/utils'
 import { Card, CardContent } from '@/components/ui/card'
 import { DashboardSkeleton } from '@/components/private/support/dashboard/dashboard-skeleton'
 
 // Components import - direct import without relative paths
 import { StatsCard } from '@/components/private/support/dashboard/stats-card'
 import { ActivityTrendChart } from '@/components/private/support/dashboard/activity-trend-chart'
-import { ContentDistributionChart } from '@/components/private/support/dashboard/content-distribution-chart'
 import { RefundStatusChart } from '@/components/private/support/dashboard/refund-status-chart'
+import { useDashboardSupporterQuery } from '@/queries/useDashboard'
 
 // Chart colors for consistency
 const chartColors = {
@@ -28,8 +26,7 @@ const chartColors = {
   },
   refund: {
     pending: '#f59e0b', // Amber
-    processing: '#3b82f6', // Blue
-    completed: '#22c55e', // Green
+    approved: '#22c55e', // Green
     rejected: '#ef4444' // Red
   },
   order: {
@@ -43,7 +40,6 @@ const chartColors = {
 export default function SupportDashboard() {
   // State for client-side rendering
   const [isClient, setIsClient] = useState(false)
-  const [isLoading, setIsLoading] = useState(true)
   const router = useRouter()
   const searchParams = useSearchParams()
 
@@ -86,6 +82,17 @@ export default function SupportDashboard() {
 
   const [dateRange, setDateRange] = useState<DateRange>(initialDateRange)
 
+  // Get formatted start and end dates for API
+  const start_date = useMemo(() => formatDateForApi(dateRange?.from), [dateRange?.from])
+  const end_date = useMemo(() => formatDateForApi(dateRange?.to), [dateRange?.to])
+
+  // Fetch dashboard data from API
+  const { data: dashboardData, isLoading } = useDashboardSupporterQuery({
+    range_type: currentRangeType,
+    start_date,
+    end_date
+  })
+
   // Initialize on client-side
   useEffect(() => {
     setIsClient(true)
@@ -98,13 +105,6 @@ export default function SupportDashboard() {
         range_type: '3_MONTH'
       })
     }
-
-    // Simulate data loading
-    const timer = setTimeout(() => {
-      setIsLoading(false)
-    }, 1000)
-
-    return () => clearTimeout(timer)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
@@ -133,16 +133,48 @@ export default function SupportDashboard() {
     }
   }
 
-  // Prepare enhanced refund status data with proper colors
-  const enhancedRefundStatus = refundData.refundStatus.map((item) => ({
-    ...item,
-    color:
-      item.name === 'Chờ duyệt'
-        ? chartColors.refund.pending
-        : item.name === 'Đang xử lý'
-          ? chartColors.refund.processing
-          : chartColors.refund.completed
-  }))
+  // Process activity trend data
+  const activityTrendData = useMemo(() => {
+    if (!dashboardData?.payload?.data?.commentAndReviewTrendData) return []
+
+    return dashboardData.payload.data.commentAndReviewTrendData.map((item) => ({
+      date: item.date,
+      courseComments: item.courseReview,
+      blogComments: item.blogComment,
+      productReviews: item.productReview
+    }))
+  }, [dashboardData])
+
+  // Map refund status data to the expected format for the chart
+  const refundStatusData = useMemo(() => {
+    if (!dashboardData?.payload?.data?.refundOrderStatusData) return []
+
+    return dashboardData.payload.data.refundOrderStatusData.map((item) => {
+      let name = 'Unknown'
+      let color = '#6b7280' // Gray default
+
+      switch (item.status) {
+        case 'PENDING':
+          name = 'Chờ duyệt'
+          color = chartColors.refund.pending
+          break
+        case 'APPROVED':
+          name = 'Đã duyệt'
+          color = chartColors.refund.approved
+          break
+        case 'REJECTED':
+          name = 'Từ chối'
+          color = chartColors.refund.rejected
+          break
+      }
+
+      return {
+        name,
+        value: Number(item.count),
+        color
+      }
+    })
+  }, [dashboardData])
 
   // Return a loading state until client-side rendering is ready
   if (!isClient || isLoading) {
@@ -151,6 +183,16 @@ export default function SupportDashboard() {
         <DashboardSkeleton />
       </div>
     )
+  }
+
+  const statistics = dashboardData?.payload?.data?.statistic || {
+    totalTickets: 0,
+    totalRefunds: 0,
+    totalOrders: 0,
+    totalCourseReview: 0,
+    totalProductReview: 0,
+    totalBlogComment: 0,
+    totalCommentAndReview: 0
   }
 
   return (
@@ -175,7 +217,7 @@ export default function SupportDashboard() {
       <div className='grid gap-4 grid-cols-1 md:grid-cols-3'>
         <StatsCard
           title='Yêu cầu hỗ trợ'
-          value={ticketData.totalTickets}
+          value={statistics.totalTickets}
           icon={MessageSquare}
           iconColor='text-blue-600'
           iconBgColor='bg-blue-100'
@@ -183,7 +225,7 @@ export default function SupportDashboard() {
 
         <StatsCard
           title='Yêu cầu hoàn tiền'
-          value={refundData.totalRefunds}
+          value={statistics.totalRefunds}
           icon={DollarSign}
           iconColor='text-red-600'
           iconBgColor='bg-red-100'
@@ -191,7 +233,7 @@ export default function SupportDashboard() {
 
         <StatsCard
           title='Đơn hàng'
-          value={orderData.totalOrders}
+          value={statistics.totalOrders}
           icon={ShoppingCart}
           iconColor='text-amber-600'
           iconBgColor='bg-amber-100'
@@ -205,7 +247,7 @@ export default function SupportDashboard() {
             <div className='flex justify-between items-start'>
               <div>
                 <p className='text-sm font-medium text-muted-foreground'>Tổng số bình luận</p>
-                <h3 className='text-2xl font-bold mt-1'>{contentSummaryData.totalComments}</h3>
+                <h3 className='text-2xl font-bold mt-1'>{statistics.totalCommentAndReview}</h3>
               </div>
               <div className='p-2 bg-blue-50 rounded-full'>
                 <MessageSquare className='h-5 w-5 text-blue-600' />
@@ -225,7 +267,7 @@ export default function SupportDashboard() {
             <div className='flex justify-between items-start'>
               <div>
                 <p className='text-sm font-medium text-muted-foreground'>Bình luận khóa học</p>
-                <h3 className='text-2xl font-bold mt-1'>{contentSummaryData.courseComments}</h3>
+                <h3 className='text-2xl font-bold mt-1'>{statistics.totalCourseReview}</h3>
               </div>
               <div className='p-2 bg-indigo-50 rounded-full'>
                 <BookText className='h-5 w-5 text-indigo-600' />
@@ -245,7 +287,7 @@ export default function SupportDashboard() {
             <div className='flex justify-between items-start'>
               <div>
                 <p className='text-sm font-medium text-muted-foreground'>Bình luận bài viết</p>
-                <h3 className='text-2xl font-bold mt-1'>{contentSummaryData.blogComments}</h3>
+                <h3 className='text-2xl font-bold mt-1'>{statistics.totalBlogComment}</h3>
               </div>
               <div className='p-2 bg-purple-50 rounded-full'>
                 <Sparkles className='h-5 w-5 text-purple-600' />
@@ -265,7 +307,7 @@ export default function SupportDashboard() {
             <div className='flex justify-between items-start'>
               <div>
                 <p className='text-sm font-medium text-muted-foreground'>Đánh giá sản phẩm</p>
-                <h3 className='text-2xl font-bold mt-1'>{contentSummaryData.productReviews}</h3>
+                <h3 className='text-2xl font-bold mt-1'>{statistics.totalProductReview}</h3>
               </div>
               <div className='p-2 bg-green-50 rounded-full'>
                 <Star className='h-5 w-5 text-green-600' />
@@ -274,7 +316,7 @@ export default function SupportDashboard() {
             <div className='text-xs text-muted-foreground mt-2'>
               <div className='flex items-center gap-1'>
                 <div className='w-2 h-2 rounded-full bg-green-600'></div>
-                <span>Điểm đánh giá trung bình: {contentSummaryData.averageRating}</span>
+                <span>Điểm đánh giá trung bình</span>
               </div>
             </div>
           </CardContent>
@@ -288,20 +330,12 @@ export default function SupportDashboard() {
         description='Thống kê bình luận khóa học, bài viết và đánh giá sản phẩm theo thời gian'
       />
 
-      {/* Content Distribution and Refund Status Charts */}
-      <div className='grid gap-6 grid-cols-1 lg:grid-cols-2'>
-        <ContentDistributionChart
-          data={contentDistributionData}
-          title='Phân bố bình luận và đánh giá'
-          description='Thống kê số lượng theo từng loại nội dung'
-        />
-
-        <RefundStatusChart
-          data={enhancedRefundStatus}
-          title='Trạng thái hoàn tiền'
-          description='Thống kê các yêu cầu hoàn tiền theo trạng thái'
-        />
-      </div>
+      {/* Refund Status Chart */}
+      <RefundStatusChart
+        data={refundStatusData}
+        title='Trạng thái hoàn tiền'
+        description='Thống kê các yêu cầu hoàn tiền theo trạng thái: Chờ duyệt, Đã duyệt, Từ chối'
+      />
     </div>
   )
 }
