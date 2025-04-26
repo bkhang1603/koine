@@ -15,6 +15,7 @@ import { Button } from '@/components/ui/button'
 import Link from 'next/link'
 import { toast } from '@/components/ui/use-toast'
 import { formatCourseStatus, handleErrorApi } from '@/lib/utils'
+import configRoute from '@/config/route'
 
 function SalesmanCourse(props: { searchParams: SearchParams }) {
   const searchParams = use(props.searchParams)
@@ -179,7 +180,7 @@ function SalesmanCourse(props: { searchParams: SearchParams }) {
                 isDraft: course.isDraft
               }}
               itemType='course'
-              onView={() => router.push(`/expert/course/${course.id}`)}
+              onView={() => router.push(`${configRoute.expert.course}/${course.id}`)}
               onUpdateStatusCourse={() => handleUpdateStatus(course.id)}
               onReject={() => handleRejectCourse(course.id)}
               updateStatusLabel='Duyệt khóa học'
@@ -223,7 +224,7 @@ function SalesmanCourse(props: { searchParams: SearchParams }) {
         headerColumn={headerColumn}
         bodyColumn={bodyColumn}
         loading={isLoading}
-        href='/salesman/course'
+        href={configRoute.expert.course}
         showSearch={true}
         searchParamName='keyword'
         searchPlaceholder='Tìm kiếm khoá học...'

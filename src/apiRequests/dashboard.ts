@@ -2,7 +2,10 @@ import http from '@/lib/http'
 import {
   GetUserDetailAdminResType,
   GetUserListAdminResType,
-  GetDashboardStatisticsResType
+  GetDashboardStatisticsResType,
+  GetDashboardExpertResType,
+  GetDashboardContentCreatorResType,
+  GetDashboardSupporterResType
 } from '@/schemaValidations/admin.schema'
 
 const dashboardApiRequest = {
@@ -30,6 +33,42 @@ const dashboardApiRequest = {
   }) => {
     const url = `/admin/dashboard?range_type=${range_type}${range_type === 'DAY' && start_date ? `&start_date=${start_date}` : ''}${range_type === 'DAY' && end_date ? `&end_date=${end_date}` : ''}`
     return http.get<GetDashboardStatisticsResType>(url)
+  },
+  getDashboardExpertStatistics: ({
+    range_type,
+    start_date,
+    end_date
+  }: {
+    range_type: 'DAY' | 'THIS_MONTH' | '3_MONTH' | '6_MONTH' | '1_YEAR' | '2_YEARS' | '3_YEARS'
+    start_date?: string
+    end_date?: string
+  }) => {
+    const url = `/admin/dashboard-expert?range_type=${range_type}${range_type === 'DAY' && start_date ? `&start_date=${start_date}` : ''}${range_type === 'DAY' && end_date ? `&end_date=${end_date}` : ''}`
+    return http.get<GetDashboardExpertResType>(url)
+  },
+  getDashboardContentCreator: ({
+    range_type,
+    start_date,
+    end_date
+  }: {
+    range_type: 'DAY' | 'THIS_MONTH' | '3_MONTH' | '6_MONTH' | '1_YEAR' | '2_YEARS' | '3_YEARS'
+    start_date?: string
+    end_date?: string
+  }) => {
+    const url = `/admin/dashboard-content?range_type=${range_type}${range_type === 'DAY' && start_date ? `&start_date=${start_date}` : ''}${range_type === 'DAY' && end_date ? `&end_date=${end_date}` : ''}`
+    return http.get<GetDashboardContentCreatorResType>(url)
+  },
+  getDashboardSupporter: ({
+    range_type,
+    start_date,
+    end_date
+  }: {
+    range_type: 'DAY' | 'THIS_MONTH' | '3_MONTH' | '6_MONTH' | '1_YEAR' | '2_YEARS' | '3_YEARS'
+    start_date?: string
+    end_date?: string
+  }) => {
+    const url = `/admin/dashboard-supporter?range_type=${range_type}${range_type === 'DAY' && start_date ? `&start_date=${start_date}` : ''}${range_type === 'DAY' && end_date ? `&end_date=${end_date}` : ''}`
+    return http.get<GetDashboardSupporterResType>(url)
   }
 }
 

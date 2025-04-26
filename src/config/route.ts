@@ -49,15 +49,9 @@ const configRoute = {
     dashboard: '/manager',
     order: '/manager/order',
     blog: '/manager/blog',
-    addBlog: '/manager/blog/add',
-    editBlog: '/manager/blog/edit',
     course: '/manager/course',
-    addCourse: '/manager/course/add',
-    editCourse: '/manager/course/edit',
     product: '/manager/product',
-    productNew: '/manager/product/new',
-    productEdit: '/manager/product/edit',
-    user: '/manager/user'
+    report: '/manager/report'
   },
   admin: {
     dashboard: '/admin',
@@ -71,7 +65,8 @@ const configRoute = {
     product: '/admin/product',
     productNew: '/admin/product/new',
     productEdit: '/admin/product/edit',
-    user: '/admin/user'
+    user: '/admin/user',
+    report: '/admin/report'
   },
   salesman: {
     dashboard: '/salesman',
@@ -92,11 +87,17 @@ const configRoute = {
     order: '/support/order',
     user: '/support/user',
     refund: '/support/refund',
+    exchange: '/support/exchange',
     blog: '/support/blog',
     course: '/support/course',
     settings: '/support/settings',
     tickets: '/support/tickets',
-    product: '/support/product'
+    product: '/support/product',
+    chat: '/support/chat'
+  },
+  expert: {
+    dashboard: '/expert',
+    course: '/expert/course'
   }
 }
 

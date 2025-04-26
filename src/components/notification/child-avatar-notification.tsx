@@ -66,7 +66,7 @@ function ChildAvatarNotification() {
       setRole()
       setAvatar()
       setUsername()
-      router.push(configRoute.home)
+      router.push(configRoute.login)
       router.refresh()
     } catch (error: any) {
       handleErrorApi(error)

@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import { ArrowLeft, Calendar, Clock, User, ThumbsUp, MessageSquare, Edit, ExternalLink } from 'lucide-react'
+import { ArrowLeft, Calendar, Clock, User, ThumbsUp, MessageSquare } from 'lucide-react'
 import Image from 'next/image'
 import { useBlogDetailQuery } from '@/queries/useBlog'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -104,20 +104,6 @@ export default function BlogPostDetail(props: { params: Promise<{ id: string }> 
           <div>
             <h1 className='text-2xl font-bold line-clamp-1 max-w-[500px]'>{post.title}</h1>
             <p className='text-sm text-muted-foreground mt-1'>Chi tiết bài viết</p>
-          </div>
-          <div className='space-x-2'>
-            <Button variant='outline' asChild>
-              <Link href={`/admin/blog/${post.id}/edit`}>
-                <Edit className='mr-2 h-4 w-4' />
-                Chỉnh sửa
-              </Link>
-            </Button>
-            <Button variant='outline' asChild>
-              <Link href={`/knowledge/${post.slug}`} target='_blank'>
-                <ExternalLink className='mr-2 h-4 w-4' />
-                Xem trước
-              </Link>
-            </Button>
           </div>
         </div>
 

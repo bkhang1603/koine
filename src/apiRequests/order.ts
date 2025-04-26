@@ -6,7 +6,10 @@ import {
   GetRefundRequestsResType,
   GetReturnOrdersResType,
   UpdateRefundRequestResType,
-  UpdateRefundRequestBodyType
+  UpdateRefundRequestBodyType,
+  GetExchangeRequestsResType,
+  UpdateExchangeRequestBodyType,
+  UpdateExchangeRequestResType
 } from '@/schemaValidations/admin.schema'
 import {
   CancelOrderBody,
@@ -47,13 +50,29 @@ const orderApiRequest = {
   getAdminOrderById: (id: string) => http.get<GetOrderDetailAdminResType>(`/orders/detail/${id}`),
   confirmDeliveryOrder: ({ id }: { id: string }) =>
     http.put<OnlyMessageResType>(`/deliveries/simulate-delivery/{orderId}?orderId=${id}`, {}),
-  getRefundRequests: ({ page_size, page_index }: { page_size: number; page_index: number }) =>
-    http.get<GetRefundRequestsResType>(`/orders/refund?page_size=${page_size}&page_index=${page_index}`),
+  getRefundRequests: ({ page_size, page_index, status }: { page_size: number; page_index: number; status?: string }) =>
+    http.get<GetRefundRequestsResType>(
+      `/orders/manage-refund?${status ? `status=${status}&` : ''}page_size=${page_size}&page_index=${page_index}`
+    ),
+  getExchangeRequests: ({
+    page_size,
+    page_index,
+    status
+  }: {
+    page_size: number
+    page_index: number
+    status?: string
+  }) =>
+    http.get<GetExchangeRequestsResType>(
+      `/orders/manage-exchange?${status ? `status=${status}&` : ''}page_size=${page_size}&page_index=${page_index}`
+    ),
   getRefundRequestById: (id: string) => http.get<GetRefundRequestByIdResType>(`/orders/${id}`),
   getReturnOrders: ({ page_size, page_index }: { page_size: number; page_index: number }) =>
     http.get<GetReturnOrdersResType>(`/orders/my-exchange?page_size=${page_size}&page_index=${page_index}`),
   updateRefundRequest: ({ id, body }: { id: string; body: UpdateRefundRequestBodyType }) =>
-    http.put<UpdateRefundRequestResType>(`/orders/refund/${id}/resolve-refund`, body)
+    http.put<UpdateRefundRequestResType>(`/orders/refund/${id}/resolve-refund`, body),
+  updateExchangeRequest: ({ id, body }: { id: string; body: UpdateExchangeRequestBodyType }) =>
+    http.put<UpdateExchangeRequestResType>(`/orders/exchange/${id}/resolve-exchange`, body)
 }
 
 export default orderApiRequest

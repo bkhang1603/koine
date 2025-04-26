@@ -18,7 +18,7 @@ import {
   AlertDialogTitle
 } from '@/components/ui/alert-dialog'
 import { Button } from '@/components/ui/button'
-import { Edit, MoreHorizontal, Trash, Eye, MessageSquare, CheckCircle, XCircle, Truck } from 'lucide-react'
+import { Edit, MoreHorizontal, Trash, Eye, MessageSquare, CheckCircle, XCircle, Truck, Ban } from 'lucide-react'
 import { useState } from 'react'
 
 interface ItemType {
@@ -46,6 +46,8 @@ interface MoreOptionsProps {
   onUpdateStatusCourse?: () => void
   onUpdateStatusBlog?: () => void
   onResolve?: () => void
+  onBanUser?: () => void
+  onUnBanUser?: () => void
   updateStatusLabel?: string
   isUpdateStatusEnabled?: boolean
   isActionEnabled?: boolean
@@ -66,6 +68,8 @@ export function MoreOptions({
   onUpdateStatusCourse,
   onUpdateStatusBlog,
   onResolve,
+  onBanUser,
+  onUnBanUser,
   updateStatusLabel,
   isUpdateStatusEnabled = false,
   isActionEnabled = false
@@ -76,6 +80,8 @@ export function MoreOptions({
   const [showConfirmDeliveryAlert, setShowConfirmDeliveryAlert] = useState(false)
   const [showVisibilityAlert, setShowVisibilityAlert] = useState(false)
   const [showUpdateStatusAlert, setShowUpdateStatusAlert] = useState(false)
+  const [showBanUserAlert, setShowBanUserAlert] = useState(false)
+  const [showUnBanUserAlert, setShowUnBanUserAlert] = useState(false)
   const [rejectReason, setRejectReason] = useState('')
   const [isDropdownOpen, setIsDropdownOpen] = useState(false)
 
@@ -107,6 +113,16 @@ export function MoreOptions({
   const handleUpdateStatus = () => {
     setIsDropdownOpen(false)
     setShowUpdateStatusAlert(true)
+  }
+
+  const handleBanUser = () => {
+    setIsDropdownOpen(false)
+    setShowBanUserAlert(true)
+  }
+
+  const handleUnBanUser = () => {
+    setIsDropdownOpen(false)
+    setShowUnBanUserAlert(true)
   }
 
   // Map hiển thị text tương ứng với từng loại
@@ -270,6 +286,38 @@ export function MoreOptions({
               >
                 <CheckCircle className='w-4 h-4 mr-2' />
                 {item.status === 'VISIBLE' ? 'Ẩn bài viết' : 'Hiển thị bài viết'}
+              </DropdownMenuItem>
+            </>
+          )}
+
+          {onBanUser && itemType === 'user' && (
+            <>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem
+                onClick={handleBanUser}
+                className='text-red-600'
+                onSelect={(event) => {
+                  event.preventDefault()
+                }}
+              >
+                <Ban className='w-4 h-4 mr-2' />
+                Khóa tài khoản
+              </DropdownMenuItem>
+            </>
+          )}
+
+          {onUnBanUser && itemType === 'user' && (
+            <>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem
+                onClick={handleUnBanUser}
+                className='text-green-600'
+                onSelect={(event) => {
+                  event.preventDefault()
+                }}
+              >
+                <Ban className='w-4 h-4 mr-2' />
+                Mở khóa tài khoản
               </DropdownMenuItem>
             </>
           )}
@@ -449,6 +497,54 @@ export function MoreOptions({
             >
               <CheckCircle className='w-4 h-4 mr-2' />
               Xác nhận
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      <AlertDialog open={showBanUserAlert} onOpenChange={setShowBanUserAlert}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Bạn có chắc chắn muốn khóa tài khoản này?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Người dùng &quot;{item.title}&quot; sẽ không thể đăng nhập vào hệ thống sau khi bị khóa.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel className='focus-visible:ring-0'>Hủy</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => {
+                onBanUser?.()
+                setShowBanUserAlert(false)
+              }}
+              className='bg-destructive hover:bg-destructive/90'
+            >
+              <Ban className='w-4 h-4 mr-2' />
+              Khóa tài khoản
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      <AlertDialog open={showUnBanUserAlert} onOpenChange={setShowUnBanUserAlert}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Bạn có chắc chắn muốn mở khóa tài khoản này?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Người dùng &quot;{item.title}&quot; sẽ có thể đăng nhập vào hệ thống sau khi được mở khóa.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel className='focus-visible:ring-0'>Hủy</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => {
+                onUnBanUser?.()
+                setShowUnBanUserAlert(false)
+              }}
+              className='bg-green-600 hover:bg-green-700'
+            >
+              <Ban className='w-4 h-4 mr-2' />
+              Mở khóa tài khoản
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

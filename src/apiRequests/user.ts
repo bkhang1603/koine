@@ -6,7 +6,9 @@ import {
   GetUserListAdminResType,
   GetRequestSupportListResType,
   UpdateRequestSupportBodyType,
-  UpdateRequestSupportResType
+  UpdateRequestSupportResType,
+  BanUserResType,
+  UnBanUserResType
 } from '@/schemaValidations/admin.schema'
 
 const userApiRequest = {
@@ -36,7 +38,9 @@ const userApiRequest = {
       `/request-supports?page_index=${page_index}&page_size=${page_size}${keyword ? `&keyword=${keyword}` : ''}${isResolve ? `&isResolve=${isResolve}` : ''}`
     ),
   updateRequestSupport: (id: string, body: UpdateRequestSupportBodyType) =>
-    http.put<UpdateRequestSupportResType>(`/request-supports/${id}`, body)
+    http.put<UpdateRequestSupportResType>(`/request-supports/${id}`, body),
+  banUser: (userId: string) => http.put<BanUserResType>(`/users/${userId}/ban`, {}),
+  unBanUser: (userId: string) => http.put<UnBanUserResType>(`/users/${userId}/unban`, {})
 }
 
 export default userApiRequest

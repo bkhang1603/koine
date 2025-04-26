@@ -55,6 +55,17 @@ export default function Layout({
       ]
     },
     {
+      title: 'Báo cáo',
+      group: [
+        {
+          id: 'report',
+          href: '/admin/report',
+          icon: <FileText className='h-5 w-5' />,
+          label: 'Báo cáo'
+        }
+      ]
+    },
+    {
       title: 'Cài đặt',
       group: [
         {

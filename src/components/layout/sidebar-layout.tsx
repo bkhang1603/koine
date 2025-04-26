@@ -1,4 +1,4 @@
-import { Bell, Menu } from 'lucide-react'
+import { Menu } from 'lucide-react'
 import Link from 'next/link'
 
 import { Button } from '@/components/ui/button'
@@ -10,6 +10,7 @@ import DropdownAvatar from '@/components/dropdown-avatar'
 import SidebarMenu from '@/components/layout/sidebar-menu'
 import Image from 'next/image'
 import icons from '@/assets/icons'
+import BellNotification from '@/components/notification/bell-notification'
 
 export default function SidebarLayout({ children, sidebarData }: { children: React.ReactNode; sidebarData: Sidebar }) {
   return (
@@ -27,9 +28,9 @@ export default function SidebarLayout({ children, sidebarData }: { children: Rea
                 className='h-10 w-auto object-contain cursor-pointer'
               />
             </Link>
-            <Button variant='outline' size='icon' className='ml-auto h-8 w-8'>
-              <Bell className='h-4 w-4' />
-            </Button>
+            <div className='ml-auto'>
+              <BellNotification />
+            </div>
           </div>
           <SidebarMenu sidebarData={sidebarData} />
         </div>

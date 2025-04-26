@@ -49,3 +49,63 @@ export const useDashboardStatisticsQuery = ({
       })
   })
 }
+
+export const useDashboardExpertStatisticsQuery = ({
+  range_type,
+  start_date,
+  end_date
+}: {
+  range_type: 'DAY' | 'THIS_MONTH' | '3_MONTH' | '6_MONTH' | '1_YEAR' | '2_YEARS' | '3_YEARS'
+  start_date?: string
+  end_date?: string
+}) => {
+  return useQuery({
+    queryKey: ['dashboard-expert-statistics', range_type, start_date, end_date],
+    queryFn: () =>
+      dashboardApiRequest.getDashboardExpertStatistics({
+        range_type,
+        start_date,
+        end_date
+      })
+  })
+}
+
+export const useDashboardContentCreatorQuery = ({
+  range_type,
+  start_date,
+  end_date
+}: {
+  range_type: 'DAY' | 'THIS_MONTH' | '3_MONTH' | '6_MONTH' | '1_YEAR' | '2_YEARS' | '3_YEARS'
+  start_date?: string
+  end_date?: string
+}) => {
+  return useQuery({
+    queryKey: ['dashboard-content-creator', range_type, start_date, end_date],
+    queryFn: () =>
+      dashboardApiRequest.getDashboardContentCreator({
+        range_type,
+        start_date,
+        end_date
+      })
+  })
+}
+
+export const useDashboardSupporterQuery = ({
+  range_type,
+  start_date,
+  end_date
+}: {
+  range_type: 'DAY' | 'THIS_MONTH' | '3_MONTH' | '6_MONTH' | '1_YEAR' | '2_YEARS' | '3_YEARS'
+  start_date?: string
+  end_date?: string
+}) => {
+  return useQuery({
+    queryKey: ['dashboard-supporter', range_type, start_date, end_date],
+    queryFn: () =>
+      dashboardApiRequest.getDashboardSupporter({
+        range_type,
+        start_date,
+        end_date
+      })
+  })
+}

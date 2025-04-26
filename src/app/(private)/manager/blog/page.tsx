@@ -1,8 +1,8 @@
 'use client'
 
-import { use, useEffect, useMemo, useCallback } from 'react'
+import { use, useCallback, useEffect, useMemo } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { BookOpen, MessageSquare, BarChart, ThumbsUp, Settings, Plus } from 'lucide-react'
+import { BookOpen, MessageSquare, BarChart, ThumbsUp } from 'lucide-react'
 import { TableCustom, dataListType } from '@/components/table-custom'
 import configRoute from '@/config/route'
 import { SearchParams } from '@/types/query'
@@ -11,13 +11,11 @@ import { Badge } from '@/components/ui/badge'
 import { format } from 'date-fns'
 import { vi } from 'date-fns/locale'
 import { MoreOptions } from '@/components/private/common/more-options'
-import { useBlogDeleteMutation, useMyBlogsQuery, useBlogUpdateStatusMutation } from '@/queries/useBlog'
+import { useBlogUpdateStatusMutation, useMyBlogsQuery } from '@/queries/useBlog'
 import { Skeleton } from '@/components/ui/skeleton'
 import Image from 'next/image'
-import { Button } from '@/components/ui/button'
-import Link from 'next/link'
-import { toast } from '@/components/ui/use-toast'
 import { handleErrorApi } from '@/lib/utils'
+import { toast } from '@/components/ui/use-toast'
 
 function AdminBlog(props: { searchParams: SearchParams }) {
   const searchParams = use(props.searchParams)
@@ -39,25 +37,7 @@ function AdminBlog(props: { searchParams: SearchParams }) {
     page_index: currentPageIndex
   })
 
-  // Thêm mutation và hàm xử lý xóa blog
-  const deleteBlogMutation = useBlogDeleteMutation()
   const updateStatusMutation = useBlogUpdateStatusMutation()
-
-  const handleDelete = useCallback(
-    async (blogId: string) => {
-      try {
-        await deleteBlogMutation.mutateAsync(blogId)
-        toast({
-          description: 'Xóa bài viết thành công'
-        })
-      } catch (error) {
-        handleErrorApi({
-          error
-        })
-      }
-    },
-    [deleteBlogMutation]
-  )
 
   const handleUpdateStatus = useCallback(
     async (id: string, currentStatus: string) => {
@@ -192,16 +172,15 @@ function AdminBlog(props: { searchParams: SearchParams }) {
                 slug: blog.slug
               }}
               itemType='blog'
-              onView={() => router.push(`/manager/blog/${blog.id}`)}
-              onEdit={() => router.push(`/manager/blog/${blog.id}/edit`)}
-              onDelete={() => handleDelete(blog.id)}
+              onView={() => router.push(`${configRoute.manager.blog}/${blog.id}`)}
+              onManageComments={() => router.push(`${configRoute.manager.blog}/${blog.id}/comment`)}
               onUpdateStatusBlog={() => handleUpdateStatus(blog.id, blog.status)}
             />
           </div>
         )
       }
     ],
-    [router, handleDelete, handleUpdateStatus]
+    [router, handleUpdateStatus]
   )
 
   const tableData: dataListType = {
@@ -217,20 +196,6 @@ function AdminBlog(props: { searchParams: SearchParams }) {
         <div>
           <h1 className='text-2xl font-bold'>Quản lý bài viết</h1>
           <p className='text-muted-foreground mt-1'>Quản lý và theo dõi tất cả bài viết trong hệ thống</p>
-        </div>
-        <div className='flex items-center gap-4'>
-          <Button variant='outline' asChild>
-            <Link href='/manager/blog/categories'>
-              <Settings className='w-4 h-4 mr-2' />
-              Quản lý danh mục
-            </Link>
-          </Button>
-          <Button asChild>
-            <Link href='/manager/blog/new'>
-              <Plus className='w-4 h-4 mr-2' />
-              Tạo bài viết mới
-            </Link>
-          </Button>
         </div>
       </div>
 

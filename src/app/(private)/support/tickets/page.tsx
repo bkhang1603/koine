@@ -160,12 +160,14 @@ function SupportTickets(props: { searchParams: SearchParams }) {
 
   // Cấu hình cột cho bảng
   const headerColumn = [
-    { id: 1, name: 'Thông tin người gửi' },
-    { id: 2, name: 'Thời gian tạo' },
-    { id: 3, name: 'Nội dung' },
-    { id: 4, name: 'Trạng thái' },
-    { id: 5, name: 'Nội dung phản hồi' },
-    { id: 6, name: '' }
+    { id: 1, name: 'Tên người gửi' },
+    { id: 2, name: 'Email' },
+    { id: 3, name: 'Số điện thoại' },
+    { id: 4, name: 'Thời gian tạo' },
+    { id: 5, name: 'Nội dung' },
+    { id: 6, name: 'Trạng thái' },
+    { id: 7, name: 'Nội dung phản hồi' },
+    { id: 8, name: '' }
   ]
 
   const bodyColumn = useMemo(
@@ -174,22 +176,10 @@ function SupportTickets(props: { searchParams: SearchParams }) {
         {
           id: 1,
           render: (ticket: any) => (
-            <div className='space-y-1'>
+            <div className='flex items-center gap-1.5'>
+              <User className='w-3.5 h-3.5 text-muted-foreground' />
               {ticket.isGuestRequest ? (
-                <>
-                  <div className='flex items-center gap-1.5'>
-                    <User className='w-3.5 h-3.5 text-muted-foreground' />
-                    <span className='text-sm font-medium'>{ticket.guestInfo.name}</span>
-                  </div>
-                  <div className='flex items-center gap-1.5'>
-                    <Mail className='w-3.5 h-3.5 text-muted-foreground' />
-                    <span className='text-xs'>{ticket.guestInfo.email}</span>
-                  </div>
-                  <div className='flex items-center gap-1.5'>
-                    <Phone className='w-3.5 h-3.5 text-muted-foreground' />
-                    <span className='text-xs'>{ticket.guestInfo.phone}</span>
-                  </div>
-                </>
+                <span className='text-sm font-medium'>{ticket.guestInfo.name}</span>
               ) : (
                 <span>User ID: {ticket.objectId || 'N/A'}</span>
               )}
@@ -198,6 +188,30 @@ function SupportTickets(props: { searchParams: SearchParams }) {
         },
         {
           id: 2,
+          render: (ticket: any) =>
+            ticket.isGuestRequest ? (
+              <div className='flex items-center gap-1.5'>
+                <Mail className='w-3.5 h-3.5 text-muted-foreground' />
+                <span className='text-xs'>{ticket.guestInfo.email}</span>
+              </div>
+            ) : (
+              <span className='text-muted-foreground text-xs'>-</span>
+            )
+        },
+        {
+          id: 3,
+          render: (ticket: any) =>
+            ticket.isGuestRequest ? (
+              <div className='flex items-center gap-1.5'>
+                <Phone className='w-3.5 h-3.5 text-muted-foreground' />
+                <span className='text-xs'>{ticket.guestInfo.phone}</span>
+              </div>
+            ) : (
+              <span className='text-muted-foreground text-xs'>-</span>
+            )
+        },
+        {
+          id: 4,
           render: (ticket: any) => {
             const createdDate = new Date(ticket.createdAt)
             return (
@@ -209,7 +223,7 @@ function SupportTickets(props: { searchParams: SearchParams }) {
           }
         },
         {
-          id: 3,
+          id: 5,
           render: (ticket: any) => (
             <div className='max-w-xs truncate' title={ticket.content}>
               {ticket.content}
@@ -217,19 +231,18 @@ function SupportTickets(props: { searchParams: SearchParams }) {
           )
         },
         {
-          id: 4,
+          id: 6,
           render: (ticket: any) => {
             const isResolved = ticket.isResolve.toString()
             const config = resolveStatusConfig[isResolved as keyof typeof resolveStatusConfig] || {
               label: isResolved ? 'Đã xử lý' : 'Chưa xử lý',
               variant: 'default'
             }
-
             return <Badge variant={config.variant as any}>{config.label}</Badge>
           }
         },
         {
-          id: 5,
+          id: 7,
           render: (ticket: any) => (
             <div className='max-w-xs truncate' title={ticket.resolveContent || 'Không có nội dung'}>
               {ticket.resolveContent ? ticket.resolveContent : 'Không có nội dung'}
@@ -237,14 +250,11 @@ function SupportTickets(props: { searchParams: SearchParams }) {
           )
         },
         {
-          id: 6,
-          render: (ticket: any) => (
-            <MoreOptions
-              item={ticket}
-              itemType='ticket'
-              onResolve={!ticket.isResolve ? () => handleResolveTicket(ticket) : undefined}
-            />
-          )
+          id: 8,
+          render: (ticket: any) =>
+            !ticket.isResolve ? (
+              <MoreOptions item={ticket} itemType='ticket' onResolve={() => handleResolveTicket(ticket)} />
+            ) : null
         }
       ] as any,
     // eslint-disable-next-line react-hooks/exhaustive-deps

@@ -1,7 +1,6 @@
 'use client'
 
 import { use, useMemo, useCallback } from 'react'
-import { LayoutList } from 'lucide-react'
 import { TableCustom, dataListType } from '@/components/table-custom'
 import { SearchParams } from '@/types/query'
 import { useRouter } from 'next/navigation'
@@ -15,10 +14,9 @@ import {
   useUpdateIsVisibleCourseMutation
 } from '@/queries/useCourse'
 import Image from 'next/image'
-import { Button } from '@/components/ui/button'
-import Link from 'next/link'
 import { toast } from '@/components/ui/use-toast'
 import { formatCourseStatus, handleErrorApi } from '@/lib/utils'
+import configRoute from '@/config/route'
 
 function SalesmanCourse(props: { searchParams: SearchParams }) {
   const searchParams = use(props.searchParams)
@@ -157,10 +155,10 @@ function SalesmanCourse(props: { searchParams: SearchParams }) {
                 isDraft: course.isDraft
               }}
               itemType='course'
-              onView={() => router.push(`/salesman/course/${course.id}`)}
-              onEdit={() => router.push(`/salesman/course/${course.id}/edit`)}
+              onView={() => router.push(`${configRoute.salesman.course}/${course.id}`)}
+              onEdit={() => router.push(`${configRoute.salesman.course}/${course.id}/edit`)}
               onUpdateStatusCourse={() => handleUpdateStatus(course.id)}
-              updateStatusLabel='Duyệt lên trang'
+              updateStatusLabel='Duyệt giá khoá học'
               isUpdateStatusEnabled={course.status == 'PENDINGPRICING'}
             />
           </div>
@@ -185,12 +183,6 @@ function SalesmanCourse(props: { searchParams: SearchParams }) {
             <h1 className='text-2xl font-bold'>Quản lý khóa học</h1>
             <p className='text-muted-foreground mt-1'>Quản lý và theo dõi tất cả khóa học trong hệ thống</p>
           </div>
-          <Link href='/salesman/course/categories'>
-            <Button variant='outline'>
-              <LayoutList className='w-4 h-4 mr-2' />
-              Quản lý danh mục
-            </Button>
-          </Link>
         </div>
       </div>
 
@@ -200,7 +192,7 @@ function SalesmanCourse(props: { searchParams: SearchParams }) {
         headerColumn={headerColumn}
         bodyColumn={bodyColumn}
         loading={isLoading}
-        href='/salesman/course'
+        href={configRoute.salesman.course}
         showSearch={true}
         searchParamName='keyword'
         searchPlaceholder='Tìm kiếm khoá học...'

@@ -4,20 +4,23 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Progress } from '@/components/ui/progress'
 import { Users } from 'lucide-react'
 
-interface PopularCourse {
+export interface PopularCourse {
   id: string
   title: string
   views: number
   engagement?: number
+  enrollments?: number
 }
 
 interface PopularContentCardProps {
   data: PopularCourse[]
   title: string
   description: string
+  // eslint-disable-next-line no-unused-vars
+  onItemClick?: (course: PopularCourse) => void
 }
 
-export function PopularContentCard({ data, title, description }: PopularContentCardProps) {
+export function PopularContentCard({ data, title, description, onItemClick }: PopularContentCardProps) {
   // Find maximum enrollment for relative progress calculation
   const maxEnrollments = Math.max(...data.map((course) => course.views))
 
@@ -30,9 +33,13 @@ export function PopularContentCard({ data, title, description }: PopularContentC
       <CardContent>
         <div className='space-y-6'>
           {data.map((course) => (
-            <div key={course.id} className='space-y-2'>
+            <div
+              key={course.id}
+              className='space-y-2 cursor-pointer hover:bg-gray-50 rounded p-2 transition-colors'
+              onClick={() => onItemClick?.(course)}
+            >
               <div className='flex items-center justify-between'>
-                <h3 className='font-medium'>{course.title}</h3>
+                <h3 className='font-medium truncate'>{course.title}</h3>
                 <div className='flex items-center text-sm text-muted-foreground'>
                   <Users className='mr-1 h-4 w-4' />
                   <span>{course.views} học viên</span>

@@ -1,5 +1,6 @@
 'use client'
 
+import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
@@ -7,23 +8,35 @@ import { Label } from '@/components/ui/label'
 import { Separator } from '@/components/ui/separator'
 import { Switch } from '@/components/ui/switch'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { Textarea } from '@/components/ui/textarea'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { Badge } from '@/components/ui/badge'
+import { Bell, Settings } from 'lucide-react'
 
 export default function SettingsPage() {
+  const [activeTab, setActiveTab] = useState('general')
+
   return (
     <div className='container mx-auto px-4 py-6 space-y-6'>
-      <div>
-        <h1 className='text-2xl font-bold'>Cài đặt hệ thống</h1>
-        <p className='text-sm text-muted-foreground mt-1'>Quản lý cài đặt và tùy chỉnh hệ thống hỗ trợ</p>
+      <div className='flex items-center justify-between'>
+        <div>
+          <h1 className='text-2xl font-bold'>Cài đặt hệ thống</h1>
+          <p className='text-sm text-muted-foreground mt-1'>Quản lý cài đặt và tùy chỉnh hệ thống hỗ trợ</p>
+        </div>
+        <Badge variant='outline' className='px-3 py-1'>
+          {activeTab === 'general' ? 'Chung' : 'Thông báo'}
+        </Badge>
       </div>
 
-      <Tabs defaultValue='general' className='space-y-6'>
-        <TabsList>
-          <TabsTrigger value='general'>Chung</TabsTrigger>
-          <TabsTrigger value='notifications'>Thông báo</TabsTrigger>
-          <TabsTrigger value='automation'>Tự động hóa</TabsTrigger>
-          <TabsTrigger value='templates'>Mẫu phản hồi</TabsTrigger>
+      <Tabs defaultValue='general' className='space-y-6' onValueChange={setActiveTab}>
+        <TabsList className='grid grid-cols-2 w-full max-w-md'>
+          <TabsTrigger value='general' className='flex gap-2 items-center'>
+            <Settings className='h-4 w-4' />
+            <span>Chung</span>
+          </TabsTrigger>
+          <TabsTrigger value='notifications' className='flex gap-2 items-center'>
+            <Bell className='h-4 w-4' />
+            <span>Thông báo</span>
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value='general'>
@@ -55,38 +68,24 @@ export default function SettingsPage() {
                       </SelectContent>
                     </Select>
                   </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle>Phân loại ticket</CardTitle>
-              </CardHeader>
-              <CardContent className='space-y-6'>
-                <div className='space-y-4'>
-                  <div className='flex items-center justify-between'>
-                    <div className='space-y-0.5'>
-                      <Label>Kỹ thuật</Label>
-                      <p className='text-sm text-muted-foreground'>Các vấn đề về truy cập và sử dụng</p>
-                    </div>
-                    <Switch defaultChecked />
+                  <div className='space-y-2'>
+                    <Label>Ngôn ngữ</Label>
+                    <Select defaultValue='vi'>
+                      <SelectTrigger>
+                        <SelectValue placeholder='Chọn ngôn ngữ' />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value='vi'>Tiếng Việt</SelectItem>
+                        <SelectItem value='en'>Tiếng Anh</SelectItem>
+                      </SelectContent>
+                    </Select>
                   </div>
-                  <Separator />
                   <div className='flex items-center justify-between'>
                     <div className='space-y-0.5'>
-                      <Label>Thanh toán</Label>
-                      <p className='text-sm text-muted-foreground'>Các vấn đề về thanh toán và hoàn tiền</p>
+                      <Label>Chế độ tối</Label>
+                      <p className='text-sm text-muted-foreground'>Sử dụng chế độ tối cho giao diện</p>
                     </div>
-                    <Switch defaultChecked />
-                  </div>
-                  <Separator />
-                  <div className='flex items-center justify-between'>
-                    <div className='space-y-0.5'>
-                      <Label>Nội dung</Label>
-                      <p className='text-sm text-muted-foreground'>Các vấn đề về nội dung khóa học</p>
-                    </div>
-                    <Switch defaultChecked />
+                    <Switch />
                   </div>
                 </div>
               </CardContent>
@@ -103,91 +102,34 @@ export default function SettingsPage() {
               <div className='space-y-4'>
                 <div className='flex items-center justify-between'>
                   <div className='space-y-0.5'>
-                    <Label>Ticket mới</Label>
-                    <p className='text-sm text-muted-foreground'>Thông báo khi có ticket mới</p>
+                    <Label>Thông báo email</Label>
+                    <p className='text-sm text-muted-foreground'>Nhận thông báo qua email</p>
                   </div>
                   <Switch defaultChecked />
                 </div>
                 <Separator />
                 <div className='flex items-center justify-between'>
                   <div className='space-y-0.5'>
-                    <Label>Phản hồi mới</Label>
-                    <p className='text-sm text-muted-foreground'>Thông báo khi có phản hồi mới từ người dùng</p>
-                  </div>
-                  <Switch defaultChecked />
-                </div>
-                <Separator />
-                <div className='flex items-center justify-between'>
-                  <div className='space-y-0.5'>
-                    <Label>Yêu cầu hoàn tiền</Label>
-                    <p className='text-sm text-muted-foreground'>Thông báo khi có yêu cầu hoàn tiền mới</p>
-                  </div>
-                  <Switch defaultChecked />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value='automation'>
-          <Card>
-            <CardHeader>
-              <CardTitle>Tự động hóa</CardTitle>
-            </CardHeader>
-            <CardContent className='space-y-6'>
-              <div className='space-y-4'>
-                <div className='flex items-center justify-between'>
-                  <div className='space-y-0.5'>
-                    <Label>Tự động phân công</Label>
-                    <p className='text-sm text-muted-foreground'>Tự động phân công ticket cho nhân viên</p>
-                  </div>
-                  <Switch defaultChecked />
-                </div>
-                <Separator />
-                <div className='flex items-center justify-between'>
-                  <div className='space-y-0.5'>
-                    <Label>Tự động gửi email xác nhận</Label>
-                    <p className='text-sm text-muted-foreground'>Gửi email xác nhận khi nhận được ticket mới</p>
-                  </div>
-                  <Switch defaultChecked />
-                </div>
-                <Separator />
-                <div className='flex items-center justify-between'>
-                  <div className='space-y-0.5'>
-                    <Label>Tự động đóng ticket</Label>
-                    <p className='text-sm text-muted-foreground'>Tự động đóng ticket sau 7 ngày không có phản hồi</p>
+                    <Label>Thông báo đẩy</Label>
+                    <p className='text-sm text-muted-foreground'>Nhận thông báo đẩy trên trình duyệt</p>
                   </div>
                   <Switch />
                 </div>
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value='templates'>
-          <Card>
-            <CardHeader>
-              <CardTitle>Mẫu phản hồi</CardTitle>
-            </CardHeader>
-            <CardContent className='space-y-6'>
-              <div className='space-y-4'>
-                <div className='space-y-2'>
-                  <Label>Chào mừng</Label>
-                  <Textarea
-                    placeholder='Nhập nội dung mẫu...'
-                    defaultValue='Xin chào {user_name}, cảm ơn bạn đã liên hệ với chúng tôi...'
-                  />
+                <Separator />
+                <div className='flex items-center justify-between'>
+                  <div className='space-y-0.5'>
+                    <Label>Âm thanh thông báo</Label>
+                    <p className='text-sm text-muted-foreground'>Phát âm thanh khi có thông báo mới</p>
+                  </div>
+                  <Switch defaultChecked />
                 </div>
-                <div className='space-y-2'>
-                  <Label>Đang xử lý</Label>
-                  <Textarea placeholder='Nhập nội dung mẫu...' defaultValue='Chúng tôi đang xử lý yêu cầu của bạn...' />
-                </div>
-                <div className='space-y-2'>
-                  <Label>Kết thúc</Label>
-                  <Textarea
-                    placeholder='Nhập nội dung mẫu...'
-                    defaultValue='Cảm ơn bạn đã sử dụng dịch vụ của chúng tôi...'
-                  />
+                <Separator />
+                <div className='flex items-center justify-between'>
+                  <div className='space-y-0.5'>
+                    <Label>Nhắc nhở hàng ngày</Label>
+                    <p className='text-sm text-muted-foreground'>Nhận thông báo tổng hợp hàng ngày</p>
+                  </div>
+                  <Switch />
                 </div>
               </div>
             </CardContent>
@@ -197,7 +139,7 @@ export default function SettingsPage() {
 
       <div className='flex justify-end gap-4'>
         <Button variant='outline'>Hủy thay đổi</Button>
-        <Button>Lưu thay đổi</Button>
+        <Button onClick={() => alert('Đây là giao diện mẫu, không có xử lý API')}>Lưu thay đổi</Button>
       </div>
     </div>
   )
