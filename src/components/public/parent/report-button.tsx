@@ -12,7 +12,7 @@ import {
   DialogTrigger
 } from '@/components/ui/dialog'
 import { Textarea } from '@/components/ui/textarea'
-import { Flag } from 'lucide-react'
+import { Flag, Loader2 } from 'lucide-react'
 import { Label } from '@/components/ui/label'
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import { useCreateReportMutation } from '@/queries/useAccount'
@@ -22,6 +22,9 @@ import { handleErrorApi } from '@/lib/utils'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 import { cn } from '@/lib/utils'
 import { ButtonProps } from '@/components/ui/button'
+import { useReasonListQuery } from '@/queries/useReport'
+import { useAuthModal } from '@/components/auth/auth-modal-provider'
+import { useAppStore } from '@/components/app-provider'
 
 interface ReportButtonProps extends Omit<ButtonProps, 'onClick'> {
   entityId: string
@@ -46,19 +49,13 @@ export default function ReportButton({
   ...buttonProps
 }: ReportButtonProps) {
   const [open, setOpen] = useState(false)
-  const [reasonId, setReasonId] = useState('1') // Default reason ID
+  const [reasonId, setReasonId] = useState('')
   const [reasonDetail, setReasonDetail] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
   const createReportMutation = useCreateReportMutation()
-
-  // Lý do báo cáo chung cho tất cả các loại nội dung
-  const reportReasons = [
-    { id: '1', label: 'Nội dung không phù hợp' },
-    { id: '2', label: 'Thông tin sai lệch' },
-    { id: '3', label: 'Vi phạm bản quyền' },
-    { id: '4', label: 'Ngôn ngữ không phù hợp' },
-    { id: '5', label: 'Khác' }
-  ]
+  const { data: reasonsResponse, isLoading: isLoadingReasons } = useReasonListQuery()
+  const { showLoginModal } = useAuthModal()
+  const isAuth = useAppStore((state) => state.isAuth)
 
   // Tùy chỉnh tiêu đề và mô tả dựa trên loại nội dung
   const getEntityTypeLabel = () => {
@@ -74,8 +71,21 @@ export default function ReportButton({
     }
   }
 
+  const handleDialogOpen = (isOpen: boolean) => {
+    if (isOpen && !isAuth) {
+      showLoginModal()
+      return
+    }
+    setOpen(isOpen)
+  }
+
   const handleSubmit = async () => {
     try {
+      if (!isAuth) {
+        showLoginModal()
+        return
+      }
+
       if (!reasonId) {
         toast({
           variant: 'destructive',
@@ -106,7 +116,7 @@ export default function ReportButton({
       })
 
       setOpen(false)
-      setReasonId('1')
+      setReasonId('')
       setReasonDetail('')
     } catch (error) {
       handleErrorApi({ error })
@@ -163,7 +173,7 @@ export default function ReportButton({
   }
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog open={open} onOpenChange={handleDialogOpen}>
       <TooltipProvider>
         <Tooltip>
           <TooltipTrigger asChild>
@@ -187,14 +197,20 @@ export default function ReportButton({
         <div className='space-y-4 py-4'>
           <div className='space-y-2'>
             <Label htmlFor='reason'>Lý do báo cáo</Label>
-            <RadioGroup value={reasonId} onValueChange={setReasonId}>
-              {reportReasons.map((reason) => (
-                <div key={reason.id} className='flex items-center space-x-2'>
-                  <RadioGroupItem value={reason.id} id={`reason-${reason.id}`} />
-                  <Label htmlFor={`reason-${reason.id}`}>{reason.label}</Label>
-                </div>
-              ))}
-            </RadioGroup>
+            {isLoadingReasons ? (
+              <div className='flex items-center justify-center py-4'>
+                <Loader2 className='h-5 w-5 animate-spin text-muted-foreground' />
+              </div>
+            ) : (
+              <RadioGroup value={reasonId} onValueChange={setReasonId}>
+                {reasonsResponse?.payload.data.map((reason) => (
+                  <div key={reason.id} className='flex items-center space-x-2'>
+                    <RadioGroupItem value={reason.id} id={`reason-${reason.id}`} />
+                    <Label htmlFor={`reason-${reason.id}`}>{reason.name}</Label>
+                  </div>
+                ))}
+              </RadioGroup>
+            )}
           </div>
 
           <div className='space-y-2'>

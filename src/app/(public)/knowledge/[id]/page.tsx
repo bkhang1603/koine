@@ -54,7 +54,7 @@ async function BlogDetailPage(props: { params: Promise<{ id: string }> }) {
               </div>
             </div>
 
-            <ReportBlogButton blogId={id} blogTitle={blog.title} buttonVariant='icon' />
+            <ReportBlogButton blogId={blog.id} blogTitle={blog.title} buttonVariant='icon' />
           </div>
 
           {/* Title */}

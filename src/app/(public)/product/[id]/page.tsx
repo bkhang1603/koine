@@ -43,7 +43,7 @@ export default async function ProductDetail(props: {
             <p className='text-gray-500 mb-2'>
               {product.categories && changeCategoriesToString(product.categories.map((category) => category.name))}
             </p>
-            <ReportProductButton productId={id} productName={product.name} buttonVariant='icon' />
+            <ReportProductButton productId={product.id} productName={product.name} buttonVariant='icon' />
           </div>
           <h2 className='text-4xl mb-4'>{product.name}</h2>
           <div className='mb-4 flex items-center gap-2'>

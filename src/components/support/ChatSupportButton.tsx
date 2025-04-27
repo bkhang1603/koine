@@ -53,7 +53,7 @@ const ChatSupportButton = () => {
   } = useGetChatMessages({
     id: chatRoom?.id || '',
     limit: 100,
-    enabled: !!chatRoom?.id
+    enabled: !!chatRoom?.id && !!user
   })
 
   // Parse messages safely
