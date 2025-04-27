@@ -37,3 +37,10 @@ export const useUpdateReportResolveQuery = (id: string, body: UpdateReportResolv
     }
   })
 }
+
+export const useReasonListQuery = () => {
+  return useQuery({
+    queryKey: ['reason'],
+    queryFn: () => reportApiRequest.getReason()
+  })
+}

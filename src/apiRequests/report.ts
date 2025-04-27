@@ -3,7 +3,8 @@ import {
   GetReportListResType,
   GetReportDetailResType,
   UpdateReportResolveResType,
-  UpdateReportResolveBodyType
+  UpdateReportResolveBodyType,
+  GetReasonResType
 } from '@/schemaValidations/admin.schema'
 
 const reportApiRequest = {
@@ -23,7 +24,8 @@ const reportApiRequest = {
     ),
   getReportDetail: (id: string) => http.get<GetReportDetailResType>(`/reports/${id}`),
   updateReportResolve: (id: string, body: UpdateReportResolveBodyType) =>
-    http.put<UpdateReportResolveResType>(`/reports/resolve/${id}`, body)
+    http.put<UpdateReportResolveResType>(`/reports/resolve/${id}`, body),
+  getReason: () => http.get<GetReasonResType>(`/reasons`)
 }
 
 export default reportApiRequest

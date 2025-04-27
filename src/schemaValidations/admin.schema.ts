@@ -1509,6 +1509,22 @@ export const removeQuestionFromChapterRes = z.object({
   message: z.string()
 })
 
+export const getReasonBody = z.object({
+  isDeleted: z.boolean(),
+  createdAt: z.string(),
+  updatedAt: z.string(),
+  id: z.string(),
+  name: z.string(),
+  description: z.string()
+})
+
+export const getReasonRes = z.object({
+  data: z.array(getReasonBody),
+  statusCode: z.number(),
+  info: z.string(),
+  message: z.string()
+})
+
 // Courses
 export type GetCoursesListAdminResType = z.infer<typeof getCoursesListAdminRes>
 
@@ -1618,3 +1634,5 @@ export type AddMultiQuestionsToChapterResType = z.TypeOf<typeof addMultiQuestion
 export type RemoveQuestionFromChapterBodyType = z.TypeOf<typeof removeQuestionFromChapterBody>
 
 export type RemoveQuestionFromChapterResType = z.TypeOf<typeof removeQuestionFromChapterRes>
+
+export type GetReasonResType = z.TypeOf<typeof getReasonRes>
