@@ -358,7 +358,7 @@ export default function ChapterDetailPage(props: { params: Promise<{ id: string;
                   <DialogTrigger asChild>
                     <Button variant='outline' size='sm'>
                       <Plus className='w-4 h-4 mr-1' />
-                      Thêm câu hỏi
+                      Thêm nhiều câu hỏi
                     </Button>
                   </DialogTrigger>
                   <DialogContent className='sm:max-w-[600px]'>
