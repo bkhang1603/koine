@@ -33,8 +33,9 @@ interface ItemType {
 
 interface MoreOptionsProps {
   item: ItemType
-  itemType: 'blog' | 'category' | 'course' | 'order' | 'user' | 'chapter' | 'lesson' | 'product' | 'ticket'
+  itemType: 'blog' | 'category' | 'course' | 'order' | 'user' | 'chapter' | 'lesson' | 'product' | 'ticket' | 'question'
   onView?: () => void
+  onViewLabel?: string
   onEdit?: () => void
   onDelete?: () => void
   onManageComments?: () => void
@@ -57,6 +58,7 @@ export function MoreOptions({
   item,
   itemType,
   onView,
+  onViewLabel,
   onEdit,
   onDelete,
   onManageComments,
@@ -135,7 +137,8 @@ export function MoreOptions({
     chapter: 'Chương',
     lesson: 'Bài học',
     product: 'Sản phẩm',
-    ticket: 'Yêu cầu hỗ trợ'
+    ticket: 'Yêu cầu hỗ trợ',
+    question: 'Câu hỏi'
   }
 
   return (
@@ -150,7 +153,7 @@ export function MoreOptions({
           {onView && (
             <DropdownMenuItem onClick={onView}>
               <Eye className='w-4 h-4 mr-2' />
-              Xem chi tiết
+              {onViewLabel || 'Xem chi tiết'}
             </DropdownMenuItem>
           )}
           {onEdit && (

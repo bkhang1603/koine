@@ -1,6 +1,18 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import { Clock, FileText, LayoutList, Users, Star, Calendar, Info, AlertCircle, BookOpen, Tag } from 'lucide-react'
+import {
+  Clock,
+  FileText,
+  LayoutList,
+  Users,
+  Star,
+  Calendar,
+  Info,
+  AlertCircle,
+  BookOpen,
+  Tag,
+  HelpCircle
+} from 'lucide-react'
 import Image from 'next/image'
 import { formatLevel } from '@/lib/utils'
 import { format } from 'date-fns'
@@ -254,6 +266,10 @@ export function CourseDetail({ course }: CourseDetailProps) {
                             <div className='flex items-center gap-1'>
                               <Clock className='w-4 h-4' />
                               <span>{chapter.durationsDisplay}</span>
+                            </div>
+                            <div className='flex items-center gap-1'>
+                              <HelpCircle className='w-4 h-4' />
+                              <span>{chapter.questions?.length || 0} câu hỏi</span>
                             </div>
                           </div>
                         </div>

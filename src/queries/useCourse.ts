@@ -373,10 +373,9 @@ export const useCreateLessonMutation = () => {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: courseApiRequest.createLesson,
-    onSuccess: (_, variables) => {
-      // Invalidate relevant queries after successful creation
-      queryClient.invalidateQueries({ queryKey: ['chapters', variables.chapterId] })
-      queryClient.invalidateQueries({ queryKey: ['lessons', variables.chapterId] })
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['chapters'] })
+      queryClient.invalidateQueries({ queryKey: ['lessons'] })
     }
   })
 }
@@ -456,6 +455,94 @@ export const useCreateCourseCommentMutation = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: ['courseReview']
+      })
+    }
+  })
+}
+
+export const useGetQuestionListQuery = ({ page_index, page_size }: { page_index?: number; page_size?: number }) => {
+  return useQuery({
+    queryKey: ['questionList', page_index, page_size],
+    queryFn: () => courseApiRequest.getQuestionList({ page_index, page_size })
+  })
+}
+
+export const useCreateQuestionMutation = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: courseApiRequest.createQuestion,
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ['questionList']
+      })
+    }
+  })
+}
+
+export const useUpdateQuestionMutation = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: ({ id, data }: { id: string; data: any }) => courseApiRequest.updateQuestion(id, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ['questionList']
+      })
+    }
+  })
+}
+
+export const useDeleteQuestionMutation = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: courseApiRequest.deleteQuestion,
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ['questionList']
+      })
+    }
+  })
+}
+
+export const useGetChapterQuestionListQuery = ({
+  chapterId,
+  page_index,
+  page_size
+}: {
+  chapterId: string
+  page_index?: number
+  page_size?: number
+}) => {
+  return useQuery({
+    queryKey: ['chapterQuestionList', chapterId, page_index, page_size],
+    queryFn: () => courseApiRequest.getChapterQuestionList({ chapterId, page_index, page_size })
+  })
+}
+
+// Add new mutations
+export const useAddMultiQuestionsToChapterMutation = ({ chapterId }: { chapterId: string }) => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: (questionIds: string[]) => courseApiRequest.addMultiQuestionsToChapter({ chapterId, questionIds }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ['chapterQuestionList', chapterId]
+      })
+    }
+  })
+}
+
+export const useRemoveQuestionFromChapterMutation = ({ chapterId }: { chapterId: string }) => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: (questionId: string) => courseApiRequest.removeQuestionFromChapter({ chapterId, questionId }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ['chapterQuestionList', chapterId]
       })
     }
   })

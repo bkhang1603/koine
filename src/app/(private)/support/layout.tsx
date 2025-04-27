@@ -1,6 +1,15 @@
 import { Sidebar } from '@/types/sidebar'
 import SidebarLayout from '@/components/layout/sidebar-layout'
-import { BarChart, LayoutDashboard, MessageSquare, RefreshCcw, Settings, ShoppingCart, Users } from 'lucide-react'
+import {
+  BarChart,
+  FileText,
+  LayoutDashboard,
+  MessageSquare,
+  RefreshCcw,
+  Settings,
+  ShoppingCart,
+  Users
+} from 'lucide-react'
 
 export default function SupportLayout({
   children
@@ -80,6 +89,17 @@ export default function SupportLayout({
           href: '/support/product',
           icon: <ShoppingCart className='h-5 w-5' />,
           label: 'Sản phẩm'
+        }
+      ]
+    },
+    {
+      title: 'Báo cáo',
+      group: [
+        {
+          id: 'report',
+          href: '/support/report',
+          icon: <FileText className='h-5 w-5' />,
+          label: 'Báo cáo'
         }
       ]
     },

@@ -1,9 +1,17 @@
 'use client'
 
 import { use } from 'react'
-import { useGetChaptersQuery, useGetCourseQuery, useDeleteLessonMutation } from '@/queries/useCourse'
+import {
+  useGetChaptersQuery,
+  useGetCourseQuery,
+  useDeleteLessonMutation,
+  useGetChapterQuestionListQuery,
+  useRemoveQuestionFromChapterMutation,
+  useAddMultiQuestionsToChapterMutation,
+  useGetQuestionListQuery
+} from '@/queries/useCourse'
 import { Breadcrumb } from '@/components/private/common/breadcrumb'
-import { FileText, Clock, BookOpen, LayoutList, Video, File } from 'lucide-react'
+import { FileText, Clock, BookOpen, LayoutList, Video, File, HelpCircle, Plus } from 'lucide-react'
 import { Skeleton } from '@/components/ui/skeleton'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
@@ -13,6 +21,9 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { useRouter } from 'next/navigation'
 import { MoreOptions } from '@/components/private/common/more-options'
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
+import { Checkbox } from '@/components/ui/checkbox'
+import { useState } from 'react'
 
 // Skeleton component for the chapter detail
 const ChapterDetailSkeleton = () => {
@@ -67,6 +78,8 @@ function LessonTypeDisplay({ type }: { type: string }) {
 export default function ChapterDetailPage(props: { params: Promise<{ id: string; chapterId: string }> }) {
   const router = useRouter()
   const params = use(props.params)
+  const [open, setOpen] = useState(false)
+  const [selectedQuestions, setSelectedQuestions] = useState<string[]>([])
 
   // Fetch chapter data using useGetChaptersQuery
   const { data: chaptersData, isLoading: isLoadingChapters } = useGetChaptersQuery({ id: params.id })
@@ -74,11 +87,28 @@ export default function ChapterDetailPage(props: { params: Promise<{ id: string;
   // Fetch course data for breadcrumb and context
   const { data: courseData, isLoading: isLoadingCourse } = useGetCourseQuery({ id: params.id })
 
+  // Fetch chapter questions data
+  const { data: questionsData, isLoading: isLoadingQuestions } = useGetChapterQuestionListQuery({
+    chapterId: params.chapterId,
+    page_size: 99,
+    page_index: 1
+  })
+
+  // Fetch all questions for selection
+  const { data: allQuestionsData, isLoading: isLoadingAllQuestions } = useGetQuestionListQuery({
+    page_size: 99,
+    page_index: 1
+  })
+
   // State for lesson deletion
   const deleteLessonMutation = useDeleteLessonMutation({ chapterId: params.chapterId })
 
+  // State for question operations
+  const removeQuestionMutation = useRemoveQuestionFromChapterMutation({ chapterId: params.chapterId })
+  const addMultiQuestionsMutation = useAddMultiQuestionsToChapterMutation({ chapterId: params.chapterId })
+
   // Show skeleton while loading
-  if (isLoadingChapters || isLoadingCourse) return <ChapterDetailSkeleton />
+  if (isLoadingChapters || isLoadingCourse || isLoadingQuestions) return <ChapterDetailSkeleton />
 
   // Find the specific chapter from the chapters data
   const chapter = chaptersData?.payload?.data?.find((ch) => ch.id === params.chapterId)
@@ -147,6 +177,53 @@ export default function ChapterDetailPage(props: { params: Promise<{ id: string;
       <p className='text-muted-foreground mb-6'>Chương học này chưa có bài học nào</p>
     </div>
   )
+
+  // Handle question deletion
+  const handleRemoveQuestion = (questionId: string) => {
+    return async () => {
+      try {
+        await removeQuestionMutation.mutateAsync(questionId)
+        toast({
+          description: 'Xóa câu hỏi thành công'
+        })
+      } catch (error) {
+        handleErrorApi({
+          error
+        })
+      }
+    }
+  }
+
+  // Handle adding multiple questions
+  const handleAddMultiQuestions = async () => {
+    if (selectedQuestions.length === 0) {
+      toast({
+        description: 'Vui lòng chọn ít nhất một câu hỏi',
+        variant: 'destructive'
+      })
+      return
+    }
+
+    try {
+      await addMultiQuestionsMutation.mutateAsync(selectedQuestions)
+      toast({
+        description: 'Thêm câu hỏi thành công'
+      })
+      setOpen(false)
+      setSelectedQuestions([])
+    } catch (error) {
+      handleErrorApi({
+        error
+      })
+    }
+  }
+
+  // Handle question selection
+  const toggleQuestionSelection = (questionId: string) => {
+    setSelectedQuestions((prev) =>
+      prev.includes(questionId) ? prev.filter((id) => id !== questionId) : [...prev, questionId]
+    )
+  }
 
   return (
     <div className='min-h-screen bg-background'>
@@ -265,6 +342,121 @@ export default function ChapterDetailPage(props: { params: Promise<{ id: string;
                     </div>
                   </div>
                 ))}
+          </CardContent>
+        </Card>
+
+        {/* Chapter Questions */}
+        <Card>
+          <CardHeader className='border-b'>
+            <div className='flex items-center justify-between'>
+              <div className='flex items-center gap-2'>
+                <HelpCircle className='w-5 h-5 text-primary' />
+                <CardTitle>Câu hỏi</CardTitle>
+              </div>
+              <div className='flex gap-2'>
+                <Dialog open={open} onOpenChange={setOpen}>
+                  <DialogTrigger asChild>
+                    <Button variant='outline' size='sm'>
+                      <Plus className='w-4 h-4 mr-1' />
+                      Thêm nhiều câu hỏi
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent className='sm:max-w-[600px]'>
+                    <DialogHeader>
+                      <DialogTitle>Thêm câu hỏi vào chương học</DialogTitle>
+                    </DialogHeader>
+                    <div className='max-h-[400px] overflow-y-auto'>
+                      {isLoadingAllQuestions ? (
+                        <div className='p-4'>
+                          <Skeleton className='h-8 w-full mb-4' />
+                          <Skeleton className='h-8 w-full mb-4' />
+                          <Skeleton className='h-8 w-full' />
+                        </div>
+                      ) : (
+                        allQuestionsData?.payload?.data?.map((question) => (
+                          <div key={question.id} className='flex items-center space-x-2 p-2 border-b'>
+                            <Checkbox
+                              id={question.id}
+                              checked={selectedQuestions.includes(question.id)}
+                              onCheckedChange={() => toggleQuestionSelection(question.id)}
+                            />
+                            <label htmlFor={question.id} className='text-sm flex-1 cursor-pointer'>
+                              {question.content}
+                            </label>
+                          </div>
+                        ))
+                      )}
+                    </div>
+                    <div className='flex justify-end gap-2 mt-4'>
+                      <Button variant='outline' onClick={() => setOpen(false)}>
+                        Hủy
+                      </Button>
+                      <Button onClick={handleAddMultiQuestions} disabled={addMultiQuestionsMutation.isPending}>
+                        {addMultiQuestionsMutation.isPending ? 'Đang thêm...' : 'Thêm câu hỏi'}
+                      </Button>
+                    </div>
+                  </DialogContent>
+                </Dialog>
+              </div>
+            </div>
+          </CardHeader>
+
+          <CardContent className='p-0'>
+            {isLoadingQuestions ? (
+              <div className='p-6'>
+                <Skeleton className='h-12 w-full mb-4' />
+                <Skeleton className='h-12 w-full mb-4' />
+                <Skeleton className='h-12 w-full' />
+              </div>
+            ) : questionsData?.payload?.data?.length === 0 ? (
+              <div className='p-8 text-center'>
+                <HelpCircle className='w-12 h-12 text-muted-foreground mx-auto mb-4' />
+                <h3 className='text-lg font-medium mb-2'>Chưa có câu hỏi nào</h3>
+                <p className='text-muted-foreground mb-6'>Chương học này chưa có câu hỏi nào</p>
+              </div>
+            ) : (
+              questionsData?.payload?.data?.map((question, index) => (
+                <div key={question.id} className='border-b last:border-0'>
+                  <div className='p-4 md:p-6'>
+                    <div className='flex gap-4'>
+                      <div className='w-10 h-10 rounded-lg flex items-center justify-center font-medium shrink-0 bg-amber-500/10 text-amber-500'>
+                        {index + 1}
+                      </div>
+                      <div className='flex-1'>
+                        <h3 className='font-medium mb-2'>{question.content}</h3>
+                        <div className='space-y-2'>
+                          {question.questionOptions?.map((option, optionIndex) => (
+                            <div
+                              key={optionIndex}
+                              className={`p-3 rounded-lg border ${option.isCorrect ? 'border-green-500 bg-green-50' : 'border-gray-200'}`}
+                            >
+                              <div className='flex items-start gap-2'>
+                                <div
+                                  className={`w-6 h-6 rounded-full flex items-center justify-center shrink-0 ${option.isCorrect ? 'bg-green-500 text-white' : 'bg-gray-100'}`}
+                                >
+                                  {String.fromCharCode(65 + optionIndex)}
+                                </div>
+                                <span>{option.optionData}</span>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                      <MoreOptions
+                        item={{
+                          id: question.id,
+                          title: question.content,
+                          status: 'VISIBLE',
+                          slug: ''
+                        }}
+                        itemType='question'
+                        onDelete={handleRemoveQuestion(question.id)}
+                      />
+                    </div>
+                  </div>
+                </div>
+              ))
+            )}
           </CardContent>
         </Card>
       </div>

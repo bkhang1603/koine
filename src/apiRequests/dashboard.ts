@@ -5,7 +5,8 @@ import {
   GetDashboardStatisticsResType,
   GetDashboardExpertResType,
   GetDashboardContentCreatorResType,
-  GetDashboardSupporterResType
+  GetDashboardSupporterResType,
+  GetDashboardCourseDetailResType
 } from '@/schemaValidations/admin.schema'
 
 const dashboardApiRequest = {
@@ -69,7 +70,9 @@ const dashboardApiRequest = {
   }) => {
     const url = `/admin/dashboard-supporter?range_type=${range_type}${range_type === 'DAY' && start_date ? `&start_date=${start_date}` : ''}${range_type === 'DAY' && end_date ? `&end_date=${end_date}` : ''}`
     return http.get<GetDashboardSupporterResType>(url)
-  }
+  },
+  getDashboardCourseDetail: ({ courseId }: { courseId: string }) =>
+    http.get<GetDashboardCourseDetailResType>(`/admin/dashboard-course-detail/${courseId}`)
 }
 
 export default dashboardApiRequest

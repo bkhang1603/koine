@@ -1172,6 +1172,107 @@ export const createCourseCommentRes = z.object({
   message: z.string()
 })
 
+export const getQuestionListRes = z.object({
+  statusCode: z.number(),
+  info: z.string(),
+  message: z.string(),
+  data: z.array(
+    z.object({
+      isDeleted: z.boolean(),
+      createdAt: z.string(),
+      updatedAt: z.string(),
+      id: z.string().uuid(),
+      content: z.string(),
+      numCorrect: z.number(),
+      questionOptions: z.array(
+        z.object({
+          isDeleted: z.boolean(),
+          createdAt: z.string(),
+          updatedAt: z.string(),
+          id: z.string().uuid(),
+          questionId: z.string().uuid(),
+          optionData: z.string(),
+          isCorrect: z.boolean()
+        })
+      )
+    })
+  ),
+  pagination: z.object({
+    pageSize: z.number(),
+    totalItem: z.number(),
+    currentPage: z.number(),
+    maxPageSize: z.number(),
+    totalPage: z.number()
+  })
+})
+
+export const createQuestionOptionSchema = z.object({
+  optionData: z.string(),
+  isCorrect: z.boolean()
+})
+
+export const createQuestionBody = z.object({
+  content: z.string(),
+  options: z.array(createQuestionOptionSchema)
+})
+
+export const updateQuestionBody = z.object({
+  content: z.string(),
+  options: z.array(createQuestionOptionSchema)
+})
+
+export const createQuestionRes = z.object({
+  statusCode: z.number(),
+  info: z.string(),
+  message: z.string()
+})
+
+export const updateQuestionRes = z.object({
+  statusCode: z.number(),
+  info: z.string(),
+  message: z.string()
+})
+
+export const deleteQuestionRes = z.object({
+  statusCode: z.number(),
+  info: z.string(),
+  message: z.string()
+})
+
+export const getChapterQuestionListRes = z.object({
+  statusCode: z.number(),
+  info: z.string(),
+  message: z.string(),
+  data: z.array(
+    z.object({
+      isDeleted: z.boolean(),
+      createdAt: z.string(),
+      updatedAt: z.string(),
+      id: z.string().uuid(),
+      content: z.string(),
+      numCorrect: z.number().int().nonnegative(),
+      questionOptions: z.array(
+        z.object({
+          isDeleted: z.boolean(),
+          createdAt: z.string(),
+          updatedAt: z.string(),
+          id: z.string().uuid(),
+          questionId: z.string().uuid(),
+          optionData: z.string(),
+          isCorrect: z.boolean()
+        })
+      )
+    })
+  ),
+  pagination: z.object({
+    pageSize: z.number(),
+    totalItem: z.number(),
+    currentPage: z.number(),
+    maxPageSize: z.number(),
+    totalPage: z.number()
+  })
+})
+
 export const getRequestSupportListRes = z.object({
   statusCode: z.number(),
   info: z.string(),
@@ -1302,6 +1403,20 @@ export const getDashboardContentCreatorRes = z.object({
   })
 })
 
+export const getDashboardCourseDetailRes = z.object({
+  statusCode: z.number(),
+  info: z.string(),
+  message: z.string(),
+  data: z.object({
+    courseEnrollments: z.array(
+      z.object({
+        date: z.string(),
+        count: z.number()
+      })
+    )
+  })
+})
+
 export const getReportListRes = z.object({
   statusCode: z.number(),
   info: z.string(),
@@ -1370,6 +1485,30 @@ export const updateReportResolveRes = z.object({
   message: z.string()
 })
 
+// Add new schemas for multiple questions to chapter
+export const addMultiQuestionsToChapterBody = z.object({
+  chapterId: z.string(),
+  questionIds: z.array(z.string())
+})
+
+export const addMultiQuestionsToChapterRes = z.object({
+  statusCode: z.number(),
+  info: z.string(),
+  message: z.string()
+})
+
+// Remove question from chapter
+export const removeQuestionFromChapterBody = z.object({
+  chapterId: z.string(),
+  questionId: z.string()
+})
+
+export const removeQuestionFromChapterRes = z.object({
+  statusCode: z.number(),
+  info: z.string(),
+  message: z.string()
+})
+
 // Courses
 export type GetCoursesListAdminResType = z.infer<typeof getCoursesListAdminRes>
 
@@ -1380,6 +1519,20 @@ export type GetDraftCoursesResType = z.infer<typeof getDraftCoursesRes>
 export type CreateCourseCommentBodyType = z.infer<typeof createCourseCommentBody>
 
 export type CreateCourseCommentResType = z.infer<typeof createCourseCommentRes>
+
+export type GetQuestionListResType = z.infer<typeof getQuestionListRes>
+
+export type CreateQuestionBodyType = z.infer<typeof createQuestionBody>
+
+export type UpdateQuestionBodyType = z.infer<typeof updateQuestionBody>
+
+export type CreateQuestionResType = z.infer<typeof createQuestionRes>
+
+export type UpdateQuestionResType = z.infer<typeof updateQuestionRes>
+
+export type DeleteQuestionResType = z.infer<typeof deleteQuestionRes>
+
+export type GetChapterQuestionListResType = z.infer<typeof getChapterQuestionListRes>
 
 // Orders
 export type GetOrderListAdminResType = z.TypeOf<typeof getOrderListAdminRes>
@@ -1430,6 +1583,8 @@ export type GetDashboardExpertResType = z.TypeOf<typeof getDashboardExpertRes>
 
 export type GetDashboardContentCreatorResType = z.TypeOf<typeof getDashboardContentCreatorRes>
 
+export type GetDashboardCourseDetailResType = z.TypeOf<typeof getDashboardCourseDetailRes>
+
 // Return Orders
 export type GetReturnOrdersResType = z.TypeOf<typeof getReturnOrdersRes>
 
@@ -1454,3 +1609,12 @@ export type GetReportDetailResType = z.TypeOf<typeof getReportDetailRes>
 export type UpdateReportResolveBodyType = z.TypeOf<typeof updateReportResolveBody>
 
 export type UpdateReportResolveResType = z.TypeOf<typeof updateReportResolveRes>
+
+// New type exports
+export type AddMultiQuestionsToChapterBodyType = z.TypeOf<typeof addMultiQuestionsToChapterBody>
+
+export type AddMultiQuestionsToChapterResType = z.TypeOf<typeof addMultiQuestionsToChapterRes>
+
+export type RemoveQuestionFromChapterBodyType = z.TypeOf<typeof removeQuestionFromChapterBody>
+
+export type RemoveQuestionFromChapterResType = z.TypeOf<typeof removeQuestionFromChapterRes>

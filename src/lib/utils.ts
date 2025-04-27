@@ -153,17 +153,17 @@ export const redirectSettingRole = (role: string) => {
     case 'CHILD':
       return '/kid/setting'
     case 'CONTENT_CREATOR':
-      return '/content-creator/setting'
+      return '/content-creator/settings'
     case 'SUPPORTER':
-      return '/support/setting'
+      return '/support/settings'
     case 'EXPERT':
-      return '/expert/setting'
+      return '/expert/settings'
     case 'SALESMAN':
-      return '/salesman/setting'
+      return '/salesman/settings'
     case 'MANAGER':
-      return '/manager/setting'
+      return '/manager/settings'
     case 'ADMIN':
-      return '/admin/setting'
+      return '/admin/settings'
     default:
       return '/'
   }

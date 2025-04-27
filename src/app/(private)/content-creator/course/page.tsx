@@ -2,7 +2,7 @@
 
 import { use, useMemo, useCallback } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { BookOpen, Eye, FilePen, GraduationCap, Settings, Plus } from 'lucide-react'
+import { BookOpen, Eye, FilePen, GraduationCap, Settings, Plus, HelpCircle } from 'lucide-react'
 import { TableCustom, dataListType } from '@/components/table-custom'
 import { SearchParams } from '@/types/query'
 import { useRouter } from 'next/navigation'
@@ -196,6 +196,12 @@ function ContentCreatorCourse(props: { searchParams: SearchParams }) {
             <Link href='/content-creator/course/categories'>
               <Settings className='w-4 h-4 mr-2' />
               Quản lý danh mục
+            </Link>
+          </Button>
+          <Button variant='outline' asChild>
+            <Link href='/content-creator/course/question'>
+              <HelpCircle className='w-4 h-4 mr-2' />
+              Quản lý câu hỏi
             </Link>
           </Button>
           <Button asChild>

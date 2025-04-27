@@ -11,7 +11,8 @@ import {
   AlertCircle,
   BookOpen,
   Tag,
-  GraduationCap
+  GraduationCap,
+  HelpCircle
 } from 'lucide-react'
 import Image from 'next/image'
 import { formatLevel } from '@/lib/utils'
@@ -262,6 +263,10 @@ export function CourseDetail({ course }: CourseDetailProps) {
                             <div className='flex items-center gap-1'>
                               <Clock className='w-4 h-4' />
                               <span>{chapter.durationsDisplay}</span>
+                            </div>
+                            <div className='flex items-center gap-1'>
+                              <HelpCircle className='w-4 h-4' />
+                              <span>{chapter.questions?.length || 0} câu hỏi</span>
                             </div>
                           </div>
                         </div>
