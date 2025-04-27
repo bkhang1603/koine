@@ -33,6 +33,12 @@ export default function Layout({
           href: '/content-creator/course',
           icon: <BookMarked className='h-5 w-5' />,
           label: 'Khoá học'
+        },
+        {
+          id: 'question',
+          href: '/content-creator/question',
+          icon: <BookMarked className='h-5 w-5' />,
+          label: 'Câu đố'
         }
       ]
     },

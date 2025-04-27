@@ -198,12 +198,6 @@ function ContentCreatorCourse(props: { searchParams: SearchParams }) {
               Quản lý danh mục
             </Link>
           </Button>
-          <Button variant='outline' asChild>
-            <Link href='/content-creator/course/question'>
-              <HelpCircle className='w-4 h-4 mr-2' />
-              Quản lý câu hỏi
-            </Link>
-          </Button>
           <Button asChild>
             <Link href='/content-creator/course/new'>
               <Plus className='w-4 h-4 mr-2' />
