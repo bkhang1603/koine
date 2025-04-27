@@ -1,97 +1,23 @@
 'use client'
-import { use, useState, useCallback } from 'react'
+import { use } from 'react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Separator } from '@/components/ui/separator'
-import { User, Clock, FileText, Tag, Info, ExternalLink, Check, X } from 'lucide-react'
+import { User, Clock, FileText, Tag, Info, ExternalLink } from 'lucide-react'
 import Link from 'next/link'
 import { format } from 'date-fns'
 import { vi } from 'date-fns/locale'
 import { Badge } from '@/components/ui/badge'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Breadcrumb } from '@/components/private/common/breadcrumb'
-import { useReportDetailQuery, useUpdateReportResolveQuery } from '@/queries/useReport'
-import { Textarea } from '@/components/ui/textarea'
-import { toast } from '@/components/ui/use-toast'
-import { useRouter } from 'next/navigation'
-import { handleErrorApi } from '@/lib/utils'
+import { useReportDetailQuery } from '@/queries/useReport'
+import configRoute from '@/config/route'
 
 export default function ReportDetailPage(props: { params: Promise<{ id: string }> }) {
   const params = use(props.params)
   const reportId = params.id
-  const router = useRouter()
-
-  const [solutionNote, setSolutionNote] = useState('')
-  const [isSubmitting, setIsSubmitting] = useState(false)
 
   const { isLoading, error, data } = useReportDetailQuery(reportId)
-
-  // Initialize the mutation hooks at component level
-  const updateReportResolveApproved = useUpdateReportResolveQuery(reportId, {
-    status: 'APPROVED',
-    solutionNote
-  })
-
-  const updateReportResolveReject = useUpdateReportResolveQuery(reportId, {
-    status: 'REJECT',
-    solutionNote
-  })
-
-  // Handle approve report
-  const handleApprove = useCallback(() => {
-    try {
-      if (isSubmitting || updateReportResolveApproved.isPending) return
-
-      setIsSubmitting(true)
-
-      updateReportResolveApproved.mutate(undefined, {
-        onSuccess: () => {
-          toast({
-            description: 'Báo cáo đã được phê duyệt thành công',
-            variant: 'default'
-          })
-          router.refresh()
-        },
-        onError: (error) => {
-          handleErrorApi({ error })
-        },
-        onSettled: () => {
-          setIsSubmitting(false)
-        }
-      })
-    } catch (error) {
-      handleErrorApi({ error })
-      setIsSubmitting(false)
-    }
-  }, [isSubmitting, updateReportResolveApproved, router])
-
-  // Handle reject report
-  const handleReject = useCallback(() => {
-    try {
-      if (isSubmitting || updateReportResolveReject.isPending) return
-
-      setIsSubmitting(true)
-
-      updateReportResolveReject.mutate(undefined, {
-        onSuccess: () => {
-          toast({
-            description: 'Báo cáo đã được từ chối',
-            variant: 'default'
-          })
-          router.refresh()
-        },
-        onError: (error) => {
-          handleErrorApi({ error })
-        },
-        onSettled: () => {
-          setIsSubmitting(false)
-        }
-      })
-    } catch (error) {
-      handleErrorApi({ error })
-      setIsSubmitting(false)
-    }
-  }, [isSubmitting, updateReportResolveReject, router])
 
   if (isLoading) {
     return (
@@ -138,7 +64,7 @@ export default function ReportDetailPage(props: { params: Promise<{ id: string }
           )}
         </div>
         <Button variant='outline' asChild>
-          <Link href='/manager/report'>Quay lại danh sách báo cáo</Link>
+          <Link href={configRoute.manager.report}>Quay lại danh sách báo cáo</Link>
         </Button>
       </div>
     )
@@ -185,9 +111,9 @@ export default function ReportDetailPage(props: { params: Promise<{ id: string }
 
     switch (reportData.type) {
       case 'COURSE':
-        return `/manager/course/${reportData.reportedEntityId}`
+        return `${configRoute.manager.course}/${reportData.reportedEntityId}`
       case 'BLOG':
-        return `/manager/blog/${reportData.reportedEntityId}`
+        return `${configRoute.manager.blog}/${reportData.reportedEntityId}`
       default:
         return null
     }
@@ -210,15 +136,12 @@ export default function ReportDetailPage(props: { params: Promise<{ id: string }
   const breadcrumbItems = [
     {
       title: 'Báo cáo',
-      href: '/manager/report'
+      href: configRoute.manager.report
     },
     {
       title: `Chi tiết báo cáo #${reportId.substring(0, 8)}`
     }
   ]
-
-  // Kiểm tra xem báo cáo có thể xử lý không
-  const canResolve = reportData.status === 'PENDING'
 
   return (
     <div className='container max-w-4xl mx-auto py-6 space-y-8'>
@@ -316,52 +239,6 @@ export default function ReportDetailPage(props: { params: Promise<{ id: string }
                 <h3 className='text-sm font-medium text-muted-foreground'>Ghi chú xử lý</h3>
                 <p className='p-3 bg-gray-50 rounded-md text-sm'>{reportData.solutionNote}</p>
               </div>
-            )}
-          </div>
-
-          {canResolve && (
-            <>
-              <Separator />
-
-              <div className='space-y-4'>
-                <h3 className='text-sm font-medium'>Phản hồi báo cáo</h3>
-                <Textarea
-                  placeholder='Nhập ghi chú xử lý báo cáo...'
-                  value={solutionNote}
-                  onChange={(e) => setSolutionNote(e.target.value)}
-                  className='min-h-[100px]'
-                />
-              </div>
-            </>
-          )}
-
-          <Separator />
-
-          <div className='flex justify-end gap-4'>
-            {canResolve ? (
-              <>
-                <Button
-                  variant='destructive'
-                  onClick={handleReject}
-                  disabled={isSubmitting || updateReportResolveReject.isPending}
-                  className='flex items-center gap-2'
-                >
-                  <X className='h-4 w-4' />
-                  Từ chối
-                </Button>
-                <Button
-                  onClick={handleApprove}
-                  disabled={isSubmitting || updateReportResolveApproved.isPending}
-                  className='flex items-center gap-2'
-                >
-                  <Check className='h-4 w-4' />
-                  Phê duyệt
-                </Button>
-              </>
-            ) : (
-              <Button variant='outline' asChild>
-                <Link href='/manager/report'>Quay lại danh sách</Link>
-              </Button>
             )}
           </div>
         </CardContent>

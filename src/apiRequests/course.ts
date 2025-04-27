@@ -4,7 +4,18 @@ import {
   CreateCourseCommentResType,
   GetCourseDetailAdminResType,
   GetCoursesListAdminResType,
-  GetDraftCoursesResType
+  GetDraftCoursesResType,
+  GetQuestionListResType,
+  CreateQuestionBodyType,
+  CreateQuestionResType,
+  UpdateQuestionBodyType,
+  UpdateQuestionResType,
+  DeleteQuestionResType,
+  GetChapterQuestionListResType,
+  AddMultiQuestionsToChapterBodyType,
+  AddMultiQuestionsToChapterResType,
+  RemoveQuestionFromChapterBodyType,
+  RemoveQuestionFromChapterResType
 } from '@/schemaValidations/admin.schema'
 import {
   AllCoursesForCustomResType,
@@ -172,7 +183,29 @@ const courseApiRequest = {
   updateIsVisibleCourse: (id: string, data: UpdateIsVisibleCourseBodyType) =>
     http.put<UpdateIsVisibleCourseResType>(`/courses/${id}`, data),
   createCourseComment: (data: CreateCourseCommentBodyType) =>
-    http.post<CreateCourseCommentResType>('/course-comments', data)
+    http.post<CreateCourseCommentResType>('/course-comments', data),
+  getQuestionList: ({ page_index, page_size }: { page_index?: number | undefined; page_size?: number | undefined }) =>
+    http.get<GetQuestionListResType>(`/questions?page_index=${page_index}&page_size=${page_size}`),
+  createQuestion: (data: CreateQuestionBodyType) => http.post<CreateQuestionResType>('/questions', data),
+  updateQuestion: (id: string, data: UpdateQuestionBodyType) =>
+    http.put<UpdateQuestionResType>(`/questions/${id}`, data),
+  deleteQuestion: (id: string) => http.delete<DeleteQuestionResType>(`/questions/${id}`),
+  getChapterQuestionList: ({
+    chapterId,
+    page_index,
+    page_size
+  }: {
+    chapterId: string
+    page_index?: number | undefined
+    page_size?: number | undefined
+  }) =>
+    http.get<GetChapterQuestionListResType>(`/questions/${chapterId}?page_index=${page_index}&page_size=${page_size}`),
+  addMultiQuestionsToChapter: (data: AddMultiQuestionsToChapterBodyType) =>
+    http.post<AddMultiQuestionsToChapterResType>('/questions/add-multi-question', data),
+  removeQuestionFromChapter: (data: RemoveQuestionFromChapterBodyType) =>
+    http.delete<RemoveQuestionFromChapterResType>(
+      `/questions/remove-question?chapterId=${data.chapterId}&questionId=${data.questionId}`
+    )
 }
 
 export default courseApiRequest

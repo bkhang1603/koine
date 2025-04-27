@@ -109,3 +109,10 @@ export const useDashboardSupporterQuery = ({
       })
   })
 }
+
+export const useDashboardCourseDetailQuery = ({ courseId }: { courseId: string }) => {
+  return useQuery({
+    queryKey: ['dashboard-course-detail', courseId],
+    queryFn: () => dashboardApiRequest.getDashboardCourseDetail({ courseId })
+  })
+}

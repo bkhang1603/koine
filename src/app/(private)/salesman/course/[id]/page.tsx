@@ -1,12 +1,11 @@
 'use client'
 import { use } from 'react'
-import { useCourseDetailAdminQuery } from '@/queries/useCourse'
+import { useGetCourseQuery } from '@/queries/useCourse'
 import { useRouter } from 'next/navigation'
-
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import { Clock, FileText, LayoutList, BookOpen, Users, Star, GraduationCap, Tag } from 'lucide-react'
+import { Clock, FileText, LayoutList, BookOpen, Users, Star, GraduationCap, Tag, HelpCircle } from 'lucide-react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { cn, formatLevel } from '@/lib/utils'
@@ -70,7 +69,7 @@ const CourseDetailSkeleton = () => {
 
 export default function CourseDetailPage(props: { params: Promise<{ id: string }> }) {
   const params = use(props.params)
-  const { data: courseData, isLoading } = useCourseDetailAdminQuery({ courseId: params.id })
+  const { data: courseData, isLoading } = useGetCourseQuery({ id: params.id })
   const router = useRouter()
 
   const course = courseData?.payload?.data
@@ -240,6 +239,10 @@ export default function CourseDetailPage(props: { params: Promise<{ id: string }
                                 <Badge variant='outline' className='ml-0'>
                                   <Clock className='w-3 h-3 mr-1' />
                                   {chapter.durationsDisplay}
+                                </Badge>
+                                <Badge variant='outline' className='ml-0'>
+                                  <HelpCircle className='w-3 h-3 mr-1' />
+                                  {chapter.questions?.length || 0} câu hỏi
                                 </Badge>
                               </div>
                             </div>

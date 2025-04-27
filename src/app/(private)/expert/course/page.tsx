@@ -1,7 +1,6 @@
 'use client'
 
 import { use, useMemo, useCallback } from 'react'
-import { LayoutList } from 'lucide-react'
 import { TableCustom, dataListType } from '@/components/table-custom'
 import { SearchParams } from '@/types/query'
 import { useRouter } from 'next/navigation'
@@ -11,8 +10,6 @@ import { vi } from 'date-fns/locale'
 import { MoreOptions } from '@/components/private/common/more-options'
 import { useGetDraftCoursesQuery, useUpdateStatusCourseMutation } from '@/queries/useCourse'
 import Image from 'next/image'
-import { Button } from '@/components/ui/button'
-import Link from 'next/link'
 import { toast } from '@/components/ui/use-toast'
 import { formatCourseStatus, handleErrorApi } from '@/lib/utils'
 import configRoute from '@/config/route'
@@ -209,12 +206,6 @@ function SalesmanCourse(props: { searchParams: SearchParams }) {
             <h1 className='text-2xl font-bold'>Quản lý khóa học</h1>
             <p className='text-muted-foreground mt-1'>Quản lý và theo dõi tất cả khóa học trong hệ thống</p>
           </div>
-          <Link href='/salesman/course/categories'>
-            <Button variant='outline'>
-              <LayoutList className='w-4 h-4 mr-2' />
-              Quản lý danh mục
-            </Button>
-          </Link>
         </div>
       </div>
 

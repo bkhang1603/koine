@@ -18,7 +18,8 @@ import {
   Calendar,
   Info,
   Tag,
-  GraduationCap
+  GraduationCap,
+  HelpCircle
 } from 'lucide-react'
 import Link from 'next/link'
 import Image from 'next/image'
@@ -31,9 +32,8 @@ import { MoreOptions } from '@/components/private/common/more-options'
 import { LessonTypeDisplay } from '@/components/private/common/course/lesson-type-display'
 import { handleErrorApi } from '@/lib/utils'
 import { CourseEnrollmentsChart } from '@/components/private/common/course/course-enrollments-chart'
-import { CourseCompletionChart } from '@/components/private/common/course/course-completion-chart'
 import { Separator } from '@/components/ui/separator'
-import { courseMonthlyEnrollments, courseCompletionData } from '@/app/(private)/admin/course/[id]/mock-data'
+import { useDashboardCourseDetailQuery } from '@/queries/useDashboard'
 
 // Skeleton component cho course detail
 const CourseDetailSkeleton = () => {
@@ -45,20 +45,7 @@ const CourseDetailSkeleton = () => {
         {/* Chart Skeletons - moved to top */}
         <div className='mb-8'>
           <Skeleton className='h-8 w-48 mb-4' />
-          <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
-            <div className='bg-card rounded-lg border shadow-sm'>
-              <div className='p-6'>
-                <Skeleton className='h-7 w-48 mb-2' />
-                <Skeleton className='h-4 w-64 mb-6' />
-                <Skeleton className='h-[300px] w-full' />
-                <div className='mt-3 pt-3 border-t'>
-                  <div className='flex justify-between'>
-                    <Skeleton className='h-4 w-32' />
-                    <Skeleton className='h-4 w-32' />
-                  </div>
-                </div>
-              </div>
-            </div>
+          <div className='w-full mx-auto'>
             <div className='bg-card rounded-lg border shadow-sm'>
               <div className='p-6'>
                 <Skeleton className='h-7 w-48 mb-2' />
@@ -124,8 +111,11 @@ export default function CourseDetailPage(props: { params: Promise<{ id: string }
   const { data: courseData, isLoading } = useGetCourseQuery({ id: params.id })
   const router = useRouter()
   const deleteChapterMutation = useDeleteChapterMutation({ courseId: params.id })
+  // eslint-disable-next-line no-unused-vars
+  const { data: dashboardData, isLoading: isDashboardLoading } = useDashboardCourseDetailQuery({ courseId: params.id })
 
   const course = courseData?.payload?.data
+  const courseEnrollments = dashboardData?.payload?.data?.courseEnrollments || []
 
   const handleDeleteChapter = async (chapterId: string) => {
     try {
@@ -158,6 +148,9 @@ export default function CourseDetailPage(props: { params: Promise<{ id: string }
   // Tính tổng số bài học từ tất cả các chương
   const totalLessons = course.chapters.reduce((acc, chapter) => acc + chapter.lessons.length, 0)
 
+  // Tính tổng số câu hỏi từ tất cả các chương
+  const totalQuestions = course.chapters.reduce((acc, chapter) => acc + (chapter.questions?.length || 0), 0)
+
   // Format dates
   const createdAt = new Date(course.createdAt)
   const updatedAt = new Date(course.updatedAt)
@@ -183,9 +176,8 @@ export default function CourseDetailPage(props: { params: Promise<{ id: string }
         {/* Charts section */}
         <div className='mb-8'>
           <h2 className='text-2xl font-bold mb-4'>Thống kê khóa học</h2>
-          <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
-            <CourseEnrollmentsChart data={courseMonthlyEnrollments} />
-            <CourseCompletionChart data={courseCompletionData} />
+          <div className='w-full mx-auto'>
+            <CourseEnrollmentsChart data={courseEnrollments} />
           </div>
         </div>
 
@@ -211,7 +203,7 @@ export default function CourseDetailPage(props: { params: Promise<{ id: string }
                 <Separator className='my-2' />
 
                 {/* Course stats section */}
-                <div className='grid grid-cols-2 md:grid-cols-4 gap-2 mb-0'>
+                <div className='grid grid-cols-2 md:grid-cols-5 gap-2 mb-0'>
                   <div className='flex flex-col items-center p-2 bg-muted/30 rounded-lg'>
                     <Users className='h-4 w-4 text-primary mb-1' />
                     <span className='text-base font-bold'>{course.totalEnrollment}</span>
@@ -226,6 +218,11 @@ export default function CourseDetailPage(props: { params: Promise<{ id: string }
                     <FileText className='h-4 w-4 text-primary mb-1' />
                     <span className='text-base font-bold'>{totalLessons}</span>
                     <span className='text-xs text-muted-foreground'>Bài học</span>
+                  </div>
+                  <div className='flex flex-col items-center p-2 bg-muted/30 rounded-lg'>
+                    <HelpCircle className='h-4 w-4 text-primary mb-1' />
+                    <span className='text-base font-bold'>{totalQuestions}</span>
+                    <span className='text-xs text-muted-foreground'>Câu hỏi</span>
                   </div>
                   <div className='flex flex-col items-center p-2 bg-muted/30 rounded-lg'>
                     <Star className='h-4 w-4 text-amber-500 mb-1' />
@@ -385,6 +382,10 @@ export default function CourseDetailPage(props: { params: Promise<{ id: string }
                                 <Badge variant='outline' className='ml-0'>
                                   <Clock className='w-3 h-3 mr-1' />
                                   {chapter.durationsDisplay}
+                                </Badge>
+                                <Badge variant='outline' className='ml-0'>
+                                  <HelpCircle className='w-3 h-3 mr-1' />
+                                  {chapter.questions?.length || 0} câu hỏi
                                 </Badge>
                               </div>
                             </div>

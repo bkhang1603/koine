@@ -1,9 +1,9 @@
 'use client'
 
-import { use, useMemo } from 'react'
-import { useGetProductListAdminQuery } from '@/queries/useProduct'
+import { use, useMemo, useCallback } from 'react'
+import { useGetProductListAdminQuery, useProductDeleteMutation } from '@/queries/useProduct'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Package, BarChart, Star, PackageX } from 'lucide-react'
+import { Package, Plus, Settings, BarChart, Star, PackageX } from 'lucide-react'
 import { TableCustom, dataListType } from '@/components/table-custom'
 import configRoute from '@/config/route'
 import { SearchParams } from '@/types/query'
@@ -12,8 +12,12 @@ import { format } from 'date-fns'
 import { vi } from 'date-fns/locale'
 import { Skeleton } from '@/components/ui/skeleton'
 import Image from 'next/image'
+import { Button } from '@/components/ui/button'
+import Link from 'next/link'
 import { MoreOptions } from '@/components/private/common/more-options'
 import { Breadcrumb } from '@/components/private/common/breadcrumb'
+import { toast } from '@/components/ui/use-toast'
+import { handleErrorApi } from '@/lib/utils'
 
 function AdminProduct(props: { searchParams: SearchParams }) {
   const searchParams = use(props.searchParams)
@@ -28,6 +32,24 @@ function AdminProduct(props: { searchParams: SearchParams }) {
     page_size: currentPageSize,
     keyword: currentKeyword
   })
+
+  const deleteProductMutation = useProductDeleteMutation()
+
+  const handleDelete = useCallback(
+    async (productId: string) => {
+      try {
+        await deleteProductMutation.mutateAsync(productId)
+        toast({
+          description: 'Xóa sản phẩm thành công'
+        })
+      } catch (error) {
+        handleErrorApi({
+          error
+        })
+      }
+    },
+    [deleteProductMutation]
+  )
 
   const products = responseData?.payload.data.products || []
   const pagination = responseData?.payload.pagination || {
@@ -126,12 +148,13 @@ function AdminProduct(props: { searchParams: SearchParams }) {
               slug: product.slug
             }}
             onView={() => router.push(`${configRoute.manager.product}/${product.id}`)}
-            onManageComments={() => router.push(`${configRoute.manager.product}/${product.id}/comment`)}
+            onEdit={() => router.push(`${configRoute.manager.product}/${product.id}/edit`)}
+            onDelete={() => handleDelete(product.id)}
           />
         )
       }
     ],
-    [router]
+    [router, handleDelete]
   )
 
   const tableData: dataListType = {
@@ -156,6 +179,20 @@ function AdminProduct(props: { searchParams: SearchParams }) {
         <div>
           <h1 className='text-2xl font-bold'>Quản lý sản phẩm</h1>
           <p className='text-muted-foreground mt-1'>Quản lý danh sách sản phẩm trong hệ thống</p>
+        </div>
+        <div className='flex items-center gap-4'>
+          <Button variant='outline' asChild>
+            <Link href='/manager/product/categories'>
+              <Settings className='w-4 h-4 mr-2' />
+              Quản lý danh mục
+            </Link>
+          </Button>
+          <Button asChild>
+            <Link href={configRoute.manager.productNew} className='flex items-center gap-2'>
+              <Plus className='h-4 w-4' />
+              Thêm sản phẩm mới
+            </Link>
+          </Button>
         </div>
       </div>
 

@@ -2,7 +2,6 @@
 
 import { use, useMemo } from 'react'
 import { useGetProductsQuery } from '@/queries/useProduct'
-import { Plus, Settings } from 'lucide-react'
 import { TableCustom, dataListType } from '@/components/table-custom'
 import configRoute from '@/config/route'
 import { SearchParams } from '@/types/query'
@@ -10,8 +9,6 @@ import { useRouter } from 'next/navigation'
 import { format } from 'date-fns'
 import { vi } from 'date-fns/locale'
 import Image from 'next/image'
-import { Button } from '@/components/ui/button'
-import Link from 'next/link'
 import { MoreOptions } from '@/components/private/common/more-options'
 import { Breadcrumb } from '@/components/private/common/breadcrumb'
 
@@ -141,20 +138,6 @@ function AdminProduct(props: { searchParams: SearchParams }) {
         <div>
           <h1 className='text-2xl font-bold'>Quản lý sản phẩm</h1>
           <p className='text-muted-foreground mt-1'>Quản lý danh sách sản phẩm trong hệ thống</p>
-        </div>
-        <div className='flex items-center gap-4'>
-          <Button variant='outline' asChild>
-            <Link href='/salesman/product/categories'>
-              <Settings className='w-4 h-4 mr-2' />
-              Quản lý danh mục
-            </Link>
-          </Button>
-          <Button asChild>
-            <Link href={configRoute.salesman.productNew} className='flex items-center gap-2'>
-              <Plus className='h-4 w-4' />
-              Thêm sản phẩm mới
-            </Link>
-          </Button>
         </div>
       </div>
 

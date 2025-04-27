@@ -51,7 +51,9 @@ const configRoute = {
     blog: '/manager/blog',
     course: '/manager/course',
     product: '/manager/product',
-    report: '/manager/report'
+    report: '/manager/report',
+    productNew: '/manager/product/new',
+    productEdit: '/manager/product/edit'
   },
   admin: {
     dashboard: '/admin',
@@ -93,7 +95,8 @@ const configRoute = {
     settings: '/support/settings',
     tickets: '/support/tickets',
     product: '/support/product',
-    chat: '/support/chat'
+    chat: '/support/chat',
+    report: '/support/report'
   },
   expert: {
     dashboard: '/expert',
