@@ -26,7 +26,7 @@ async function CourseList({ searchParams }: { searchParams?: searchParams }) {
   const data = await wrapServerApi(() =>
     courseApiRequest.getCoursesCache({
       page_index: page_index,
-      page_size: 8,
+      page_size: 12,
       keyword: keyword,
       sort: sort,
       range: range,

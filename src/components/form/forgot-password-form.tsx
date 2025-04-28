@@ -32,7 +32,7 @@ export default function ForgotPasswordForm({ className }: { className?: string }
       await requestResetMutation.mutateAsync(values.email)
 
       toast({
-        description: 'Vui lòng kiểm tra email của bạn để đặt lại mật khẩu'
+        description: 'Vui lòng kiểm tra email của bạn để nhận mật khẩu mới'
       })
 
       form.reset()

@@ -13,7 +13,7 @@ import PaginationCustom from '@/components/pagination-custom'
 async function List({ searchParams }: { searchParams: searchParams | undefined }) {
   const page_index = isNaN(Number(searchParams?.page_index)) ? 1 : Number(searchParams?.page_index)
   const search = searchParams?.search ?? ''
-  const page_size = 8
+  const page_size = 12
   const sortOptions = ['pa', 'pd', 'na', 'nd'] as const
   const sort = sortOptions.includes(searchParams?.sort as any) ? searchParams?.sort : 'pa'
   const range = isNaN(Number(searchParams?.range)) ? undefined : Number(searchParams?.range)
