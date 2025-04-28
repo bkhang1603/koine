@@ -1,6 +1,6 @@
 import { Sidebar } from '@/types/sidebar'
 import SidebarLayout from '@/components/layout/sidebar-layout'
-import { AreaChart, Book, BookMarked, Settings } from 'lucide-react'
+import { AreaChart, Book, BookMarked, Settings, HelpCircle } from 'lucide-react'
 
 export default function Layout({
   children
@@ -33,6 +33,12 @@ export default function Layout({
           href: '/content-creator/course',
           icon: <BookMarked className='h-5 w-5' />,
           label: 'Khoá học'
+        },
+        {
+          id: 'question',
+          href: '/content-creator/question',
+          icon: <HelpCircle className='h-5 w-5' />,
+          label: 'Câu đố'
         }
       ]
     },
