@@ -203,9 +203,7 @@ const courseApiRequest = {
   addMultiQuestionsToChapter: (data: AddMultiQuestionsToChapterBodyType) =>
     http.post<AddMultiQuestionsToChapterResType>('/questions/add-multi-question', data),
   removeQuestionFromChapter: (data: RemoveQuestionFromChapterBodyType) =>
-    http.delete<RemoveQuestionFromChapterResType>(
-      `/questions/remove-question?chapterId=${data.chapterId}&questionId=${data.questionId}`
-    )
+    http.put<RemoveQuestionFromChapterResType>('/questions/remove-question', data)
 }
 
 export default courseApiRequest
