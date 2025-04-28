@@ -63,7 +63,7 @@ export default function DropdownAvatar() {
       setAvatar()
       setUsername()
       setUser()
-      router.push(configRoute.home)
+      router.push(configRoute.login)
       router.refresh()
     } catch (error: any) {
       handleErrorApi(error)
