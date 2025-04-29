@@ -10,9 +10,12 @@ import { cn, handleErrorApi } from '@/lib/utils'
 import { ForgotPasswordBody, ForgotPasswordBodyType } from '@/schemaValidations/auth.schema'
 import { useRequestResetPasswordMutation } from '@/queries/useAuth'
 import { toast } from '@/components/ui/use-toast'
+import { useRouter } from 'next/navigation'
+import configRoute from '@/config/route'
 
 export default function ForgotPasswordForm({ className }: { className?: string }) {
   const requestResetMutation = useRequestResetPasswordMutation()
+  const router = useRouter()
 
   const form = useForm<ForgotPasswordBodyType>({
     resolver: zodResolver(ForgotPasswordBody),
@@ -36,6 +39,8 @@ export default function ForgotPasswordForm({ className }: { className?: string }
       })
 
       form.reset()
+
+      router.push(configRoute.login)
     } catch (error) {
       handleErrorApi({
         error,
