@@ -27,8 +27,6 @@ export default function ForgotPasswordForm({ className }: { className?: string }
   // 2. Define a submit handler.
   // eslint-disable-next-line no-unused-vars
   async function onSubmit(values: ForgotPasswordBodyType) {
-    console.log('values', values)
-
     try {
       if (requestResetMutation.isPending) return
 
