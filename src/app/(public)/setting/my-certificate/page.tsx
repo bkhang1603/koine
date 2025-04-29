@@ -197,7 +197,7 @@ export default function MyCertificatePage() {
 
                 <div className='p-5'>
                   <div className='flex items-start justify-between mb-2'>
-                    <h3 className='font-medium text-gray-900'>{cert.courseTitle}</h3>
+                    <h3 className='font-medium text-gray-900 line-clamp-1'>{cert.courseTitle}</h3>
                     <Badge
                       variant='outline'
                       className={`bg-${colorClass}-50 text-${colorClass}-700 border-${colorClass}-200`}
