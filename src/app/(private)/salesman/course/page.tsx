@@ -8,11 +8,7 @@ import { Badge } from '@/components/ui/badge'
 import { format } from 'date-fns'
 import { vi } from 'date-fns/locale'
 import { MoreOptions } from '@/components/private/common/more-options'
-import {
-  useGetDraftCoursesQuery,
-  useUpdateStatusCourseMutation,
-  useUpdateIsVisibleCourseMutation
-} from '@/queries/useCourse'
+import { useGetDraftCoursesQuery, useUpdateStatusCourseMutation } from '@/queries/useCourse'
 import Image from 'next/image'
 import { toast } from '@/components/ui/use-toast'
 import { formatCourseStatus, handleErrorApi } from '@/lib/utils'
@@ -35,7 +31,6 @@ function SalesmanCourse(props: { searchParams: SearchParams }) {
   })
 
   const updateStatusCourseMutation = useUpdateStatusCourseMutation()
-  const updateIsVisibleCourseMutation = useUpdateIsVisibleCourseMutation()
 
   const handleUpdateStatus = useCallback(
     async (courseId: string) => {
@@ -49,14 +44,6 @@ function SalesmanCourse(props: { searchParams: SearchParams }) {
           }
         })
 
-        // Then update the visibility
-        await updateIsVisibleCourseMutation.mutateAsync({
-          id: courseId,
-          data: {
-            isVisible: false
-          }
-        })
-
         toast({
           description: 'Kích hoạt khóa học thành công'
         })
@@ -66,7 +53,7 @@ function SalesmanCourse(props: { searchParams: SearchParams }) {
         })
       }
     },
-    [updateStatusCourseMutation, updateIsVisibleCourseMutation]
+    [updateStatusCourseMutation]
   )
 
   const data = responseData?.payload.data || []

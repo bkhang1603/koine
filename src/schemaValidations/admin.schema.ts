@@ -1156,6 +1156,12 @@ export const getDashboardSupporterRes = z.object({
         status: z.string(),
         count: z.number().int().nonnegative().or(z.string().transform(Number))
       })
+    ),
+    exchangeOrderStatusData: z.array(
+      z.object({
+        status: z.string(),
+        count: z.number().int().nonnegative().or(z.string().transform(Number))
+      })
     )
   })
 })

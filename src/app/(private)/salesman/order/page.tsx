@@ -187,11 +187,7 @@ function AdminOrder(props: { searchParams: SearchParams }) {
               }}
               itemType='order'
               onView={() => router.push(`/salesman/order/${order.id}`)}
-              onConfirmDelivery={
-                order.status === 'DELIVERING' && order.paymentMethod !== 'COD'
-                  ? () => handleConfirmDelivery(order.id)
-                  : undefined
-              }
+              onConfirmDelivery={order.status === 'DELIVERING' ? () => handleConfirmDelivery(order.id) : undefined}
             />
           </div>
         )
