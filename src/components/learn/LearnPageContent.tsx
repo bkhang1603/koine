@@ -347,7 +347,7 @@ export function LearnPageContent({
                 canAccessNext={!!getNextItem() && isCurrentLessonCompleted() && isNextItemAccessible()}
                 onPrevClick={() => handleNavigationClick(getPreviousItem())}
                 onNextClick={() => handleNavigationClick(getNextItem())}
-                onComplete={() => handleUpdate({ lessonId: lesson.id, courseId: course.id, status: lesson.status })}
+                onComplete={() => handleUpdate({ lessonId: lesson.id, courseId: courseId, status: lesson.status })}
                 isUpdating={Boolean(isUpdating || isFetching)}
                 canAccessLesson={canAccessLesson}
               />

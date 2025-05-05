@@ -186,12 +186,22 @@ function SupportChat() {
       onConnect()
     }
 
+    // Listen for new messages
     socket.on('newMessage', handleNewMessage)
+
+    // Listen for status changes (room closed, supporter joined, etc)
+    socket.on('roomUpdated', () => {
+      refetchRooms()
+      if (selectedRoomId) {
+        refetchMessages()
+      }
+    })
 
     return () => {
       socket.off('newMessage', handleNewMessage)
+      socket.off('roomUpdated')
     }
-  }, [user, isLoggedIn, selectedRoomId, handleNewMessage, refetchMessages])
+  }, [user, isLoggedIn, selectedRoomId, handleNewMessage, refetchMessages, refetchRooms])
 
   // Scroll to bottom when new messages come in or room changes
   useEffect(() => {
@@ -519,20 +529,8 @@ function SupportChat() {
                 </div>
               </div>
               <div className='flex items-center gap-2'>
-                {!selectedRoom.isClose && (
+                {!selectedRoom.isClose && !selectedRoom.isPendingSupport && (
                   <>
-                    <Button
-                      size='sm'
-                      onClick={() => handleJoinChat(selectedRoom.id)}
-                      disabled={requestJoinChatMutation.isPending}
-                    >
-                      {requestJoinChatMutation.isPending ? (
-                        <Loader2 className='h-4 w-4 animate-spin mr-1' />
-                      ) : (
-                        <UserPlus className='h-4 w-4 mr-1' />
-                      )}
-                      Tham gia hỗ trợ
-                    </Button>
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
                         <Button variant='ghost' size='icon' className='h-8 w-8 text-gray-500'>
@@ -627,25 +625,43 @@ function SupportChat() {
 
             {/* Input Area */}
             {!selectedRoom.isClose ? (
-              <form onSubmit={handleSendMessage} className='p-3 border-t bg-white flex items-center gap-2'>
-                <div className='flex-1 relative'>
-                  <Input
-                    ref={inputRef}
-                    value={newMessage}
-                    onChange={(e) => setNewMessage(e.target.value)}
-                    placeholder='Nhập tin nhắn...'
-                    className='bg-gray-50/80 border-gray-200'
-                    disabled={isSending}
-                  />
+              selectedRoom.isPendingSupport ? (
+                <div className='p-3 border-t bg-white flex items-center justify-center'>
+                  <Button
+                    size='sm'
+                    onClick={() => handleJoinChat(selectedRoom.id)}
+                    disabled={requestJoinChatMutation.isPending}
+                    className='w-full max-w-md'
+                  >
+                    {requestJoinChatMutation.isPending ? (
+                      <Loader2 className='h-4 w-4 animate-spin mr-1' />
+                    ) : (
+                      <UserPlus className='h-4 w-4 mr-1' />
+                    )}
+                    Tham gia hỗ trợ phòng chat này
+                  </Button>
                 </div>
-                <Button
-                  type='submit'
-                  disabled={!newMessage.trim() || isSending}
-                  className='h-9 w-9 rounded-full p-0 flex items-center justify-center'
-                >
-                  {isSending ? <Loader2 className='h-4 w-4 animate-spin' /> : <Send className='h-4 w-4' />}
-                </Button>
-              </form>
+              ) : (
+                <form onSubmit={handleSendMessage} className='p-3 border-t bg-white flex items-center gap-2'>
+                  <div className='flex-1 relative'>
+                    <Input
+                      ref={inputRef}
+                      value={newMessage}
+                      onChange={(e) => setNewMessage(e.target.value)}
+                      placeholder='Nhập tin nhắn...'
+                      className='bg-gray-50/80 border-gray-200'
+                      disabled={isSending}
+                    />
+                  </div>
+                  <Button
+                    type='submit'
+                    disabled={!newMessage.trim() || isSending}
+                    className='h-9 w-9 rounded-full p-0 flex items-center justify-center'
+                  >
+                    {isSending ? <Loader2 className='h-4 w-4 animate-spin' /> : <Send className='h-4 w-4' />}
+                  </Button>
+                </form>
+              )
             ) : (
               <div className='p-4 border-t bg-white flex flex-col items-center'>
                 <div className='text-xs text-gray-500 text-center'>
