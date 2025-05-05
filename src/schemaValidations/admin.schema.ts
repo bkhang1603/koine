@@ -1213,18 +1213,45 @@ export const getQuestionListRes = z.object({
 })
 
 export const createQuestionOptionSchema = z.object({
-  optionData: z.string(),
+  optionData: z
+    .string()
+    .min(1, 'Nội dung lựa chọn không được để trống')
+    .max(500, 'Nội dung lựa chọn không được vượt quá 500 ký tự'),
   isCorrect: z.boolean()
 })
 
 export const createQuestionBody = z.object({
-  content: z.string(),
-  options: z.array(createQuestionOptionSchema)
+  content: z
+    .string()
+    .min(10, 'Nội dung câu hỏi phải có ít nhất 10 ký tự')
+    .max(1000, 'Nội dung câu hỏi không được vượt quá 1000 ký tự'),
+  options: z
+    .array(createQuestionOptionSchema)
+    .min(2, 'Phải có ít nhất 2 lựa chọn')
+    .max(10, 'Không được vượt quá 10 lựa chọn')
+    .refine((options) => options.some((option) => option.isCorrect), {
+      message: 'Phải có ít nhất một đáp án đúng'
+    })
+    .refine((options) => options.every((option) => option.optionData.trim() !== ''), {
+      message: 'Tất cả các lựa chọn phải có nội dung'
+    })
 })
 
 export const updateQuestionBody = z.object({
-  content: z.string(),
-  options: z.array(createQuestionOptionSchema)
+  content: z
+    .string()
+    .min(10, 'Nội dung câu hỏi phải có ít nhất 10 ký tự')
+    .max(1000, 'Nội dung câu hỏi không được vượt quá 1000 ký tự'),
+  options: z
+    .array(createQuestionOptionSchema)
+    .min(2, 'Phải có ít nhất 2 lựa chọn')
+    .max(10, 'Không được vượt quá 10 lựa chọn')
+    .refine((options) => options.some((option) => option.isCorrect), {
+      message: 'Phải có ít nhất một đáp án đúng'
+    })
+    .refine((options) => options.every((option) => option.optionData.trim() !== ''), {
+      message: 'Tất cả các lựa chọn phải có nội dung'
+    })
 })
 
 export const createQuestionRes = z.object({

@@ -99,7 +99,7 @@ function AdminProduct(props: { searchParams: SearchParams }) {
       },
       {
         id: 4,
-        render: (product: any) => <span>{product.discount}%</span>
+        render: (product: any) => <span>{Math.round(product.discount * 100)}%</span>
       },
       {
         id: 5,

@@ -32,7 +32,7 @@ const userApiRequest = {
     page_index?: number | undefined
     page_size?: number | undefined
     keyword?: string | string[] | undefined
-    isResolve?: boolean | undefined
+    isResolve?: 't' | 'f' | undefined
   }) =>
     http.get<GetRequestSupportListResType>(
       `/request-supports?page_index=${page_index}&page_size=${page_size}${keyword ? `&keyword=${keyword}` : ''}${isResolve ? `&isResolve=${isResolve}` : ''}`

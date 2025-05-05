@@ -56,7 +56,8 @@ function ReportPage(props: { searchParams: SearchParams }) {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const reportTypeConfig = {
     COURSE: 'Khóa học',
-    BLOG: 'Bài viết'
+    BLOG: 'Bài viết',
+    PRODUCT: 'Sản phẩm'
   } as const
 
   // Cấu hình cột cho bảng
@@ -197,6 +198,7 @@ function ReportPage(props: { searchParams: SearchParams }) {
                 <SelectItem value='--'>--</SelectItem>
                 <SelectItem value='COURSE'>Khóa học</SelectItem>
                 <SelectItem value='BLOG'>Bài viết</SelectItem>
+                <SelectItem value='PRODUCT'>Sản phẩm</SelectItem>
               </SelectContent>
             </Select>
           </div>

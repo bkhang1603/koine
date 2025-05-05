@@ -23,11 +23,22 @@ import { toast } from '@/components/ui/use-toast'
 
 // Form validation schema
 const formSchema = z.object({
-  title: z.string().min(5, { message: 'Tiêu đề phải có ít nhất 5 ký tự' }),
-  description: z.string().min(10, { message: 'Mô tả phải có ít nhất 10 ký tự' }),
-  content: z.string().min(50, { message: 'Nội dung phải có ít nhất 50 ký tự' }),
+  title: z
+    .string()
+    .min(5, { message: 'Tiêu đề phải có ít nhất 5 ký tự' })
+    .max(255, { message: 'Tiêu đề không được vượt quá 255 ký tự' })
+    .trim(),
+  description: z
+    .string()
+    .min(10, { message: 'Mô tả phải có ít nhất 10 ký tự' })
+    .max(255, { message: 'Mô tả không được vượt quá 255 ký tự' })
+    .trim(),
+  content: z
+    .string()
+    .min(50, { message: 'Nội dung phải có ít nhất 50 ký tự' })
+    .refine((val) => val !== '<p></p>', { message: 'Nội dung không được để trống' }),
   categoryIds: z.array(z.string()).min(1, { message: 'Vui lòng chọn ít nhất 1 danh mục' }),
-  imageUrl: z.string().url({ message: 'URL hình ảnh không hợp lệ' }).or(z.string().length(0))
+  imageUrl: z.string().min(1, { message: 'Ảnh đại diện không được để trống' })
 })
 
 type FormValues = z.infer<typeof formSchema>

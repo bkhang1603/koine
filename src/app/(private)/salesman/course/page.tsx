@@ -69,9 +69,11 @@ function SalesmanCourse(props: { searchParams: SearchParams }) {
   const headerColumn = [
     { id: 1, name: 'Tên khóa học' },
     { id: 2, name: 'Ngày tạo' },
-    { id: 3, name: 'Hiển thị' },
-    { id: 4, name: 'Trạng thái' },
-    { id: 5, name: '' }
+    { id: 3, name: 'Giá' },
+    { id: 4, name: 'Giảm giá' },
+    { id: 5, name: 'Hiển thị' },
+    { id: 6, name: 'Trạng thái' },
+    { id: 7, name: '' }
   ]
 
   const bodyColumn = useMemo(
@@ -112,6 +114,24 @@ function SalesmanCourse(props: { searchParams: SearchParams }) {
       {
         id: 3,
         render: (course: any) => (
+          <div className='min-w-[100px]'>
+            <div className='text-sm'>
+              {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(course.price)}
+            </div>
+          </div>
+        )
+      },
+      {
+        id: 4,
+        render: (course: any) => (
+          <div className='min-w-[100px]'>
+            <div className='text-sm'>{Math.round(course.discount * 100)}%</div>
+          </div>
+        )
+      },
+      {
+        id: 5,
+        render: (course: any) => (
           <div className='flex items-center min-w-[100px]'>
             <Badge variant={course.isVisible ? 'green' : 'destructive'} className='w-fit'>
               {course.isVisible ? 'Hiển thị' : 'Ẩn'}
@@ -120,7 +140,7 @@ function SalesmanCourse(props: { searchParams: SearchParams }) {
         )
       },
       {
-        id: 4,
+        id: 6,
         render: (course: any) => (
           <div className='flex items-center min-w-[100px]'>
             <Badge variant='outline' className='w-fit bg-primary/10'>
@@ -130,7 +150,7 @@ function SalesmanCourse(props: { searchParams: SearchParams }) {
         )
       },
       {
-        id: 5,
+        id: 7,
         render: (course: any) => (
           <div className='flex justify-end min-w-[40px]'>
             <MoreOptions
