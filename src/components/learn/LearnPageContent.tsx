@@ -19,7 +19,7 @@ interface LearnPageContentProps {
   isFetching?: boolean
   onLessonClick: (lesson: any) => void
   onQuizClick: (chapter: any) => void
-  handleUpdate: ({ lessonId, status }: { lessonId: string; status: string }) => void
+  handleUpdate: ({ lessonId, courseId, status }: { lessonId: string; courseId: string; status: string }) => void
   isUpdating: boolean
   forKid?: boolean
   backUrl: string
@@ -347,7 +347,7 @@ export function LearnPageContent({
                 canAccessNext={!!getNextItem() && isCurrentLessonCompleted() && isNextItemAccessible()}
                 onPrevClick={() => handleNavigationClick(getPreviousItem())}
                 onNextClick={() => handleNavigationClick(getNextItem())}
-                onComplete={() => handleUpdate({ lessonId: lesson.id, status: lesson.status })}
+                onComplete={() => handleUpdate({ lessonId: lesson.id, courseId: course.id, status: lesson.status })}
                 isUpdating={Boolean(isUpdating || isFetching)}
                 canAccessLesson={canAccessLesson}
               />
