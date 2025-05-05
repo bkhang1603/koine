@@ -74,6 +74,7 @@ function SupportChat() {
   const requestJoinChatMutation = useRequestJoinChatRoom({
     onSuccess: () => {
       refetchRooms()
+      refetchMessages()
     }
   })
 
@@ -139,6 +140,11 @@ function SupportChat() {
       })
       .filter(Boolean) as ExtendedChatMessage[]
   }, [messagesData])
+
+  // Kiểm tra trạng thái phòng chat có đang chờ hỗ trợ không
+  const isMissingSupport = useMemo(() => {
+    return messagesData?.payload?.data?.isMissingSupported || false
+  }, [messagesData?.payload?.data?.isMissingSupported])
 
   // Socket event handlers
   const handleNewMessage = useCallback(() => {
@@ -472,6 +478,14 @@ function SupportChat() {
                               <History className='h-3 w-3' />
                               <span className='text-[10px]'>Đã kết thúc</span>
                             </Badge>
+                          ) : room.isMissingSupported ? (
+                            <Badge
+                              variant='outline'
+                              className='px-1.5 py-0 gap-1 text-amber-500 border-amber-200 bg-amber-50 flex-shrink-0 whitespace-nowrap'
+                            >
+                              <UserPlus className='h-3 w-3' />
+                              <span className='text-[10px]'>Cần hỗ trợ</span>
+                            </Badge>
                           ) : (
                             <Badge
                               variant='outline'
@@ -519,6 +533,11 @@ function SupportChat() {
                         <History className='h-3 w-3 mr-1' />
                         Đã kết thúc
                       </span>
+                    ) : isMissingSupport ? (
+                      <span className='text-amber-500 flex items-center'>
+                        <UserPlus className='h-3 w-3 mr-1' />
+                        Cần hỗ trợ
+                      </span>
                     ) : (
                       <span className='text-green-500 flex items-center'>
                         <CheckCheck className='h-3 w-3 mr-1' />
@@ -529,7 +548,7 @@ function SupportChat() {
                 </div>
               </div>
               <div className='flex items-center gap-2'>
-                {!selectedRoom.isClose && !selectedRoom.isPendingSupport && (
+                {!selectedRoom.isClose && !isMissingSupport && (
                   <>
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
@@ -625,7 +644,7 @@ function SupportChat() {
 
             {/* Input Area */}
             {!selectedRoom.isClose ? (
-              selectedRoom.isPendingSupport ? (
+              isMissingSupport ? (
                 <div className='p-3 border-t bg-white flex items-center justify-center'>
                   <Button
                     size='sm'

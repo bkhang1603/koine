@@ -90,6 +90,7 @@ export const SupporterChatRoomListRes = z.object({
       imageUrl: z.string().nullable(),
       isGroup: z.boolean(),
       isClose: z.boolean(),
+      isMissingSupported: z.boolean(),
       members: z.array(
         z.object({
           id: z.string(),
