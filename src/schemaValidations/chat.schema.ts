@@ -35,7 +35,13 @@ export const ChatMessageData = z.object({
       })
     })
   ),
-  hasMore: z.boolean()
+  hasMore: z.boolean(),
+  isMissingSupported: z.boolean(),
+  adultDisplay: z.object({
+    avatarUrl: z.string(),
+    id: z.string(),
+    name: z.string()
+  })
 })
 
 export const ChatMessageDataRes = z.object({
@@ -84,6 +90,7 @@ export const SupporterChatRoomListRes = z.object({
       imageUrl: z.string().nullable(),
       isGroup: z.boolean(),
       isClose: z.boolean(),
+      isMissingSupported: z.boolean(),
       members: z.array(
         z.object({
           id: z.string(),

@@ -10,8 +10,8 @@ export default function SidebarMenu({ sidebarData }: { sidebarData: Sidebar }) {
   const pathname = usePathname()
 
   return (
-    <div className='flex-1'>
-      <nav className='grid items-start px-2 text-base font-medium lg:px-4'>
+    <div className='flex-1 overflow-y-auto'>
+      <nav className='grid items-start px-2 text-base font-medium lg:px-4 pb-6'>
         {sidebarData.map((item) => (
           <div key={item.title}>
             <h3 className='text-sm font-medium text-muted-foreground/60 my-3'>{item.title}</h3>

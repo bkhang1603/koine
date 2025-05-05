@@ -212,7 +212,7 @@ function NeedReviewPage() {
 
                 let displayPrice = 0
                 let displayQuantity = 1
-                let displayDiscount = 0
+                // let displayDiscount = 0
                 let displayUnitPrice = 0
                 let displayRating = 0
                 let displayComment = ''
@@ -220,7 +220,7 @@ function NeedReviewPage() {
                 if (isNeedReview(item)) {
                   displayPrice = item.totalPrice
                   displayQuantity = item.quantity
-                  displayDiscount = item.discount
+                  // displayDiscount = item.discount
                   displayUnitPrice = item.unitPrice
                 } else if (isReviewed(item)) {
                   displayRating = item.rating

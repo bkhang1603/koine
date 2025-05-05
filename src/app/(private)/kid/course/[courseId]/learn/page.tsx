@@ -92,10 +92,10 @@ function LearnPage(props: { params: Promise<{ courseId: string }> }) {
   }, [lessonId, courseLoading, course, courseId, router, quizId])
 
   const handleUpdate = useCallback(
-    async ({ lessonId, status }: { lessonId: string; status: Lesson['status'] }) => {
+    async ({ lessonId, courseId, status }: { lessonId: string; courseId: string; status: Lesson['status'] }) => {
       try {
         if (status === 'NOTYET') {
-          await updateCourseMutation.mutateAsync(lessonId)
+          await updateCourseMutation.mutateAsync({ lessonId, courseId })
           // const nextLesson = getNextLesson()
           // if (nextLesson) {
           //   router.push(`/kid/course/${courseId}/learn?lessonId=${nextLesson.id}`)

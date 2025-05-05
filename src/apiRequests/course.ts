@@ -112,7 +112,8 @@ const courseApiRequest = {
   //   http.post<OnlyMessageResType>(`/courses/active-course-enroll`, body),
   getCourseComboDetail: (id: string) => http.get<CourseComboDetailResType>(`/combos/${id}`),
   getUserCourses: () => http.get<UserCoursesResType>('/course-enrollment/enrolled'),
-  updateCourseProgress: (lessonId: string) => http.post<OnlyMessageResType>('/user-progresses', { lessonId }),
+  updateCourseProgress: ({ lessonId, courseId }: { lessonId: string; courseId: string }) =>
+    http.post<OnlyMessageResType>('/user-progresses', { lessonId, courseId }),
   // getCategoryCourses: () => http.get<CategoryCoursesResType>(`/category-courses`),
   // getCategoryCourses with caching
   getCategoryCoursesCache: () =>

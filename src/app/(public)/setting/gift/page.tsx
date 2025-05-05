@@ -152,7 +152,7 @@ const GiftPage = () => {
         ) : filteredReceivedGifts.length > 0 ? (
           <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
             {filteredReceivedGifts.map((gift) => (
-              <Card key={gift.id} className='overflow-hidden'>
+              <Card key={gift.id} className='overflow-hidden flex flex-col h-full'>
                 <CardHeader className='bg-gray-50 pb-2 pt-4'>
                   <div className='flex justify-between items-start'>
                     <div>
@@ -163,32 +163,34 @@ const GiftPage = () => {
                       </div>
                     </div>
                     <Badge variant='outline' className='bg-green-50 text-green-700 border-green-200 whitespace-nowrap'>
-                      {gift.quantity} chỗ
+                      {gift.quantity} phần
                     </Badge>
                   </div>
                 </CardHeader>
 
-                <CardContent className='pt-4'>
+                <CardContent className='pt-4 flex-grow'>
                   <div className='space-y-4'>
                     <div>
                       <p className='text-sm font-medium text-gray-700'>Người gửi:</p>
                       <p className='text-sm text-gray-600'>Người gửi #{gift.senderId}</p>
                     </div>
 
-                    {gift.message && (
+                    {gift.message ? (
                       <div>
                         <p className='text-sm font-medium text-gray-700'>Lời nhắn:</p>
                         <p className='text-sm text-gray-600 italic'>{`'${gift.message}'`}</p>
+                      </div>
+                    ) : (
+                      <div>
+                        <p className='text-sm font-medium text-gray-700'>Lời nhắn:</p>
+                        <p className='text-sm text-gray-400 italic'>Không có lời nhắn</p>
                       </div>
                     )}
                   </div>
                 </CardContent>
 
                 <CardFooter className='border-t pt-4 flex gap-2 justify-end'>
-                  <Button size='sm' className='flex items-center gap-1.5' onClick={() => setShowRedeemConfirm(true)}>
-                    <CheckCircle2 className='h-3.5 w-3.5' />
-                    Kích hoạt
-                  </Button>
+                  {/* Removed individual activation button */}
                 </CardFooter>
               </Card>
             ))}
@@ -211,7 +213,7 @@ const GiftPage = () => {
       ) : filteredSentGifts.length > 0 ? (
         <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
           {filteredSentGifts.map((gift) => (
-            <Card key={gift.id} className='overflow-hidden'>
+            <Card key={gift.id} className='overflow-hidden flex flex-col h-full'>
               <CardHeader className='bg-gray-50 pb-2 pt-4'>
                 <div className='flex justify-between items-start'>
                   <div>
@@ -222,12 +224,12 @@ const GiftPage = () => {
                     </div>
                   </div>
                   <Badge variant='outline' className='bg-blue-50 text-blue-700 border-blue-200 whitespace-nowrap'>
-                    {gift.quantity} chỗ
+                    {gift.quantity} phần
                   </Badge>
                 </div>
               </CardHeader>
 
-              <CardContent className='pt-4'>
+              <CardContent className='pt-4 flex-grow'>
                 <div className='space-y-4'>
                   <div>
                     <p className='text-sm font-medium text-gray-700'>Người nhận:</p>
@@ -238,10 +240,15 @@ const GiftPage = () => {
                     </div>
                   </div>
 
-                  {gift.message && (
+                  {gift.message ? (
                     <div>
                       <p className='text-sm font-medium text-gray-700'>Lời nhắn:</p>
                       <p className='text-sm text-gray-600 italic'>{`'${gift.message}'`}</p>
+                    </div>
+                  ) : (
+                    <div>
+                      <p className='text-sm font-medium text-gray-700'>Lời nhắn:</p>
+                      <p className='text-sm text-gray-400 italic'>Không có lời nhắn</p>
                     </div>
                   )}
                 </div>

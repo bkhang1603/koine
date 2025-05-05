@@ -11,12 +11,7 @@ import { Button } from '@/components/ui/button'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import {
-  useGetSupporterChatRoomList,
-  useGetChatMessages,
-  useRequestJoinChatRoom,
-  useCloseChatRoom
-} from '@/queries/useChat'
+import { useGetSupporterChatRoomList, useGetChatMessages, useRequestJoinChatRoom } from '@/queries/useChat'
 import { getAccessTokenFromLocalStorage } from '@/lib/utils'
 import socket from '@/lib/socket'
 import { ChatMessageDataType } from '@/schemaValidations/chat.schema'
@@ -51,6 +46,7 @@ function SupportChat() {
   const [activeTab, setActiveTab] = useState('all')
   const [isCloseDialogOpen, setIsCloseDialogOpen] = useState(false)
   const [roomToClose, setRoomToClose] = useState<string | null>(null)
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false)
   const messageEndRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
 
@@ -79,10 +75,9 @@ function SupportChat() {
   const requestJoinChatMutation = useRequestJoinChatRoom({
     onSuccess: () => {
       refetchRooms()
+      refetchMessages()
     }
   })
-
-  const closeChatMutation = useCloseChatRoom()
 
   // Parse chat rooms data safely
   const chatRooms = useMemo(() => {
@@ -147,6 +142,11 @@ function SupportChat() {
       .filter(Boolean) as ExtendedChatMessage[]
   }, [messagesData])
 
+  // Kiểm tra trạng thái phòng chat có đang chờ hỗ trợ không
+  const isMissingSupport = useMemo(() => {
+    return messagesData?.payload?.data?.isMissingSupported || false
+  }, [messagesData?.payload?.data?.isMissingSupported])
+
   // Socket event handlers
   const handleNewMessage = useCallback(() => {
     if (selectedRoomId) {
@@ -193,12 +193,22 @@ function SupportChat() {
       onConnect()
     }
 
+    // Listen for new messages
     socket.on('newMessage', handleNewMessage)
+
+    // Listen for status changes (room closed, supporter joined, etc)
+    socket.on('roomUpdated', () => {
+      refetchRooms()
+      if (selectedRoomId) {
+        refetchMessages()
+      }
+    })
 
     return () => {
       socket.off('newMessage', handleNewMessage)
+      socket.off('roomUpdated')
     }
-  }, [user, isLoggedIn, selectedRoomId, handleNewMessage, refetchMessages])
+  }, [user, isLoggedIn, selectedRoomId, handleNewMessage, refetchMessages, refetchRooms])
 
   // Scroll to bottom when new messages come in or room changes
   useEffect(() => {
@@ -249,20 +259,28 @@ function SupportChat() {
 
   // Handle close chat room
   const handleCloseChat = (roomId: string) => {
-    setRoomToClose(roomId)
-    setIsCloseDialogOpen(true)
+    // Đảm bảo dropdown đã đóng trước
+    setIsDropdownOpen(false)
+
+    // Sử dụng setTimeout để đảm bảo dropdown đã đóng hoàn toàn trước khi mở dialog
+    setTimeout(() => {
+      setRoomToClose(roomId)
+      setIsCloseDialogOpen(true)
+    }, 100)
   }
 
   // Confirm and close chat
   const confirmCloseChat = async () => {
     if (!roomToClose) return
 
-    closeChatMutation.mutateAsync(roomToClose, {
-      onSuccess: () => {
-        setIsCloseDialogOpen(false)
-        setRoomToClose(null)
-      }
-    })
+    setIsCloseDialogOpen(false)
+
+    // Using socket to close the room instead of API call
+    socket.emit('closeRoom', { roomId: roomToClose })
+
+    refetchRooms()
+    refetchMessages()
+    setRoomToClose(null)
   }
 
   // Format date for message timestamp
@@ -466,6 +484,14 @@ function SupportChat() {
                               <History className='h-3 w-3' />
                               <span className='text-[10px]'>Đã kết thúc</span>
                             </Badge>
+                          ) : room.isMissingSupported ? (
+                            <Badge
+                              variant='outline'
+                              className='px-1.5 py-0 gap-1 text-amber-500 border-amber-200 bg-amber-50 flex-shrink-0 whitespace-nowrap'
+                            >
+                              <UserPlus className='h-3 w-3' />
+                              <span className='text-[10px]'>Cần hỗ trợ</span>
+                            </Badge>
                           ) : (
                             <Badge
                               variant='outline'
@@ -513,6 +539,11 @@ function SupportChat() {
                         <History className='h-3 w-3 mr-1' />
                         Đã kết thúc
                       </span>
+                    ) : isMissingSupport ? (
+                      <span className='text-amber-500 flex items-center'>
+                        <UserPlus className='h-3 w-3 mr-1' />
+                        Cần hỗ trợ
+                      </span>
                     ) : (
                       <span className='text-green-500 flex items-center'>
                         <CheckCheck className='h-3 w-3 mr-1' />
@@ -523,21 +554,9 @@ function SupportChat() {
                 </div>
               </div>
               <div className='flex items-center gap-2'>
-                {!selectedRoom.isClose && (
+                {!selectedRoom.isClose && !isMissingSupport && (
                   <>
-                    <Button
-                      size='sm'
-                      onClick={() => handleJoinChat(selectedRoom.id)}
-                      disabled={requestJoinChatMutation.isPending}
-                    >
-                      {requestJoinChatMutation.isPending ? (
-                        <Loader2 className='h-4 w-4 animate-spin mr-1' />
-                      ) : (
-                        <UserPlus className='h-4 w-4 mr-1' />
-                      )}
-                      Tham gia hỗ trợ
-                    </Button>
-                    <DropdownMenu>
+                    <DropdownMenu open={isDropdownOpen} onOpenChange={setIsDropdownOpen}>
                       <DropdownMenuTrigger asChild>
                         <Button variant='ghost' size='icon' className='h-8 w-8 text-gray-500'>
                           <MoreVertical size={18} />
@@ -547,13 +566,8 @@ function SupportChat() {
                         <DropdownMenuItem
                           className='text-red-500 focus:text-red-500 cursor-pointer'
                           onClick={() => handleCloseChat(selectedRoom.id)}
-                          disabled={closeChatMutation.isPending}
                         >
-                          {closeChatMutation.isPending ? (
-                            <Loader2 className='h-4 w-4 animate-spin mr-2' />
-                          ) : (
-                            <LogOut className='h-4 w-4 mr-2' />
-                          )}
+                          <LogOut className='h-4 w-4 mr-2' />
                           Kết thúc cuộc trò chuyện
                         </DropdownMenuItem>
                       </DropdownMenuContent>
@@ -636,25 +650,43 @@ function SupportChat() {
 
             {/* Input Area */}
             {!selectedRoom.isClose ? (
-              <form onSubmit={handleSendMessage} className='p-3 border-t bg-white flex items-center gap-2'>
-                <div className='flex-1 relative'>
-                  <Input
-                    ref={inputRef}
-                    value={newMessage}
-                    onChange={(e) => setNewMessage(e.target.value)}
-                    placeholder='Nhập tin nhắn...'
-                    className='bg-gray-50/80 border-gray-200'
-                    disabled={isSending}
-                  />
+              isMissingSupport ? (
+                <div className='p-3 border-t bg-white flex items-center justify-center'>
+                  <Button
+                    size='sm'
+                    onClick={() => handleJoinChat(selectedRoom.id)}
+                    disabled={requestJoinChatMutation.isPending}
+                    className='w-full max-w-md'
+                  >
+                    {requestJoinChatMutation.isPending ? (
+                      <Loader2 className='h-4 w-4 animate-spin mr-1' />
+                    ) : (
+                      <UserPlus className='h-4 w-4 mr-1' />
+                    )}
+                    Tham gia hỗ trợ phòng chat này
+                  </Button>
                 </div>
-                <Button
-                  type='submit'
-                  disabled={!newMessage.trim() || isSending}
-                  className='h-9 w-9 rounded-full p-0 flex items-center justify-center'
-                >
-                  {isSending ? <Loader2 className='h-4 w-4 animate-spin' /> : <Send className='h-4 w-4' />}
-                </Button>
-              </form>
+              ) : (
+                <form onSubmit={handleSendMessage} className='p-3 border-t bg-white flex items-center gap-2'>
+                  <div className='flex-1 relative'>
+                    <Input
+                      ref={inputRef}
+                      value={newMessage}
+                      onChange={(e) => setNewMessage(e.target.value)}
+                      placeholder='Nhập tin nhắn...'
+                      className='bg-gray-50/80 border-gray-200'
+                      disabled={isSending}
+                    />
+                  </div>
+                  <Button
+                    type='submit'
+                    disabled={!newMessage.trim() || isSending}
+                    className='h-9 w-9 rounded-full p-0 flex items-center justify-center'
+                  >
+                    {isSending ? <Loader2 className='h-4 w-4 animate-spin' /> : <Send className='h-4 w-4' />}
+                  </Button>
+                </form>
+              )
             ) : (
               <div className='p-4 border-t bg-white flex flex-col items-center'>
                 <div className='text-xs text-gray-500 text-center'>
@@ -695,20 +727,8 @@ function SupportChat() {
             >
               Hủy
             </Button>
-            <Button
-              type='button'
-              variant='destructive'
-              onClick={confirmCloseChat}
-              disabled={closeChatMutation.isPending}
-            >
-              {closeChatMutation.isPending ? (
-                <>
-                  <Loader2 className='h-4 w-4 animate-spin mr-2' />
-                  Đang xử lý...
-                </>
-              ) : (
-                'Kết thúc cuộc trò chuyện'
-              )}
+            <Button type='button' variant='destructive' onClick={confirmCloseChat}>
+              Kết thúc cuộc trò chuyện
             </Button>
           </DialogFooter>
         </DialogContent>

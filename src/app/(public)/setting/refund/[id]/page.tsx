@@ -10,7 +10,6 @@ import {
   Calendar,
   RefreshCcw,
   Receipt,
-  User,
   CheckCircle2,
   XCircle,
   CircleDot,
@@ -23,8 +22,7 @@ import configRoute from '@/config/route'
 import { useGetRefundAndReturnDetailRequestsQuery } from '@/queries/useOrder'
 import Loading from '@/components/loading'
 import { formatCurrency } from '@/lib/utils'
-import { GetRefundAndReturnResType } from '@/schemaValidations/order.schema'
-import { OrderStatus, OrderStatusValues } from '@/constants/type'
+import { OrderStatus } from '@/constants/type'
 
 const statusColorMap: Record<string, string> = {
   [OrderStatus.PENDING]: 'bg-yellow-100 text-yellow-800',
