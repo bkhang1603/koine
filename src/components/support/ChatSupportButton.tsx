@@ -121,6 +121,15 @@ const ChatSupportButton = () => {
     }
   }, [chatRoom?.id, refetchMessages])
 
+  // Xử lý khi phòng chat bị đóng
+  const handleRoomClosed = useCallback(() => {
+    // Refetch dữ liệu để cập nhật trạng thái phòng
+    refetchChat()
+    if (chatRoom?.id) {
+      refetchMessages()
+    }
+  }, [chatRoom?.id, refetchChat, refetchMessages])
+
   // Socket connection management
   useEffect(() => {
     if (!user) return
@@ -171,11 +180,13 @@ const ChatSupportButton = () => {
     }
 
     socket.on('newMessage', handleNewMessage)
+    socket.on('roomClosed', handleRoomClosed)
 
     return () => {
       socket.off('newMessage', handleNewMessage)
+      socket.off('roomClosed', handleRoomClosed)
     }
-  }, [user, token, isLoggedIn, chatRoom?.id, handleNewMessage, refetchChat, refetchMessages])
+  }, [user, token, isLoggedIn, chatRoom?.id, handleNewMessage, handleRoomClosed, refetchChat, refetchMessages])
 
   // Join chat room when chat ID changes
   // useEffect(() => {

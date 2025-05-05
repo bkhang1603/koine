@@ -11,17 +11,17 @@ import {
 } from '@/queries/useCourse'
 import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { handleErrorApi } from '@/lib/utils'
-import { useCallback, use, useEffect, useRef } from 'react'
+import { getAccessTokenFromLocalStorage, handleErrorApi } from '@/lib/utils'
+import { useCallback, use, useEffect } from 'react'
 import { UserCourseProgressResType } from '@/schemaValidations/course.schema'
 import { LessonContent } from '@/components/learn/LessonContent'
 import { LoadingSkeleton } from '@/components/learn/LoadingSkeleton'
 import { AlertTriangle } from 'lucide-react'
-import { useGetStillLearningCourse } from '@/queries/useAccount'
 import { toast } from '@/components/ui/use-toast'
 import { BreadcrumbParent } from '@/components/learn/BreadcrumbParent'
 import configRoute from '@/config/route'
 import { LearnPageContent } from '@/components/learn/LearnPageContent'
+import socket from '@/lib/socket'
 
 type Lesson = UserCourseProgressResType['data']['chapters'][0]['lessons'][0]
 
@@ -80,6 +80,16 @@ function LearnPage(props: { params: Promise<{ id: string }> }) {
 
   const course = data?.payload.data || null
 
+  // Automatically navigate to first accessible lesson if no lessonId or quizId is provided
+  useEffect(() => {
+    if (!isLoading && course && !lessonId && !quizId && !isPreviewMode) {
+      const firstLesson = findFirstAccessibleLesson(course)
+      if (firstLesson) {
+        router.push(`/learn/${id}?lessonId=${firstLesson.id}`)
+      }
+    }
+  }, [isLoading, course, lessonId, quizId, router, id, isPreviewMode])
+
   // Nếu ở chế độ preview, lấy lesson từ previewData, ngược lại dùng lessonData
   const lesson = isPreviewMode
     ? previewData?.payload.data?.previewLessons?.find((lesson) => lesson.id === lessonId)
@@ -88,54 +98,65 @@ function LearnPage(props: { params: Promise<{ id: string }> }) {
   // Xác định trạng thái loading tổng hợp cho phần nội dung bài học
   const isLessonLoading = isPreviewMode ? previewLoading : lessonLoading
 
-  const { refetch: refetchStillLearning, isError } = useGetStillLearningCourse({ enabled: !isPreviewMode })
-  const refetchIntervalRef = useRef<NodeJS.Timeout | null>(null)
+  const token = getAccessTokenFromLocalStorage()
 
   useEffect(() => {
-    // Chỉ setup interval và gọi refetch khi không ở chế độ preview
-    if (!isPreviewMode) {
-      // Gọi refetch ngay lập tức khi component mount
-      refetchStillLearning()
-
-      // Clear previous interval if exists
-      if (refetchIntervalRef.current) {
-        clearInterval(refetchIntervalRef.current)
+    if (token) {
+      if (socket.connected) {
+        onConnect()
+        login()
       }
-
-      // Set new interval 1 minute
-      const intervalTime = 1 * 60 * 1000
-      refetchIntervalRef.current = setInterval(() => {
-        refetchStillLearning()
-      }, intervalTime)
     }
 
-    // Cleanup on unmount
+    function onConnect() {
+      console.log('socket id', socket.id)
+    }
+
+    function onDisconnect() {
+      console.log('disconnected')
+    }
+
+    function getNotifications() {
+      toast({
+        description: 'Phiên học của bạn đã bị chấm dứt do có thiết bị khác đăng nhập'
+      })
+      router.push(configRoute.setting.myCourse)
+    }
+
+    function login() {
+      socket.emit(
+        'login',
+        {
+          token: token
+        },
+        (response: any) => {
+          if (response?.statusCode === 200) {
+            socket.emit('startLearning')
+          }
+        }
+      )
+    }
+
+    socket.on('connect', onConnect)
+
+    socket.on('login', login)
+
+    socket.on('learningKicked', getNotifications)
+
+    socket.on('disconnect', onDisconnect)
+
     return () => {
-      if (refetchIntervalRef.current) {
-        clearInterval(refetchIntervalRef.current)
-        refetchIntervalRef.current = null
-      }
-    }
-  }, [refetchStillLearning, isPreviewMode])
+      socket.off('connect', onConnect)
 
-  // Auto-select first lesson when course data is loaded and no lessonId is provided
-  useEffect(() => {
-    if (quizId) {
-      const chapter = course?.chapters.find((c: any) => c.id === quizId)
-      if (chapter) {
-        router.push(`/learn/${id}?quizId=${chapter.id}`)
-      }
-      return
-    }
+      socket.off('login', login)
 
-    if (!lessonId && course && !isLoading) {
-      const firstLesson = findFirstAccessibleLesson(course)
-      if (firstLesson) {
-        router.push(`/learn/${id}?lessonId=${firstLesson.id}`)
-      }
-      return
+      socket.off('learningKicked', getNotifications)
+
+      socket.off('disconnect', onDisconnect)
     }
-  }, [course, isLoading, lessonId, id, router, quizId])
+  }, [token, router])
+
+  // Socket connection cho learning session
 
   const handleUpdate = useCallback(
     async ({ lessonId, courseId, status }: { lessonId: string; courseId: string; status: Lesson['status'] }) => {
@@ -163,16 +184,6 @@ function LearnPage(props: { params: Promise<{ id: string }> }) {
     },
     [id, router]
   )
-
-  // Xử lý khi có lỗi
-  useEffect(() => {
-    if (isError) {
-      toast({
-        description: 'Hiện đang có thiết bị khác đang học khóa học này',
-        variant: 'destructive'
-      })
-    }
-  }, [isError, router])
 
   // Render preview UI overlay when in preview mode
   if (isPreviewMode) {
