@@ -42,7 +42,7 @@ function BlogComments({ id }: { id: string }) {
   const reactMutation = useBlogReactUpdateMutation()
 
   const [localReacted, setLocalReacted] = useState(isReacted)
-  const [localTotalReacts, setLocalTotalReacts] = useState(totalReacts)
+  // const [localTotalReacts, setLocalTotalReacts] = useState(totalReacts)
   const [shouldUpdateApi, setShouldUpdateApi] = useState(false)
   const timeoutRef = useRef<NodeJS.Timeout>(null)
 
@@ -55,7 +55,7 @@ function BlogComments({ id }: { id: string }) {
 
   useEffect(() => {
     setLocalReacted(isReacted)
-    setLocalTotalReacts(totalReacts)
+    // setLocalTotalReacts(totalReacts)
   }, [isReacted, totalReacts])
 
   useEffect(() => {
@@ -78,7 +78,7 @@ function BlogComments({ id }: { id: string }) {
           setShouldUpdateApi(false)
         } catch (error) {
           setLocalReacted(isReacted)
-          setLocalTotalReacts(totalReacts)
+          // setLocalTotalReacts(totalReacts)
           handleErrorApi({ error })
           setShouldUpdateApi(false)
         }
@@ -156,7 +156,7 @@ function BlogComments({ id }: { id: string }) {
 
     if (reactMutation.isPending) return
     setLocalReacted(!localReacted)
-    setLocalTotalReacts((prev) => (!localReacted ? prev + 1 : prev - 1))
+    // setLocalTotalReacts((prev) => (!localReacted ? prev + 1 : prev - 1))
     setShouldUpdateApi(true)
   }
 
@@ -166,7 +166,7 @@ function BlogComments({ id }: { id: string }) {
         <div className='hidden sm:flex justify-start items-center gap-4'>
           <div className='flex items-center gap-2 cursor-pointer text-secondary hover:underline' onClick={handleReact}>
             {localReacted ? <Heart className='w-6 h-6 fill-secondary' /> : <Heart className='w-6 h-6' />}
-            {localTotalReacts !== 0 && <span className='text-lg'>{localTotalReacts}</span>}
+            {/* {localTotalReacts !== 0 && <span className='text-lg'>{localTotalReacts}</span>} */}
           </div>
 
           <div
