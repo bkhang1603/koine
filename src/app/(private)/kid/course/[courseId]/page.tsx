@@ -240,7 +240,7 @@ function CourseDetailPage(props: { params: Promise<{ courseId: string }> }) {
               <div className='flex items-center gap-2'>
                 <CheckCircle2 className='h-5 w-5 text-green-600' />
                 <p className='text-sm text-gray-600'>Đã hoàn thành</p>
-              </div>
+            </div>
               <p className='text-2xl font-bold text-green-600 mt-2'>{course.totalCompletedLessonsInCourse}</p>
             </div>
           </div>
@@ -257,7 +257,7 @@ function CourseDetailPage(props: { params: Promise<{ courseId: string }> }) {
               disabled={enrollMutation.isPending}
             >
               {enrollMutation.isPending ? 'Đang đăng ký...' : 'Đăng ký ngay 🎉'}
-            </Button>
+          </Button>
           )}
         </div>
       </div>
@@ -274,22 +274,22 @@ function CourseDetailPage(props: { params: Promise<{ courseId: string }> }) {
         {!isEnrolled && (
           <div className='bg-amber-50 border border-amber-200 rounded-lg p-4 text-amber-700'>
             <p>Đăng ký khóa học để truy cập toàn bộ nội dung bài học</p>
-          </div>
+                </div>
         )}
 
         {course.chapters.length > 0 ? (
           course.chapters.map((chapter) => (
             <Card key={chapter.id} className={cn('p-6', !isEnrolled && 'opacity-60')}>
               <div className='mb-4'>
-                <h3 className='text-xl font-bold mb-2'>
+                  <h3 className='text-xl font-bold mb-2'>
                   Chương {chapter.sequence}: {chapter.title}
-                </h3>
+                  </h3>
                 <div className='flex items-center gap-4 text-sm text-gray-600'>
-                  <div className='flex items-center gap-2'>
+                    <div className='flex items-center gap-2'>
                     <Clock className='h-4 w-4' />
                     <span>{chapter.durationsDisplay}</span>
-                  </div>
-                  <div className='flex items-center gap-2'>
+                    </div>
+                    <div className='flex items-center gap-2'>
                     <BookOpen className='h-4 w-4' />
                     <span>{chapter.lessons.length} bài học</span>
                   </div>
@@ -319,14 +319,14 @@ function CourseDetailPage(props: { params: Promise<{ courseId: string }> }) {
                           Bài {lesson.sequence}: {lesson.title}
                         </h4>
                         <p className='text-sm text-gray-500'>{lesson.description}</p>
-                      </div>
-                      <div className='flex items-center gap-2'>
+              </div>
+                <div className='flex items-center gap-2'>
                         <div className='flex items-center gap-2 text-sm text-gray-500'>
                           <Clock className='h-4 w-4' />
                           <span>{lesson.durationsDisplay}</span>
                         </div>
                       </div>
-                    </div>
+                </div>
                   ))
                 ) : (
                   <div className='text-center py-4 text-gray-500'>Chương này chưa có bài học nào</div>
@@ -337,7 +337,7 @@ function CourseDetailPage(props: { params: Promise<{ courseId: string }> }) {
         ) : (
           <EmptyChapter />
         )}
-      </div>
+              </div>
     </div>
   )
 }

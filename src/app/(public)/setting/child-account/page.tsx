@@ -18,6 +18,11 @@ import { handleErrorApi } from '@/lib/utils'
 import { ChildAccountCard } from '@/components/public/parent/setting/child-account/child-account-card'
 import { ChildAccountListSkeleton } from '@/components/public/parent/setting/child-account/child-account-list-skeleton'
 import { Skeleton } from '@/components/ui/skeleton'
+import { Calendar } from '@/components/ui/calendar'
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
+import { format } from 'date-fns'
+import { vi } from 'date-fns/locale'
+import { cn } from '@/lib/utils'
 
 // Thêm interface cho filters
 type Filters = {
@@ -291,21 +296,43 @@ export default function ChildAccountPage() {
                 )}
               />
 
-              {/* Ngày sinh */}
+              {/* Ngày sinh - Updated with Calendar */}
               <FormField
                 control={form.control}
                 name='dob'
                 render={({ field }) => (
-                  <FormItem>
+                  <FormItem className='flex flex-col'>
                     <FormLabel className='text-sm font-medium'>Ngày sinh</FormLabel>
-                    <FormControl>
-                      <div className='relative'>
-                        <Input placeholder='MM/DD/YYYY (VD: 01/15/2015)' className='border-gray-200' {...field} />
-                        <CalendarIcon className='w-4 h-4 absolute right-3 top-1/2 -translate-y-1/2 text-gray-400' />
-                      </div>
-                    </FormControl>
+                    <Popover modal>
+                      <PopoverTrigger asChild>
+                        <FormControl>
+                          <Button
+                            variant={'outline'}
+                            className={cn(
+                              'w-full pl-3 text-left font-normal border-gray-200',
+                              !field.value && 'text-muted-foreground'
+                            )}
+                          >
+                            {field.value ? (
+                              format(new Date(field.value), 'dd/MM/yyyy', { locale: vi })
+                            ) : (
+                              <span>Chọn ngày sinh</span>
+                            )}
+                            <CalendarIcon className='ml-auto h-4 w-4 opacity-50' />
+                          </Button>
+                        </FormControl>
+                      </PopoverTrigger>
+                      <PopoverContent className='w-auto p-0' align='start'>
+                        <Calendar
+                          mode='single'
+                          selected={field.value ? new Date(field.value) : undefined}
+                          onSelect={(date) => field.onChange(date ? format(date, 'MM/dd/yyyy') : '')}
+                          disabled={(date) => date > new Date() || date < new Date('1900-01-01')}
+                          initialFocus
+                        />
+                      </PopoverContent>
+                    </Popover>
                     <FormMessage className='text-xs mt-1' />
-                    <p className='text-xs text-muted-foreground mt-1'>Nhập theo định dạng: Tháng/Ngày/Năm</p>
                   </FormItem>
                 )}
               />
