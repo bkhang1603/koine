@@ -12,12 +12,11 @@ import {
 import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { getAccessTokenFromLocalStorage, handleErrorApi } from '@/lib/utils'
-import { useCallback, use, useEffect, useRef } from 'react'
+import { useCallback, use, useEffect } from 'react'
 import { UserCourseProgressResType } from '@/schemaValidations/course.schema'
 import { LessonContent } from '@/components/learn/LessonContent'
 import { LoadingSkeleton } from '@/components/learn/LoadingSkeleton'
 import { AlertTriangle } from 'lucide-react'
-import { useGetStillLearningCourse } from '@/queries/useAccount'
 import { toast } from '@/components/ui/use-toast'
 import { BreadcrumbParent } from '@/components/learn/BreadcrumbParent'
 import configRoute from '@/config/route'
@@ -81,6 +80,16 @@ function LearnPage(props: { params: Promise<{ id: string }> }) {
 
   const course = data?.payload.data || null
 
+  // Automatically navigate to first accessible lesson if no lessonId or quizId is provided
+  useEffect(() => {
+    if (!isLoading && course && !lessonId && !quizId && !isPreviewMode) {
+      const firstLesson = findFirstAccessibleLesson(course)
+      if (firstLesson) {
+        router.push(`/learn/${id}?lessonId=${firstLesson.id}`)
+      }
+    }
+  }, [isLoading, course, lessonId, quizId, router, id, isPreviewMode])
+
   // Nếu ở chế độ preview, lấy lesson từ previewData, ngược lại dùng lessonData
   const lesson = isPreviewMode
     ? previewData?.payload.data?.previewLessons?.find((lesson) => lesson.id === lessonId)
@@ -89,36 +98,29 @@ function LearnPage(props: { params: Promise<{ id: string }> }) {
   // Xác định trạng thái loading tổng hợp cho phần nội dung bài học
   const isLessonLoading = isPreviewMode ? previewLoading : lessonLoading
 
-  const stillLearningIntervalRef = useRef<NodeJS.Timeout | null>(null)
-
-  // Socket handlers
-  const handleLearningKicked = useCallback(() => {
-    toast({
-      title: 'Phiên học bị chấm dứt',
-      description: 'Tài khoản của bạn đang được sử dụng trên thiết bị khác',
-      variant: 'destructive'
-    })
-    // Có thể thêm redirect về trang danh sách khóa học
-    router.push(configRoute.setting.myCourse)
-  }, [router])
-
-  const handleLearningTimeout = useCallback(() => {
-    toast({
-      title: 'Phiên học hết hạn',
-      description: 'Phiên học của bạn đã hết hạn do không có hoạt động',
-      variant: 'destructive'
-    })
-  }, [])
-
   const token = getAccessTokenFromLocalStorage()
 
-  // Socket connection cho learning session
   useEffect(() => {
-    // Chỉ kết nối socket khi không ở chế độ preview và đã có course id
-    if (isPreviewMode || !id) return
+    if (token) {
+      if (socket.connected) {
+        onConnect()
+        login()
+      }
+    }
 
     function onConnect() {
-      login()
+      console.log('socket id', socket.id)
+    }
+
+    function onDisconnect() {
+      console.log('disconnected')
+    }
+
+    function getNotifications() {
+      toast({
+        description: 'Phiên học của bạn đã bị chấm dứt do có thiết bị khác đăng nhập'
+      })
+      router.push(configRoute.setting.myCourse)
     }
 
     function login() {
@@ -129,67 +131,32 @@ function LearnPage(props: { params: Promise<{ id: string }> }) {
         },
         (response: any) => {
           if (response?.statusCode === 200) {
-            startLearningSession()
-            setupStillLearningInterval()
+            socket.emit('startLearning')
           }
         }
       )
     }
 
-    // Định nghĩa các hàm emit sự kiện
-    const startLearningSession = () => {
-      socket.emit('startLearning', { courseId: id }, (response: any) => {
-        if (response?.statusCode !== 200) {
-          toast({
-            description: 'Không thể bắt đầu phiên học. Vui lòng thử lại sau.',
-            variant: 'destructive'
-          })
-        }
-      })
-    }
+    socket.on('connect', onConnect)
 
-    const setupStillLearningInterval = () => {
-      // Xóa interval cũ nếu có
-      if (stillLearningIntervalRef.current) {
-        clearInterval(stillLearningIntervalRef.current)
-      }
+    socket.on('login', login)
 
-      // Thiết lập interval mới để gửi stillLearning mỗi 2 phút
-      stillLearningIntervalRef.current = setInterval(
-        () => {
-          socket.emit('stillLearning', { courseId: id })
-        },
-        2 * 60 * 1000
-      )
-    }
+    socket.on('learningKicked', getNotifications)
 
-    // Kết nối socket
-    if (!socket.connected) {
-      socket.connect()
-    } else {
-      onConnect()
-    }
+    socket.on('disconnect', onDisconnect)
 
-    // Lắng nghe các sự kiện
-    socket.on('learningKicked', handleLearningKicked)
-    socket.on('learningTimeout', handleLearningTimeout)
-
-    // Cleanup
     return () => {
-      if (stillLearningIntervalRef.current) {
-        clearInterval(stillLearningIntervalRef.current)
-        stillLearningIntervalRef.current = null
-      }
+      socket.off('connect', onConnect)
 
-      socket.off('learningKicked', handleLearningKicked)
-      socket.off('learningTimeout', handleLearningTimeout)
+      socket.off('login', login)
 
-      // Emit kết thúc phiên học khi rời trang
-      if (socket.connected) {
-        socket.emit('stopLearning', { courseId: id })
-      }
+      socket.off('learningKicked', getNotifications)
+
+      socket.off('disconnect', onDisconnect)
     }
-  }, [id, isPreviewMode, handleLearningKicked, handleLearningTimeout, token])
+  }, [token, router])
+
+  // Socket connection cho learning session
 
   const handleUpdate = useCallback(
     async ({ lessonId, courseId, status }: { lessonId: string; courseId: string; status: Lesson['status'] }) => {
