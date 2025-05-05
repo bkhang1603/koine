@@ -13,6 +13,7 @@ import { MoreOptions } from '@/components/private/common/more-options'
 import { DollarSign } from 'lucide-react'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { GetRefundRequestsResType } from '@/schemaValidations/admin.schema'
+import { formatOrderStatus } from '@/lib/utils'
 
 function RefundRequestsPage(props: { searchParams: SearchParams }) {
   const searchParams = use(props.searchParams)
@@ -45,12 +46,13 @@ function RefundRequestsPage(props: { searchParams: SearchParams }) {
   }
   const message = (responseData as any)?.payload?.message || ''
 
-  // Refund status configuration
+  // Refund status configuration for badge variants
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  const refundStatusConfig = {
-    REFUND_REQUEST: { label: 'Yêu cầu hoàn tiền', variant: 'default' },
-    REFUNDING: { label: 'Đang xử lý', variant: 'warning' },
-    REFUNDED: { label: 'Đã hoàn tiền', variant: 'success' }
+  const refundStatusVariants = {
+    REFUND_REQUEST: 'default',
+    REFUNDING: 'warning',
+    REFUNDED: 'success',
+    REFUND_FAILED: 'destructive'
   } as const
 
   // Payment method configuration
@@ -123,12 +125,9 @@ function RefundRequestsPage(props: { searchParams: SearchParams }) {
         id: 5,
         render: (request: RefundRequestItem) => {
           const status = request.status
-          const config = refundStatusConfig[status as keyof typeof refundStatusConfig] || {
-            label: status,
-            variant: 'default'
-          }
+          const variant = refundStatusVariants[status as keyof typeof refundStatusVariants] || 'default'
 
-          return <Badge variant={config.variant as any}>{config.label}</Badge>
+          return <Badge variant={variant as any}>{formatOrderStatus(status)}</Badge>
         }
       },
       {
@@ -147,7 +146,7 @@ function RefundRequestsPage(props: { searchParams: SearchParams }) {
         )
       }
     ],
-    [refundStatusConfig, paymentMethodConfig, router]
+    [refundStatusVariants, paymentMethodConfig, router]
   )
 
   const tableData: dataListType = {

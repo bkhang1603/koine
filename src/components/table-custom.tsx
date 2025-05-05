@@ -3,7 +3,7 @@ import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Input } from '@/components/ui/input'
-import { Search } from 'lucide-react'
+import { Search, Inbox } from 'lucide-react'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { useEffect, useState } from 'react'
 
@@ -199,17 +199,28 @@ export function TableCustom({
             </TableRow>
           </TableHeader>
           <TableBody>
-            {loading
-              ? renderSkeleton()
-              : data.data.map((item, index) => (
-                  <TableRow key={index}>
-                    {bodyColumn.map((col) => (
-                      <TableCell key={col.id} className={col.className ?? ''}>
-                        {col.render(item)}
-                      </TableCell>
-                    ))}
-                  </TableRow>
-                ))}
+            {loading ? (
+              renderSkeleton()
+            ) : data.data.length === 0 ? (
+              <TableRow>
+                <TableCell colSpan={headerColumn.length} className='h-32'>
+                  <div className='flex flex-col items-center justify-center gap-2 text-muted-foreground'>
+                    <Inbox className='h-8 w-8' />
+                    <p className='text-sm font-medium'>Không có dữ liệu</p>
+                  </div>
+                </TableCell>
+              </TableRow>
+            ) : (
+              data.data.map((item, index) => (
+                <TableRow key={index}>
+                  {bodyColumn.map((col) => (
+                    <TableCell key={col.id} className={col.className ?? ''}>
+                      {col.render(item)}
+                    </TableCell>
+                  ))}
+                </TableRow>
+              ))
+            )}
           </TableBody>
         </Table>
       </CardContent>

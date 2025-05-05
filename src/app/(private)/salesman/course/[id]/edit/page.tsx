@@ -38,6 +38,7 @@ export default function EditCoursePage(props: { params: Promise<{ id: string }> 
       setIsSubmitting(true)
 
       // For salesmen, we only update price and discount
+      // Note: The discount conversion is now handled in CourseEditForm component
       const updateData: SalesmanCourseUpdateType = {
         price: values.price,
         discount: values.discount

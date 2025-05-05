@@ -2,7 +2,7 @@
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LabelList } from 'recharts'
-import { formatPercentage } from '@/lib/utils'
+import { formatPercentage, formatCourseStatus } from '@/lib/utils'
 
 interface CourseStatusData {
   status: string
@@ -12,17 +12,10 @@ interface CourseStatusData {
 interface ContentStatusChartProps {
   data: {
     course: CourseStatusData[]
+    product: CourseStatusData[]
   }
   title: string
   description: string
-}
-
-// Status translations - match expert dashboard exactly
-const statusTranslations: Record<string, string> = {
-  ACTIVE: 'Đang hoạt động',
-  PENDINGREVIEW: 'Chờ duyệt',
-  PENDINGPRICING: 'Chờ định giá',
-  REJECTED: 'Đã từ chối'
 }
 
 export function ContentStatusChart({ data, title, description }: ContentStatusChartProps) {
@@ -34,7 +27,7 @@ export function ContentStatusChart({ data, title, description }: ContentStatusCh
   // Transform data for the bar chart with translations
   const transformedData = courseData
     .map((item) => ({
-      name: statusTranslations[item.status] || item.status,
+      name: formatCourseStatus(item.status),
       count: Number(item.count)
     }))
     .sort((a, b) => b.count - a.count) // Sort by count in descending order

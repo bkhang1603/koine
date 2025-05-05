@@ -191,7 +191,9 @@ export default function EditCoursePage(props: { params: Promise<{ id: string }> 
       }
 
       await updateCourseMutation.mutateAsync({
-        ...values
+        ...values,
+        price: course?.price || 0,
+        discount: course?.discount || 0
       })
 
       toast({
@@ -506,48 +508,6 @@ export default function EditCoursePage(props: { params: Promise<{ id: string }> 
                   </FormItem>
                 )}
               />
-
-              {/* Price Field */}
-              <div className='grid grid-cols-2 gap-4'>
-                <FormField
-                  control={form.control}
-                  name='price'
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Giá (VNĐ)</FormLabel>
-                      <FormControl>
-                        <Input
-                          type='number'
-                          placeholder='Nhập giá khóa học'
-                          {...field}
-                          onChange={(e) => field.onChange(Number(e.target.value))}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                {/* Discount Field */}
-                <FormField
-                  control={form.control}
-                  name='discount'
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Giảm giá (%)</FormLabel>
-                      <FormControl>
-                        <Input
-                          type='number'
-                          placeholder='Nhập % giảm giá'
-                          {...field}
-                          onChange={(e) => field.onChange(Number(e.target.value))}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
             </CardContent>
           </Card>
         </form>

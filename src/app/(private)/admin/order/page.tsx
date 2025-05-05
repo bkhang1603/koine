@@ -14,6 +14,7 @@ import { vi } from 'date-fns/locale'
 import { MoreOptions } from '@/components/private/common/more-options'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { formatOrderStatus } from '@/lib/utils'
 
 function AdminOrder(props: { searchParams: SearchParams }) {
   const searchParams = use(props.searchParams)
@@ -47,15 +48,25 @@ function AdminOrder(props: { searchParams: SearchParams }) {
   }
   const message = responseData?.payload.message || ''
 
-  // Cấu hình màu sắc và nhãn cho trạng thái
+  // Cấu hình variant màu sắc cho trạng thái
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  const orderStatusConfig = {
-    PROCESSING: { label: 'Đang xử lý', variant: 'default' },
-    DELIVERING: { label: 'Đang giao', variant: 'primary' },
-    COMPLETED: { label: 'Hoàn thành', variant: 'secondary' },
-    CANCELLED: { label: 'Đã hủy', variant: 'destructive' },
-    REFUND_REQUEST: { label: 'Hoàn tiền', variant: 'destructive' },
-    EXCHANGE_REQUEST: { label: 'Yêu cầu đổi hàng', variant: 'warning' }
+  const orderStatusVariants = {
+    PROCESSING: 'default',
+    DELIVERING: 'primary',
+    COMPLETED: 'secondary',
+    CANCELLED: 'destructive',
+    REFUND_REQUEST: 'destructive',
+    EXCHANGE_REQUEST: 'warning',
+    PENDING: 'default',
+    DELIVERED: 'primary',
+    REFUNDING: 'warning',
+    REFUNDED: 'success',
+    EXCHANGING: 'warning',
+    EXCHANGED: 'success',
+    EXCHANGE_FAILED: 'destructive',
+    REFUND_FAILED: 'destructive',
+    FAILED: 'destructive',
+    FAILED_PAYMENT: 'destructive'
   } as const
 
   // Cấu hình phương thức thanh toán
@@ -131,12 +142,8 @@ function AdminOrder(props: { searchParams: SearchParams }) {
         id: 5,
         render: (order: any) => {
           const status = order.status
-          const config = orderStatusConfig[status as keyof typeof orderStatusConfig] || {
-            label: status,
-            variant: 'default'
-          }
-
-          return <Badge variant={config.variant as any}>{config.label}</Badge>
+          const variant = orderStatusVariants[status as keyof typeof orderStatusVariants] || 'default'
+          return <Badge variant={variant as any}>{formatOrderStatus(status)}</Badge>
         }
       },
       {
@@ -146,7 +153,7 @@ function AdminOrder(props: { searchParams: SearchParams }) {
         )
       }
     ],
-    [orderStatusConfig, paymentMethodConfig, router]
+    [orderStatusVariants, paymentMethodConfig, router]
   )
 
   const tableData: dataListType = {
@@ -262,14 +269,22 @@ function AdminOrder(props: { searchParams: SearchParams }) {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value='ALL'>Tất cả</SelectItem>
-              <SelectItem value='PENDING'>Chờ xử lý</SelectItem>
+              <SelectItem value='PENDING'>Chờ xác nhận</SelectItem>
               <SelectItem value='PROCESSING'>Đang xử lý</SelectItem>
               <SelectItem value='DELIVERING'>Đang giao</SelectItem>
+              <SelectItem value='DELIVERED'>Đã giao hàng</SelectItem>
               <SelectItem value='COMPLETED'>Hoàn thành</SelectItem>
               <SelectItem value='CANCELLED'>Đã hủy</SelectItem>
+              <SelectItem value='FAILED'>Thất bại</SelectItem>
               <SelectItem value='FAILED_PAYMENT'>Thanh toán thất bại</SelectItem>
-              <SelectItem value='RETURN_REQUEST'>Yêu cầu trả hàng</SelectItem>
+              <SelectItem value='REFUND_REQUEST'>Yêu cầu hoàn tiền</SelectItem>
+              <SelectItem value='REFUNDING'>Đang hoàn tiền</SelectItem>
+              <SelectItem value='REFUNDED'>Đã hoàn tiền</SelectItem>
+              <SelectItem value='REFUND_FAILED'>Hoàn tiền thất bại</SelectItem>
               <SelectItem value='EXCHANGE_REQUEST'>Yêu cầu đổi hàng</SelectItem>
+              <SelectItem value='EXCHANGING'>Đang xử lý đổi hàng</SelectItem>
+              <SelectItem value='EXCHANGED'>Đã đổi hàng</SelectItem>
+              <SelectItem value='EXCHANGE_FAILED'>Đổi hàng thất bại</SelectItem>
             </SelectContent>
           </Select>
         }

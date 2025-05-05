@@ -1,6 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from 'recharts'
-import { formatPercentage } from '@/lib/utils'
+import { formatPercentage, formatOrderStatus } from '@/lib/utils'
 
 interface OrderStatusData {
   status: string
@@ -18,30 +18,24 @@ interface OrderStatusChartProps {
   }
 }
 
-// Translate order status to Vietnamese
-const translateStatus = (status: string): string => {
-  const statusMap: Record<string, string> = {
-    PROCESSING: 'Đang xử lý',
-    DELIVERING: 'Đang giao',
-    COMPLETED: 'Hoàn thành',
-    CANCELLED: 'Đã hủy',
-    PENDING: 'Chờ xử lý',
-    REFUNDED: 'Hoàn tiền',
-    REFUND_REQUEST: 'Yêu cầu hoàn tiền',
-    EXCHANGE_REQUEST: 'Yêu cầu đổi hàng'
-  }
-
-  return statusMap[status] || status
-}
-
 // Default status values to ensure we always display all statuses even if they're zero
 const DEFAULT_STATUSES = [
+  { status: 'PENDING', count: 0 },
   { status: 'PROCESSING', count: 0 },
   { status: 'DELIVERING', count: 0 },
+  { status: 'DELIVERED', count: 0 },
   { status: 'COMPLETED', count: 0 },
   { status: 'CANCELLED', count: 0 },
+  { status: 'FAILED', count: 0 },
+  { status: 'FAILED_PAYMENT', count: 0 },
   { status: 'REFUND_REQUEST', count: 0 },
-  { status: 'EXCHANGE_REQUEST', count: 0 }
+  { status: 'REFUNDING', count: 0 },
+  { status: 'REFUNDED', count: 0 },
+  { status: 'REFUND_FAILED', count: 0 },
+  { status: 'EXCHANGE_REQUEST', count: 0 },
+  { status: 'EXCHANGING', count: 0 },
+  { status: 'EXCHANGED', count: 0 },
+  { status: 'EXCHANGE_FAILED', count: 0 }
 ]
 
 export function OrderStatusChart({ data, colors }: OrderStatusChartProps) {
@@ -78,7 +72,7 @@ export function OrderStatusChart({ data, colors }: OrderStatusChartProps) {
   // Prepare data with Vietnamese status names for display
   const displayData = mergedData.map((item) => ({
     ...item,
-    name: translateStatus(item.status),
+    name: formatOrderStatus(item.status),
     value: typeof item.count === 'number' ? item.count : parseInt(item.count as string, 10) || 0,
     percentage:
       total > 0

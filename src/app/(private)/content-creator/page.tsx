@@ -119,7 +119,7 @@ export default function ContentCreatorDashboard() {
           averageCourseRating: 0
         },
         contentTrendData: [],
-        contentStatusData: { course: [] },
+        contentStatusData: { course: [], product: [] },
         popularContentData: [],
         ageGroupData: []
       }
@@ -138,7 +138,8 @@ export default function ContentCreatorDashboard() {
         course: data.courseStatusData.map((item) => ({
           status: item.status,
           count: Number(item.count)
-        }))
+        })),
+        product: [] // Mảng trống cho product data vì API không cung cấp dữ liệu này
       },
       popularContentData: data.popularCourseData.map((item) => ({
         id: item.id,

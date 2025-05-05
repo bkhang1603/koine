@@ -10,7 +10,7 @@ import Link from 'next/link'
 import { format } from 'date-fns'
 import { vi } from 'date-fns/locale'
 import { Badge } from '@/components/ui/badge'
-import { useGetRefundRequestById, useUpdateRefundRequestMutation } from '@/queries/useOrder'
+import { useGetRefundAndReturnDetailRequestsQuery, useUpdateRefundRequestMutation } from '@/queries/useOrder'
 import { Skeleton } from '@/components/ui/skeleton'
 import { formatOrderStatus, formatPaymentStatus, formatPrice, handleErrorApi } from '@/lib/utils'
 import { Breadcrumb } from '@/components/private/common/breadcrumb'
@@ -24,7 +24,7 @@ export default function RefundDetailPage(props: { params: Promise<{ id: string }
   const router = useRouter()
   const [note, setNote] = useState('')
 
-  const { isLoading, error, data } = useGetRefundRequestById({ id: refundId })
+  const { isLoading, error, data } = useGetRefundAndReturnDetailRequestsQuery({ orderId: refundId })
   const updateRefundMutation = useUpdateRefundRequestMutation()
 
   const handleApproveRefund = () => {
@@ -134,7 +134,7 @@ export default function RefundDetailPage(props: { params: Promise<{ id: string }
     )
   }
 
-  if (error || !data?.payload) {
+  if (error || !data?.payload?.data) {
     const errorMessage =
       error instanceof Error
         ? error.message
@@ -164,19 +164,17 @@ export default function RefundDetailPage(props: { params: Promise<{ id: string }
   const refundData = data.payload.data
   const orderDetails = refundData.orderDetails || []
 
-  // Refund status configuration
-  const refundStatusConfig = {
-    REFUND_REQUEST: { label: 'Yêu cầu hoàn tiền', variant: 'default' },
-    REFUNDING: { label: 'Đang xử lý', variant: 'warning' },
-    REFUNDED: { label: 'Đã hoàn tiền', variant: 'success' }
+  // Refund status configuration for badge variants
+  const refundStatusVariants = {
+    REFUND_REQUEST: 'default',
+    REFUNDING: 'warning',
+    REFUNDED: 'success',
+    REFUND_FAILED: 'destructive'
   } as const
 
   const formatStatus = (status: string) => {
-    const config = refundStatusConfig[status as keyof typeof refundStatusConfig] || {
-      label: status,
-      variant: 'default'
-    }
-    return <Badge variant={config.variant as any}>{config.label}</Badge>
+    const variant = refundStatusVariants[status as keyof typeof refundStatusVariants] || 'default'
+    return <Badge variant={variant as any}>{formatOrderStatus(status)}</Badge>
   }
 
   // Format payment method
@@ -234,7 +232,9 @@ export default function RefundDetailPage(props: { params: Promise<{ id: string }
         <div className='flex items-center gap-6 text-sm text-gray-500'>
           <div className='flex items-center gap-2'>
             <Clock className='h-4 w-4' />
-            {format(new Date(refundData.createdAt), 'HH:mm - dd/MM/yyyy', { locale: vi })}
+            {format(new Date(refundData.returnRequestDate), 'HH:mm - dd/MM/yyyy', {
+              locale: vi
+            })}
           </div>
         </div>
       </div>
@@ -251,8 +251,27 @@ export default function RefundDetailPage(props: { params: Promise<{ id: string }
             </CardHeader>
             <CardContent className='space-y-4'>
               <div className='p-4 bg-gray-50 rounded-md'>
-                <p className='whitespace-pre-line'>{refundData.note || 'Không có lý do'}</p>
+                <p className='whitespace-pre-line'>{refundData.returnReason || refundData.note || 'Không có lý do'}</p>
               </div>
+
+              {/* Display images if available */}
+              {refundData.returnRequestImages && refundData.returnRequestImages.length > 0 && (
+                <div className='mt-4'>
+                  <h4 className='font-medium mb-2'>Hình ảnh đính kèm</h4>
+                  <div className='grid grid-cols-2 sm:grid-cols-3 gap-2'>
+                    {refundData.returnRequestImages.map((imageUrl, index) => (
+                      <div key={index} className='relative aspect-square rounded-md overflow-hidden border'>
+                        <Image
+                          src={imageUrl}
+                          alt={`Ảnh đính kèm ${index + 1}`}
+                          fill
+                          className='object-cover hover:scale-105 transition-transform'
+                        />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
             </CardContent>
           </Card>
 
@@ -271,21 +290,14 @@ export default function RefundDetailPage(props: { params: Promise<{ id: string }
                     <div className='flex gap-4'>
                       <div className='relative w-16 h-16'>
                         <Image
-                          src={
-                            item.product?.imageUrl ||
-                            item.course?.imageUrl ||
-                            item.combo?.imageUrl ||
-                            '/placeholder.jpg'
-                          }
-                          alt={item.product?.name || item.course?.title || item.combo?.name || 'Item'}
+                          src={item.itemImageUrl || '/placeholder.jpg'}
+                          alt={item.itemName || 'Item'}
                           fill
                           className='object-cover rounded-lg'
                         />
                       </div>
                       <div className='flex-1'>
-                        <h3 className='font-medium'>
-                          {item.product?.name || item.course?.title || item.combo?.name || 'Sản phẩm'}
-                        </h3>
+                        <h3 className='font-medium'>{item.itemName || 'Sản phẩm'}</h3>
                         <div className='flex items-center justify-between mt-2'>
                           <div className='text-sm text-muted-foreground'>
                             Số lượng: <span className='font-medium'>{item.quantity}</span>
@@ -304,6 +316,31 @@ export default function RefundDetailPage(props: { params: Promise<{ id: string }
               )}
             </CardContent>
           </Card>
+
+          {/* Processing Note - Only show if the request has been processed */}
+          {refundData.returnNote && refundData.status !== 'REFUND_REQUEST' && (
+            <Card>
+              <CardHeader>
+                <CardTitle className='flex items-center gap-2'>
+                  <Clock className='w-5 h-5' />
+                  Kết quả xử lý
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className='space-y-4'>
+                  <div className='p-4 bg-gray-50 rounded-md'>
+                    <p className='whitespace-pre-line'>{refundData.returnNote}</p>
+                  </div>
+                  <div className='text-sm text-muted-foreground'>
+                    Xử lý vào:{' '}
+                    {refundData.returnProcessedDateFormatted ||
+                      (refundData.returnProcessedDate &&
+                        format(new Date(refundData.returnProcessedDate), 'HH:mm - dd/MM/yyyy', { locale: vi }))}
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          )}
 
           {/* Action box - Only show if status is REFUND_REQUEST */}
           {canApproveOrReject && (
@@ -384,13 +421,10 @@ export default function RefundDetailPage(props: { params: Promise<{ id: string }
                 </div>
                 <div className='flex justify-between'>
                   <span className='text-muted-foreground'>Ngày yêu cầu hoàn tiền</span>
-                  <span>{format(new Date(refundData.createdAt), 'dd/MM/yyyy', { locale: vi })}</span>
-                </div>
-                <div className='flex justify-between'>
-                  <span className='text-muted-foreground'>Ngày cập nhật</span>
                   <span>
-                    {refundData.updatedAtFormatted ||
-                      format(new Date(refundData.updatedAt), 'dd/MM/yyyy', { locale: vi })}
+                    {format(new Date(refundData.returnRequestDate), 'dd/MM/yyyy', {
+                      locale: vi
+                    })}
                   </span>
                 </div>
               </div>
@@ -408,7 +442,7 @@ export default function RefundDetailPage(props: { params: Promise<{ id: string }
           </Card>
 
           {/* Delivery Info - if available */}
-          {refundData.deliveryInfo && (
+          {refundData.delivery && Object.keys(refundData.delivery).length > 0 && (
             <Card>
               <CardHeader>
                 <CardTitle className='flex items-center gap-2'>
@@ -418,27 +452,33 @@ export default function RefundDetailPage(props: { params: Promise<{ id: string }
               </CardHeader>
               <CardContent>
                 <div className='space-y-4'>
-                  <div className='flex items-start gap-3'>
-                    <User className='h-5 w-5 text-muted-foreground shrink-0 mt-0.5' />
-                    <div>
-                      <div className='font-medium'>{refundData.deliveryInfo.name || 'Không có thông tin'}</div>
-                    </div>
-                  </div>
-                  <div className='flex items-start gap-3'>
-                    <Phone className='h-5 w-5 text-muted-foreground shrink-0 mt-0.5' />
-                    <div>
-                      <div className='font-medium'>{refundData.deliveryInfo.phone || 'Không có thông tin'}</div>
-                    </div>
-                  </div>
+                  {refundData.customerInfo && (
+                    <>
+                      <div className='flex items-start gap-3'>
+                        <User className='h-5 w-5 text-muted-foreground shrink-0 mt-0.5' />
+                        <div>
+                          <div className='font-medium'>{refundData.customerInfo.fullName || 'Không có thông tin'}</div>
+                        </div>
+                      </div>
+                      <div className='flex items-start gap-3'>
+                        <Phone className='h-5 w-5 text-muted-foreground shrink-0 mt-0.5' />
+                        <div>
+                          <div className='font-medium'>{refundData.customerInfo.phone || 'Không có thông tin'}</div>
+                        </div>
+                      </div>
+                    </>
+                  )}
                   <div className='flex items-start gap-3'>
                     <MapPin className='h-5 w-5 text-muted-foreground shrink-0 mt-0.5' />
                     <div>
-                      <div className='font-medium'>{refundData.deliveryInfo.address || 'Không có thông tin'}</div>
-                      {refundData.deliveryInfo.status && (
+                      <div className='font-medium'>
+                        {(refundData.delivery as any).address || 'Không có thông tin địa chỉ'}
+                      </div>
+                      {(refundData.delivery as any).status && (
                         <div className='text-sm text-muted-foreground mt-1'>
                           Trạng thái:{' '}
                           <span className='capitalize'>
-                            {formatOrderStatus(refundData.deliveryInfo.status.toLowerCase())}
+                            {formatOrderStatus((refundData.delivery as any).status.toLowerCase())}
                           </span>
                         </div>
                       )}

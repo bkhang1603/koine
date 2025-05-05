@@ -16,9 +16,11 @@ import { useForm, useFieldArray } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { createQuestionBody } from '@/schemaValidations/admin.schema'
 import { Checkbox } from '@/components/ui/checkbox'
-import { Trash2 } from 'lucide-react'
-import { FormField, FormItem, FormControl, FormMessage, Form } from '@/components/ui/form'
+import { Trash2, AlertCircle } from 'lucide-react'
+import { FormField, FormItem, FormControl, FormMessage, Form, FormLabel } from '@/components/ui/form'
 import { z } from 'zod'
+import { Alert, AlertDescription } from '@/components/ui/alert'
+import { useEffect } from 'react'
 
 interface CreateQuestionDialogProps {
   open: boolean
@@ -38,13 +40,27 @@ export function CreateQuestionDialog({ open, onOpenChange, onSubmit, isLoading }
         { optionData: '', isCorrect: false },
         { optionData: '', isCorrect: false }
       ]
-    }
+    },
+    mode: 'onChange'
   })
 
   const { fields, append, remove } = useFieldArray({
     control: form.control,
     name: 'options'
   })
+
+  // Reset form when dialog closes
+  useEffect(() => {
+    if (!open) {
+      form.reset({
+        content: '',
+        options: [
+          { optionData: '', isCorrect: false },
+          { optionData: '', isCorrect: false }
+        ]
+      })
+    }
+  }, [open, form])
 
   const addOption = () => {
     append({ optionData: '', isCorrect: false })
@@ -57,18 +73,10 @@ export function CreateQuestionDialog({ open, onOpenChange, onSubmit, isLoading }
   }
 
   const handleSubmit = form.handleSubmit((data) => {
-    const hasAtLeastOneCorrect = data.options.some((option) => option.isCorrect)
-
-    if (!hasAtLeastOneCorrect) {
-      form.setError('options', {
-        type: 'manual',
-        message: 'Phải có ít nhất một đáp án đúng'
-      })
-      return
-    }
-
     onSubmit(data)
   })
+
+  const formErrors = form.formState.errors
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -80,19 +88,31 @@ export function CreateQuestionDialog({ open, onOpenChange, onSubmit, isLoading }
         <Form {...form}>
           <form onSubmit={handleSubmit} className='space-y-6'>
             <div className='space-y-4'>
-              <div className='space-y-2'>
-                <Label htmlFor='content'>Nội dung câu hỏi</Label>
-                <Textarea id='content' placeholder='Nhập nội dung câu hỏi...' {...form.register('content')} rows={3} />
-                {form.formState.errors.content && (
-                  <p className='text-sm text-red-500'>{form.formState.errors.content.message}</p>
+              {/* Question content field */}
+              <FormField
+                control={form.control}
+                name='content'
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Nội dung câu hỏi</FormLabel>
+                    <FormControl>
+                      <Textarea placeholder='Nhập nội dung câu hỏi...' {...field} rows={3} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
                 )}
-              </div>
+              />
+
+              {/* Show array-level validation errors */}
+              {formErrors.options && formErrors.options.message && (
+                <Alert variant='destructive' className='mt-2'>
+                  <AlertCircle className='h-4 w-4' />
+                  <AlertDescription>{formErrors.options.message as string}</AlertDescription>
+                </Alert>
+              )}
 
               <div className='space-y-2'>
                 <Label>Các lựa chọn</Label>
-                {form.formState.errors.options && (
-                  <p className='text-sm text-red-500'>{form.formState.errors.options.message as string}</p>
-                )}
                 <div className='space-y-3'>
                   {fields.map((field, index) => (
                     <div key={field.id} className='flex items-start gap-2'>
@@ -131,9 +151,12 @@ export function CreateQuestionDialog({ open, onOpenChange, onSubmit, isLoading }
                     </div>
                   ))}
                 </div>
-                <Button type='button' variant='outline' size='sm' onClick={addOption}>
+                <Button type='button' variant='outline' size='sm' onClick={addOption} disabled={fields.length >= 10}>
                   Thêm lựa chọn
                 </Button>
+                {fields.length >= 10 && (
+                  <p className='text-sm text-muted-foreground mt-1'>Đã đạt số lượng lựa chọn tối đa (10)</p>
+                )}
               </div>
             </div>
 

@@ -66,6 +66,12 @@ export default function ProductNewPage({ localDraft, baseUrl }: ProductNewPagePr
     try {
       setIsSubmitting(true)
 
+      // Convert discount from percentage (0-100) to decimal (0-1) for API
+      const formattedData = {
+        ...data,
+        discount: data.discount / 100
+      }
+
       // STEP 1: UPLOAD IMAGES (only happens when form is submitted)
       // This ensures images are only uploaded when the user clicks the "Save" button
       if (files && files.length > 0) {
@@ -84,9 +90,11 @@ export default function ProductNewPage({ localDraft, baseUrl }: ProductNewPagePr
 
           if (result?.payload?.data) {
             // Replace the temporary preview URLs with real server URLs
-            data.imageUrlArray = Array.isArray(result.payload.data) ? result.payload.data : [result.payload.data]
+            formattedData.imageUrlArray = Array.isArray(result.payload.data)
+              ? result.payload.data
+              : [result.payload.data]
 
-            console.log(`Tải lên hình ảnh hoàn tất: ${data.imageUrlArray.length} hình`)
+            console.log(`Tải lên hình ảnh hoàn tất: ${formattedData.imageUrlArray.length} hình`)
           }
         } catch (uploadError) {
           console.error('Error uploading images:', uploadError)
@@ -102,8 +110,8 @@ export default function ProductNewPage({ localDraft, baseUrl }: ProductNewPagePr
       }
 
       // STEP 2: CREATE PRODUCT (after images have been uploaded successfully)
-      console.log('Tạo sản phẩm với dữ liệu:', data)
-      await createProductMutation.mutateAsync(data)
+      console.log('Tạo sản phẩm với dữ liệu:', formattedData)
+      await createProductMutation.mutateAsync(formattedData)
 
       // STEP 3: CLEAN UP & REDIRECT
       // Clear draft from localStorage after successful submission
@@ -218,10 +226,16 @@ export default function ProductNewPage({ localDraft, baseUrl }: ProductNewPagePr
                       <FormLabel>Giá (VNĐ)</FormLabel>
                       <FormControl>
                         <Input
-                          type='number'
+                          type='text'
+                          inputMode='numeric'
                           placeholder='Nhập giá'
-                          {...field}
-                          onChange={(e) => field.onChange(Number(e.target.value))}
+                          value={field.value}
+                          onChange={(e) => {
+                            // Remove leading zeros and non-numeric characters
+                            const value = e.target.value.replace(/^0+|[^0-9]/g, '')
+                            // Convert to number or 0 if empty
+                            field.onChange(value === '' ? 0 : parseInt(value, 10))
+                          }}
                         />
                       </FormControl>
                       <FormMessage />
@@ -237,10 +251,16 @@ export default function ProductNewPage({ localDraft, baseUrl }: ProductNewPagePr
                       <FormLabel>Số lượng</FormLabel>
                       <FormControl>
                         <Input
-                          type='number'
+                          type='text'
+                          inputMode='numeric'
                           placeholder='Nhập số lượng'
-                          {...field}
-                          onChange={(e) => field.onChange(Number(e.target.value))}
+                          value={field.value}
+                          onChange={(e) => {
+                            // Remove leading zeros and non-numeric characters
+                            const value = e.target.value.replace(/^0+|[^0-9]/g, '')
+                            // Convert to number or 0 if empty
+                            field.onChange(value === '' ? 0 : parseInt(value, 10))
+                          }}
                         />
                       </FormControl>
                       <FormMessage />
@@ -256,10 +276,18 @@ export default function ProductNewPage({ localDraft, baseUrl }: ProductNewPagePr
                       <FormLabel>Giảm giá (%)</FormLabel>
                       <FormControl>
                         <Input
-                          type='number'
+                          type='text'
+                          inputMode='numeric'
                           placeholder='Nhập % giảm giá'
-                          {...field}
-                          onChange={(e) => field.onChange(Number(e.target.value))}
+                          value={field.value}
+                          onChange={(e) => {
+                            // Remove leading zeros and non-numeric characters
+                            const value = e.target.value.replace(/^0+|[^0-9]/g, '')
+                            // Convert to number or 0 if empty
+                            const numValue = value === '' ? 0 : parseInt(value, 10)
+                            // Ensure value is between 0-100
+                            field.onChange(numValue > 100 ? 100 : numValue)
+                          }}
                         />
                       </FormControl>
                       <FormMessage />
