@@ -12,7 +12,14 @@ import { vi } from 'date-fns/locale'
 import { Badge } from '@/components/ui/badge'
 import { useGetAdminOrderQuery } from '@/queries/useOrder'
 import { Skeleton } from '@/components/ui/skeleton'
-import { formatDate, formatOrderStatus, formatPaymentStatus, formatPrice } from '@/lib/utils'
+import {
+  formatDate,
+  formatOrderStatus,
+  formatPaymentStatus,
+  formatPrice,
+  formatPaymentMethod,
+  formatDeliveryMethod
+} from '@/lib/utils'
 import { Breadcrumb } from '@/components/private/common/breadcrumb'
 
 type OrderItemType = {
@@ -92,48 +99,29 @@ export default function SupportOrderDetailPage(props: { params: Promise<{ id: st
   // eslint-disable-next-line no-unused-vars
   const orderHistory = orderData.orderHistory || []
 
-  // Cấu hình màu sắc và nhãn cho trạng thái
-  const orderStatusConfig = {
-    PROCESSING: { label: 'Đang xử lý', variant: 'default' },
-    DELIVERING: { label: 'Đang giao', variant: 'primary' },
-    COMPLETED: { label: 'Hoàn thành', variant: 'secondary' },
-    CANCELLED: { label: 'Đã hủy', variant: 'destructive' },
-    EXCHANGE_REQUEST: { label: 'Yêu cầu đổi hàng', variant: 'warning' },
-    REFUND_REQUEST: { label: 'Hoàn tiền', variant: 'destructive' }
+  // Cấu hình variant màu sắc cho trạng thái
+  const orderStatusVariants = {
+    PROCESSING: 'default',
+    DELIVERING: 'primary',
+    COMPLETED: 'secondary',
+    CANCELLED: 'destructive',
+    EXCHANGE_REQUEST: 'warning',
+    REFUND_REQUEST: 'destructive',
+    PENDING: 'default',
+    DELIVERED: 'primary',
+    REFUNDING: 'warning',
+    REFUNDED: 'success',
+    EXCHANGING: 'warning',
+    EXCHANGED: 'success',
+    EXCHANGE_FAILED: 'destructive',
+    REFUND_FAILED: 'destructive',
+    FAILED: 'destructive',
+    FAILED_PAYMENT: 'destructive'
   } as const
 
   const formatStatus = (status: string) => {
-    const config = orderStatusConfig[status as keyof typeof orderStatusConfig] || {
-      label: formatOrderStatus(status),
-      variant: 'default'
-    }
-    return <Badge variant={config.variant as any}>{config.label}</Badge>
-  }
-
-  // Format delivery method
-  const formatDeliveryMethod = (method: string): string => {
-    switch (method) {
-      case 'STANDARD':
-        return 'Tiêu chuẩn'
-      case 'EXPEDITED':
-        return 'Nhanh'
-      case 'NONESHIP':
-        return 'Không giao hàng'
-      default:
-        return method
-    }
-  }
-
-  // Format payment method
-  const formatPaymentMethod = (method: string): string => {
-    switch (method) {
-      case 'COD':
-        return 'Thanh toán khi nhận hàng'
-      case 'BANKING':
-        return 'Chuyển khoản ngân hàng'
-      default:
-        return method
-    }
+    const variant = orderStatusVariants[status as keyof typeof orderStatusVariants] || 'default'
+    return <Badge variant={variant as any}>{formatOrderStatus(status)}</Badge>
   }
 
   const breadcrumbItems = [
