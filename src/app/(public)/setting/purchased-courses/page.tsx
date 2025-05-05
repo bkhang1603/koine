@@ -261,7 +261,7 @@ export default function PurchasedCoursesPage() {
                       <Button
                         size='sm'
                         variant='outline'
-                        className='absolute top-4 right-4 flex items-center gap-1'
+                        className='absolute top-3 left-3 flex items-center gap-1'
                         onClick={() =>
                           openGiftDialog({
                             id: item.course.id,
