@@ -46,6 +46,7 @@ function SupportChat() {
   const [activeTab, setActiveTab] = useState('all')
   const [isCloseDialogOpen, setIsCloseDialogOpen] = useState(false)
   const [roomToClose, setRoomToClose] = useState<string | null>(null)
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false)
   const messageEndRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
 
@@ -258,8 +259,14 @@ function SupportChat() {
 
   // Handle close chat room
   const handleCloseChat = (roomId: string) => {
-    setRoomToClose(roomId)
-    setIsCloseDialogOpen(true)
+    // Đảm bảo dropdown đã đóng trước
+    setIsDropdownOpen(false)
+
+    // Sử dụng setTimeout để đảm bảo dropdown đã đóng hoàn toàn trước khi mở dialog
+    setTimeout(() => {
+      setRoomToClose(roomId)
+      setIsCloseDialogOpen(true)
+    }, 100)
   }
 
   // Confirm and close chat
@@ -269,12 +276,11 @@ function SupportChat() {
     setIsCloseDialogOpen(false)
 
     // Using socket to close the room instead of API call
-    socket.emit('closeRoom', { roomId: roomToClose }, (response: any) => {
-      if (response?.statusCode === 200) {
-        refetchRooms()
-        setRoomToClose(null)
-      }
-    })
+    socket.emit('closeRoom', { roomId: roomToClose })
+
+    refetchRooms()
+    refetchMessages()
+    setRoomToClose(null)
   }
 
   // Format date for message timestamp
@@ -550,7 +556,7 @@ function SupportChat() {
               <div className='flex items-center gap-2'>
                 {!selectedRoom.isClose && !isMissingSupport && (
                   <>
-                    <DropdownMenu>
+                    <DropdownMenu open={isDropdownOpen} onOpenChange={setIsDropdownOpen}>
                       <DropdownMenuTrigger asChild>
                         <Button variant='ghost' size='icon' className='h-8 w-8 text-gray-500'>
                           <MoreVertical size={18} />
