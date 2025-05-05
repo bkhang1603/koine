@@ -28,6 +28,8 @@ import { formatPrice } from '@/lib/utils'
 import { RefundStatusValues, ReturnStatusValues } from '@/constants/type'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import Image from 'next/image'
+import { useRouter } from 'next/navigation'
+import configRoute from '@/config/route'
 
 type RefundStatus = (typeof RefundStatusValues)[number]
 type ReturnStatus = (typeof ReturnStatusValues)[number]
@@ -117,6 +119,7 @@ const getReturnStatusText = (status: string) => {
 }
 
 export default function RefundPage() {
+  const router = useRouter()
   // Trạng thái cho tìm kiếm và lọc
   const [tabValue, setTabValue] = useState('refund')
   const [search, setSearch] = useState('')
@@ -181,6 +184,10 @@ export default function RefundPage() {
     } catch (e) {
       return dateString
     }
+  }
+
+  const handleRefundCardClick = (orderId: string) => {
+    router.push(`${configRoute.setting.refund}/${orderId}`)
   }
 
   return (
@@ -302,7 +309,11 @@ export default function RefundPage() {
             ) : (
               // Hiển thị danh sách hoàn tiền
               filteredRefundOrders.map((order) => (
-                <Card key={order.id} className='overflow-hidden border hover:border-primary/40 transition-colors'>
+                <Card
+                  key={order.id}
+                  className='overflow-hidden border hover:border-primary/40 transition-colors cursor-pointer'
+                  onClick={() => handleRefundCardClick(order.id)}
+                >
                   <CardContent className='p-6'>
                     <div className='flex flex-col gap-6'>
                       {/* Header */}

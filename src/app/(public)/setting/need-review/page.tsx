@@ -285,8 +285,8 @@ function NeedReviewPage() {
                                 <div className='text-sm text-gray-500'>
                                   {displayQuantity > 1 && `${displayQuantity} × ${formatCurrency(displayUnitPrice)}`}
                                   {hasDiscount && (
-                                    <span className='text-emerald-600 ml-1'>
-                                      (Giảm {formatCurrency(displayDiscount)})
+                                    <span className='text-emerald-600'>
+                                      (Giảm {formatCurrency(displayUnitPrice - displayPrice)})
                                     </span>
                                   )}
                                 </div>
