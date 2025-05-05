@@ -11,12 +11,7 @@ import { Button } from '@/components/ui/button'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import {
-  useGetSupporterChatRoomList,
-  useGetChatMessages,
-  useRequestJoinChatRoom,
-  useCloseChatRoom
-} from '@/queries/useChat'
+import { useGetSupporterChatRoomList, useGetChatMessages, useRequestJoinChatRoom } from '@/queries/useChat'
 import { getAccessTokenFromLocalStorage } from '@/lib/utils'
 import socket from '@/lib/socket'
 import { ChatMessageDataType } from '@/schemaValidations/chat.schema'
@@ -81,8 +76,6 @@ function SupportChat() {
       refetchRooms()
     }
   })
-
-  const closeChatMutation = useCloseChatRoom()
 
   // Parse chat rooms data safely
   const chatRooms = useMemo(() => {
@@ -257,9 +250,12 @@ function SupportChat() {
   const confirmCloseChat = async () => {
     if (!roomToClose) return
 
-    closeChatMutation.mutateAsync(roomToClose, {
-      onSuccess: () => {
-        setIsCloseDialogOpen(false)
+    setIsCloseDialogOpen(false)
+
+    // Using socket to close the room instead of API call
+    socket.emit('closeRoom', { roomId: roomToClose }, (response: any) => {
+      if (response?.statusCode === 200) {
+        refetchRooms()
         setRoomToClose(null)
       }
     })
@@ -547,13 +543,8 @@ function SupportChat() {
                         <DropdownMenuItem
                           className='text-red-500 focus:text-red-500 cursor-pointer'
                           onClick={() => handleCloseChat(selectedRoom.id)}
-                          disabled={closeChatMutation.isPending}
                         >
-                          {closeChatMutation.isPending ? (
-                            <Loader2 className='h-4 w-4 animate-spin mr-2' />
-                          ) : (
-                            <LogOut className='h-4 w-4 mr-2' />
-                          )}
+                          <LogOut className='h-4 w-4 mr-2' />
                           Kết thúc cuộc trò chuyện
                         </DropdownMenuItem>
                       </DropdownMenuContent>
@@ -695,20 +686,8 @@ function SupportChat() {
             >
               Hủy
             </Button>
-            <Button
-              type='button'
-              variant='destructive'
-              onClick={confirmCloseChat}
-              disabled={closeChatMutation.isPending}
-            >
-              {closeChatMutation.isPending ? (
-                <>
-                  <Loader2 className='h-4 w-4 animate-spin mr-2' />
-                  Đang xử lý...
-                </>
-              ) : (
-                'Kết thúc cuộc trò chuyện'
-              )}
+            <Button type='button' variant='destructive' onClick={confirmCloseChat}>
+              Kết thúc cuộc trò chuyện
             </Button>
           </DialogFooter>
         </DialogContent>
