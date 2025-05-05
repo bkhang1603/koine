@@ -18,6 +18,7 @@ import {
   CreateRefundOrderBodyRes,
   CreateReturnOrderBody,
   CreateReturnOrderBodyRes,
+  GetRefundAndReturnResType,
   OrderBody,
   OrderBodyResType,
   OrderDetailResType,
@@ -72,7 +73,9 @@ const orderApiRequest = {
   updateRefundRequest: ({ id, body }: { id: string; body: UpdateRefundRequestBodyType }) =>
     http.put<UpdateRefundRequestResType>(`/orders/refund/${id}/resolve-refund`, body),
   updateExchangeRequest: ({ id, body }: { id: string; body: UpdateExchangeRequestBodyType }) =>
-    http.put<UpdateExchangeRequestResType>(`/orders/exchange/${id}/resolve-exchange`, body)
+    http.put<UpdateExchangeRequestResType>(`/orders/exchange/${id}/resolve-exchange`, body),
+  getRefundAndReturnDetail: ({ orderId }: { orderId: string }) =>
+    http.get<GetRefundAndReturnResType>(`/orders/detail/${orderId}/refund-exchange`)
 }
 
 export default orderApiRequest

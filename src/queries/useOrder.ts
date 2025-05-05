@@ -202,3 +202,10 @@ export const useUpdateExchangeRequestMutation = () => {
     }
   })
 }
+
+export const useGetRefundAndReturnDetailRequestsQuery = ({ orderId }: { orderId: string }) => {
+  return useQuery({
+    queryKey: ['refund-return-detail', orderId],
+    queryFn: () => orderApiRequest.getRefundAndReturnDetail({ orderId })
+  })
+}

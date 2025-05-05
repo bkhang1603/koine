@@ -276,6 +276,84 @@ export const createReturnOrderBodyRes = z.object({
   statusCode: z.number()
 })
 
+export const getRefundAndReturn = z.object({
+  id: z.string(),
+  userId: z.string(),
+  orderCode: z.string(),
+  orderCodeFormatted: z.string(),
+  orderDate: z.string(),
+  orderDateFormatted: z.string(),
+  totalAmount: z.number(),
+  deliAmount: z.number(),
+  deliMethod: z.string(),
+  status: z.string(),
+  note: z.string(),
+  expiredAt: z.string(),
+  returnType: z.string(),
+  returnRequestDate: z.string(),
+  returnRequestDateFormatted: z.string(),
+  returnProcessedDate: z.string(),
+  returnProcessedDateFormatted: z.string(),
+  returnReason: z.string(),
+  returnNote: z.string(),
+  returnStatus: z.string(),
+  returnTotalAmount: z.number(),
+  payment: z.object({
+    isDeleted: z.boolean(),
+    createdAt: z.string(),
+    updatedAt: z.string(),
+    id: z.string(),
+    orderId: z.string(),
+    payMethod: z.string(),
+    payDate: z.string(),
+    payAmount: z.number(),
+    payStatus: z.string()
+  }),
+  delivery: z.object({}),
+  orderDetails: z.array(
+    z.object({
+      id: z.string(),
+      orderId: z.string(),
+      productId: z.string(),
+      courseId: z.string(),
+      comboId: z.string(),
+      quantity: z.number(),
+      unitPrice: z.number(),
+      discount: z.number(),
+      totalPrice: z.number(),
+      itemName: z.string(),
+      itemDescription: z.string(),
+      itemImageUrl: z.string(),
+      itemType: z.string(),
+      returnQuantity: z.number(),
+      returnAmount: z.number(),
+      returnReason: z.string(),
+      isReturned: z.boolean()
+    })
+  ),
+  orderStatusHistory: z.array(
+    z.object({
+      status: z.enum(OrderStatusValues),
+      timestamp: z.string(),
+      timestampFormatted: z.string()
+    })
+  ),
+  customerInfo: z.object({
+    id: z.string(),
+    fullName: z.string(),
+    phone: z.string(),
+    email: z.string()
+  }),
+  returnRequestImages: z.array(z.string())
+})
+
+export const getRefundAndReturnRes = z.object({
+  data: getRefundAndReturn,
+  statusCode: z.number(),
+  info: z.string(),
+  message: z.string()
+})
+
 export type OrderBody = z.infer<typeof orderBody>
 
 export type OrderBodyResType = z.TypeOf<typeof orderBodyRes>
@@ -307,3 +385,5 @@ export type CreateRefundOrderBodyRes = z.TypeOf<typeof createRefundOrderBodyRes>
 export type CreateReturnOrderBody = z.TypeOf<typeof createReturnOrderBody>
 
 export type CreateReturnOrderBodyRes = z.TypeOf<typeof createReturnOrderBodyRes>
+
+export type GetRefundAndReturnResType = z.TypeOf<typeof getRefundAndReturnRes>

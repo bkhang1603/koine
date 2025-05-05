@@ -242,7 +242,7 @@ export default function PurchasedCoursesPage() {
                   </SelectContent>
                 </Select>
               </div>
-            </div>
+                  </div>
 
             {filteredCourses.length > 0 ? (
               <div className='grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3'>
@@ -276,8 +276,8 @@ export default function PurchasedCoursesPage() {
                     )}
                   </div>
                 ))}
-              </div>
-            ) : (
+                    </div>
+                  ) : (
               <EmptyCourses
                 title={`Không tìm thấy khóa học nào ${searchQuery ? 'phù hợp với tìm kiếm' : 'trong danh mục này'}`}
                 description='Hãy thử tìm kiếm với từ khóa khác hoặc khám phá thêm các khóa học mới.'
@@ -388,7 +388,7 @@ export default function PurchasedCoursesPage() {
                     </div>
                   )}
                   Tặng khóa học
-                </Button>
+                      </Button>
               </DialogFooter>
             </form>
           </Form>
