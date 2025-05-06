@@ -17,10 +17,14 @@ import configRoute from '@/config/route'
 import { toast } from '@/components/ui/use-toast'
 import { getAccessTokenFromLocalStorage, handleErrorApi } from '@/lib/utils'
 import { useCartDetailQuery } from '@/queries/useCartDetail'
+import { useRouter, usePathname } from 'next/navigation'
 
 function BellNotification() {
   const user = useAppStore((state) => state.user)
   const role = useAppStore((state) => state.role)
+
+  const router = useRouter()
+  const pathname = usePathname()
 
   const { data, isLoading, refetch } = useGetAccountNotifications({ page_index: 1, page_size: 100 })
   const { refetch: refetchCart } = useCartDetailQuery({
@@ -52,6 +56,14 @@ function BellNotification() {
       refetchCart()
     }
 
+    function getEventStarted() {
+      // Chỉ refresh khi đang ở màn hình event hoặc event detail
+      const isEventPage = pathname?.startsWith('/event')
+      if (isEventPage) {
+        router.refresh()
+      }
+    }
+
     function login() {
       socket.emit('login', {
         token: token
@@ -59,23 +71,19 @@ function BellNotification() {
     }
 
     socket.on('connect', onConnect)
-
     socket.on('login', login)
-
     socket.on('notification', getNotifications)
-
+    socket.on('eventStarted', getEventStarted)
     socket.on('disconnect', onDisconnect)
 
     return () => {
       socket.off('connect', onConnect)
-
       socket.off('login', login)
-
       socket.off('notification', getNotifications)
-
+      socket.off('eventStarted', getEventStarted)
       socket.off('disconnect', onDisconnect)
     }
-  }, [user, refetch, token, refetchCart])
+  }, [user, refetch, token, refetchCart, router, pathname])
 
   // Count unread notifications
   const unreadCount = notifications.filter((notification) => !notification.isRead).length

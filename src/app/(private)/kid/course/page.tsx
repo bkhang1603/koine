@@ -7,12 +7,42 @@ import Link from 'next/link'
 import { Card } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Progress } from '@/components/ui/progress'
-import { BookOpen, Target, Brain, Gamepad2 } from 'lucide-react'
+import { BookOpen, Target, Brain, Gamepad2, EyeOff } from 'lucide-react'
 import images from '@/assets/images'
 import { motion } from 'framer-motion'
 import { Clock, Medal } from 'lucide-react'
 import { Skeleton } from '@/components/ui/skeleton'
 import { translateLevel } from '@/lib/utils'
+
+interface Course {
+  id: string
+  title: string
+  description: string
+  imageUrl: string
+  level: string
+  categories: {
+    id: string
+    name: string
+  }[]
+  totalLesson: number
+  totalLessonFinished: number
+  completionRate: number
+  isVisible?: boolean
+}
+
+interface SuggestCourse {
+  id: string
+  title: string
+  description: string
+  imageUrl: string
+  level: string
+  categories: {
+    id: string
+    name: string
+  }[]
+  totalLesson: number
+  isVisible?: boolean
+}
 
 // Thêm component Overview
 const CourseOverview = ({ courses }: { courses: any[] }) => {
@@ -130,7 +160,7 @@ const CourseCardSkeleton = () => (
 )
 
 function CoursePage() {
-  const { data: courseData, isLoading: coursesLoading } = useCourseByAccount({ page_size: 10, page_index: 1 })
+  const { data: courseData, isLoading: coursesLoading } = useCourseByAccount({ page_size: 100, page_index: 1 })
   const courses = courseData?.payload.data ?? []
 
   const { data: suggestCoursesData, isLoading: suggestionsLoading } = useSuggestCoursesFree()
@@ -252,66 +282,133 @@ function CoursePage() {
               </div>
             ) : courses.length > 0 ? (
               <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'>
-                {courses.map((course) => (
-                  <Link href={`/kid/course/${course.id}?isEnrolled=true`} key={course.id}>
-                    <Card className='border-0 overflow-hidden bg-white/80 backdrop-blur-sm hover:bg-white transition-all shadow-md hover:shadow-lg group'>
-                      <div className='relative p-5'>
-                        {/* Quest decorator */}
-                        <div className='absolute top-0 left-5 w-0.5 h-full bg-amber-200'></div>
-                        <div className='absolute top-5 left-5 w-4 h-4 rounded-full bg-amber-400 border-4 border-amber-50 -ml-2 shadow-sm'></div>
+                {courses.map((course) =>
+                  course.isVisible ? (
+                    <Link href={`/kid/course/${course.id}?isEnrolled=true`} key={course.id}>
+                      <Card className='border-0 overflow-hidden bg-white/80 backdrop-blur-sm hover:bg-white hover:shadow-lg group shadow-md relative'>
+                        <div className='relative p-5'>
+                          {/* Quest decorator */}
+                          <div className='absolute top-0 left-5 w-0.5 h-full bg-amber-200'></div>
+                          <div className='absolute top-5 left-5 w-4 h-4 rounded-full bg-amber-400 border-4 border-amber-50 -ml-2 shadow-sm'></div>
 
-                        <div className='ml-6 pl-4'>
-                          <div className='flex items-start justify-between'>
-                            <div>
-                              <div className='flex flex-wrap gap-2 mb-2'>
-                                {course.categories?.slice(0, 1).map((category) => (
-                                  <span
-                                    key={category.id}
-                                    className='px-2 py-1 bg-indigo-50 text-indigo-600 text-xs rounded-lg font-medium'
-                                  >
-                                    {category.name}
+                          <div className='ml-6 pl-4'>
+                            <div className='flex items-start justify-between'>
+                              <div>
+                                <div className='flex flex-wrap gap-2 mb-2'>
+                                  {course.categories?.slice(0, 1).map((category) => (
+                                    <span
+                                      key={category.id}
+                                      className='px-2 py-1 bg-indigo-50 text-indigo-600 text-xs rounded-lg font-medium'
+                                    >
+                                      {category.name}
+                                    </span>
+                                  ))}
+                                  <span className='px-2 py-1 bg-amber-50 text-amber-600 text-xs rounded-lg font-medium'>
+                                    {course.level}
                                   </span>
-                                ))}
-                                <span className='px-2 py-1 bg-amber-50 text-amber-600 text-xs rounded-lg font-medium'>
-                                  {course.level}
-                                </span>
+                                </div>
+
+                                <h3 className='text-xl font-bold text-slate-700 group-hover:text-amber-500 transition-colors mb-2 line-clamp-1'>
+                                  {course.title}
+                                </h3>
+
+                                <p className='text-slate-600 text-sm mb-4 line-clamp-2'>{course.description}</p>
                               </div>
 
-                              <h3 className='text-xl font-bold text-slate-700 group-hover:text-amber-500 transition-colors mb-2 line-clamp-1'>
-                                {course.title}
-                              </h3>
-
-                              <p className='text-slate-600 text-sm mb-4 line-clamp-2'>{course.description}</p>
-                            </div>
-
-                            <div className='w-16 h-16 shrink-0 ml-4'>
-                              <div className='w-full h-full rounded-xl overflow-hidden shadow-md'>
-                                <Image
-                                  src={course.imageUrl || images.toy}
-                                  alt={course.title}
-                                  width={64}
-                                  height={64}
-                                  className='w-full h-full object-cover'
-                                />
+                              <div className='w-16 h-16 shrink-0 ml-4'>
+                                <div className='w-full h-full rounded-xl overflow-hidden shadow-md'>
+                                  <Image
+                                    src={course.imageUrl || images.toy}
+                                    alt={course.title}
+                                    width={64}
+                                    height={64}
+                                    className='w-full h-full object-cover'
+                                  />
+                                </div>
                               </div>
                             </div>
-                          </div>
 
-                          <div className='mb-3'>
-                            <Progress value={course.completionRate} className='h-3 bg-slate-200' />
-                          </div>
+                            <div className='mb-3'>
+                              <Progress value={course.completionRate} className='h-3 bg-slate-200' />
+                            </div>
 
-                          <div className='flex justify-between text-xs text-slate-600'>
-                            <span>
-                              {course.totalLessonFinished}/{course.totalLesson} bài học
-                            </span>
-                            <span>{course.completionRate}% hoàn thành</span>
+                            <div className='flex justify-between text-xs text-slate-600'>
+                              <span>
+                                {course.totalLessonFinished}/{course.totalLesson} bài học
+                              </span>
+                              <span>{course.completionRate}% hoàn thành</span>
+                            </div>
                           </div>
                         </div>
-                      </div>
-                    </Card>
-                  </Link>
-                ))}
+                      </Card>
+                    </Link>
+                  ) : (
+                    <div key={course.id}>
+                      <Card className='border-0 overflow-hidden bg-white/80 backdrop-blur-sm shadow-md relative opacity-60 cursor-pointer'>
+                        <div className='absolute inset-0 bg-slate-100/50 backdrop-blur-[2px] z-10 flex items-center justify-center'>
+                          <div className='bg-white/90 px-4 py-2 rounded-full shadow-md flex items-center gap-2'>
+                            <EyeOff className='w-4 h-4 text-slate-500' />
+                            <span className='text-sm font-medium text-slate-600'>Chưa có quyền truy cập</span>
+                          </div>
+                        </div>
+                        <div className='relative p-5'>
+                          {/* Quest decorator */}
+                          <div className='absolute top-0 left-5 w-0.5 h-full bg-amber-200'></div>
+                          <div className='absolute top-5 left-5 w-4 h-4 rounded-full bg-amber-400 border-4 border-amber-50 -ml-2 shadow-sm'></div>
+
+                          <div className='ml-6 pl-4'>
+                            <div className='flex items-start justify-between'>
+                              <div>
+                                <div className='flex flex-wrap gap-2 mb-2'>
+                                  {course.categories?.slice(0, 1).map((category) => (
+                                    <span
+                                      key={category.id}
+                                      className='px-2 py-1 bg-indigo-50 text-indigo-600 text-xs rounded-lg font-medium'
+                                    >
+                                      {category.name}
+                                    </span>
+                                  ))}
+                                  <span className='px-2 py-1 bg-amber-50 text-amber-600 text-xs rounded-lg font-medium'>
+                                    {course.level}
+                                  </span>
+                                </div>
+
+                                <h3 className='text-xl font-bold text-slate-700 group-hover:text-amber-500 transition-colors mb-2 line-clamp-1'>
+                                  {course.title}
+                                </h3>
+
+                                <p className='text-slate-600 text-sm mb-4 line-clamp-2'>{course.description}</p>
+                              </div>
+
+                              <div className='w-16 h-16 shrink-0 ml-4'>
+                                <div className='w-full h-full rounded-xl overflow-hidden shadow-md'>
+                                  <Image
+                                    src={course.imageUrl || images.toy}
+                                    alt={course.title}
+                                    width={64}
+                                    height={64}
+                                    className='w-full h-full object-cover'
+                                  />
+                                </div>
+                              </div>
+                            </div>
+
+                            <div className='mb-3'>
+                              <Progress value={course.completionRate} className='h-3 bg-slate-200' />
+                            </div>
+
+                            <div className='flex justify-between text-xs text-slate-600'>
+                              <span>
+                                {course.totalLessonFinished}/{course.totalLesson} bài học
+                              </span>
+                              <span>{course.completionRate}% hoàn thành</span>
+                            </div>
+                          </div>
+                        </div>
+                      </Card>
+                    </div>
+                  )
+                )}
               </div>
             ) : (
               <Card className='p-8 text-center bg-white/80 backdrop-blur'>

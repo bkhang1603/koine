@@ -124,7 +124,8 @@ function LearnPage(props: { params: Promise<{ id: string }> }) {
       router.push(configRoute.setting.myCourse)
     }
 
-    function handleLearningTimeout() {
+    function handleLearningTimeout(data: any) {
+      console.log(data)
       toast({
         description: 'Phiên học của bạn đã hết hạn do không hoạt động'
       })
@@ -156,8 +157,8 @@ function LearnPage(props: { params: Promise<{ id: string }> }) {
           })
         }
       },
-      2 * 60 * 1000
-    ) // 2 minutes
+      1 * 60 * 1000
+    ) // 1 minutes
 
     socket.on('connect', onConnect)
     socket.on('login', login)

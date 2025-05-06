@@ -131,7 +131,8 @@ const courseApiRequest = {
   updateLesson: (id: string, data: UpdateLessonBodyType) => http.put<OnlyMessageResType>(`/lessons/${id}`, data),
   deleteLesson: (id: string) => http.delete<OnlyMessageResType>(`/lessons/${id}`),
   getCourseReview: (id: string) => http.get<CourseReviewResType>(`/courses/${id}/reviews`),
-  getAllCoursesForCustom: () => http.get<AllCoursesForCustomResType>(`/courses/all-basic-course-info`),
+  getAllCoursesForCustom: () =>
+    http.get<AllCoursesForCustomResType>(`/courses/all-basic-course-info?page_index=1&page_size=1000`),
   getCoursesAdmin: ({
     page_index,
     page_size,
