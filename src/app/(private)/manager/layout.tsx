@@ -23,28 +23,34 @@ export default function Layout({
       title: 'Quản lý',
       group: [
         {
-          id: 'orderDashboard',
+          id: 'order',
           href: '/manager/order',
           icon: <ShoppingCart className='h-5 w-5' />,
           label: 'Đơn hàng'
         },
         {
-          id: 'coursesDashboard',
+          id: 'courses',
           href: '/manager/course',
           icon: <BookOpen className='h-5 w-5' />,
           label: 'Khoá học'
         },
         {
-          id: 'blogDashboard',
+          id: 'blog',
           href: '/manager/blog',
           icon: <FileText className='h-5 w-5' />,
           label: 'Bài viết'
         },
         {
-          id: 'productDashboard',
+          id: 'product',
           href: '/manager/product',
           icon: <Package className='h-5 w-5' />,
           label: 'Sản phẩm'
+        },
+        {
+          id: 'combo',
+          href: '/manager/combo',
+          icon: <Package className='h-5 w-5' />,
+          label: 'Combo'
         }
       ]
     },

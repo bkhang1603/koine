@@ -53,7 +53,8 @@ const configRoute = {
     product: '/manager/product',
     report: '/manager/report',
     productNew: '/manager/product/new',
-    productEdit: '/manager/product/edit'
+    productEdit: '/manager/product/edit',
+    combo: '/manager/combo'
   },
   admin: {
     dashboard: '/admin',
@@ -68,7 +69,8 @@ const configRoute = {
     productNew: '/admin/product/new',
     productEdit: '/admin/product/edit',
     user: '/admin/user',
-    report: '/admin/report'
+    report: '/admin/report',
+    combo: '/admin/combo'
   },
   salesman: {
     dashboard: '/salesman',
@@ -82,7 +84,10 @@ const configRoute = {
     product: '/salesman/product',
     productNew: '/salesman/product/new',
     productEdit: '/salesman/product/edit',
-    user: '/salesman/user'
+    user: '/salesman/user',
+    combo: '/salesman/combo',
+    comboNew: '/salesman/combo/new',
+    comboEdit: '/salesman/combo/edit'
   },
   support: {
     dashboard: '/support',

@@ -51,6 +51,12 @@ export default function Layout({
           href: '/admin/user',
           icon: <Users className='h-5 w-5' />,
           label: 'Người dùng'
+        },
+        {
+          id: 'combo',
+          href: '/admin/combo',
+          icon: <Package className='h-5 w-5' />,
+          label: 'Combo'
         }
       ]
     },

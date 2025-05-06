@@ -50,6 +50,12 @@ export default function SalesmanLayout({
           href: '/salesman/product',
           icon: <Package className='h-5 w-5' />,
           label: 'Sản phẩm'
+        },
+        {
+          id: 'combos',
+          href: '/salesman/combo',
+          icon: <Package className='h-5 w-5' />,
+          label: 'Combo'
         }
       ]
     },
