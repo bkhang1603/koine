@@ -18,16 +18,16 @@ export default function SidebarLayout({ children, sidebarData }: { children: Rea
       <div className='hidden border-r bg-muted/40 md:block'>
         <div className='flex h-full max-h-screen flex-col gap-2'>
           <div className='flex h-14 items-center border-b px-4 lg:h-[60px] lg:px-6'>
-            <Link href={configRoute.home} className='flex items-center gap-2 font-semibold text-primary text-xl'>
+            <div className='flex items-center gap-2 font-semibold text-primary text-xl'>
               <Image
                 src={icons.logo}
                 alt='Koine'
                 width={1000}
                 height={1000}
                 quality={100}
-                className='h-10 w-auto object-contain cursor-pointer'
+                className='h-10 w-auto object-contain'
               />
-            </Link>
+            </div>
           </div>
           <SidebarMenu sidebarData={sidebarData} />
         </div>
