@@ -114,11 +114,19 @@ function LearnPage(props: { params: Promise<{ id: string }> }) {
 
     function onDisconnect() {
       console.log('disconnected')
+      socket.emit('stopLearning')
     }
 
     function getNotifications() {
       toast({
         description: 'Phiên học của bạn đã bị chấm dứt do có thiết bị khác đăng nhập'
+      })
+      router.push(configRoute.setting.myCourse)
+    }
+
+    function handleLearningTimeout() {
+      toast({
+        description: 'Phiên học của bạn đã hết hạn do không hoạt động'
       })
       router.push(configRoute.setting.myCourse)
     }
@@ -137,22 +145,38 @@ function LearnPage(props: { params: Promise<{ id: string }> }) {
       )
     }
 
+    // Add interval for stillLearning
+    const stillLearningInterval = setInterval(
+      () => {
+        if (socket.connected) {
+          socket.emit('stillLearning', (response: any) => {
+            if (response?.statusCode === 200) {
+              console.log('stillLearning', response)
+            }
+          })
+        }
+      },
+      2 * 60 * 1000
+    ) // 2 minutes
+
     socket.on('connect', onConnect)
-
     socket.on('login', login)
-
     socket.on('learningKicked', getNotifications)
-
+    socket.on('learningTimeout', handleLearningTimeout)
     socket.on('disconnect', onDisconnect)
 
     return () => {
       socket.off('connect', onConnect)
-
       socket.off('login', login)
-
       socket.off('learningKicked', getNotifications)
-
+      socket.off('learningTimeout', handleLearningTimeout)
       socket.off('disconnect', onDisconnect)
+      clearInterval(stillLearningInterval)
+
+      // Emit stopLearning when component unmounts
+      if (socket.connected) {
+        socket.emit('stopLearning')
+      }
     }
   }, [token, router])
 
