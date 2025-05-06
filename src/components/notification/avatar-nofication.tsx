@@ -108,7 +108,7 @@ function AvatarNotification() {
           </Link>
           <Separator />
           <Button asChild variant={'custom'} className='w-full'>
-            <Link href={configRoute.setting.profile}>Xem các tài khoản quản lý</Link>
+            <Link href={configRoute.setting.profile}>Quản lý tài khoản</Link>
           </Button>
         </div>
 

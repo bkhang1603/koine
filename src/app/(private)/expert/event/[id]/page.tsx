@@ -254,7 +254,6 @@ export default function EventDetailPage(props: { params: Promise<{ id: string }>
               {EVENT_STATUS[event.status as keyof typeof EVENT_STATUS].text}
             </Badge>
           </div>
-          <p className='text-muted-foreground text-lg'>{event.description}</p>
         </div>
         <div className='flex gap-2'>
           {canJoinEvent && event.roomHostUrl && (
