@@ -450,18 +450,38 @@ export const translateLevel = (level: string) => {
 
 export const formatOrderStatus = (status: string) => {
   switch (status) {
+    case 'PENDING':
+      return 'Chờ xác nhận'
     case 'PROCESSING':
       return 'Đang xử lý'
     case 'DELIVERING':
       return 'Đang giao'
+    case 'DELIVERED':
+      return 'Đã giao hàng'
     case 'COMPLETED':
       return 'Hoàn thành'
     case 'CANCELLED':
       return 'Đã hủy'
+    case 'FAILED':
+      return 'Thất bại'
+    case 'FAILED_PAYMENT':
+      return 'Thanh toán thất bại'
     case 'EXCHANGE_REQUEST':
       return 'Yêu cầu đổi hàng'
+    case 'EXCHANGING':
+      return 'Đang xử lý đổi hàng'
+    case 'EXCHANGED':
+      return 'Đã đổi hàng'
+    case 'EXCHANGE_FAILED':
+      return 'Đổi hàng thất bại'
     case 'REFUND_REQUEST':
       return 'Yêu cầu hoàn tiền'
+    case 'REFUNDING':
+      return 'Đang hoàn tiền'
+    case 'REFUNDED':
+      return 'Đã hoàn tiền'
+    case 'REFUND_FAILED':
+      return 'Hoàn tiền thất bại'
     default:
       return status
   }
@@ -469,14 +489,32 @@ export const formatOrderStatus = (status: string) => {
 
 export const formatPaymentStatus = (status: string) => {
   switch (status) {
+    case 'PENDING':
+      return 'Chờ thanh toán'
     case 'PROCESSING':
       return 'Đang xử lý'
-    case 'SUC':
+    case 'DELIVERING':
       return 'Đang giao'
+    case 'DELIVERED':
+      return 'Đã giao hàng'
     case 'COMPLETED':
       return 'Hoàn thành'
     case 'CANCELLED':
       return 'Đã hủy'
+    case 'FAILED':
+      return 'Thất bại'
+    case 'FAILED_PAYMENT':
+      return 'Thanh toán thất bại'
+    case 'REFUND_REQUEST':
+      return 'Yêu cầu hoàn tiền'
+    case 'REFUNDING':
+      return 'Đang hoàn tiền'
+    case 'REFUNDED':
+      return 'Đã hoàn tiền'
+    case 'REFUND_FAILED':
+      return 'Hoàn tiền thất bại'
+    case 'SUCCESS':
+      return 'Thành công'
     default:
       return status
   }
@@ -496,12 +534,6 @@ export const formatPercentage = (value: number, minDecimals = 1, maxDecimals = 1
     minimumFractionDigits: minDecimals,
     maximumFractionDigits: maxDecimals
   })}%`
-}
-
-export function getRandomInt(min: number, max: number) {
-  min = Math.ceil(min)
-  max = Math.floor(max)
-  return Math.floor(Math.random() * (max - min + 1)) + min
 }
 
 export function formatShortCurrency(value: number): string {
@@ -664,5 +696,29 @@ export const formatCourseStatus = (status: string) => {
       return 'Đã từ chối'
     default:
       return status
+  }
+}
+
+export const formatPaymentMethod = (method: string): string => {
+  switch (method) {
+    case 'COD':
+      return 'Thanh toán khi nhận hàng'
+    case 'BANKING':
+      return 'Chuyển khoản ngân hàng'
+    default:
+      return method
+  }
+}
+
+export const formatDeliveryMethod = (method: string): string => {
+  switch (method) {
+    case 'STANDARD':
+      return 'Tiêu chuẩn'
+    case 'EXPEDITED':
+      return 'Nhanh'
+    case 'NONESHIP':
+      return 'Không giao hàng'
+    default:
+      return method
   }
 }

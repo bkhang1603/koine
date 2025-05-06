@@ -85,7 +85,8 @@ export function CourseEditForm({ course, categoryOptions, onSubmit, isLoading }:
         imageUrl: course.imageUrl,
         imageBanner: course.imageBanner,
         price: course.price,
-        discount: course.discount,
+        // Convert API discount (0-1) to percentage (0-100) for display
+        discount: course.discount * 100,
         level: course.level,
         ageStage: course?.ageStage || '18+'
       })
@@ -98,7 +99,8 @@ export function CourseEditForm({ course, categoryOptions, onSubmit, isLoading }:
     // Salesmen can only update price and discount
     const updatedValues: SalesmanCourseUpdateType = {
       price: values.price,
-      discount: values.discount
+      // Convert percentage (0-100) back to decimal (0-1) for API
+      discount: values.discount / 100
     }
 
     onSubmit(updatedValues as CreateCourseBodyType)
@@ -186,10 +188,16 @@ export function CourseEditForm({ course, categoryOptions, onSubmit, isLoading }:
                     <FormLabel>Giá (VNĐ)</FormLabel>
                     <FormControl>
                       <Input
-                        type='number'
+                        type='text'
+                        inputMode='numeric'
                         placeholder='Nhập giá khóa học'
-                        {...field}
-                        onChange={(e) => field.onChange(Number(e.target.value))}
+                        value={field.value}
+                        onChange={(e) => {
+                          // Remove leading zeros and non-numeric characters
+                          const value = e.target.value.replace(/^0+|[^0-9]/g, '')
+                          // Convert to number or 0 if empty
+                          field.onChange(value === '' ? 0 : parseInt(value, 10))
+                        }}
                       />
                     </FormControl>
                     <FormMessage />
@@ -206,14 +214,17 @@ export function CourseEditForm({ course, categoryOptions, onSubmit, isLoading }:
                     <FormLabel>Giảm giá (%)</FormLabel>
                     <FormControl>
                       <Input
-                        type='number'
+                        type='text'
+                        inputMode='numeric'
                         placeholder='Nhập % giảm giá'
-                        {...field}
-                        min={0}
-                        max={100}
+                        value={field.value}
                         onChange={(e) => {
-                          const value = Number(e.target.value)
-                          field.onChange(value > 100 ? 100 : value < 0 ? 0 : value)
+                          // Remove leading zeros and non-numeric characters
+                          const value = e.target.value.replace(/^0+|[^0-9]/g, '')
+                          // Convert to number or 0 if empty
+                          const numValue = value === '' ? 0 : parseInt(value, 10)
+                          // Ensure value is between 0-100
+                          field.onChange(numValue > 100 ? 100 : numValue)
                         }}
                       />
                     </FormControl>

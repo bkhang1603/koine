@@ -302,7 +302,7 @@ export default function CourseCategoriesPage() {
         data={tableData}
         headerColumn={headerColumn}
         bodyColumn={bodyColumn}
-        href={'/salesman/product/categories'}
+        href={'/manager/product/categories'}
         loading={isLoading}
         showSearch={true}
         searchParamName='keyword'

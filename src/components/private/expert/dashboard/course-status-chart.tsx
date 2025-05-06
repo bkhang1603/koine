@@ -1,6 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LabelList } from 'recharts'
-import { formatPercentage } from '@/lib/utils'
+import { formatPercentage, formatCourseStatus } from '@/lib/utils'
 
 interface CourseStatusData {
   status: string
@@ -13,21 +13,13 @@ interface CourseStatusChartProps {
   description: string
 }
 
-// Status translations
-const statusTranslations: Record<string, string> = {
-  ACTIVE: 'Đang hoạt động',
-  PENDINGREVIEW: 'Chờ duyệt',
-  PENDINGPRICING: 'Chờ định giá',
-  REJECTED: 'Đã từ chối'
-}
-
 export function CourseStatusChart({ data, title, description }: CourseStatusChartProps) {
   // Total count for percentage calculation
   const total = data.reduce((sum, item) => sum + Number(item.count), 0)
 
   // Transform data for the bar chart with translations
   const transformedData = data.map((item) => ({
-    name: statusTranslations[item.status] || item.status,
+    name: formatCourseStatus(item.status),
     count: Number(item.count)
   }))
 

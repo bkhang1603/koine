@@ -2,45 +2,38 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts'
 import { formatPercentage } from '@/lib/utils'
 
-interface RefundStatusData {
-  status: string
-  count: number
+interface ExchangeStatusData {
+  name: string
+  value: number
+  color: string
 }
 
-interface RefundStatusChartProps {
-  data: RefundStatusData[]
+interface ExchangeStatusChartProps {
+  data: ExchangeStatusData[]
   title: string
   description: string
 }
 
-// Define status mapping
-const STATUS_MAPPING = {
-  REFUND_REQUEST: { name: 'Chờ duyệt', color: '#f59e0b' }, // Amber
-  REFUNDING: { name: 'Đang hoàn tiền', color: '#3b82f6' }, // Blue
-  REFUNDED: { name: 'Đã hoàn tiền', color: '#22c55e' }, // Green
-  REFUND_FAILED: { name: 'Hoàn tiền thất bại', color: '#ef4444' } // Red
-}
+// Only the three main statuses
+const DEFAULT_STATUSES = [
+  { name: 'Chờ duyệt', value: 0, color: '#f59e0b' }, // Amber
+  { name: 'Đang đổi hàng', value: 0, color: '#3b82f6' }, // Blue
+  { name: 'Đã đổi hàng', value: 0, color: '#22c55e' }, // Green
+  { name: 'Đổi hàng thất bại', value: 0, color: '#ef4444' } // Red
+]
 
-// Define all possible refund statuses
-const DEFAULT_STATUSES = Object.entries(STATUS_MAPPING).map(([status, { name, color }]) => ({
-  status,
-  name,
-  value: 0,
-  color
-}))
-
-export function RefundStatusChart({ data, title, description }: RefundStatusChartProps) {
+export function ExchangeStatusChart({ data, title, description }: ExchangeStatusChartProps) {
   // Ensure all default statuses are included even if count is zero
   let mergedData = [...DEFAULT_STATUSES]
 
-  // Map the incoming data by status for easy lookup
-  const dataMap = new Map(data.map((item) => [item.status, item]))
+  // Map the incoming data by name for easy lookup
+  const dataMap = new Map(data.map((item) => [item.name, item]))
 
   // Update values for existing statuses in our merged data
   mergedData = mergedData.map((item) => ({
     ...item,
-    value: dataMap.has(item.status) ? dataMap.get(item.status)!.count : 0,
-    color: STATUS_MAPPING[item.status as keyof typeof STATUS_MAPPING].color
+    value: dataMap.has(item.name) ? dataMap.get(item.name)!.value : 0,
+    color: dataMap.has(item.name) ? dataMap.get(item.name)!.color : item.color
   }))
 
   // Calculate total for percentage

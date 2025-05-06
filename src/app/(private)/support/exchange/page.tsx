@@ -13,6 +13,7 @@ import { MoreOptions } from '@/components/private/common/more-options'
 import { DollarSign } from 'lucide-react'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { GetExchangeRequestsResType } from '@/schemaValidations/admin.schema'
+import { formatOrderStatus } from '@/lib/utils'
 
 function ExchangeRequestsPage(props: { searchParams: SearchParams }) {
   const searchParams = use(props.searchParams)
@@ -45,13 +46,13 @@ function ExchangeRequestsPage(props: { searchParams: SearchParams }) {
   }
   const message = (responseData as any)?.payload?.message || ''
 
-  // Exchange status configuration
+  // Exchange status configuration for badge variants
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  const exchangeStatusConfig = {
-    EXCHANGE_REQUEST: { label: 'Yêu cầu đổi trả', variant: 'default' },
-    EXCHANGING: { label: 'Đang xử lý', variant: 'warning' },
-    EXCHANGED: { label: 'Đã đổi trả', variant: 'success' },
-    EXCHANGE_FAILED: { label: 'Đổi trả thất bại', variant: 'destructive' }
+  const exchangeStatusVariants = {
+    EXCHANGE_REQUEST: 'default',
+    EXCHANGING: 'warning',
+    EXCHANGED: 'success',
+    EXCHANGE_FAILED: 'destructive'
   } as const
 
   // Payment method configuration
@@ -126,12 +127,9 @@ function ExchangeRequestsPage(props: { searchParams: SearchParams }) {
         id: 5,
         render: (request: ExchangeRequestItem) => {
           const status = request.status
-          const config = exchangeStatusConfig[status as keyof typeof exchangeStatusConfig] || {
-            label: status,
-            variant: 'default'
-          }
+          const variant = exchangeStatusVariants[status as keyof typeof exchangeStatusVariants] || 'default'
 
-          return <Badge variant={config.variant as any}>{config.label}</Badge>
+          return <Badge variant={variant as any}>{formatOrderStatus(status)}</Badge>
         }
       },
       {
@@ -150,7 +148,7 @@ function ExchangeRequestsPage(props: { searchParams: SearchParams }) {
         )
       }
     ],
-    [exchangeStatusConfig, paymentMethodConfig, router]
+    [exchangeStatusVariants, paymentMethodConfig, router]
   )
 
   const tableData: dataListType = {

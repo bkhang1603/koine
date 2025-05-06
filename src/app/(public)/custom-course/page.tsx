@@ -458,7 +458,7 @@ export default function CustomCoursePage() {
                   Đang xử lý...
                 </span>
               ) : (
-                'Gửi yêu cầu'
+                'Tạo khóa học'
               )}
             </Button>
             <p className='text-xs text-muted-foreground text-center'>

@@ -40,11 +40,22 @@ const chartColors = {
 }
 
 const orderStatusColors = {
+  PENDING: '#f59e0b', // Amber
   PROCESSING: '#f59e0b', // Amber
   DELIVERING: '#3b82f6', // Blue
+  DELIVERED: '#22c55e', // Green
   COMPLETED: '#22c55e', // Green
   CANCELLED: '#ef4444', // Red
-  EXCHANGE_REQUEST: '#8b5cf6' // Purple
+  FAILED: '#ef4444', // Red
+  FAILED_PAYMENT: '#ef4444', // Red
+  REFUND_REQUEST: '#8b5cf6', // Purple
+  REFUNDING: '#8b5cf6', // Purple
+  REFUNDED: '#22c55e', // Green
+  REFUND_FAILED: '#ef4444', // Red
+  EXCHANGE_REQUEST: '#0ea5e9', // Sky
+  EXCHANGING: '#0ea5e9', // Sky
+  EXCHANGED: '#22c55e', // Green
+  EXCHANGE_FAILED: '#ef4444' // Red
 }
 
 export default function AdminDashboard() {

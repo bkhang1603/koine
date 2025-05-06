@@ -308,7 +308,7 @@ export default function AdminProductDetail(props: { params: Promise<{ id: string
                 {product.discount > 0 && (
                   <div className='flex justify-between text-sm'>
                     <span className='text-muted-foreground'>Giảm giá</span>
-                    <span className='text-red-500'>{product.discount}%</span>
+                    <span className='text-red-500'>{Math.round(product.discount * 100)}%</span>
                   </div>
                 )}
                 {product.discount > 0 && (

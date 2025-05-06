@@ -10,7 +10,7 @@ import Link from 'next/link'
 import { format } from 'date-fns'
 import { vi } from 'date-fns/locale'
 import { Badge } from '@/components/ui/badge'
-import { useGetRefundRequestById, useUpdateExchangeRequestMutation } from '@/queries/useOrder'
+import { useGetRefundAndReturnDetailRequestsQuery, useUpdateExchangeRequestMutation } from '@/queries/useOrder'
 import { Skeleton } from '@/components/ui/skeleton'
 import { formatOrderStatus, formatPaymentStatus, formatPrice, handleErrorApi } from '@/lib/utils'
 import { Breadcrumb } from '@/components/private/common/breadcrumb'
@@ -24,7 +24,7 @@ export default function ExchangeDetailPage(props: { params: Promise<{ id: string
   const router = useRouter()
   const [note, setNote] = useState('')
 
-  const { isLoading, error, data } = useGetRefundRequestById({ id: exchangeId })
+  const { isLoading, error, data } = useGetRefundAndReturnDetailRequestsQuery({ orderId: exchangeId })
   const updateExchangeMutation = useUpdateExchangeRequestMutation()
 
   const handleApproveExchange = () => {
@@ -134,7 +134,7 @@ export default function ExchangeDetailPage(props: { params: Promise<{ id: string
     )
   }
 
-  if (error || !data?.payload) {
+  if (error || !data?.payload?.data) {
     const errorMessage =
       error instanceof Error
         ? error.message
@@ -164,20 +164,17 @@ export default function ExchangeDetailPage(props: { params: Promise<{ id: string
   const exchangeData = data.payload.data
   const orderDetails = exchangeData.orderDetails || []
 
-  // Exchange status configuration
-  const exchangeStatusConfig = {
-    EXCHANGE_REQUEST: { label: 'Yêu cầu đổi trả', variant: 'default' },
-    EXCHANGING: { label: 'Đang xử lý', variant: 'warning' },
-    EXCHANGED: { label: 'Đã đổi trả', variant: 'success' },
-    EXCHANGE_FAILED: { label: 'Đổi trả thất bại', variant: 'destructive' }
+  // Exchange status configuration for badge variants
+  const exchangeStatusVariants = {
+    EXCHANGE_REQUEST: 'default',
+    EXCHANGING: 'warning',
+    EXCHANGED: 'success',
+    EXCHANGE_FAILED: 'destructive'
   } as const
 
   const formatStatus = (status: string) => {
-    const config = exchangeStatusConfig[status as keyof typeof exchangeStatusConfig] || {
-      label: status,
-      variant: 'default'
-    }
-    return <Badge variant={config.variant as any}>{config.label}</Badge>
+    const variant = exchangeStatusVariants[status as keyof typeof exchangeStatusVariants] || 'default'
+    return <Badge variant={variant as any}>{formatOrderStatus(status)}</Badge>
   }
 
   // Format payment method
@@ -235,7 +232,7 @@ export default function ExchangeDetailPage(props: { params: Promise<{ id: string
         <div className='flex items-center gap-6 text-sm text-gray-500'>
           <div className='flex items-center gap-2'>
             <Clock className='h-4 w-4' />
-            {format(new Date(exchangeData.createdAt), 'HH:mm - dd/MM/yyyy', { locale: vi })}
+            {format(new Date(exchangeData.returnRequestDate), 'HH:mm - dd/MM/yyyy', { locale: vi })}
           </div>
         </div>
       </div>
@@ -243,7 +240,7 @@ export default function ExchangeDetailPage(props: { params: Promise<{ id: string
       <div className='grid grid-cols-3 gap-6'>
         <div className='col-span-2 space-y-6'>
           {/* Exchange Reason */}
-          {exchangeData.note && (
+          {(exchangeData.returnReason || exchangeData.note) && (
             <Card>
               <CardHeader>
                 <CardTitle className='flex items-center gap-2'>
@@ -253,8 +250,29 @@ export default function ExchangeDetailPage(props: { params: Promise<{ id: string
               </CardHeader>
               <CardContent className='space-y-4'>
                 <div className='p-4 bg-gray-50 rounded-md'>
-                  <p className='whitespace-pre-line'>{exchangeData.note || 'Không có lý do'}</p>
+                  <p className='whitespace-pre-line'>
+                    {exchangeData.returnReason || exchangeData.note || 'Không có lý do'}
+                  </p>
                 </div>
+
+                {/* Display images if available */}
+                {exchangeData.returnRequestImages && exchangeData.returnRequestImages.length > 0 && (
+                  <div className='mt-4'>
+                    <h4 className='font-medium mb-2'>Hình ảnh đính kèm</h4>
+                    <div className='grid grid-cols-2 sm:grid-cols-3 gap-2'>
+                      {exchangeData.returnRequestImages.map((imageUrl, index) => (
+                        <div key={index} className='relative aspect-square rounded-md overflow-hidden border'>
+                          <Image
+                            src={imageUrl}
+                            alt={`Ảnh đính kèm ${index + 1}`}
+                            fill
+                            className='object-cover hover:scale-105 transition-transform'
+                          />
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </CardContent>
             </Card>
           )}
@@ -272,33 +290,16 @@ export default function ExchangeDetailPage(props: { params: Promise<{ id: string
                 orderDetails.map((item) => (
                   <div key={item.id} className='py-4 first:pt-0 last:pb-0'>
                     <div className='flex gap-4'>
-                      {item.product ? (
-                        <div className='relative w-16 h-16'>
-                          <Image
-                            src={item.product.imageUrl || '/placeholder.jpg'}
-                            alt={item.product.name || 'Product'}
-                            fill
-                            className='object-cover rounded-lg'
-                          />
-                        </div>
-                      ) : item.course ? (
-                        <div className='relative w-16 h-16'>
-                          <Image
-                            src={item.course.imageUrl || '/placeholder.jpg'}
-                            alt={item.course.title || 'Course'}
-                            fill
-                            className='object-cover rounded-lg'
-                          />
-                        </div>
-                      ) : (
-                        <div className='relative w-16 h-16 bg-gray-100 rounded-lg flex items-center justify-center'>
-                          <Package className='w-8 h-8 text-gray-400' />
-                        </div>
-                      )}
+                      <div className='relative w-16 h-16'>
+                        <Image
+                          src={item.itemImageUrl || '/placeholder.jpg'}
+                          alt={item.itemName || 'Product'}
+                          fill
+                          className='object-cover rounded-lg'
+                        />
+                      </div>
                       <div className='flex-1'>
-                        <h3 className='font-medium'>
-                          {item.product?.name || item.course?.title || item.combo?.name || 'Sản phẩm'}
-                        </h3>
+                        <h3 className='font-medium'>{item.itemName || 'Sản phẩm'}</h3>
                         <div className='flex items-center justify-between mt-2'>
                           <div className='text-sm text-muted-foreground'>
                             Số lượng: <span className='font-medium'>{item.quantity}</span>
@@ -317,6 +318,31 @@ export default function ExchangeDetailPage(props: { params: Promise<{ id: string
               )}
             </CardContent>
           </Card>
+
+          {/* Processing Note - Only show if the request has been processed */}
+          {exchangeData.returnNote && exchangeData.status !== 'EXCHANGE_REQUEST' && (
+            <Card>
+              <CardHeader>
+                <CardTitle className='flex items-center gap-2'>
+                  <Clock className='w-5 h-5' />
+                  Kết quả xử lý
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className='space-y-4'>
+                  <div className='p-4 bg-gray-50 rounded-md'>
+                    <p className='whitespace-pre-line'>{exchangeData.returnNote}</p>
+                  </div>
+                  <div className='text-sm text-muted-foreground'>
+                    Xử lý vào:{' '}
+                    {exchangeData.returnProcessedDateFormatted ||
+                      (exchangeData.returnProcessedDate &&
+                        format(new Date(exchangeData.returnProcessedDate), 'HH:mm - dd/MM/yyyy', { locale: vi }))}
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          )}
 
           {/* Action box - Only show if status is EXCHANGE_REQUEST */}
           {canApproveOrReject && (
@@ -398,10 +424,8 @@ export default function ExchangeDetailPage(props: { params: Promise<{ id: string
                   <span>{formatDeliveryMethod(exchangeData.deliMethod || 'UNKNOWN')}</span>
                 </div>
                 <div className='flex justify-between'>
-                  <span className='text-muted-foreground'>Ngày cập nhật</span>
-                  <span>
-                    {exchangeData.updatedAt && format(new Date(exchangeData.updatedAt), 'dd/MM/yyyy', { locale: vi })}
-                  </span>
+                  <span className='text-muted-foreground'>Ngày yêu cầu đổi trả</span>
+                  <span>{format(new Date(exchangeData.returnRequestDate), 'dd/MM/yyyy', { locale: vi })}</span>
                 </div>
               </div>
 

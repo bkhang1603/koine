@@ -15,27 +15,8 @@ import { DashboardSkeleton } from '@/components/private/support/dashboard/dashbo
 import { StatsCard } from '@/components/private/support/dashboard/stats-card'
 import { ActivityTrendChart } from '@/components/private/support/dashboard/activity-trend-chart'
 import { RefundStatusChart } from '@/components/private/support/dashboard/refund-status-chart'
+import { ExchangeStatusChart } from '@/components/private/support/dashboard/exchange-status-chart'
 import { useDashboardSupporterQuery } from '@/queries/useDashboard'
-
-// Chart colors for consistency
-const chartColors = {
-  ticket: {
-    pending: '#f59e0b', // Amber
-    inProgress: '#3b82f6', // Blue
-    resolved: '#22c55e' // Green
-  },
-  refund: {
-    pending: '#f59e0b', // Amber
-    approved: '#22c55e', // Green
-    rejected: '#ef4444' // Red
-  },
-  order: {
-    PROCESSING: '#f59e0b', // Amber
-    DELIVERING: '#3b82f6', // Blue
-    COMPLETED: '#22c55e', // Green
-    CANCELLED: '#ef4444' // Red
-  }
-}
 
 export default function SupportDashboard() {
   // State for client-side rendering
@@ -149,22 +130,36 @@ export default function SupportDashboard() {
   const refundStatusData = useMemo(() => {
     if (!dashboardData?.payload?.data?.refundOrderStatusData) return []
 
-    return dashboardData.payload.data.refundOrderStatusData.map((item) => {
+    return dashboardData.payload.data.refundOrderStatusData.map((item) => ({
+      status: item.status,
+      count: Number(item.count)
+    }))
+  }, [dashboardData])
+
+  // Map exchange status data to the expected format for the chart
+  const exchangeStatusData = useMemo(() => {
+    if (!dashboardData?.payload?.data?.exchangeOrderStatusData) return []
+
+    return dashboardData.payload.data.exchangeOrderStatusData.map((item) => {
       let name = 'Unknown'
       let color = '#6b7280' // Gray default
 
       switch (item.status) {
-        case 'PENDING':
+        case 'EXCHANGE_REQUEST':
           name = 'Chờ duyệt'
-          color = chartColors.refund.pending
+          color = '#f59e0b' // Amber
           break
-        case 'APPROVED':
-          name = 'Đã duyệt'
-          color = chartColors.refund.approved
+        case 'EXCHANGING':
+          name = 'Đang đổi hàng'
+          color = '#3b82f6' // Blue
           break
-        case 'REJECTED':
-          name = 'Từ chối'
-          color = chartColors.refund.rejected
+        case 'EXCHANGED':
+          name = 'Đã đổi hàng'
+          color = '#22c55e' // Green
+          break
+        case 'EXCHANGE_FAILED':
+          name = 'Đổi hàng thất bại'
+          color = '#ef4444' // Red
           break
       }
 
@@ -330,12 +325,22 @@ export default function SupportDashboard() {
         description='Thống kê bình luận khóa học, bài viết và đánh giá sản phẩm theo thời gian'
       />
 
-      {/* Refund Status Chart */}
-      <RefundStatusChart
-        data={refundStatusData}
-        title='Trạng thái hoàn tiền'
-        description='Thống kê các yêu cầu hoàn tiền theo trạng thái: Chờ duyệt, Đã duyệt, Từ chối'
-      />
+      {/* Status Charts Grid */}
+      <div className='grid gap-6 grid-cols-1 md:grid-cols-2'>
+        {/* Refund Status Chart */}
+        <RefundStatusChart
+          data={refundStatusData}
+          title='Trạng thái hoàn tiền'
+          description='Thống kê các yêu cầu hoàn tiền theo trạng thái: Chờ duyệt, Đã duyệt, Từ chối'
+        />
+
+        {/* Exchange Status Chart */}
+        <ExchangeStatusChart
+          data={exchangeStatusData}
+          title='Trạng thái đổi hàng'
+          description='Thống kê các yêu cầu đổi hàng theo trạng thái: Chờ duyệt, Đang đổi hàng, Đã đổi hàng, Đổi hàng thất bại'
+        />
+      </div>
     </div>
   )
 }

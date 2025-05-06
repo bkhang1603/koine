@@ -1,6 +1,6 @@
 'use client'
 
-import { use, useMemo, useState } from 'react'
+import { use, useMemo } from 'react'
 import { Mail, Phone, User } from 'lucide-react'
 import { TableCustom, dataListType } from '@/components/table-custom'
 import configRoute from '@/config/route'
@@ -9,129 +9,24 @@ import { useRouter } from 'next/navigation'
 import { Badge } from '@/components/ui/badge'
 import { format } from 'date-fns'
 import { vi } from 'date-fns/locale'
-import { MoreOptions } from '@/components/private/common/more-options'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { useRequestSupportListQuery, useUpdateRequestSupportMutation } from '@/queries/useUser'
-import { toast } from '@/components/ui/use-toast'
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle
-} from '@/components/ui/dialog'
-import { Button } from '@/components/ui/button'
-import { Label } from '@/components/ui/label'
-import { Textarea } from '@/components/ui/textarea'
-import { handleErrorApi } from '@/lib/utils'
-
-// Dialog component for resolving tickets
-function ResolveTicketDialog({
-  ticket,
-  open,
-  onOpenChange
-}: {
-  ticket: any
-  open: boolean
-  // eslint-disable-next-line no-unused-vars
-  onOpenChange: (open: boolean) => void
-}) {
-  const [resolveContent, setResolveContent] = useState('')
-  const updateMutation = useUpdateRequestSupportMutation()
-  const isLoading = updateMutation.isPending
-
-  const handleResolve = (courseId: string, resolveContent: string) => {
-    try {
-      if (updateMutation.isPending) return
-
-      updateMutation.mutate(
-        {
-          id: ticket.id,
-          body: {
-            isResolve: true,
-            resolveContent
-          }
-        },
-        {
-          onSuccess: () => {
-            toast({
-              description: 'Yêu cầu hỗ trợ đã được xử lý'
-            })
-            setResolveContent('')
-            onOpenChange(false)
-          },
-          onError: (error) => {
-            handleErrorApi({ error })
-          }
-        }
-      )
-    } catch (error) {
-      handleErrorApi({ error })
-    }
-  }
-
-  return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className='sm:max-w-[425px]'>
-        <DialogHeader>
-          <DialogTitle>Xử lý yêu cầu hỗ trợ</DialogTitle>
-          <DialogDescription>Điền nội dung phản hồi để xử lý yêu cầu hỗ trợ này.</DialogDescription>
-        </DialogHeader>
-        <div className='space-y-4 py-4'>
-          <div className='space-y-2'>
-            <Label htmlFor='ticket-content'>Nội dung yêu cầu</Label>
-            <div className='p-3 bg-gray-50 dark:bg-gray-900 rounded-md text-sm'>{ticket?.content}</div>
-          </div>
-          <div className='space-y-2'>
-            <Label htmlFor='resolve-content'>Nội dung phản hồi</Label>
-            <Textarea
-              id='resolve-content'
-              placeholder='Nhập nội dung phản hồi...'
-              value={resolveContent}
-              onChange={(e) => setResolveContent(e.target.value)}
-              className='min-h-[100px]'
-            />
-          </div>
-        </div>
-        <DialogFooter>
-          <Button variant='outline' onClick={() => onOpenChange(false)}>
-            Hủy
-          </Button>
-          <Button
-            type='submit'
-            onClick={() => handleResolve(ticket.id, resolveContent)}
-            disabled={isLoading || !resolveContent.trim()}
-          >
-            {isLoading ? 'Đang xử lý...' : 'Xác nhận'}
-          </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
-  )
-}
+import { useRequestSupportListQuery } from '@/queries/useUser'
+import { TicketMoreOptions } from '@/components/private/support/ticket/ticket-more-options'
 
 function SupportTickets(props: { searchParams: SearchParams }) {
   const searchParams = use(props.searchParams)
   const router = useRouter()
-  const [selectedTicket, setSelectedTicket] = useState<any>(null)
-  const [resolveDialogOpen, setResolveDialogOpen] = useState(false)
 
   const currentIsResolve = (searchParams.is_resolve as string) || 'ALL'
   const currentKeyword = (searchParams.keyword as string) || ''
   const currentPageSize = Number(searchParams.page_size) || 10
   const currentPageIndex = Number(searchParams.page_index) || 1
 
-  const {
-    data: responseData,
-    isLoading,
-    // eslint-disable-next-line no-unused-vars
-    error
-  } = useRequestSupportListQuery({
+  const { data: responseData, isLoading } = useRequestSupportListQuery({
     page_index: currentPageIndex,
     page_size: currentPageSize,
     keyword: currentKeyword,
-    isResolve: currentIsResolve === 'ALL' ? undefined : currentIsResolve === 'RESOLVED'
+    isResolve: currentIsResolve === 'ALL' ? undefined : currentIsResolve === 'RESOLVED' ? 't' : 'f'
   })
 
   const tickets = responseData?.payload.data || []
@@ -151,12 +46,6 @@ function SupportTickets(props: { searchParams: SearchParams }) {
     true: { label: 'Đã xử lý', variant: 'secondary' },
     false: { label: 'Chưa xử lý', variant: 'destructive' }
   } as const
-
-  // Handle resolving a ticket
-  const handleResolveTicket = (ticket: any) => {
-    setSelectedTicket(ticket)
-    setResolveDialogOpen(true)
-  }
 
   // Cấu hình cột cho bảng
   const headerColumn = [
@@ -251,14 +140,10 @@ function SupportTickets(props: { searchParams: SearchParams }) {
         },
         {
           id: 8,
-          render: (ticket: any) =>
-            !ticket.isResolve ? (
-              <MoreOptions item={ticket} itemType='ticket' onResolve={() => handleResolveTicket(ticket)} />
-            ) : null
+          render: (ticket: any) => (!ticket.isResolve ? <TicketMoreOptions ticket={ticket} /> : null)
         }
       ] as any,
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [resolveStatusConfig, router]
+    [resolveStatusConfig]
   )
 
   const tableData: dataListType = {
@@ -310,20 +195,6 @@ function SupportTickets(props: { searchParams: SearchParams }) {
           </Select>
         }
       />
-
-      {/* Resolve Dialog */}
-      {selectedTicket && (
-        <ResolveTicketDialog
-          ticket={selectedTicket}
-          open={resolveDialogOpen}
-          onOpenChange={(open) => {
-            setResolveDialogOpen(open)
-            if (!open) {
-              setTimeout(() => setSelectedTicket(null), 300)
-            }
-          }}
-        />
-      )}
     </div>
   )
 }

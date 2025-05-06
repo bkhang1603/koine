@@ -157,7 +157,8 @@ export default function ReportDetailPage(props: { params: Promise<{ id: string }
   // Cấu hình loại báo cáo
   const reportTypeConfig = {
     COURSE: 'Khóa học',
-    BLOG: 'Bài viết'
+    BLOG: 'Bài viết',
+    PRODUCT: 'Sản phẩm'
   } as const
 
   const formatStatus = (status: string) => {
@@ -189,6 +190,8 @@ export default function ReportDetailPage(props: { params: Promise<{ id: string }
         return `/support/course/${reportData.reportedEntityId}`
       case 'BLOG':
         return `/support/blog/${reportData.reportedEntityId}`
+      case 'PRODUCT':
+        return `/support/product/${reportData.reportedEntityId}`
       default:
         return null
     }
@@ -201,6 +204,8 @@ export default function ReportDetailPage(props: { params: Promise<{ id: string }
         return 'khóa học'
       case 'BLOG':
         return 'bài viết'
+      case 'PRODUCT':
+        return 'sản phẩm'
       default:
         return 'đối tượng'
     }

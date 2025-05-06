@@ -86,7 +86,7 @@ export default function ProductEdit({ productId, baseUrl, detailUrl }: ProductEd
         guide: product.guide,
         price: product.price,
         stockQuantity: product.stockQuantity,
-        discount: product.discount || 0,
+        discount: (product.discount || 0) * 100,
         // Convert the image objects to an array of URLs
         imageUrlArray: product.images.map((img) => img.imageUrl),
         categoryIds: product.categories.map((cat) => cat.id)
@@ -140,55 +140,30 @@ export default function ProductEdit({ productId, baseUrl, detailUrl }: ProductEd
     try {
       setIsSubmitting(true)
 
-      // STEP 1: Upload new images if present
-      if (files.length > 0) {
-        try {
-          toast({
-            description: 'Đang tải hình ảnh lên máy chủ...'
-          })
-
+      // Upload new images if any
+      const uploadedImageUrls = await Promise.all(
+        files.map(async (file) => {
           const formData = new FormData()
-          files.forEach((file: File) => {
-            formData.append('images', file)
-          })
+          formData.append('file', file)
+          const response = await uploadMutation.mutateAsync(formData)
+          return response.payload.data
+        })
+      )
 
-          console.log(`Bắt đầu tải lên ${files.length} hình ảnh mới...`)
-          const result = await uploadMutation.mutateAsync(formData)
+      // Combine existing and new image URLs
+      const allImageUrls = [...values.imageUrlArray.filter((url) => !url.startsWith('blob:')), ...uploadedImageUrls]
 
-          if (result?.payload?.data) {
-            // Get the real URLs from the server
-            const newImageUrls = Array.isArray(result.payload.data) ? result.payload.data : [result.payload.data]
-
-            console.log(`Tải lên hình ảnh hoàn tất: ${newImageUrls.length} hình`)
-
-            // Replace temporary preview URLs with actual URLs
-            // Keep existing image URLs (which are already on the server)
-            const existingImageUrls = product?.images.map((img) => img.imageUrl) || []
-            values.imageUrlArray = [...existingImageUrls, ...newImageUrls]
-          }
-        } catch (uploadError) {
-          console.error('Error uploading images:', uploadError)
-          toast({
-            variant: 'destructive',
-            title: 'Lỗi tải ảnh',
-            description: 'Không thể tải hình ảnh lên. Vui lòng thử lại.'
-          })
-          setIsSubmitting(false)
-          return
-        }
-      }
-
-      // STEP 2: Update product with all values
+      // Update product with new data
       await updateProductMutation.mutateAsync({
-        ...values
+        ...values,
+        discount: values.discount / 100, // Convert percentage to decimal
+        imageUrlArray: allImageUrls
       })
 
       toast({
-        description: 'Sản phẩm đã được cập nhật thành công',
-        variant: 'default'
+        description: 'Cập nhật sản phẩm thành công'
       })
 
-      // Navigate to product detail page
       router.push(detailUrl)
     } catch (error) {
       handleErrorApi({
@@ -430,10 +405,16 @@ export default function ProductEdit({ productId, baseUrl, detailUrl }: ProductEd
                       <FormLabel>Giá (VNĐ)</FormLabel>
                       <FormControl>
                         <Input
-                          type='number'
+                          type='text'
+                          inputMode='numeric'
                           placeholder='Nhập giá'
-                          {...field}
-                          onChange={(e) => field.onChange(Number(e.target.value))}
+                          value={field.value}
+                          onChange={(e) => {
+                            // Remove leading zeros and non-numeric characters
+                            const value = e.target.value.replace(/^0+|[^0-9]/g, '')
+                            // Convert to number or 0 if empty
+                            field.onChange(value === '' ? 0 : parseInt(value, 10))
+                          }}
                         />
                       </FormControl>
                       <FormMessage />
@@ -449,10 +430,16 @@ export default function ProductEdit({ productId, baseUrl, detailUrl }: ProductEd
                       <FormLabel>Số lượng</FormLabel>
                       <FormControl>
                         <Input
-                          type='number'
+                          type='text'
+                          inputMode='numeric'
                           placeholder='Nhập số lượng'
-                          {...field}
-                          onChange={(e) => field.onChange(Number(e.target.value))}
+                          value={field.value}
+                          onChange={(e) => {
+                            // Remove leading zeros and non-numeric characters
+                            const value = e.target.value.replace(/^0+|[^0-9]/g, '')
+                            // Convert to number or 0 if empty
+                            field.onChange(value === '' ? 0 : parseInt(value, 10))
+                          }}
                         />
                       </FormControl>
                       <FormMessage />
@@ -468,10 +455,18 @@ export default function ProductEdit({ productId, baseUrl, detailUrl }: ProductEd
                       <FormLabel>Giảm giá (%)</FormLabel>
                       <FormControl>
                         <Input
-                          type='number'
+                          type='text'
+                          inputMode='numeric'
                           placeholder='Nhập % giảm giá'
-                          {...field}
-                          onChange={(e) => field.onChange(Number(e.target.value))}
+                          value={field.value}
+                          onChange={(e) => {
+                            // Remove leading zeros and non-numeric characters
+                            const value = e.target.value.replace(/^0+|[^0-9]/g, '')
+                            // Convert to number or 0 if empty
+                            const numValue = value === '' ? 0 : parseInt(value, 10)
+                            // Ensure value is between 0-100
+                            field.onChange(numValue > 100 ? 100 : numValue)
+                          }}
                         />
                       </FormControl>
                       <FormMessage />

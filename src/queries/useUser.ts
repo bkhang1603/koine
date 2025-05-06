@@ -52,7 +52,7 @@ export const useRequestSupportListQuery = ({
   page_index?: number | undefined
   page_size?: number | undefined
   keyword?: string | string[] | undefined
-  isResolve?: boolean | undefined
+  isResolve?: 't' | 'f' | undefined
 }) => {
   return useQuery({
     queryKey: ['request-support-list', page_index, page_size, keyword, isResolve],
