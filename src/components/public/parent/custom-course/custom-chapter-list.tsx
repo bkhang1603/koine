@@ -51,11 +51,6 @@ export function CustomChapterList({ chapters, onChange }: CustomChapterListProps
                 <span className='text-sm'>{chapter.lessons?.length || 0} bài học</span>
               </div>
 
-              <div className='flex items-center text-muted-foreground'>
-                <Clock className='h-4 w-4 mr-2' />
-                <span className='text-sm'>{chapter.durationsDisplay || '0 phút'}</span>
-              </div>
-
               {chapter.description && (
                 <div className='sm:col-span-2 text-sm text-muted-foreground line-clamp-1'>{chapter.description}</div>
               )}

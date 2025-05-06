@@ -23,7 +23,10 @@ export const CourseGridItem = ({
   isCourseSemiSelected
 }: CourseGridItemProps) => (
   <Card key={course.id} className='overflow-hidden'>
-    <div className='aspect-video relative'>
+    <div
+      className='aspect-video relative cursor-pointer'
+      onClick={() => onSelectAll(course.id, !isCourseFullySelected(course.id))}
+    >
       <Image
         src={course.imageUrl || 'https://placehold.co/600x400/jpeg'}
         alt={course.title}
@@ -41,7 +44,10 @@ export const CourseGridItem = ({
       </div>
     </div>
     <CardContent className='p-3 flex justify-between items-center'>
-      <div className='flex items-center'>
+      <div
+        className='flex items-center cursor-pointer'
+        onClick={() => onSelectAll(course.id, !isCourseFullySelected(course.id))}
+      >
         <Checkbox
           id={`course-${course.id}`}
           checked={isCourseFullySelected(course.id)}
@@ -49,12 +55,20 @@ export const CourseGridItem = ({
           data-state={isCourseSemiSelected(course.id) ? 'indeterminate' : undefined}
           onCheckedChange={(checked) => onSelectAll(course.id, checked === true)}
         />
-        <label htmlFor={`course-${course.id}`} className='ml-2 text-sm cursor-pointer'>
+        <label htmlFor={`course-${course.id}`} className='ml-2 text-sm'>
           Chọn tất cả
         </label>
       </div>
 
-      <Button variant='outline' size='sm' className='ml-auto' onClick={() => onCourseClick(course)}>
+      <Button
+        variant='outline'
+        size='sm'
+        className='ml-auto'
+        onClick={(e) => {
+          e.stopPropagation()
+          onCourseClick(course)
+        }}
+      >
         Xem chương
         <ChevronRight className='ml-1 h-4 w-4' />
       </Button>

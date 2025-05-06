@@ -152,16 +152,10 @@ export default function CustomCoursePage() {
       }
     })
 
-    // Avoid duplicates
-    const existingIds = new Set(chapters.map((c) => c.id))
-    const newChapters = formattedChapters.filter((c) => !existingIds.has(c.id))
-
-    // Update state if we have new chapters
-    if (newChapters.length) {
-      setCustomCourse({
-        chapters: [...chapters, ...newChapters]
-      })
-    }
+    // Update state with all selected chapters
+    setCustomCourse({
+      chapters: formattedChapters
+    })
   }
 
   const handleChaptersChange = (updatedChapters: Chapter[]) => {

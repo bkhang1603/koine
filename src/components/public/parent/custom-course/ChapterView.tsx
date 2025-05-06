@@ -73,9 +73,10 @@ export const ChapterView = ({
           <Card
             key={chapter.id}
             className={cn(
-              'border overflow-hidden transition-colors',
+              'border overflow-hidden transition-colors cursor-pointer',
               selectedChapterIds.has(chapter.id) ? 'bg-primary/5 border-primary/30' : 'hover:border-muted-foreground/30'
             )}
+            onClick={() => onToggleChapter(chapter.id)}
           >
             <CardContent className='p-0'>
               <div className='p-4 border-b bg-muted/10 flex items-center justify-between'>
@@ -89,6 +90,7 @@ export const ChapterView = ({
                 <Checkbox
                   checked={selectedChapterIds.has(chapter.id)}
                   onCheckedChange={() => onToggleChapter(chapter.id)}
+                  onClick={(e) => e.stopPropagation()}
                 />
               </div>
 
