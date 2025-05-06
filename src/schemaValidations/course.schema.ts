@@ -348,6 +348,7 @@ export const AllCoursesForCustomData = z.object({
   imageUrl: z.string(),
   description: z.string(),
   totalChapter: z.number(),
+  pricePerChapter: z.number(),
   chapters: z.array(
     z.object({
       id: z.string(),
