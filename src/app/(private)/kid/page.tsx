@@ -16,6 +16,7 @@ import { PlayerCard } from '@/components/private/kid/home/PlayerCard'
 import { AchievementSection } from '@/components/private/kid/home/AchievementSection'
 import { formatLevel } from '@/lib/utils'
 
+// eslint-disable-next-line no-unused-vars
 interface Course {
   id: string
   title: string

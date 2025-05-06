@@ -14,6 +14,7 @@ import { Clock, Medal } from 'lucide-react'
 import { Skeleton } from '@/components/ui/skeleton'
 import { translateLevel } from '@/lib/utils'
 
+// eslint-disable-next-line no-unused-vars
 interface Course {
   id: string
   title: string
@@ -30,6 +31,7 @@ interface Course {
   isVisible?: boolean
 }
 
+// eslint-disable-next-line no-unused-vars
 interface SuggestCourse {
   id: string
   title: string

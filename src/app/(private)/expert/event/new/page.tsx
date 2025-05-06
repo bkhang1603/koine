@@ -73,8 +73,11 @@ export default function CreateEventPage() {
   const [file, setFile] = useState<File | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const [hours, setHours] = useState(0)
-  const [minutes, setMinutes] = useState(0)
+
+  // Initialize with current date hour and minute
+  const now = new Date()
+  const [hours, setHours] = useState(now.getHours())
+  const [minutes, setMinutes] = useState(Math.floor(now.getMinutes() / 5) * 5) // Round to nearest 5 minutes
 
   const uploadMutation = useUploadImageMutation()
   const createEventMutation = useCreateEventMutation()
@@ -87,7 +90,11 @@ export default function CreateEventPage() {
       description: '',
       content: '',
       imageUrl: '',
-      startedAt: new Date(),
+      startedAt: (() => {
+        const defaultDate = new Date()
+        defaultDate.setHours(hours, minutes, 0, 0)
+        return defaultDate
+      })(),
       durations: '1'
     }
   })
@@ -120,6 +127,13 @@ export default function CreateEventPage() {
         }
       }
 
+      // Format date to ensure exact ISO string format (YYYY-MM-DDTHH:MM:SS)
+      const eventDate = new Date(data.startedAt)
+      // Ensure valid date before converting
+      if (isNaN(eventDate.getTime())) {
+        throw new Error('Thời gian bắt đầu không hợp lệ')
+      }
+
       // Create event
       await createEventMutation.mutateAsync({
         body: {
@@ -127,7 +141,7 @@ export default function CreateEventPage() {
           description: data.description,
           content: data.content,
           imageUrl: imageUrl || '',
-          startedAt: data.startedAt.toISOString(),
+          startedAt: eventDate.toISOString(),
           durations: Math.round(parseFloat(data.durations) * 3600) // Convert hours to seconds
         }
       })
@@ -277,7 +291,9 @@ export default function CreateEventPage() {
                                 selected={field.value}
                                 onSelect={(date) => {
                                   if (date) {
+                                    // Preserve current time when selecting a new date
                                     const newDate = new Date(date)
+                                    // Set the time components from the current values
                                     newDate.setHours(hours, minutes, 0, 0)
                                     field.onChange(newDate)
                                   }
@@ -300,8 +316,12 @@ export default function CreateEventPage() {
                                 initHours={hours}
                                 initMinutes={minutes}
                                 onTimeChange={(h, m) => {
+                                  // Update the date object with the new time values
                                   const newDate = new Date(field.value)
                                   newDate.setHours(h, m, 0, 0)
+                                  // Update hours and minutes state
+                                  setHours(h)
+                                  setMinutes(m)
                                   field.onChange(newDate)
                                 }}
                               />
