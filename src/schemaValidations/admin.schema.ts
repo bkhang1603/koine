@@ -1558,6 +1558,148 @@ export const getReasonRes = z.object({
   message: z.string()
 })
 
+// Combo
+export const getComboListRes = z.object({
+  statusCode: z.number(),
+  info: z.string(),
+  message: z.string(),
+  data: z.array(
+    z.object({
+      createdAt: z.string(),
+      updatedAt: z.string(),
+      id: z.string().uuid(),
+      creatorId: z.string().uuid(),
+      name: z.string(),
+      nameNoTone: z.string(),
+      slug: z.string(),
+      description: z.string(),
+      price: z.number(),
+      discount: z.number(),
+      allPrice: z.number(),
+      imageUrl: z.string().url().nullable(),
+      creator: z.object({
+        id: z.string().uuid(),
+        username: z.string()
+      }),
+      courseInfos: z.array(
+        z.object({
+          id: z.string().uuid(),
+          title: z.string(),
+          titleNoTone: z.string(),
+          slug: z.string(),
+          description: z.string(),
+          durations: z.number().int().nonnegative(),
+          imageUrl: z.string().url().nullable(),
+          imageBanner: z.string().url().nullable(),
+          price: z.number(),
+          discount: z.number(),
+          totalEnrollment: z.number().int().nonnegative(),
+          aveRating: z.number().nonnegative(),
+          categories: z.array(
+            z.object({
+              id: z.string().uuid(),
+              name: z.string()
+            })
+          )
+        })
+      ),
+      categories: z.array(
+        z.object({
+          id: z.string().uuid(),
+          name: z.string()
+        })
+      )
+    })
+  ),
+  pagination: z.object({
+    pageSize: z.number(),
+    totalItem: z.number(),
+    currentPage: z.number(),
+    maxPageSize: z.number(),
+    totalPage: z.number()
+  })
+})
+
+export const getComboDetailRes = z.object({
+  statusCode: z.number(),
+  info: z.string(),
+  message: z.string(),
+  data: z.object({
+    isDeleted: z.boolean(),
+    createdAt: z.string(),
+    updatedAt: z.string(),
+    id: z.string().uuid(),
+    creatorId: z.string().uuid(),
+    name: z.string(),
+    nameNoTone: z.string(),
+    slug: z.string(),
+    description: z.string(),
+    price: z.number(),
+    discount: z.number(),
+    allPrice: z.number(),
+    imageUrl: z.string().url().nullable(),
+    courseInfos: z.array(
+      z.object({
+        id: z.string().uuid(),
+        title: z.string(),
+        titleNoTone: z.string(),
+        slug: z.string(),
+        description: z.string(),
+        durations: z.number().int().nonnegative(),
+        imageUrl: z.string().url().nullable(),
+        imageBanner: z.string().url().nullable(),
+        price: z.number(),
+        discount: z.number(),
+        totalEnrollment: z.number().int().nonnegative(),
+        aveRating: z.number().nonnegative(),
+        categories: z.array(
+          z.object({
+            id: z.string().uuid(),
+            name: z.string()
+          })
+        )
+      })
+    ),
+    categories: z.array(
+      z.object({
+        id: z.string().uuid(),
+        name: z.string()
+      })
+    )
+  })
+})
+
+export const createComboBodySchema = z.object({
+  name: z.string().min(1, 'Tên combo là bắt buộc'),
+  description: z.string().min(1, 'Mô tả combo là bắt buộc'),
+  price: z.number().min(0, 'Giá combo phải lớn hơn hoặc bằng 0'),
+  imageUrl: z.string().min(1, 'Hình ảnh combo là bắt buộc')
+})
+
+export const updateComboBodySchema = z.object({
+  name: z.string().min(1, 'Tên combo là bắt buộc'),
+  description: z.string().min(1, 'Mô tả combo là bắt buộc'),
+  price: z.number().min(0, 'Giá combo phải lớn hơn hoặc bằng 0')
+})
+
+export const createComboBodyRes = z.object({
+  statusCode: z.number(),
+  info: z.string(),
+  message: z.string()
+})
+
+export const updateComboBodyRes = z.object({
+  statusCode: z.number(),
+  info: z.string(),
+  message: z.string()
+})
+
+export const deleteComboRes = z.object({
+  statusCode: z.number(),
+  info: z.string(),
+  message: z.string()
+})
+
 // Courses
 export type GetCoursesListAdminResType = z.infer<typeof getCoursesListAdminRes>
 
@@ -1669,3 +1811,18 @@ export type RemoveQuestionFromChapterBodyType = z.TypeOf<typeof removeQuestionFr
 export type RemoveQuestionFromChapterResType = z.TypeOf<typeof removeQuestionFromChapterRes>
 
 export type GetReasonResType = z.TypeOf<typeof getReasonRes>
+
+// Combo
+export type GetComboListResType = z.TypeOf<typeof getComboListRes>
+
+export type GetComboDetailResType = z.TypeOf<typeof getComboDetailRes>
+
+export type CreateComboBodyType = z.TypeOf<typeof createComboBodySchema>
+
+export type UpdateComboBodyType = z.TypeOf<typeof updateComboBodySchema>
+
+export type CreateComboBodyResType = z.TypeOf<typeof createComboBodyRes>
+
+export type UpdateComboBodyResType = z.TypeOf<typeof updateComboBodyRes>
+
+export type DeleteComboResType = z.TypeOf<typeof deleteComboRes>
