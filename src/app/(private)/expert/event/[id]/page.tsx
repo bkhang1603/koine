@@ -395,7 +395,7 @@ export default function EventDetailPage(props: { params: Promise<{ id: string }>
                   <div className='flex items-center justify-between p-3 bg-muted/50 rounded-lg'>
                     <div className='flex items-center gap-2'>
                       <div className='w-2 h-2 rounded-full bg-muted-foreground' />
-                      <span className='font-medium'>Chưa có phòng</span>
+                      <span className='font-medium'>Chưa tới giờ tạo phòng</span>
                     </div>
                     <Badge variant='outline'>Chờ tạo</Badge>
                   </div>
