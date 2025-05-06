@@ -119,7 +119,8 @@ function LearnPage(props: { params: Promise<{ id: string }> }) {
 
     function getNotifications() {
       toast({
-        description: 'Phiên học của bạn đã bị chấm dứt do có thiết bị khác đăng nhập'
+        description: 'Phiên học của bạn đã bị chấm dứt do có thiết bị khác đăng nhập',
+        variant: 'destructive'
       })
       router.push(configRoute.setting.myCourse)
     }
@@ -127,7 +128,8 @@ function LearnPage(props: { params: Promise<{ id: string }> }) {
     function handleLearningTimeout(data: any) {
       console.log(data)
       toast({
-        description: 'Phiên học của bạn đã hết hạn do không hoạt động'
+        description: 'Phiên học của bạn đã hết hạn do không hoạt động',
+        variant: 'destructive'
       })
       router.push(configRoute.setting.myCourse)
     }

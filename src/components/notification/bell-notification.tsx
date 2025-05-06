@@ -54,12 +54,18 @@ function BellNotification() {
       console.log('get notifications')
       refetch()
       refetchCart()
+
+      const isEventPage = pathname?.startsWith('/event')
+      if (isEventPage) {
+        router.refresh()
+      }
     }
 
     function getEventStarted() {
       // Chỉ refresh khi đang ở màn hình event hoặc event detail
       const isEventPage = pathname?.startsWith('/event')
       if (isEventPage) {
+        refetch()
         router.refresh()
       }
     }
