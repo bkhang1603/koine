@@ -10,7 +10,7 @@ import { useActiveCourseMutation, useGetCourseProgressQuery } from '@/queries/us
 import { BookOpen, Clock, CheckCircle2, LockKeyhole, ChevronRight, Home } from 'lucide-react'
 import { Skeleton } from '@/components/ui/skeleton'
 import Link from 'next/link'
-import { cn, handleErrorApi } from '@/lib/utils'
+import { cn, formatCourseStatusForKid, handleErrorApi } from '@/lib/utils'
 
 function CourseDetailPage(props: { params: Promise<{ courseId: string }> }) {
   const params = use(props.params)
@@ -213,7 +213,9 @@ function CourseDetailPage(props: { params: Promise<{ courseId: string }> }) {
           <div className='absolute inset-0 bg-gradient-to-t from-black/60 to-transparent' />
           <div className='absolute bottom-6 left-6 text-white'>
             <div className='flex items-center gap-2 mb-2'>
-              <span className='bg-white/20 px-3 py-1 rounded-full text-sm'>{course.status}</span>
+              <span className='bg-white/20 px-3 py-1 rounded-full text-sm'>
+                {formatCourseStatusForKid(course.status)}
+              </span>
             </div>
             <h1 className='text-3xl font-bold mb-2'>{course.title}</h1>
             <p className='text-lg opacity-90'>{course.description}</p>

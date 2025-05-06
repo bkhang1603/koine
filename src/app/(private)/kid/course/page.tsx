@@ -12,7 +12,7 @@ import images from '@/assets/images'
 import { motion } from 'framer-motion'
 import { Clock, Medal } from 'lucide-react'
 import { Skeleton } from '@/components/ui/skeleton'
-import { translateLevel } from '@/lib/utils'
+import { formatLevel, translateLevel } from '@/lib/utils'
 
 // eslint-disable-next-line no-unused-vars
 interface Course {
@@ -306,7 +306,7 @@ function CoursePage() {
                                     </span>
                                   ))}
                                   <span className='px-2 py-1 bg-amber-50 text-amber-600 text-xs rounded-lg font-medium'>
-                                    {course.level}
+                                    {formatLevel(course.level || 'BEGINNER')}
                                   </span>
                                 </div>
 

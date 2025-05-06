@@ -139,7 +139,7 @@ const KidAdventureDashboard = () => {
                                   </span>
                                 ))}
                                 <span className='px-2 py-1 bg-amber-50 text-amber-600 text-xs rounded-lg font-medium'>
-                                  {course.level}
+                                  {formatLevel(course.level || 'BEGINNER')}
                                 </span>
                               </div>
 

@@ -181,7 +181,7 @@ export default function OrderDetailPage(props: { params: Promise<{ id: string }>
           </div>
           <div className='flex items-center gap-2'>
             <Tag className='h-4 w-4' />
-            {order.totalAmount.toLocaleString()}đ
+            {(order.totalAmount + (hasOnlyCourses ? 0 : order.deliAmount)).toLocaleString()}đ
           </div>
         </div>
       </div>

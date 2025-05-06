@@ -570,7 +570,7 @@ export default function Checkout() {
                     ) : pickAddress ? (
                       <div>
                         <div className='flex items-center gap-2'>
-                          <span className='font-medium'>{pickAddress.name}</span>
+                          <span className='font-medium'>{pickAddress.name.split(' ')[0]}</span>
                           <span className='text-muted-foreground'>|</span>
                           <span>{pickAddress.phone}</span>
                           {pickAddress.isDefault && (

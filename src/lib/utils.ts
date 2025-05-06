@@ -722,3 +722,14 @@ export const formatDeliveryMethod = (method: string): string => {
       return method
   }
 }
+
+export const formatCourseStatusForKid = (status: string) => {
+  switch (status) {
+    case 'PENDING':
+      return 'Chưa bắt đầu'
+    case 'FINISH':
+      return 'Đã hoàn thành'
+    default:
+      return status
+  }
+}
