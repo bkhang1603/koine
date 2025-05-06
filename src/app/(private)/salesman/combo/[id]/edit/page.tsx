@@ -48,7 +48,8 @@ export default function ComboEditPage(props: { params: Promise<{ id: string }> }
               defaultValues={{
                 name: combo.name,
                 description: combo.description,
-                price: combo.price
+                price: combo.price,
+                imageUrl: combo.imageUrl || ''
               }}
               baseUrl={configRoute.salesman.combo}
             />

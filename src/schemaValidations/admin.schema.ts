@@ -1679,7 +1679,8 @@ export const createComboBodySchema = z.object({
 export const updateComboBodySchema = z.object({
   name: z.string().min(1, 'Tên combo là bắt buộc'),
   description: z.string().min(1, 'Mô tả combo là bắt buộc'),
-  price: z.number().min(0, 'Giá combo phải lớn hơn hoặc bằng 0')
+  price: z.number().min(0, 'Giá combo phải lớn hơn hoặc bằng 0'),
+  imageUrl: z.string().min(1, 'Hình ảnh combo là bắt buộc')
 })
 
 export const createComboBodyRes = z.object({
