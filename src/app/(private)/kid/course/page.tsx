@@ -7,12 +7,42 @@ import Link from 'next/link'
 import { Card } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Progress } from '@/components/ui/progress'
-import { BookOpen, Target, Brain, Gamepad2 } from 'lucide-react'
+import { BookOpen, Target, Brain, Gamepad2, EyeOff } from 'lucide-react'
 import images from '@/assets/images'
 import { motion } from 'framer-motion'
 import { Clock, Medal } from 'lucide-react'
 import { Skeleton } from '@/components/ui/skeleton'
 import { translateLevel } from '@/lib/utils'
+
+interface Course {
+  id: string
+  title: string
+  description: string
+  imageUrl: string
+  level: string
+  categories: {
+    id: string
+    name: string
+  }[]
+  totalLesson: number
+  totalLessonFinished: number
+  completionRate: number
+  isVisible?: boolean
+}
+
+interface SuggestCourse {
+  id: string
+  title: string
+  description: string
+  imageUrl: string
+  level: string
+  categories: {
+    id: string
+    name: string
+  }[]
+  totalLesson: number
+  isVisible?: boolean
+}
 
 // Thêm component Overview
 const CourseOverview = ({ courses }: { courses: any[] }) => {
@@ -130,7 +160,7 @@ const CourseCardSkeleton = () => (
 )
 
 function CoursePage() {
-  const { data: courseData, isLoading: coursesLoading } = useCourseByAccount({ page_size: 10, page_index: 1 })
+  const { data: courseData, isLoading: coursesLoading } = useCourseByAccount({ page_size: 100, page_index: 1 })
   const courses = courseData?.payload.data ?? []
 
   const { data: suggestCoursesData, isLoading: suggestionsLoading } = useSuggestCoursesFree()
@@ -254,7 +284,17 @@ function CoursePage() {
               <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'>
                 {courses.map((course) => (
                   <Link href={`/kid/course/${course.id}?isEnrolled=true`} key={course.id}>
-                    <Card className='border-0 overflow-hidden bg-white/80 backdrop-blur-sm hover:bg-white transition-all shadow-md hover:shadow-lg group'>
+                    <Card
+                      className={`border-0 overflow-hidden bg-white/80 backdrop-blur-sm shadow-md relative ${!course.isVisible ? 'opacity-60' : 'hover:bg-white hover:shadow-lg group'}`}
+                    >
+                      {!course.isVisible && (
+                        <div className='absolute inset-0 bg-slate-100/50 backdrop-blur-[2px] z-10 flex items-center justify-center'>
+                          <div className='bg-white/90 px-4 py-2 rounded-full shadow-md flex items-center gap-2'>
+                            <EyeOff className='w-4 h-4 text-slate-500' />
+                            <span className='text-sm font-medium text-slate-600'>Chưa có quyền truy cập</span>
+                          </div>
+                        </div>
+                      )}
                       <div className='relative p-5'>
                         {/* Quest decorator */}
                         <div className='absolute top-0 left-5 w-0.5 h-full bg-amber-200'></div>
@@ -275,6 +315,12 @@ function CoursePage() {
                                 <span className='px-2 py-1 bg-amber-50 text-amber-600 text-xs rounded-lg font-medium'>
                                   {course.level}
                                 </span>
+                                {!course.isVisible && (
+                                  <span className='px-2 py-1 bg-slate-100 text-slate-600 text-xs rounded-lg font-medium flex items-center gap-1'>
+                                    <EyeOff className='w-3 h-3' />
+                                    Chưa có quyền truy cập
+                                  </span>
+                                )}
                               </div>
 
                               <h3 className='text-xl font-bold text-slate-700 group-hover:text-amber-500 transition-colors mb-2 line-clamp-1'>

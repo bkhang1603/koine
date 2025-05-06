@@ -35,7 +35,8 @@ export const courseByAccount = z.object({
   author: z.string(),
   imageUrl: z.string(),
   createdAtFormatted: z.string(),
-  updatedAtFormatted: z.string()
+  updatedAtFormatted: z.string(),
+  isVisible: z.boolean().optional()
 })
 
 export const courseByAccountRes = z.object({
