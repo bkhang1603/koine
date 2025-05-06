@@ -27,6 +27,19 @@ import { Breadcrumb } from '@/components/public/parent/setting/Breadcrumb'
 
 type Chapter = CoursesResType['data'][0]['chapters'][0]
 
+// Extend Chapter type to include pricePerChapter
+type ChapterWithPrice = {
+  id: string
+  title?: string
+  lessons: any[]
+  description?: string
+  durations?: number
+  durationsDisplay?: string
+  sequence?: number
+  pricePerChapter?: number
+  [key: string]: any
+}
+
 // Thêm schema validation
 const customCourseSchema = z.object({
   customTitle: z.string().min(1, 'Vui lòng nhập tên khóa học'),
@@ -58,7 +71,7 @@ export default function CustomCoursePage() {
   })
 
   // Get Zustand state with guaranteed initialization
-  const chapters = useAppStore((state) => state.customCourse.chapters || [])
+  const chapters: ChapterWithPrice[] = useAppStore((state) => state.customCourse.chapters || [])
   const setCustomCourse = useAppStore((state) => state.setCustomCourse)
 
   // Memoize courses to prevent unnecessary recalculations
@@ -68,6 +81,12 @@ export default function CustomCoursePage() {
   const totalChapters = chapters.length
   const totalLessons = useMemo(
     () => chapters.reduce((sum, chapter) => sum + (chapter.lessons?.length || 0), 0),
+    [chapters]
+  )
+
+  // Calculate total price
+  const totalPrice = useMemo(
+    () => chapters.reduce((sum, chapter) => sum + (chapter.pricePerChapter || 0), 0),
     [chapters]
   )
 
@@ -119,14 +138,19 @@ export default function CustomCoursePage() {
   const handleSelectChapters = (selectedChapters: any[]) => {
     if (!selectedChapters.length) return
 
-    // Normalize incoming chapters
-    const formattedChapters = selectedChapters.map((chapter) => ({
-      ...chapter,
-      description: chapter.description || '',
-      durations: chapter.durations || 0,
-      durationsDisplay: chapter.durationsDisplay || '0',
-      sequence: chapter.sequence || 0
-    }))
+    // Attach pricePerChapter from parent course
+    const formattedChapters = selectedChapters.map((chapter) => {
+      // Find parent course
+      const parentCourse = courses.find((course) => course.chapters.some((c: any) => c.id === chapter.id))
+      return {
+        ...chapter,
+        pricePerChapter: parentCourse?.pricePerChapter || 0,
+        description: chapter.description || '',
+        durations: chapter.durations || 0,
+        durationsDisplay: chapter.durationsDisplay || '0',
+        sequence: chapter.sequence || 0
+      }
+    })
 
     // Avoid duplicates
     const existingIds = new Set(chapters.map((c) => c.id))
@@ -372,16 +396,23 @@ export default function CustomCoursePage() {
             </div>
 
             <div>
-              <h3 className='font-medium mb-3'>Thứ tự các chương</h3>
+              <h3 className='font-medium mb-3'>Thứ tự các chương & Giá</h3>
               <ScrollArea className='h-[200px]'>
                 <div className='space-y-2 text-sm pr-4'>
                   {chapters.map((chapter, index) => (
-                    <div key={chapter.id} className='flex gap-2'>
-                      <span className='text-muted-foreground min-w-[20px]'>{index + 1}.</span>
-                      <div>
-                        <div>{chapter.title}</div>
-                        <div className='text-muted-foreground text-xs'>{chapter.lessons?.length || 0} bài học</div>
+                    <div key={chapter.id} className='flex gap-2 items-center justify-between'>
+                      <div className='flex gap-2'>
+                        <span className='text-muted-foreground min-w-[20px]'>{index + 1}.</span>
+                        <div>
+                          <div>{chapter.title}</div>
+                          <div className='text-muted-foreground text-xs'>{chapter.lessons?.length || 0} bài học</div>
+                        </div>
                       </div>
+                      <span className='text-primary font-semibold whitespace-nowrap'>
+                        {chapter.pricePerChapter
+                          ? chapter.pricePerChapter.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })
+                          : '0₫'}
+                      </span>
                     </div>
                   ))}
                   {chapters.length === 0 && (
@@ -389,6 +420,12 @@ export default function CustomCoursePage() {
                   )}
                 </div>
               </ScrollArea>
+              <div className='flex justify-between items-center mt-4 pt-2 border-t'>
+                <span className='font-medium'>Tổng tiền</span>
+                <span className='text-lg text-primary font-bold'>
+                  {totalPrice.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}
+                </span>
+              </div>
             </div>
 
             <Button
