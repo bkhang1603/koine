@@ -160,7 +160,7 @@ function ContentCreatorCourse(props: { searchParams: SearchParams }) {
               onDelete={() => handleDelete(course.id)}
               onUpdateStatusCourse={() => handleUpdateStatus(course.id)}
               updateStatusLabel='Yêu cầu xét duyệt'
-              isUpdateStatusEnabled={course.isDraft}
+              isUpdateStatusEnabled={course.isDraft || course.status === 'REJECTED'}
             />
           </div>
         )
