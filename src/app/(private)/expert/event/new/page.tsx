@@ -134,6 +134,9 @@ export default function CreateEventPage() {
         throw new Error('Thời gian bắt đầu không hợp lệ')
       }
 
+      // Add 7 hours to the event start time to account for timezone difference
+      const adjustedEventDate = new Date(eventDate.getTime() + 7 * 60 * 60 * 1000)
+
       // Create event
       await createEventMutation.mutateAsync({
         body: {
@@ -141,7 +144,7 @@ export default function CreateEventPage() {
           description: data.description,
           content: data.content,
           imageUrl: imageUrl || '',
-          startedAt: eventDate.toISOString(),
+          startedAt: adjustedEventDate.toISOString(),
           durations: Math.round(parseFloat(data.durations) * 3600) // Convert hours to seconds
         }
       })
