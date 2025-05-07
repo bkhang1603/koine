@@ -216,6 +216,7 @@ export const useCreateOrderNeedReviewMutation = () => {
     mutationFn: accountApiRequest.createOrderNeedReview,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['list-order-need-review'] })
+      queryClient.invalidateQueries({ queryKey: ['my-orders-reviews'] })
     }
   })
 }
@@ -230,7 +231,7 @@ export const useGetChildProfileQuery = ({ enabled }: { enabled?: boolean }) => {
 
 export const useGetMyOrdersReviews = () => {
   return useQuery({
-    queryKey: ['list-order-need-review'],
+    queryKey: ['my-orders-reviews'],
     queryFn: accountApiRequest.getMyOrdersReviews
   })
 }

@@ -122,7 +122,7 @@ export default function MyCoursesPage() {
 
           {/* Tabs & Filters */}
           <Tabs value={activeTab} onValueChange={setActiveTab} className='w-full'>
-            <div className='flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6'>
+            <div className='flex flex-col items-start xl:flex-row xl:items-center justify-between gap-4 mb-6'>
               <TabsList className='bg-gray-100/80'>
                 {courseTabs.map((tab) => (
                   <TabsTrigger key={tab.value} value={tab.value} className='data-[state=active]:bg-white'>

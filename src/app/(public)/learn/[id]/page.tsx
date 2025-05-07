@@ -117,23 +117,6 @@ function LearnPage(props: { params: Promise<{ id: string }> }) {
       socket.emit('stopLearning')
     }
 
-    function getNotifications() {
-      toast({
-        description: 'Phiên học của bạn đã bị chấm dứt do có thiết bị khác đăng nhập',
-        variant: 'destructive'
-      })
-      router.push(configRoute.setting.myCourse)
-    }
-
-    function handleLearningTimeout(data: any) {
-      console.log(data)
-      toast({
-        description: 'Phiên học của bạn đã hết hạn do không hoạt động',
-        variant: 'destructive'
-      })
-      router.push(configRoute.setting.myCourse)
-    }
-
     function login() {
       socket.emit(
         'login',
@@ -142,7 +125,11 @@ function LearnPage(props: { params: Promise<{ id: string }> }) {
         },
         (response: any) => {
           if (response?.statusCode === 200) {
-            socket.emit('startLearning')
+            socket.emit('startLearning', (response: any) => {
+              if (response?.statusCode === 200) {
+                console.log('startLearning', response)
+              }
+            })
           }
         }
       )
@@ -161,6 +148,22 @@ function LearnPage(props: { params: Promise<{ id: string }> }) {
       },
       1 * 60 * 1000
     ) // 1 minutes
+
+    function getNotifications() {
+      toast({
+        description: 'Phiên học của bạn đã bị chấm dứt do có thiết bị khác đăng nhập',
+        variant: 'destructive'
+      })
+      router.push(configRoute.setting.myCourse)
+    }
+
+    function handleLearningTimeout() {
+      toast({
+        description: 'Phiên học của bạn đã hết hạn do không hoạt động',
+        variant: 'destructive'
+      })
+      router.push(configRoute.setting.myCourse)
+    }
 
     socket.on('connect', onConnect)
     socket.on('login', login)
